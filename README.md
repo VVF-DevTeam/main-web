@@ -1,6 +1,4 @@
-# A Wix Events and Wix eCommerce Next.js Music Tour Template
-
-![Template showcase](docs/media/template-showcase.gif)
+# VFF Web Template
 
 This template is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It uses [Wix Headless](https://dev.wix.com/api/sdk/about-wix-headless/overview) to leverage the Wix Events and Wix Stores business solutions for managing event ticketing and a store.
 
