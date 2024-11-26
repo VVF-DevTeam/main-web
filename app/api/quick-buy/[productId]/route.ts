@@ -6,12 +6,9 @@ import { STORES_APP_ID } from '@app/constants';
 
 export async function GET(
   request: NextRequest,
-  {
-    params: { productId },
-  }: {
-    params: { productId: string };
-  }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
+  const productId = (await params).productId;
   const requestUrl = getRequestUrl(request);
   const baseUrl = new URL('/', requestUrl).toString();
   const { searchParams } = new URL(requestUrl);
