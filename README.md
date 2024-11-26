@@ -19,6 +19,7 @@ Run the development server:
 1. Run either:
 
    ```sh
+   npm install --global yarn
    yarn dev
    ```
 
