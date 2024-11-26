@@ -13,7 +13,7 @@ import { WIX_REFRESH_TOKEN } from '@app/constants';
 export const getWixClient = async () => {
   let refreshToken;
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     refreshToken = JSON.parse(
       cookieStore.get(WIX_REFRESH_TOKEN)?.value || '{}'
     );
