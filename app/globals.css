@@ -2,109 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-display: block;
-  font-family: Avenir-LT-W01_35-Light1475496;
-  src: url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/edefe737-dc78-4aa3-ad03-3c6f908330ed.eot?#iefix);
-  src: url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/edefe737-dc78-4aa3-ad03-3c6f908330ed.eot?#iefix) format('eot'),
-    url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/0078f486-8e52-42c0-ad81-3c8d3d43f48e.woff2) format('woff2'),
-    url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/908c4810-64db-4b46-bb8e-823eb41f68c0.woff) format('woff'),
-    url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/4577388c-510f-4366-addb-8b663bcc762a.ttf) format('truetype'),
-    url(//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/b0268c31-e450-4159-bfea-e0d20e2b5c0c.svg#b0268c31-e450-4159-bfea-e0d20e2b5c0c) format('svg');
-}
-
-@font-face {
-  font-family: 'Helvetica-W01-Light';
-  src: url('//static.parastorage.com/services/third-party/fonts/user-site-fonts/fonts/03805817-4611-4dbc-8c65-0f73031c3973.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Poppins-SemiBold';
-  font-weight: 700;
-  src: url('//fonts.gstatic.com/s/poppins/v5/aDjpMND83pDErGXlVEr-Sfk_vArhqVIZ0nv9q090hN8.woff2') format('woff2');
-}
-
-@layer components {
-  .btn-main {
-    @apply text-white;
-    @apply text-sm;
-    @apply font-medium;
-    @apply bg-purple-600;
-    @apply hover:bg-purple-800;
-    @apply focus:outline-none;
-    @apply focus:ring-4;
-    @apply focus:ring-gray-300;
-    @apply rounded-none;
-    @apply px-5;
-    @apply py-2;
-  }
-
-  .btn-main[disabled] {
-    @apply hover:text-white;
-    @apply bg-gray-400;
-    @apply border-gray-400;
-    @apply hover:bg-gray-400;
-  }
-
-  .font-default {
-    font-family: 'Poppins-SemiBold', sans-serif;
-  }
-
-  .font-helvetica {
-    font-family: Helvetica-W01-Light, sans-serif;
-  }
-
-  h1,
-  .title {
-    @apply font-default;
-    @apply text-2xl;
-  }
-
-  h2 {
-    @apply font-default;
-    @apply text-base;
-    @apply sm:text-xl;
-  }
-
-  .h-header {
-    @apply h-[60px];
-  }
-
-  .header-line {
-    @apply w-9;
-    @apply h-[2px];
-    @apply bg-black;
-    @apply mb-2;
-  }
-}
-
-html,
 body {
-  padding: 0;
-  margin: 0;
-  font: normal normal normal 18px/1.4em avenir-lt-w01_35-light1475496,
-    sans-serif;
-  @apply text-black;
-  @apply font-helvetica;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
 
-* {
-  box-sizing: border-box;
-}
-
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type='number'] {
-  -moz-appearance: textfield;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

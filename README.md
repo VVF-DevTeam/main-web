@@ -1,68 +1,36 @@
-# VVF Web Template
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-This template is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It uses [Wix Headless](https://dev.wix.com/api/sdk/about-wix-headless/overview) to leverage the Wix Events and Wix Stores business solutions for managing event ticketing and a store.
+## Getting Started
 
-## Local Development
+First, run the development server:
 
-Prerequisites:
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-1. [Create a Wix Headless project](https://dev.wix.com/docs/go-headless/getting-started/setup/general-setup/create-a-project)
-2. [Add the Stores and Events apps to your project](https://dev.wix.com/docs/go-headless/getting-started/setup/general-setup/add-apps-to-a-project)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Set up environment variables to consume Wix Headless APIs:
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. In the template's root folder, create .env.local file
-2. In the new **.env.local** file, paste the OAuth app client ID after `NEXT_PUBLIC_WIX_CLIENT_ID=` (please contact Hung to get the Oauth).
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Run the development server:
+## Learn More
 
-1. Run either:
+To learn more about Next.js, take a look at the following resources:
 
-   ```sh
-   npm install --global yarn
-   yarn dev
-   ```
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-   or
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-   ```sh
-   npm i
-   npm run dev
-   ```
+## Deploy on Vercel
 
-2. Open http://localhost:3000 in your browser to see the template home page.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Edit the template:
-
-- Start editing the homepage by modifying **app/page.tsx**. The page auto-updates as you edit the file.
-- Edit any other page using the pattern **app/page.tsx**. For more information, see [Defining Routes](https://beta.nextjs.org/docs/routing/defining-routes) in the Next.js documentation.
-
-# Deployment
-
-You can deploy this repository using any platform which supports Next.js Version 13 and [App Router](https://nextjs.org/docs/app).
-
-The repository requires a single environment variable: `NEXT_PUBLIC_WIX_CLIENT_ID`, which should contain a client ID authorizing access to a Wix project's data.
-
-# Learn More
-
-To learn how to customize the template and add more functionality using Wix APIs, see the [Wix JavaScript SDK reference](https://dev.wix.com/api/sdk).
-
-This template is written in [Next.js](https://nextjs.org/docs) 13 using the [Next.js App Router](https://nextjs.org/docs/app).
-
-To learn more about Next.js, see:
-
-- [Next.js documentation](https://nextjs.org/docs): Learn about Next.js features and APIs.
-- [Learn Next.js](https://nextjs.org/learn): An interactive Next.js tutorial.
-
-Additionally, this template uses the following libraries and features:
-
-- [React Server Components](https://nextjs.org/docs/advanced-features/react-18/server-components)
-- [TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
-- [TanStack Query v4](https://tanstack.com/query/latest)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Flowbite](https://flowbite.com/)
-- [Wix client SDK](https://dev.wix.com/api/sdk/introduction)
-
-# Next.js and Wix Integration Guide
-
-See the comprehensive [integration guide](./docs/integration-guide.md) for step-by-step instructions on how to configure Wix as your headless Booking solution using Next.js on Vercel.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
