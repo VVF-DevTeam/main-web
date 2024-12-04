@@ -4,33 +4,46 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Run either:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```sh
+   npm install --global yarn
+   yarn dev
+   ```
+
+   or
+
+   ```sh
+   npm i
+   npm run dev
+   ```
+
+2. Open http://localhost:3000 in your browser to see the template home page.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+# Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn how to customize the template and add more functionality using Wix APIs, see the [Wix JavaScript SDK reference](https://dev.wix.com/api/sdk).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This template is written in [Next.js](https://nextjs.org/docs) 13 using the [Next.js App Router](https://nextjs.org/docs/app).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To learn more about Next.js, see:
 
-## Deploy on Vercel
+- [Next.js documentation](https://nextjs.org/docs): Learn about Next.js features and APIs.
+- [Learn Next.js](https://nextjs.org/learn): An interactive Next.js tutorial.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Additionally, this template uses the following libraries and features:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [React Server Components](https://nextjs.org/docs/advanced-features/react-18/server-components)
+- [TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
+- [TanStack Query v4](https://tanstack.com/query/latest)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Flowbite](https://flowbite.com/)
+- [Wix client SDK](https://dev.wix.com/api/sdk/introduction)
+
+# Next.js and Wix Integration Guide
+
+See the comprehensive [integration guide](./docs/integration-guide.md) for step-by-step instructions on how to configure Wix as your headless Booking solution using Next.js on Vercel.
