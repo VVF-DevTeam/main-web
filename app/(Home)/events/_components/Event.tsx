@@ -12,9 +12,15 @@ interface EventProps {
 const Event = ({ day, location, thumbnail }: EventProps) => {
   return (
     <div className="py-6">
-      <div className="w-full h-full flex flex-col gap-y-4 flex-start md:flex-row md:justify-between text-white items-center">
-        <div className="flex gap-x-6 lg:gap-x-8 text-xl lg:text-2xl font-light items-center">
-          <Image src={thumbnail} alt="Event Thumbnail" width={140} height={140} className="rounded-sm object-cover"/>
+      <div className="w-full h-full flex flex-col gap-y-4 flex-start md:flex-row md:justify-between text-white md:items-center">
+        <div className="flex gap-x-8 text-xl lg:text-2xl font-light justify-center md:justify-normal items-center">
+          <Image
+            src={thumbnail}
+            alt="Event Thumbnail"
+            width={140}
+            height={140}
+            className="rounded-sm object-cover"
+          />
           <span>{day}</span>
           <span>{location}</span>
         </div>
