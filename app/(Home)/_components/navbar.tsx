@@ -1,7 +1,7 @@
 import React from "react";
 import MobileSidebar from "./mobileSidebar";
 import NavLinks from "./navLinks";
-import CompanyLogo from "@/lib/companyLogo";
+import CompanyLogo from "@/app/components/CustomIcon";
 const Navbar = () => {
   return (
     <nav className="w-full h-[110px] bg-[#EFB9A2]/20 p-6 flex items-center">
