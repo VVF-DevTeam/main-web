@@ -1,10 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project to create a web application template for Viet Vibe Foundation (VVF) non-profit organization.
 
 ## Getting Started
 
-First, run the development server:
-
-1. Run either:
+1. Run the development server:
 
    ```sh
    npm install --global yarn
@@ -18,16 +16,21 @@ First, run the development server:
    npm run dev
    ```
 
-2. Open http://localhost:3000 in your browser to see the template home page.
+2. Local Development: 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   Open http://localhost:3000 in your browser to see the template home page. You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+3. Deployment:
+
+   This project uses AWS Amplify and Vercel to host the production and dev branches:
+   - Amplify: https://dev.d2stxy8cy8jezo.amplifyapp.com/events
+   - Vercel: https://main-web-drab.vercel.app/
+  
+   In addition, it is integrated with Vercel bot to build every Pull Request: ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
 
 # Learn More
-
-To learn how to customize the template and add more functionality using Wix APIs, see the [Wix JavaScript SDK reference](https://dev.wix.com/api/sdk).
-
 This template is written in [Next.js](https://nextjs.org/docs) 13 using the [Next.js App Router](https://nextjs.org/docs/app).
 
 To learn more about Next.js, see:
@@ -41,7 +44,3 @@ Additionally, this template uses the following libraries and features:
 - [TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
 - [TanStack Query v4](https://tanstack.com/query/latest)
 - [Tailwind CSS](https://tailwindcss.com/)
-
-# Next.js and Wix Integration Guide
-
-See the comprehensive [integration guide](./docs/integration-guide.md) for step-by-step instructions on how to configure Wix as your headless Booking solution using Next.js on Vercel.
