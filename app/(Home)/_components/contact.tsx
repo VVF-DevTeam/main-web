@@ -1,5 +1,5 @@
 import React from "react";
-import CompanyLogo from "@/lib/companyLogo";
+import CompanyLogo from "@/app/components/CustomIcon";
 import { Contact2 } from "lucide-react";
 const Contact = () => {
   return (
