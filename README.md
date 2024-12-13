@@ -28,7 +28,9 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
    - Amplify: https://dev.d2stxy8cy8jezo.amplifyapp.com/events
    - Vercel: https://main-web-drab.vercel.app/
   
-   In addition, the branch is integrated with Vercel bot to build every PR: ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
+   In addition, the branch is integrated with Vercel and Amplify bot to build every PR's preview automatically: 
+   ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
+   ![image](https://github.com/user-attachments/assets/804a3bb8-16bb-4702-9840-da15c53941fc)
 
 # Learn More
 This template is written in [Next.js](https://nextjs.org/docs) 13 using the [Next.js App Router](https://nextjs.org/docs/app).
