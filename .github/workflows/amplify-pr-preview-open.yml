@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    permissions: write-all
     environment: Amplify-PR-Preview
     runs-on: ubuntu-latest
     steps:
