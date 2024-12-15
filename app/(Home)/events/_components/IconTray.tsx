@@ -1,15 +1,15 @@
-import React from "react";
-import CustomIcon from "@/app/components/CustomIcon";
-import Link from "next/link";
+import React from 'react'
+import CustomIcon from '@/app/components/CustomIcon'
+import Link from 'next/link'
 
 interface IconTrayProps {
   iconList: {
-    id: string;
-    url: string;
-    name: string;
-    icon: string;
-  }[];
-  isLink?: boolean;
+    id: string
+    url: string
+    name: string
+    icon: string
+  }[]
+  isLink?: boolean
 }
 
 const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
@@ -21,7 +21,7 @@ const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
             <Link
               href={icon.url}
               key={icon.id}
-              className="hover:text-[#EFB9A2] hover:scale-110 hover:shadow-md transition-all"
+              className="transition-all hover:scale-110 hover:text-[#EFB9A2] hover:shadow-md"
             >
               <CustomIcon src={icon.icon} height={30} width={30} />
             </Link>
@@ -35,7 +35,7 @@ const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default IconTray;
+export default IconTray
