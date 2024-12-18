@@ -5,14 +5,16 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 1. Run the development server:
 
    ```sh
+   (Preferred method)
    npm install --global yarn
+   yarn install --immutable
    yarn dev
-   ```
+   ``` 
 
    or
 
    ```sh
-   npm i
+   npm ci
    npm run dev
    ```
 
@@ -20,9 +22,15 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
    Open http://localhost:3000 in your browser to see the template home page. You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-   This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   *__Some important tips:__*
+      - If you added/modified **any** packages in package.json, please update package-lock.json and yarn.lock by running:
 
-3. Deployment:
+         ```sh
+         npm i --package-lock-only
+         yarn install --mode=update-lockfile
+         ```
+         
+4. Deployment:
 
    This project uses AWS Amplify and Vercel to host the production and dev branches:
    - Amplify: https://dev.d2stxy8cy8jezo.amplifyapp.com/events
