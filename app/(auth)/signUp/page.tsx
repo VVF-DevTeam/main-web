@@ -1,22 +1,22 @@
-import React from "react";
-import SignUpForm from "../_components/SignUpForm";
-import Image from "next/image";
+import React from 'react'
+import SignUpForm from '../_components/SignUpForm'
+import Image from 'next/image'
 function signUpPage() {
   return (
-    <div className="min-h-screen h-full flex px-12 py-40 lg:px-24 xl:px-48 bg-[#1B171A]/50 mt-auto">
-      <div className="w-full max-w-7xl h-full max-h-9xl mx-auto bg-white/95 shadow-md flex flex-col md:flex-row rounded-md">
-        <div className="hidden md:block basis-[40%] shrink-0 relative">
+    <div className="min-w-screen flex min-h-screen bg-[#1B171A]/80 px-8 py-8 lg:px-16">
+      <div className="m-auto flex h-full max-h-[1700px] w-full max-w-7xl flex-col rounded-md bg-slate-100 shadow-md md:flex-row">
+        <div className="relative hidden shrink-0 basis-[40%] md:block">
           <Image
             src="/sample-images/image4.jpg"
             alt="Org image"
             fill
-            className="object-cover rounded-md"
+            className="rounded-md object-cover"
           />
         </div>
         <SignUpForm />
       </div>
     </div>
-  );
+  )
 }
 
-export default signUpPage;
+export default signUpPage

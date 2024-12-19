@@ -1,14 +1,14 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import axios from "axios";
+'use client'
+import React, { useState } from 'react'
+import Link from 'next/link'
+import axios from 'axios'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import CustomIcon from "@/app/components/CustomIcon";
-import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import CustomIcon from '@/app/components/CustomIcon'
+import { Button } from '@/components/ui/button'
+import { Eye } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -16,62 +16,60 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@radix-ui/react-separator";
-import { useToast } from "@/hooks/use-toast";
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@radix-ui/react-separator'
+import { useToast } from '@/hooks/use-toast'
 
 const signInSchema = z.object({
   email: z.string().email(),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long" }),
-});
+    .min(8, { message: 'Password must be at least 8 characters long' }),
+})
 
 const SignInForm = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false)
+  const { toast } = useToast()
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
-      const response = await axios.post("/api/signup", data);
-      console.log(response.data);
+      const response = await axios.post('/api/signup', data)
+      console.log(response.data)
     } catch (error) {
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Something went wrong",
-      });
-      console.log(error);
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Something went wrong',
+      })
+      console.log(error)
     }
-  };
+  }
   return (
-    <div className="w-full flex flex-col py-12 px-12 lg:px-14 xl:px-20">
+    <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
       {/* form header */}
-      <div className= "mb-24 lg:mb-36 flex items-center gap-x-4">
+      <div className="mb-24 flex items-center gap-x-4 lg:mb-36">
         <CustomIcon height={100} width={100} />
         <h1 className="text-xl">Company Name</h1>
       </div>
-      <h1 className="text-xl md:text-2xl font-semibold text-[#620BC4]">
-        Login
-      </h1>
-      <p className="text-sm text-muted-foreground mt-8">
+      <h1 className="text-2xl font-semibold text-[#620BC4]">Login</h1>
+      <p className="mt-8 text-sm text-muted-foreground">
         Login to your account to book event tickets or lessons.
       </p>
-      <Separator className="my-4 bg-gray-300 h-[1px] w-full" />
+      <Separator className="my-4 h-[1px] w-full bg-gray-300" />
       {/* form */}
       <div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 gap-y-4 pt-2"
+            className="mt-4 grid grid-cols-1 gap-y-8 pb-8 pt-2"
           >
             {/* email */}
             <FormField
@@ -105,16 +103,16 @@ const SignInForm = () => {
                   <FormControl>
                     <div className="relative max-w-[360px]">
                       <Input
-                        type={showPassword ? "password" : "text"}
+                        type={showPassword ? 'password' : 'text'}
                         placeholder="Enter your password"
                         {...field}
                         className="text-[#1B171A] lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
-                        size={"icon"}
+                        size={'icon'}
                         type="button"
-                        className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <Eye className="h-7 w-7" />
@@ -126,18 +124,18 @@ const SignInForm = () => {
               )}
             />
 
-            <div className="flex flex-col gap-y-4 self-stretch">
+            <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="bg-[#620BC4] max-w-60 text-white font-[600] hover:bg-[#620BC4]/80 hover:scale-105 transition-all"
+                className="max-w-60 bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
               >
                 LogIn
               </Button>
               <p className="text-sm">
-                Don&apos;t have an account?{" "}
+                Don&apos;t have an account?{' '}
                 <Link
                   href="/signUp"
-                  className="text-[#620BC4] decoration-2 hover:underline hover:opacity-80 transition-all"
+                  className="text-[#620BC4] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
                   Sign Up
                 </Link>
@@ -147,7 +145,7 @@ const SignInForm = () => {
         </Form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignInForm;
+export default SignInForm

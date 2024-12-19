@@ -1,9 +1,9 @@
-import Footer from "./_components/footer";
-import Header from "./_components/header";
-import Navbar from "./_components/navbar";
+import Footer from './_components/footer'
+import Header from './_components/header'
+import Navbar from './_components/navbar'
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="w-full h-full bg-[#EFB9A2]/20">
+    <div className="h-full w-full bg-[#EFB9A2]/20">
       <div>
         <Header />
       </div>
@@ -15,7 +15,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <Footer />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout

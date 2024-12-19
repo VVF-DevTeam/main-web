@@ -1,15 +1,11 @@
 import React from 'react'
 
 type Props = {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
-function layout({children}: Props) {
-  return (
-    <div className='h-full min-h-screen w-screen bg-gray-500'>
-        {children}
-    </div>
-  )
+function layout({ children }: Props) {
+  return <div className="min-w-screen min-h-screen">{children}</div>
 }
 
 export default layout
