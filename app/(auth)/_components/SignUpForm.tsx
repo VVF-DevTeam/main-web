@@ -1,14 +1,14 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import axios from "axios";
+'use client'
+import React, { useState } from 'react'
+import Link from 'next/link'
+import axios from 'axios'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { Eye } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -16,79 +16,79 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@radix-ui/react-separator";
-import { useToast } from "@/hooks/use-toast";
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@radix-ui/react-separator'
+import { useToast } from '@/hooks/use-toast'
 
 const signUpSchema = z
   .object({
     firstName: z
       .string()
-      .min(2, { message: "First name must be at least 2 characters long" }),
+      .min(2, { message: 'First name must be at least 2 characters long' }),
     lastName: z
       .string()
-      .min(1, { message: "Last name must be at least 2 characters long" }),
+      .min(1, { message: 'Last name must be at least 2 characters long' }),
     email: z.string().email(),
-    age: z.string().min(1),
-    phoneNumber: z.string().min(10, { message: "Incomplete phone number" }),
-    address: z.string().min(10, { message: "Incomplete address" }),
+    age: z.number().min(1),
+    phoneNumber: z.number().min(10, { message: 'Incomplete phone number' }),
+    address: z.string().min(10, { message: 'Incomplete address' }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters long" }),
+      .min(8, { message: 'Password must be at least 8 characters long' }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
 const SignUpForm = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false)
+  const { toast } = useToast()
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      age: "",
-      phoneNumber: "",
-      address: "",
-      password: "",
-      confirmPassword: "",
+      firstName: '',
+      lastName: '',
+      email: '',
+      age: 0,
+      phoneNumber: 0,
+      address: '',
+      password: '',
+      confirmPassword: '',
     },
-  });
+  })
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
-      const response = await axios.post("/api/signup", data);
-      console.log(response.data);
+      const response = await axios.post('/api/signup', data)
+      console.log(response.data)
     } catch (error) {
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Something went wrong",
-      });
-      console.log(error);
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Something went wrong',
+      })
+      console.log(error)
     }
-  };
+  }
   return (
-    <div className="w-full flex flex-col py-12 px-12 lg:px-14 xl:px-26">
+    <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
       {/* form header */}
-      <h1 className=" text-xl md:text-2xl font-semibold text-[#620BC4]">
+      <h1 className="mt-8 text-xl font-semibold text-[#620BC4] md:text-3xl lg:mt-12">
         Register
       </h1>
-      <p className="text-sm text-muted-foreground mt-12">
+      <p className="mt-6 text-sm text-muted-foreground">
         Let us get you all set up.
       </p>
-      <Separator className="my-4 bg-gray-300 h-[1px] w-full" />
+      <Separator className="my-4 h-[1px] w-full bg-gray-300" />
       {/* form */}
       <div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 md:grid-cols-2 gap-x-6 lg:gap-x-10 gap-y-4 pt-2"
+            className="mb-4 grid grid-cols-1 gap-x-6 gap-y-6 pt-2 md:grid-cols-2 md:gap-y-8 lg:gap-x-8"
           >
             {/* first name */}
             <FormField
@@ -101,7 +101,7 @@ const SignUpForm = () => {
                     <Input
                       placeholder="eg: Joe"
                       {...field}
-                      className="text-[#1B171A] border-2 lg:max-w-[360px] "
+                      className="border-2 text-[#1B171A] lg:max-w-[360px]"
                     />
                   </FormControl>
 
@@ -212,16 +212,16 @@ const SignUpForm = () => {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={!showPassword ? "password" : "text"}
+                        type={!showPassword ? 'password' : 'text'}
                         placeholder="Enter your password"
                         {...field}
                         className="text-[#1B171A] lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
-                        size={"icon"}
+                        size={'icon'}
                         type="button"
-                        className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <Eye className="h-7 w-7" />
@@ -247,16 +247,16 @@ const SignUpForm = () => {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        type={!showPassword ? "password" : "text"}
+                        type={!showPassword ? 'password' : 'text'}
                         placeholder="Confirm password"
                         {...field}
                         className="text-[#1B171A] lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
-                        size={"icon"}
+                        size={'icon'}
                         type="button"
-                        className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <Eye className="h-7 w-7" />
@@ -267,18 +267,18 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            <div className="flex flex-col gap-y-4 self-stretch">
+            <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="bg-[#620BC4] max-w-60 text-white font-[600] hover:bg-[#620BC4]/80 hover:scale-105 transition-all"
+                className="max-w-60 bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
               >
                 Create Account
               </Button>
               <p className="text-sm">
-                Already have an account?{" "}
+                Already have an account?{' '}
                 <Link
                   href="/signIn"
-                  className="text-[#620BC4] decoration-2 hover:underline hover:opacity-80 transition-all"
+                  className="text-[#620BC4] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
                   Login
                 </Link>
@@ -288,7 +288,7 @@ const SignUpForm = () => {
         </Form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignUpForm;
+export default SignUpForm

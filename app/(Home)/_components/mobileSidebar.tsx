@@ -1,4 +1,4 @@
-import { Menu, X } from "lucide-react";
+import { Menu, X } from 'lucide-react'
 import {
   Sheet,
   SheetClose,
@@ -8,18 +8,18 @@ import {
   SheetHeader,
   SheetTrigger,
   SheetTitle,
-} from "@/components/ui/sheet";
-import NavLinks from "./navLinks";
+} from '@/components/ui/sheet'
+import NavLinks from './navLinks'
 
 const MobileSidebar = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button className="flex items-center justify-center">
-          <Menu className="w-8 h-8 text-[#1B171A] hover:w-9 hover:h-9 hover:text-[#620BC4] transition-all" />
+          <Menu className="h-8 w-8 text-[#1B171A] transition-all hover:h-9 hover:w-9 hover:text-[#620BC4]" />
         </button>
       </SheetTrigger>
-      <SheetContent className="bg-[#1B171A] w-[300px]">
+      <SheetContent className="w-[300px] bg-[#1B171A]">
         <SheetHeader>
           <SheetTitle className="text-[#1B171A]">Menu</SheetTitle>
 
@@ -28,16 +28,16 @@ const MobileSidebar = () => {
           </SheetDescription>
         </SheetHeader>
 
-        <SheetFooter className="flex items-center mt-20">
+        <SheetFooter className="mt-20 flex items-center">
           <SheetClose asChild>
             <button>
-              <X className="p-1 rounded-md w-12 h-12 text-[#EFB9A2] hover:border-[#620BC4] hover:border-2 transition-all" />
+              <X className="h-12 w-12 rounded-md p-1 text-[#EFB9A2] transition-all hover:border-2 hover:border-[#620BC4]" />
             </button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}
 
-export default MobileSidebar;
+export default MobileSidebar
