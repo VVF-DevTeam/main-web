@@ -5,17 +5,9 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 1. Run the development server:
 
    ```sh
-   (Preferred method)
    npm install --global yarn
    yarn install --immutable
    yarn dev
-   ``` 
-
-   or
-
-   ```sh
-   npm ci
-   npm run dev
    ```
 
 2. Local Development: 
