@@ -1,0 +1,93 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+  directUrl =  env("POSTGRES_URL_NON_POOLING")
+}
+
+model EventCategory {
+  id        String     @default(cuid()) @id
+  title     String
+  description   String?
+  published Boolean @default(false)
+  events Event[]
+}
+
+model Event {
+    id        String     @default(cuid()) @id
+    title     String
+    description   String?
+
+    // Metadata
+    eventCategory EventCategory @relation(fields: [eventCategoryId], references: [id])
+    eventCategoryId String
+    location String?
+    isFree Boolean @default(false)
+    startTime DateTime
+    endTime DateTime
+    allDay Boolean?
+    capacity Int?
+    ticketsSold Int?
+    
+    // States
+    published Boolean @default(false)
+    createdAt     DateTime  @default(now()) @map(name: "created_at")
+    updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+    createdBy User @relation(fields: [createdById], references: [id])
+    createdById String
+
+    // Relations
+    tickets Ticket[]
+}
+
+// Ticket tiers
+model Ticket{
+    id            String       @default(cuid()) @id
+    title          String?
+    description  String?
+    price Float
+    event Event @relation(fields: [eventId], references: [id])
+    eventId String
+    
+    // States
+    published Boolean @default(false)
+    createdAt     DateTime  @default(now()) @map(name: "created_at")
+    updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+
+    // For ticket checking
+    consumed Boolean @default(false)
+
+    // Relations
+    purchases Purchase[]
+}
+
+// Act like a purchased ticket
+model Purchase{
+    id            String       @default(cuid()) @id
+    user User @relation(fields: [userId], references: [id])
+    userId  String
+    ticket Ticket @relation(fields: [ticketId], references: [id])
+    ticketId String
+    paymentMethod String?
+
+    @@unique([userId, ticketId])
+}
+
+model User {
+  id            String       @default(cuid()) @id
+  name          String?
+  email         String?   @unique
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  
+  // Relations
+  createdEvents Event[]
+  purchases Purchase[]
+  @@map(name: "users")
+}
+
