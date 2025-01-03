@@ -7,9 +7,10 @@ interface EventProps {
   name: string
   location: string
   thumbnail: string
+  end: string
 }
 
-const Event = ({ day, location, thumbnail }: EventProps) => {
+const Event = ({ day, location, thumbnail, end }: EventProps) => {
   return (
     <div className="py-6">
       <div className="flex-start flex h-full w-full flex-col gap-y-4 text-white md:flex-row md:items-center md:justify-between">
@@ -25,7 +26,7 @@ const Event = ({ day, location, thumbnail }: EventProps) => {
           <span>{location}</span>
         </div>
         <button className="rounded-full bg-[#1B171A] px-6 py-2 transition-all duration-75 ease-out hover:border-2 hover:border-[#EFB9A2] hover:bg-[#1B171A]/90 hover:text-white lg:px-8 lg:py-3">
-          Buy Tickets
+          {end === 'True' ? 'Sold Out' : 'Buy Tickets'}
         </button>
       </div>
       <Separator className="my-4 bg-[#EFB9A2]" />
