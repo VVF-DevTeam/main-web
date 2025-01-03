@@ -18,13 +18,13 @@ const Header = () => {
             <div
               className="group flex items-center gap-x-2 hover:text-[#EFB9A2]"
               onClick={() => {
-                navigator.clipboard.writeText('+1 (123) 456-7890')
+                navigator.clipboard.writeText('+1 (778) 583-7088')
                 toast({
                   title: 'Copied to clipboard',
                 })
               }}
             >
-              <Phone className="h-5 w-5" /> <span>+1 (123) 456-7890</span>
+              <Phone className="h-5 w-5" /> <span>+1 (778) 583-7088</span>
             </div>
           </TooltipTrigger>
           <TooltipContent className="bg-[#1B171A]">
@@ -42,13 +42,13 @@ const Header = () => {
             <div
               className="group flex items-center gap-x-2 hover:text-[#EFB9A2]"
               onClick={() => {
-                navigator.clipboard.writeText('randomemail@gmail.com')
+                navigator.clipboard.writeText('admingoogle@vietvibe.org')
                 toast({
                   title: 'Copied to clipboard',
                 })
               }}
             >
-              <Mail className="h-5 w-5" /> <span>randomemail@gmail.com</span>
+              <Mail className="h-5 w-5" /> <span>admingoogle@vietvibe.org</span>
             </div>
           </TooltipTrigger>
           <TooltipContent className="bg-[#1B171A]">

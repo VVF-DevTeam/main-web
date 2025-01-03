@@ -7,6 +7,7 @@ interface EventsProps {
     name: string
     location: string
     thumbnail: string
+    end: string
   }[]
 }
 
