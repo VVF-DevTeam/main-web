@@ -5,7 +5,7 @@ import { Contact2 } from 'lucide-react'
 
 const Contact = () => {
   const handleClick = () => {
-    window.location.href = "https://www.instagram.com/vietvibe.foundation/";
+    window.location.href = "https://www.instagram.com/vietvibe.foundation";
   }
 
   return (
