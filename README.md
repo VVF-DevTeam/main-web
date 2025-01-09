@@ -44,5 +44,5 @@ Additionally, this template uses the following libraries and features:
 
 - [React Server Components](https://nextjs.org/docs/advanced-features/react-18/server-components)
 - [TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
-- [TanStack Query v4](https://tanstack.com/query/latest)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [Prisma](https://www.prisma.io/)
