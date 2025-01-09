@@ -33,7 +33,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
    ![image](https://github.com/user-attachments/assets/804a3bb8-16bb-4702-9840-da15c53941fc)
 
 # Learn More
-This template is written in [Next.js](https://nextjs.org/docs) 13 using the [Next.js App Router](https://nextjs.org/docs/app).
+This template is written in [Next.js](https://nextjs.org/docs) 15 using the [Next.js App Router](https://nextjs.org/docs/app).
 
 To learn more about Next.js, see:
 
