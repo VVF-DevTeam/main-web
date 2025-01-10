@@ -6,88 +6,147 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL")
-  directUrl =  env("POSTGRES_URL_NON_POOLING")
+  url      = env("DATABASE_URL")
 }
 
 model EventCategory {
-  id        String     @default(cuid()) @id
-  title     String
-  description   String?
-  published Boolean @default(false)
-  events Event[]
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  published   Boolean @default(false)
+  events      Event[]
 }
 
 model Event {
-    id        String     @default(cuid()) @id
-    title     String
-    description   String?
+  id          String  @id @default(cuid())
+  title       String
+  description String?
 
-    // Metadata
-    eventCategory EventCategory @relation(fields: [eventCategoryId], references: [id])
-    eventCategoryId String
-    location String?
-    isFree Boolean @default(false)
-    startTime DateTime
-    endTime DateTime
-    allDay Boolean?
-    capacity Int?
-    ticketsSold Int?
-    
-    // States
-    published Boolean @default(false)
-    createdAt     DateTime  @default(now()) @map(name: "created_at")
-    updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-    createdBy User @relation(fields: [createdById], references: [id])
-    createdById String
+  // Metadata
+  eventCategory   EventCategory @relation(fields: [eventCategoryId], references: [id])
+  eventCategoryId String
+  location        String?
+  isFree          Boolean       @default(false)
+  startTime       DateTime
+  endTime         DateTime
+  allDay          Boolean?
+  capacity        Int?
+  ticketsSold     Int?
 
-    // Relations
-    tickets Ticket[]
+  // States
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+
+  // Relations
+  tickets Ticket[]
 }
 
 // Ticket tiers
-model Ticket{
-    id            String       @default(cuid()) @id
-    title          String?
-    description  String?
-    price Float
-    event Event @relation(fields: [eventId], references: [id])
-    eventId String
-    
-    // States
-    published Boolean @default(false)
-    createdAt     DateTime  @default(now()) @map(name: "created_at")
-    updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+model Ticket {
+  id          String  @id @default(cuid())
+  title       String?
+  description String?
+  price       Float
+  event       Event   @relation(fields: [eventId], references: [id])
+  eventId     String
 
-    // For ticket checking
-    consumed Boolean @default(false)
+  // States
+  published Boolean  @default(false)
+  updatedAt DateTime @default(now())
+  createdAt DateTime @updatedAt
 
-    // Relations
-    purchases Purchase[]
+  // For ticket checking
+  consumed Boolean @default(false)
+
+  // Relations
+  purchases Purchase[]
 }
 
 // Act like a purchased ticket
-model Purchase{
-    id            String       @default(cuid()) @id
-    user User @relation(fields: [userId], references: [id])
-    userId  String
-    ticket Ticket @relation(fields: [ticketId], references: [id])
-    ticketId String
-    paymentMethod String?
+model Purchase {
+  id            String  @id @default(cuid())
+  user          User    @relation(fields: [userId], references: [id])
+  userId        String
+  ticket        Ticket  @relation(fields: [ticketId], references: [id])
+  ticketId      String
+  paymentMethod String?
 
-    @@unique([userId, ticketId])
+  @@unique([userId, ticketId])
 }
 
 model User {
-  id            String       @default(cuid()) @id
+  id            String    @id @default(cuid())
   name          String?
-  email         String?   @unique
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  
-  // Relations
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+
+  role     Role    @default(USER)
+  age      String?
+  phone    String? @unique
+  address  String?
+  password String?
+  posts    Post[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   createdEvents Event[]
-  purchases Purchase[]
-  @@map(name: "users")
+  purchases     Purchase[]
 }
 
+// Posts made by admins
+model Post {
+  id          String   @id @default(cuid())
+  title       String   @unique
+  content     String?
+  summary     String?
+  imgUrl      String?
+  isPublished Boolean? @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // relation
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+// TODO: Add Category
+  @@unique([id, userId])
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}

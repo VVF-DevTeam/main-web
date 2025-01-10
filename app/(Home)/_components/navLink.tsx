@@ -2,11 +2,12 @@
 import React from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { Home, CalendarDays, LucideIcon } from 'lucide-react'
+import { Home, CalendarDays, Newspaper, LucideIcon } from 'lucide-react'
 
 const navLogos: Record<string, LucideIcon> = {
   home: Home,
   events: CalendarDays,
+  posts: Newspaper
 }
 type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
