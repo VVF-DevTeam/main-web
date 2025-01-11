@@ -8,7 +8,7 @@ export const PUT = async (
   try {
     const { postId } = await params
     const {isPublished, ...body} = await request.json()
-
+    console.log(isPublished)
     // TODO: Check if user is admin
     // Check if post exists
     const post = await prisma.post.findUnique({

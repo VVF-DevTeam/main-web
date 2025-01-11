@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
 import { signInSchema } from '@/lib/zodSchema/signinSchema'
-import { ServerActionResponse } from '@/lib/types/serverAction'
+
 import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
 
