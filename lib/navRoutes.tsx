@@ -9,4 +9,9 @@ export const navRoutes = [
     path: "/events",
     logo: "events",
   },
+  {
+    label: "Posts",
+    path: "/events",
+    logo: "events",
+  },
 ];
