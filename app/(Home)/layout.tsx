@@ -3,6 +3,7 @@ import Navbar from './_components/navbar'
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="relative h-full min-h-screen w-full bg-[#EFB9A2]/20">
+
       <div>
         <Navbar />
       </div>

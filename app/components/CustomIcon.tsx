@@ -6,7 +6,7 @@ interface logoProps {
   width?: number;
   src?: string
 }
-const CustomIcon = ({height=120, width=120, src="/company-logo.svg"}: logoProps) => {
+const CustomIcon = ({height=120, width=120, src="/company-logo.png"}: logoProps) => {
   return (
    <Image src={src} alt="Org Logo" width={height} height={width}/>
   )

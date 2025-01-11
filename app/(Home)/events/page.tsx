@@ -11,39 +11,41 @@ const EventsPage = () => {
 
   const eventList = [
     {
-      id: '1',
-      name: 'Winter Tour1',
-      thumbnail: '/sample-images/image1.jpg',
-      day: '3 Jan',
+      id: '3',
+      name: 'Friday Chill 3',
+      thumbnail: '/sample-images/image3.jpg',
+      day: '13 Dec',
       location: 'Vancouver',
+      end: 'True',
     },
     {
       id: '2',
-      name: 'Winter Tour2',
+      name: 'Friday Chill 2',
       thumbnail: '/sample-images/image2.jpg',
-      day: '15 Dec',
+      day: '25 Oct',
       location: 'Vancouver',
+      end: 'True',
     },
     {
-      id: '3',
-      name: 'Winter Tour3',
-      thumbnail: '/sample-images/image3.jpg',
-      day: '25 Dec',
-      location: 'Toronto',
+      id: '1',
+      name: 'Friday Chill 1',
+      thumbnail: '/sample-images/image1.jpg',
+      day: '16 Aug',
+      location: 'Vancouver',
+      end: 'True',
     },
   ]
   return (
     <div className="w-full overflow-hidden">
       <div className="flex h-[70vh] flex-col justify-between gap-y-4 py-10 md:py-12 lg:flex-row">
         {/* Event title and description */}
-        <div className="flex h-full basis-1/2 flex-col gap-y-4 px-6 md:px-12 lg:mt-4 xl:mt-6 xl:gap-y-8">
+        <div className="flex h-full basis-1/2 flex-col gap-y-4 px-6 md:px-12 lg:mt-4 xl:mt-6 xl:gap-y-7">
           <div className="flex flex-col text-3xl font-bold uppercase md:text-4xl lg:text-7xl xl:text-[84px] xl:font-extrabold xl:tracking-widest">
-            <span>Vancouver </span>
-            <span> Winter</span>
-            <span>Tour</span>
+            <span>Friday</span>
+            <span>Chill</span>
           </div>
           <p className="md:text-md text-sm font-[400] uppercase">
-            A new album is on the horizon
+            Vietnamese Acoustic Shows
           </p>
           <div>
             <IconTray iconList={socialMediaIcons} isLink={true} />

@@ -10,7 +10,7 @@ const GridCard = ({ name, desc, logo: Logo }: GridCardProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-y-4 p-6 md:gap-y-6">
       <Logo className="h-12 w-12 text-[#B83AB3]/70" />
-      <h2 className="text-3xl font-bold text-[#1B171A]/80">{name}</h2>
+      <h2 className="text-3xl font-bold text-[#1B171A]/80 text-center">{name}</h2>
       <p className="text-muted-foreground">{desc}</p>
     </div>
   )
