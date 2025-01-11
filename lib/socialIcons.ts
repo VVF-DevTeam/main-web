@@ -3,18 +3,12 @@ export const socialMediaIcons = [
       id: "1",
       name: "facebook-icon",
       icon: "/icons/facebook-icon.svg",
-      url: "/",
+      url: "https://www.facebook.com/fridaychillvancouver/",
     },
     {
       id: "2",
       name: "instagram-icon",
       icon: "/icons/instagram-icon.svg",
-      url: "/",
-    },
-    {
-      id: "3",
-      name: "tiktok-icon",
-      icon: "/icons/tiktok-icon.svg",
-      url: "/",
-    },
+      url: "https://www.instagram.com/fridaychill_official/",
+    }
   ];

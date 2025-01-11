@@ -17,6 +17,7 @@ const Navbar = async () => {
             <User2 className="h-6 w-6" />
             <span>{session?.user?.name?.split(' ')[0]}</span>
           </button>
+
         </div>
 
         {/* Nav Links */}

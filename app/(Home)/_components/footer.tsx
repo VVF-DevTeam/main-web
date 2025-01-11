@@ -33,19 +33,16 @@ const Footer = () => {
                 <h5 className="py-2 text-xl text-slate-400">Contact us</h5>
                 <Separator className="h-[2px] w-1/4 bg-slate-700" />
                 <div className="mt-4 flex flex-col gap-y-2 text-sm">
-                  <p className="text-slate-300">Name of Org</p>
+
                   <p className="text-slate-500">
-                    <span className="text-slate-300">Phone Hours:</span>{' '}
-                    placeholder
+                    <span className="text-slate-300">Phone Number: +1 (778) 583-7088</span>
                   </p>
                   <p className="text-slate-500">
-                    <span className="text-slate-300">Phone Number:</span>{' '}
-                    placeholder
+                    <span className="text-slate-300">Email: admingoogle@vietvibe.org</span>
                   </p>
                   <p className="text-slate-500">
-                    <span className="text-slate-300">Email:</span>placeholder
-                  </p>
-                </div>
+                    <span className="text-slate-300">Address: 6975 Vivian St, Vancouver, BC, Canada</span>
+                  </p></div>
               </div>
             </div>
           </div>

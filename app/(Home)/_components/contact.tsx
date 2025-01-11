@@ -1,7 +1,13 @@
+'use client'
+
 import React from 'react'
-import CompanyLogo from '@/app/components/CustomIcon'
 import { Contact2 } from 'lucide-react'
+
 const Contact = () => {
+  const handleClick = () => {
+    window.location.href = "https://www.instagram.com/vietvibe.foundation";
+  }
+
   return (
     <div className="h-[50vh] w-full bg-[#1B171A]/50">
       <div className="flex h-full w-full flex-col items-center justify-center gap-y-14  lg:gap-y-20">
@@ -10,12 +16,13 @@ const Contact = () => {
             GET IN TOUCH WITH US
           </h2>
         </div>
-        <CompanyLogo height={190} width={190} />
-        <button className="inline-flex items-center rounded-md border-b-2 border-[#EFB9A2] bg-[#1B171A] px-12 py-4 font-bold tracking-wide shadow-md hover:border-[#EFB9A2]/80 hover:bg-[#1B171A]/90 hover:text-white lg:px-14 lg:py-6">
-          <span className="mx-auto flex items-center gap-x-4 text-[#EFB9A2]">
-            Contact Us
+        <button className="inline-flex items-center rounded-md border-b-2 border-[#EFB9A2] bg-[#1B171A] px-14 py-6 font-bold tracking-wide shadow-md hover:border-[#EFB9A2]/80 hover:bg-[#1B171A]/90 hover:text-white"
+          onClick={handleClick}>
+          <a className="mx-auto flex items-center gap-x-4 text-[#EFB9A2]">
+            Chat With Us
+
             <Contact2 className="h-7 w-7" />
-          </span>
+          </a>
         </button>
       </div>
     </div>
