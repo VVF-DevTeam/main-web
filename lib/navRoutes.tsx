@@ -14,18 +14,4 @@ export const navRoutes = [
     path: '/posts',
     logo: 'posts',
   },
-]
-
-// TODO: add auth routes
-const a = [
-  {
-    label: 'login',
-    path: '/login',
-    logo: 'login',
-  },
-  {
-    label: 'logout',
-    path: '/logout',
-    logo: 'logout',
-  },
-]
+];
