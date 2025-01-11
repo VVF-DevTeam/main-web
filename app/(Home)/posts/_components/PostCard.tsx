@@ -6,14 +6,14 @@ import Link from 'next/link'
 interface PostProps {
   id: string
   title: string
-  content: string
   imageUrl: string
   createdAt: Date
+  summary: string
 }
 
-const PostCard = ({ title, content, imageUrl, createdAt, id }: PostProps) => {
+const PostCard = ({ title, summary, imageUrl, createdAt, id }: PostProps) => {
   return (
-    <div className="trasnsition-all grid w-full gap-x-6 overflow-hidden rounded-md border bg-slate-50 shadow-lg duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[40%_60%] md:gap-x-8 lg:gap-x-12">
+    <div className="trasnsition-all h-full grid w-full gap-x-6  overflow-hidden rounded-md border bg-slate-50 shadow-lg duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -32,8 +32,8 @@ const PostCard = ({ title, content, imageUrl, createdAt, id }: PostProps) => {
         <p className="text-sm text-muted-foreground">
           {createdAt.toLocaleString()}
         </p>
-        <p className="mt-4 max-w-[100%] text-wrap break-words text-slate-700">
-          {content}
+        <p className="mt-4 md:max-w-[90%] text-wrap break-words text-slate-700">
+         {summary}
         </p>
         <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-12">
           <Button
@@ -41,7 +41,7 @@ const PostCard = ({ title, content, imageUrl, createdAt, id }: PostProps) => {
             className="flex items-center gap-x-2 bg-[#620BC4] text-sm text-white hover:bg-[#620BC4]/90 hover:text-white/90 md:text-base"
           >
             <span>Read More</span>
-            <ArrowBigRightDash className="group-hover:translate-x-1 h-5 w-5 duration-100 ease-in group-hover:text-red-500" />
+            <ArrowBigRightDash className="h-5 w-5 duration-100 ease-in group-hover:translate-x-1 group-hover:text-red-500" />
           </Button>
         </Link>
       </div>
@@ -52,3 +52,4 @@ const PostCard = ({ title, content, imageUrl, createdAt, id }: PostProps) => {
 export default PostCard
 
 // Add author name on post schema.
+

@@ -26,7 +26,7 @@ interface PostImageProps {
 }
 
 const PostImageSchema = z.object({
-  imageUrl: z.string().min(1, { message: 'Post Image is required' }),
+  imgUrl: z.string().min(1, { message: 'Post Image is required' }),
 })
 
 const PostImage = ({ post }: PostImageProps) => {
@@ -37,13 +37,14 @@ const PostImage = ({ post }: PostImageProps) => {
   const form = useForm<z.infer<typeof PostImageSchema>>({
     resolver: zodResolver(PostImageSchema),
     defaultValues: {
-      imageUrl: post?.imgUrl || '',
+      imgUrl: post?.imgUrl || '',
     },
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof PostImageSchema>) => {
+    console.log(values)
     try {
-      await axios.patch(`/api/posts/edit/${post.id}`, values)
+      await axios.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -89,11 +90,11 @@ const PostImage = ({ post }: PostImageProps) => {
           >
             <FormField
               control={form.control}
-              name="imageUrl"
+              name="imgUrl"
               render={({ field }) => (
-                <FormItem className="min-h-[10vh] w-full">
+                <FormItem className="w-full">
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder='Enter Image URL' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

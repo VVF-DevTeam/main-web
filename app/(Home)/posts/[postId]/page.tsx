@@ -30,12 +30,12 @@ const PostPage = async ({ params }: PostPageProps) => {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col my-20">
-      {/* <Link href="/posts" className='p-6'>
-        <Button variant={'ghost'} className="bg-[#620BC4] flex items-center gap-x-2">
+      <Link href="/posts" className='p-6'>
+        <Button variant={'ghost'} className="bg-[#620BC4] text-slate-50 hover:bg-[#620BC4]/70 hover:text-slate-200 transition-all flex items-center gap-x-2">
           <ArrowLeft className="h-6 w-6" />
           Go back
         </Button>
-      </Link> */}
+      </Link>
       <PostBody
         title={post.title}
         createdAt={post.createdAt}

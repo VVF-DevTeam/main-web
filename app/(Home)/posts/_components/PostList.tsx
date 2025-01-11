@@ -8,14 +8,14 @@ interface PostListProps {
 
 const PostList = ({ posts }: PostListProps) => {
   return (
-    <div className="mx-auto flex flex-col justify-center gap-y-12 px-8 py-12 md:gap-y-20 lg:px-16 xl:max-w-[70vw]">
+    <div className="mx-auto w-full flex flex-col justify-center gap-y-12 px-6 py-12 md:gap-y-16 lg:px-8 xl:px-36 max-w-[1500px]">
       {posts &&
         posts.map((post) => (
           <PostCard
             key={post.id}
             id={post.id}
             title={post.title}
-            content={post.content!}
+            summary={post.summary!}
             imageUrl={post.imgUrl!}
             createdAt={post.createdAt}
           />

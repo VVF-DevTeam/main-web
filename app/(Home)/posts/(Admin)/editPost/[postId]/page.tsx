@@ -7,6 +7,7 @@ import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from './_components/ImageForm'
 import PostContent from './_components/ContentForm'
 import { Button } from '@/components/ui/button'
+import PublishButton from './_components/PublishButton'
 interface EditPostProps {
   params: Promise<{ postId: string }>
 }
@@ -47,21 +48,27 @@ const EditPost = async ({ params }: EditPostProps) => {
             <p className="text-sm text-muted-foreground">
               Fill all the fields to edit your post.
             </p>
-            <p className='text-sm text-muted-foreground'>Steps completed: {completionText}</p>
+            <p className="text-sm text-muted-foreground">
+              Steps completed: {completionText}
+            </p>
           </div>
-          <div className="flex flex-col gap-y-4 md:flex-row items-center gap-x-4">
+          <div className="flex flex-col items-center gap-x-4 gap-y-4 md:flex-row">
             {/* Buttons */}
             <Button variant={'destructive'}>Delete Post</Button>
-            <Button variant={'default'} disabled={!canPublish}>
-              {!post.isPublished? "Publish": "Unpublish"}
-            </Button>
+            <PublishButton
+              id={post.id}
+              canPublish={canPublish}
+              isPublished={post.isPublished!}
+              type="post"
+              domain="posts"
+            />
           </div>
         </div>
 
         {/* Form */}
         <div className="flex flex-col gap-y-12">
           {/* First Row */}
-          <div className="flex flex-col gap-x-8 md:flex-row">
+          <div className="flex flex-col gap-y-8 gap-x-8 md:flex-row">
             <div className="flex w-full flex-col gap-y-4">
               <div className="flex items-center gap-x-4">
                 <BookType className="h-6 w-6 md:h-8 md:w-8" />
