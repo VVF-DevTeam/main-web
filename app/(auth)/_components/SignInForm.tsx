@@ -1,9 +1,10 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import axios from 'axios'
 
+import { signinAction } from '@/lib/actions/signinAction'
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import CustomIcon from '@/app/components/CustomIcon'
@@ -20,17 +21,23 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
+import { signInSchema } from '@/lib/zodSchema/signinSchema'
 
-const signInSchema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    .min(8, { message: 'Password must be at least 8 characters long' }),
-})
+import { redirect } from 'next/navigation'
+import ProviderButtons from './ProviderButtons'
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [shouldRedirect, setShouldRedirect] = useState(false)
   const { toast } = useToast()
+
+  useEffect(() => {
+    if (shouldRedirect === false) {
+      return
+    }
+    redirect('/')
+  }, [shouldRedirect])
+
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -41,17 +48,41 @@ const SignInForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
-      const response = await axios.post('/api/signup', data)
-      console.log(response.data)
+      const response = await signinAction(data)
+
+      if (response.success === "true") {
+        toast({
+          variant: 'default',
+          title: 'Success',
+          description: response.message,
+        })
+
+        setShouldRedirect(true)
+      } else if (response.success === "false") {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        })
+
+      }
+      else if (response.success === "pending") {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        })
+    }
     } catch (error) {
+      console.log(error)
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Something went wrong',
       })
-      console.log(error)
     }
   }
+
   return (
     <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
       {/* form header */}
@@ -127,11 +158,14 @@ const SignInForm = () => {
             <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="max-w-60 bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
+                className="w-full bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
               >
                 LogIn
               </Button>
-              <p className="text-sm">
+              {/* <p className="text-center text-sm font-bold">OR</p> */}
+              <ProviderButtons />
+              <p className="text-center text-sm font-bold">OR</p>
+              <p className="text-sm text-center">
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/signUp"

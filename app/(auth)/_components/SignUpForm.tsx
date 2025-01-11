@@ -1,7 +1,10 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
-import axios from 'axios'
+
+import { signUpSchema } from '@/lib/zodSchema/signupSchema'
+import { signupAction } from '@/lib/actions/signupAction'
+import { ServerActionResponse } from '@/lib/types/serverAction'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -21,28 +24,6 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
 
-const signUpSchema = z
-  .object({
-    firstName: z
-      .string()
-      .min(2, { message: 'First name must be at least 2 characters long' }),
-    lastName: z
-      .string()
-      .min(1, { message: 'Last name must be at least 2 characters long' }),
-    email: z.string().email(),
-    age: z.number().min(1),
-    phoneNumber: z.number().min(10, { message: 'Incomplete phone number' }),
-    address: z.string().min(10, { message: 'Incomplete address' }),
-    password: z
-      .string()
-      .min(8, { message: 'Password must be at least 8 characters long' }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  })
-
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
@@ -52,8 +33,8 @@ const SignUpForm = () => {
       firstName: '',
       lastName: '',
       email: '',
-      age: 0,
-      phoneNumber: 0,
+      age: '',
+      phoneNumber: '',
       address: '',
       password: '',
       confirmPassword: '',
@@ -62,15 +43,29 @@ const SignUpForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
-      const response = await axios.post('/api/signup', data)
-      console.log(response.data)
+      const response: ServerActionResponse = await signupAction(data)
+      // Check if the account was created
+      if (response.success) {
+        toast({
+          variant: 'default',
+          title: 'Success',
+          description: response.message,
+        })
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        })
+      }
+      // Show error to the user
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Something went wrong',
       })
-      console.log(error)
+      throw error
     }
   }
   return (
@@ -156,6 +151,7 @@ const SignUpForm = () => {
                   <FormControl>
                     <Input
                       placeholder="eg: 26"
+                      type="number"
                       {...field}
                       className="text-[#1B171A] lg:max-w-[360px]"
                     />
@@ -174,6 +170,7 @@ const SignUpForm = () => {
                   <FormControl>
                     <Input
                       placeholder="eg: 1234567890"
+                      type="number"
                       {...field}
                       className="text-[#1B171A] lg:max-w-[360px]"
                     />

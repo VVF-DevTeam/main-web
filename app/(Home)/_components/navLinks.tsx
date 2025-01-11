@@ -8,11 +8,12 @@ interface NavLinkProps {
   mode: screenSize
 }
 const NavLinks = ({ mode }: NavLinkProps) => {
+  // TODO: Concat navroute and auth routes
   return (
     <div
       className={cn(
         mode === 'desktop'
-          ? 'flex h-full w-full items-center gap-x-4'
+          ? 'flex h-full w-full items-center gap-x-6'
           : 'flex h-full w-full flex-col items-center justify-center gap-y-4'
       )}
     >
