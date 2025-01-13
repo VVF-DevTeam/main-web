@@ -13,10 +13,13 @@ const Posts = async () => {
     },
   })
 
-
   return (
-    <div className="flex flex-col gap-y-6 my-20">
-      <PostList posts={publishedPosts} />
+    <div className="my-20 flex flex-col gap-y-6">
+      {publishedPosts.length > 0 ? (
+        <PostList posts={publishedPosts} />
+      ) : (
+        <p className="text-2xl font-semibold">No posts to show.</p>
+      )}
       {/* TODO: Add button to create a new post only for admins */}
       <div className="flex w-full items-center justify-end gap-x-4 px-6">
         <Link href="/posts/allPosts" className="group mb-2 py-6">
@@ -29,7 +32,7 @@ const Posts = async () => {
           </Button>
         </Link>
 
-        <Link href="/posts/createNewPost" className="group mb-2  py-6">
+        <Link href="/posts/createNewPost" className="group mb-2 py-6">
           <Button
             variant={'ghost'}
             className="flex items-center gap-x-2 bg-[#1B171A] p-6 text-slate-200 hover:bg-[#1B171A]/90 hover:text-slate-200/90"

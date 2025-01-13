@@ -1,10 +1,29 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ["images.travelandleisureasia.com", "plus.unsplash.com", "i0.wp.com"]
-  }
-};
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.i0.wp.com',
+        port: '',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.images.travelandleisureasia.com',
+        port: '',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.plus.unsplash.com',
+        port: '',
+        search: '',
+      },
+    ],
+  },
+}
 
-export default nextConfig;
+export default nextConfig
