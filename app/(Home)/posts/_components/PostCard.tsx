@@ -17,7 +17,7 @@ const PostCard = ({ title, summary, imageUrl, createdAt, id }: PostProps) => {
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
-          src={imageUrl}
+          src={'/sample-images/image4.jpg'}
           alt={title}
           fill
           className="absolute object-cover duration-500 ease-in-out hover:scale-110"
