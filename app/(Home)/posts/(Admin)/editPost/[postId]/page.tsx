@@ -72,7 +72,7 @@ const EditPost = async ({ params }: EditPostProps) => {
             <div className="flex w-full flex-col gap-y-4">
               <div className="flex items-center gap-x-4">
                 <BookType className="h-6 w-6 md:h-8 md:w-8" />
-                <h1 className="text-xl font-semibold md:text-2xl lg:text-3xl">
+                <h1 className="text-xl font-semibold md:text-2xl">
                   <span className="text-muted-foreground"> Step I : </span>Title
                 </h1>
               </div>
@@ -81,7 +81,7 @@ const EditPost = async ({ params }: EditPostProps) => {
             <div className="flex w-full flex-col gap-y-4">
               <div className="flex items-center gap-x-4">
                 <BookText className="h-6 w-6 md:h-8 md:w-8" />
-                <h1 className="text-xl font-semibold md:text-2xl lg:text-3xl">
+                <h1 className="text-xl font-semibold md:text-2xl">
                   <span className="text-muted-foreground"> Step II : </span>{' '}
                   Summary
                 </h1>
@@ -94,7 +94,7 @@ const EditPost = async ({ params }: EditPostProps) => {
           <div className="flex w-full flex-col gap-y-4">
             <div className="flex items-center gap-x-4">
               <FileImage className="h-6 w-6 md:h-8 md:w-8" />
-              <h1 className="text-xl font-semibold md:text-2xl lg:text-3xl">
+              <h1 className="text-xl font-semibold md:text-2xl">
                 <span className="text-muted-foreground"> Step III : </span>{' '}
                 Image
               </h1>
@@ -105,7 +105,7 @@ const EditPost = async ({ params }: EditPostProps) => {
           <div className="flex w-full flex-col gap-y-4">
             <div className="flex items-center gap-x-4">
               <FileText className="h-6 w-6 md:h-8 md:w-8" />
-              <h1 className="text-xl font-semibold md:text-2xl lg:text-3xl">
+              <h1 className="text-xl font-semibold md:text-2xl">
                 <span className="text-muted-foreground"> Step IV : </span>{' '}
                 Content
               </h1>
