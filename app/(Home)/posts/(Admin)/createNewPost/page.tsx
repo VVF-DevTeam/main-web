@@ -5,7 +5,7 @@ const NewPost = async () => {
   // TODO: check if user is logged in and send user data
   const session = await auth()
   if (!session?.user?.id) {
-    return redirect('/app/signIn')
+    return redirect('/signIn')
   }
  
   return (
