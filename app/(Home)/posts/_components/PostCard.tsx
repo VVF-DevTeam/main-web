@@ -12,13 +12,12 @@ interface PostProps {
 }
 
 const PostCard = ({ title, summary, imageUrl, createdAt, id }: PostProps) => {
-  console.log(imageUrl)
   return (
     <div className="trasnsition-all h-full grid w-full gap-x-6  overflow-hidden rounded-md border bg-slate-50 shadow-lg duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
-          src={'/sample-images/image4.jpg'}
+          src={imageUrl}
           alt={title}
           fill
           className="absolute object-cover duration-500 ease-in-out hover:scale-110"
