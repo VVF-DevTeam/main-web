@@ -4,7 +4,7 @@ import PostCard from './PostCard'
 
 interface PostListProps {
   posts: (Post & { postLikes: PostLikes[] })[]
-  userId: String | null
+  userId: string | null
 }
 
 const PostList = ({ posts, userId }: PostListProps) => {

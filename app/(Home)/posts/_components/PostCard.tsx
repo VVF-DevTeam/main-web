@@ -12,7 +12,7 @@ interface PostProps {
   summary: string
   postLikes: number
   hasLiked: boolean
-  userId: String | null
+  userId: string | null
 }
 
 const PostCard = ({

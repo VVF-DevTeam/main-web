@@ -9,7 +9,7 @@ interface PostStatsProps {
   postLikes: number
   hasLiked: boolean
   postId: string
-  userId: String | null
+  userId: string | null
 }
 const PostStats = ({ postLikes, hasLiked, postId, userId }: PostStatsProps) => {
   const { toast } = useToast()
@@ -26,7 +26,7 @@ const PostStats = ({ postLikes, hasLiked, postId, userId }: PostStatsProps) => {
     }
 
     try {
-      const res = await axios.patch(`/api/posts/likes/${postId}`, {
+      await axios.patch(`/api/posts/likes/${postId}`, {
         userId: userId,
         action: action,
       })
