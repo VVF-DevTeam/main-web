@@ -65,11 +65,11 @@ case $AMPLIFY_COMMAND in
       echo "Branch $BRANCH_NAME does not exist. Creating branch..."
       sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME  \
                 ${backend_env_arg} ${environment_variables_arg} --region=${AWS_REGION}"
+                
+      sleep 10
+
+      sh -c "aws amplify start-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-type=RELEASE --region=${AWS_REGION}"                
     fi
-
-    sleep 10
-
-    sh -c "aws amplify start-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-type=RELEASE --region=${AWS_REGION}"
 
     sleep 10
 
