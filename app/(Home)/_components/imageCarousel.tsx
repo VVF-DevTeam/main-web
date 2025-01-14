@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 import { ArrowLeft, ArrowRight } from 'lucide-react'
@@ -21,26 +21,24 @@ const ImageCarousel = ({
   duration = 7000,
 }: ImageCarouselProps) => {
   const [imageIndex, setImageIndex] = useState(0)
-  const changeImage = useCallback(
-    (direction: Direction) => () => {
-      let newIndex = 0
+  const changeImage = (direction: Direction) => {
+    let newIndex = 0
+    console.log('usecallback called')
+    if (direction === 'left') {
+      newIndex = imageIndex === 0 ? imageUrls.length - 1 : imageIndex - 1
+    }
+    if (direction === 'right') {
+      newIndex = imageIndex === imageUrls.length - 1 ? 0 : imageIndex + 1
+    }
 
-      if (direction === 'left') {
-        newIndex = imageIndex === 0 ? imageUrls.length - 1 : imageIndex - 1
-      }
-      if (direction === 'right') {
-        newIndex = imageIndex === imageUrls.length - 1 ? 0 : imageIndex + 1
-      }
-
-      setImageIndex(newIndex)
-    },
-    []
-  )
+    setImageIndex(newIndex)
+  }
 
   useEffect(() => {
     if (!autoSlide) {
       return
     }
+    console.log('useEffect called')
     const timer = setTimeout(() => {
       changeImage('right')
     }, duration)
@@ -48,7 +46,7 @@ const ImageCarousel = ({
     return () => {
       clearTimeout(timer)
     }
-  }, [autoSlide, duration, changeImage, imageIndex])
+  }, [autoSlide, duration, imageIndex])
 
   const totalwidth = `${imageUrls.length * 100}vw`
 

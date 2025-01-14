@@ -3,10 +3,16 @@ import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { PlusCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { auth } from '@/auth'
 const Posts = async () => {
+  // TODO: Abstract this code to a db function.
+  const session = await auth()
   const publishedPosts = await prisma.post.findMany({
     where: {
       isPublished: true,
+    },
+    include: {
+      postLikes: true,
     },
     orderBy: {
       updatedAt: 'desc',
@@ -14,14 +20,27 @@ const Posts = async () => {
   })
 
   return (
-    <div className="my-20 flex flex-col gap-y-6">
+    <div className="my-20 flex w-full max-w-[1500px] mx-auto flex-col p-6">
+      {/* Header */}
+      <div className="flex w-full flex-col gap-y-2">
+        <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
+          News Feed
+        </h1>
+        <p className="mb-12 text-sm text-muted-foreground">
+          Stay up to date with the latest news from Viet Vibe
+        </p>
+      </div>
+
+      {/* Posts */}
       {publishedPosts.length > 0 ? (
-        <PostList posts={publishedPosts} />
+        <PostList posts={publishedPosts} userId={session?.user?.id || null} />
       ) : (
-        <p className="text-2xl font-semibold">No posts to show.</p>
+        <p className="flex items-center justify-center text-2xl font-semibold">
+          No posts to show.
+        </p>
       )}
       {/* TODO: Add button to create a new post only for admins */}
-      <div className="flex w-full items-center justify-end gap-x-4 px-6">
+      <div className="mt-6 flex w-full items-center justify-end gap-x-4 px-6">
         <Link href="/posts/allPosts" className="group mb-2 py-6">
           <Button
             variant={'ghost'}
