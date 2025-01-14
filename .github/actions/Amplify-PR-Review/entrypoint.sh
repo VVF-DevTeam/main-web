@@ -5,6 +5,8 @@ set -e
 BRANCH_NAME=$1
 AMPLIFY_COMMAND=$2
 COMMENT_URL=$3
+SUBDOMAIN_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9-]/-/')
+PREVIEW_URL="https://$SUBDOMAIN_NAME.${AmplifyAppId}.amplifyapp.com"
 
 if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ] ; then
   echo "You must provide the action with both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables in order to deploy"
@@ -52,8 +54,18 @@ EOF
 case $AMPLIFY_COMMAND in
 
   deploy)
-    sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME  \
-              ${backend_env_arg} ${environment_variables_arg} --region=${AWS_REGION}"
+    # Fetch existing comments
+    EXISTING_COMMENTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$COMMENT_URL")
+    COMMENT_ID=$(echo "$EXISTING_COMMENTS" | jq -r ".[] | select(.body | contains(\"$PREVIEW_URL\")) | .id")
+  
+    # Check if branch exists
+    if aws amplify list-branches --app-id=${AmplifyAppId} --region=${AWS_REGION} | grep -q "\"branchName\": \"$BRANCH_NAME\""; then
+      echo "Branch $BRANCH_NAME already exists. Skipping branch creation."
+    else
+      echo "Branch $BRANCH_NAME does not exist. Creating branch..."
+      sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME  \
+                ${backend_env_arg} ${environment_variables_arg} --region=${AWS_REGION}"
+    fi
 
     sleep 10
 
@@ -84,9 +96,16 @@ case $AMPLIFY_COMMAND in
       else
         if [ -z "$GITHUB_TOKEN" ] ; then
           echo "Skipping comment as GITHUB_TOKEN not provided"
-        else 
-          SUBDOMAIN_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9-]/-/')
-          curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: https://$SUBDOMAIN_NAME.${AmplifyAppId}.amplifyapp.com.\n"'" }'
+        else
+          if [ -z "$COMMENT_ID" ]; then
+            # No existing comment, create a new one
+            echo "Creating a new comment on the PR..."
+            curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
+          else
+            # Existing comment found, update it
+            echo "Updating the existing comment..."
+            curl -X PATCH "$COMMENT_URL/$COMMENT_ID" -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
+          fi
         fi
 
         echo "Job failed. Job status: $JOB_STATUS"
@@ -100,9 +119,16 @@ case $AMPLIFY_COMMAND in
     # Comment the link to the Pull Request
     if [ -z "$GITHUB_TOKEN" ] ; then
       echo "Skipping comment as GITHUB_TOKEN not provided"
-    else 
-      SUBDOMAIN_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9-]/-/')
-      curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: https://$SUBDOMAIN_NAME.${AmplifyAppId}.amplifyapp.com.\n**Note**: Preview will be removed after PR closes.\n"'" }'
+    else
+      if [ -z "$COMMENT_ID" ]; then
+        # No existing comment, create a new one
+        echo "Creating a new comment on the PR..."
+        curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'
+      else
+        # Existing comment found, update it
+        echo "Updating the existing comment..."       
+        curl -X PATCH "$COMMENT_URL/$COMMENT_ID" -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'        
+      fi
     fi    
     ;;
 
