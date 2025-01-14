@@ -104,11 +104,11 @@ case $AMPLIFY_COMMAND in
           if [ -z "$COMMENT_AMPLIFY_URL" ]; then
             # No existing comment, create a new one
             echo "Creating a new comment on the PR..."
-            curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME**\n\n**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
+            curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME (Status: Failed)**\n\n**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
           else
             # Existing comment found, update it
             echo "Updating the existing comment..."
-            curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME**\n\n**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
+            curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME (Status: Failed)**\n\n**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
           fi
         fi
 
@@ -127,11 +127,11 @@ case $AMPLIFY_COMMAND in
       if [ -z "$COMMENT_AMPLIFY_URL" ]; then
         # No existing comment, create a new one
         echo "Creating a new comment on the PR..."
-        curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME**\n\nPreview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'
+        curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME (Status: Successful)**\n\nPreview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'
       else
         # Existing comment found, update it
         echo "Updating the existing comment..."       
-        curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME**\n\nPreview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'        
+        curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"${ICON} **$COMMENT_NAME (Status: Successful)**\n\nPreview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'        
       fi
     fi    
     ;;
