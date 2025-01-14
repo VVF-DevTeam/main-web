@@ -13,11 +13,14 @@ const Navbar = async () => {
       <div className="flex h-full w-full items-center justify-between">
         <div className="flex h-full w-full items-center gap-x-4">
           <CompanyLogo />
-          <button className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
-            <User2 className="h-6 w-6" />
-            <span>{session?.user?.name?.split(' ')[0]}</span>
-          </button>
-
+          
+          {/* User Button */}
+          {session?.user?.id && (
+            <button className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
+              <User2 className="h-6 w-6" />
+              <span>{session?.user?.name?.split(' ')[0]}</span>
+            </button>
+          )}
         </div>
 
         {/* Nav Links */}

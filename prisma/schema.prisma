@@ -91,12 +91,14 @@ model User {
   phone    String? @unique
   address  String?
   password String?
-  posts    Post[]
 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   createdEvents Event[]
   purchases     Purchase[]
+  posts         Post[]
+  likedPosts    PostLikes[]
 }
 
 // Posts made by admins
@@ -110,12 +112,30 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  postLikes PostLikes[]
+
   // relation
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // TODO: Add Category
   @@unique([id, userId])
+}
+
+model PostLikes {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
 }
 
 model Account {
