@@ -25,7 +25,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
    This project uses AWS Amplify and Vercel to host the production and dev branches:
    - Amplify: www.vietvibe.org
-   - Vercel: https://main-web-drab.vercel.app/
+   - Vercel: https://main-web-git-dev-khaihung-vvfs-projects.vercel.app
   
    In addition, the branch is integrated with Vercel and Amplify bot to build every PR's preview automatically: 
    ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
