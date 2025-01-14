@@ -1,7 +1,8 @@
 // schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -112,7 +113,8 @@ model Post {
   // relation
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-// TODO: Add Category
+
+  // TODO: Add Category
   @@unique([id, userId])
 }
 
