@@ -106,6 +106,7 @@ case $AMPLIFY_COMMAND in
           else
             # Existing comment found, update it
             echo "Updating the existing comment..."
+            echo "$COMMENT_URL/$COMMENT_ID"
             curl -X PATCH "$COMMENT_URL/$COMMENT_ID" -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
           fi
         fi
