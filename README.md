@@ -45,3 +45,4 @@ Additionally, this template uses the following libraries and features:
 - [TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Prisma](https://www.prisma.io/)
+- [NextAuth.js](https://next-auth.js.org/)
