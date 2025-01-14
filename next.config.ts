@@ -7,4 +7,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-exportasdasdasdasdasdasdasdsa default nextConfig
+exportasdasdasdasdasdasdasdsasdas default nextConfig
