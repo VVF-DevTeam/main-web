@@ -56,8 +56,10 @@ case $AMPLIFY_COMMAND in
   deploy)
     # Fetch existing comments
     EXISTING_COMMENTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$COMMENT_URL")
+    echo "$EXISTING_COMMENTS"
     COMMENT_ID=$(echo "$EXISTING_COMMENTS" | jq -r ".[] | select(.body | contains(\"$PREVIEW_URL\")) | .id")
-  
+    echo "$COMMENT_ID"
+    
     # Check if branch exists
     if aws amplify list-branches --app-id=${AmplifyAppId} --region=${AWS_REGION} | grep -q "\"branchName\": \"$BRANCH_NAME\""; then
       echo "Branch $BRANCH_NAME already exists. Skipping branch creation."
