@@ -56,9 +56,7 @@ case $AMPLIFY_COMMAND in
   deploy)
     # Fetch existing comments
     EXISTING_COMMENTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$COMMENT_URL")
-    echo "$EXISTING_COMMENTS"
-    COMMENT_ID=$(echo "$EXISTING_COMMENTS" | jq -r ".[] | select(.body | contains(\"$PREVIEW_URL\")) | .id")
-    echo "$COMMENT_ID"
+    COMMENT_AMPLIFY_URL=$(echo "$EXISTING_COMMENTS" | jq -r ".[] | select(.body | contains(\"$PREVIEW_URL\")) | .url")
     
     # Check if branch exists
     if aws amplify list-branches --app-id=${AmplifyAppId} --region=${AWS_REGION} | grep -q "\"branchName\": \"$BRANCH_NAME\""; then
@@ -99,15 +97,14 @@ case $AMPLIFY_COMMAND in
         if [ -z "$GITHUB_TOKEN" ] ; then
           echo "Skipping comment as GITHUB_TOKEN not provided"
         else
-          if [ -z "$COMMENT_ID" ]; then
+          if [ -z "$COMMENT_AMPLIFY_URL" ]; then
             # No existing comment, create a new one
             echo "Creating a new comment on the PR..."
             curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
           else
             # Existing comment found, update it
             echo "Updating the existing comment..."
-            echo "$COMMENT_URL/$COMMENT_ID"
-            curl -X PATCH "$COMMENT_URL/$COMMENT_ID" -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
+            curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"**Failed** to generate preview for Amplify website.\nMore info in the error visit: $PREVIEW_URL.\n"'" }'
           fi
         fi
 
@@ -123,14 +120,14 @@ case $AMPLIFY_COMMAND in
     if [ -z "$GITHUB_TOKEN" ] ; then
       echo "Skipping comment as GITHUB_TOKEN not provided"
     else
-      if [ -z "$COMMENT_ID" ]; then
+      if [ -z "$COMMENT_AMPLIFY_URL" ]; then
         # No existing comment, create a new one
         echo "Creating a new comment on the PR..."
         curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'
       else
         # Existing comment found, update it
         echo "Updating the existing comment..."       
-        curl -X PATCH "$COMMENT_URL/$COMMENT_ID" -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'        
+        curl -X PATCH $COMMENT_AMPLIFY_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview for Amplify website generated: $PREVIEW_URL.\n**Note**: Preview will be removed after PR closes.\n"'" }'        
       fi
     fi    
     ;;
