@@ -15,6 +15,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
    Open http://localhost:3000 in your browser to see the template home page. You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
    *__Some important tips:__*
+      - Remember to add all the environment variables in this [document](https://docs.google.com/spreadsheets/d/1HWzT14xOBQg8zwtJ3RfTpdCH8ENshvoSRAO7LeGP1IM/edit?usp=sharing) (only accessible for officers who have VVF gmail account): 
       - When you added/modified **any** packages in package.json, please update yarn.lock by running:
 
          ```sh
