@@ -21,7 +21,9 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
          ```sh
          yarn install --mode=update-lockfile
          ```
-         
+      - Make sure all checks pass in your PR: 
+         ![image](https://github.com/user-attachments/assets/30f67fa3-b284-4576-a23e-268f52368cc3)
+
 4. Deployment:
 
    This project uses AWS Amplify and Vercel to host the production and dev branches:
