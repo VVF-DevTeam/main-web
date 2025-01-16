@@ -14,4 +14,9 @@ export const navRoutes = [
     path: '/posts',
     logo: 'posts',
   },
-];
+  {
+    label: 'About',
+    path: '/about',
+    logo: 'about',
+  },
+]

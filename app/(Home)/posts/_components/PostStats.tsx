@@ -59,7 +59,7 @@ const PostStats = ({ postLikes, hasLiked, postId, userId }: PostStatsProps) => {
               : 'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg] group-hover:fill-red-700/80'
           )}
         />{' '}
-        {postLikes}
+        <span className='font-semibold text-foreground text-xs'>{postLikes}</span>
       </button>
     </div>
   )

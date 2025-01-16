@@ -66,6 +66,9 @@ body {
   * {
     @apply border-border;
   }
+  .c-space {
+    margin-top: 20px;
+  }
   body {
     @apply bg-background text-foreground;
   }
