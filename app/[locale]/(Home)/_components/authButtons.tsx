@@ -12,7 +12,7 @@ interface AuthButtonProps {
 }
 const AuthButtons = ({ userExists }: AuthButtonProps) => {
   const router = useRouter()
-  // @ts-expect-error useTranslation always return typescript error
+  // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation()
 
   const handleAuth = (type: 'login' | 'logout') => {

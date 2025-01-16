@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import i18nConfig from '@/i18nConfig';
 
 export default function LanguageChanger() {
-  // @ts-expect-error useTranslation only works in client side rendering
+  // @ts-ignore: useTranslation will always throw an error for typescript
   const { i18n } = useTranslation();
   const currentLocale = i18n.language;
   const router = useRouter();
