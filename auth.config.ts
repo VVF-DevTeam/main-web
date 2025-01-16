@@ -81,6 +81,8 @@ export default {
       // Check what path the user is trying to access
       const path = request.nextUrl.pathname
 
+      console.log("authorized")
+
       // check if user is logged in
       const isLoggedIn = !!auth?.user
 
