@@ -1,4 +1,4 @@
-import CreatePostForm from './_components/CreatePostForm'
+import CreatePostForm from '@/app/[locale]/(Home)/posts/(Admin)/createNewPost/_components/CreatePostForm'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 const NewPost = async () => {

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
-import { DataTable } from './_components/data-table'
-import { columns } from './_components/colums'
+import { DataTable } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/data-table'
+import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/colums'
 const AllPosts = async () => {
   // TODO: Check if user is admin
 

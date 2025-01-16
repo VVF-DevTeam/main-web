@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import NavLinks from './navLinks'
 
-const MobileSidebar = () => {
+const MobileSidebar = ({locale}:{ locale: string }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -24,7 +24,7 @@ const MobileSidebar = () => {
           <SheetTitle className="text-[#1B171A]">Menu</SheetTitle>
 
           <SheetDescription>
-            <NavLinks mode="mobile" />
+            <NavLinks mode="mobile" locale={locale}/>
           </SheetDescription>
         </SheetHeader>
 

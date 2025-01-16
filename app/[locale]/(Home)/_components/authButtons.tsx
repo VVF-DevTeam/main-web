@@ -5,11 +5,15 @@ import { ServerActionResponse } from '@/lib/types/serverAction'
 import { LogIn } from 'lucide-react'
 import { signOutAction } from '@/lib/actions/signoutAction'
 import { toast } from '@/hooks/use-toast'
+import { useTranslation } from 'react-i18next'
+
 interface AuthButtonProps {
   userExists: boolean
 }
 const AuthButtons = ({ userExists }: AuthButtonProps) => {
   const router = useRouter()
+  // @ts-expect-error useTranslation always return typescript error
+  const { t } = useTranslation()
 
   const handleAuth = (type: 'login' | 'logout') => {
     if (type === 'login') {
@@ -43,8 +47,8 @@ const AuthButtons = ({ userExists }: AuthButtonProps) => {
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
       className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70"
     >
-      <LogIn className="h-6 w-6" />
-      <span>{userExists ? 'Logout' : 'Login'}</span>
+      <LogIn className="h-6 w-8" />
+      <span>{userExists ? t('logout-nav') : t('login-nav')}</span>
     </button>
   )
 }

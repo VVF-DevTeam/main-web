@@ -1,13 +1,13 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import TitleForm from './_components/TitleForm'
+import TitleForm from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/TitleForm'
 
-import PostSummary from './_components/SummaryForm'
+import PostSummary from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/SummaryForm'
 import { BookType, BookText, FileText, FileImage } from 'lucide-react'
-import PostImage from './_components/ImageForm'
-import PostContent from './_components/ContentForm'
+import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
+import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
-import PublishButton from './_components/PublishButton'
+import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
 interface EditPostProps {
   params: Promise<{ postId: string }>
 }

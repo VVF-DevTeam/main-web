@@ -1,5 +1,5 @@
 import React from 'react'
-import SignUpForm from '../_components/SignUpForm'
+import SignUpForm from '@/app/[locale]/(auth)/_components/SignUpForm'
 import Image from 'next/image'
 function signUpPage() {
   return (

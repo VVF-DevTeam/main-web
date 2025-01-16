@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from '../(Home)/_components/navbar'
+import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 type Props = {
   children: React.ReactNode
 }

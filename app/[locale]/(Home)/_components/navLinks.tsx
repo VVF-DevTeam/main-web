@@ -2,12 +2,17 @@ import React from 'react'
 import { navRoutes } from '@/lib/navRoutes'
 import NavLink from './navLink'
 import { cn } from '@/lib/utils'
+import initTranslation from '@/app/i18n'
 
 type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
-  mode: screenSize
+  mode: screenSize,
+  locale: string
 }
-const NavLinks = ({ mode }: NavLinkProps) => {
+const NavLinks = async ({ mode, locale }: NavLinkProps) => {
+
+  const { t } = await initTranslation(locale, ['homePage', 'common']);
+
   // TODO: Concat navroute and auth routes
   return (
     <div
@@ -20,7 +25,7 @@ const NavLinks = ({ mode }: NavLinkProps) => {
       {navRoutes.map((route) => (
         <NavLink
           key={route.label}
-          label={route.label}
+          label={t(route.label.toLowerCase() + '-navLink')}
           path={route.path}
           logo={route.logo}
           mode={mode}

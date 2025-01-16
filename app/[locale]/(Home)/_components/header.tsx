@@ -6,8 +6,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useToast } from '@/hooks/use-toast'
+import { Phone, Mail, Copy, Globe } from 'lucide-react'
+import LanguageChanger from '@/components/translator/LanguageChanger'
+import React from 'react'
 
-import { Phone, Mail, Copy } from 'lucide-react'
 const Header = () => {
   const { toast } = useToast()
   return (
@@ -48,7 +50,7 @@ const Header = () => {
                 })
               }}
             >
-              <Mail className="h-5 w-5" /> <span>admingoogle@vietvibe.org</span>
+              <Mail className="h-5 w-5" /> <span>media@vietvibe.org</span>
             </div>
           </TooltipTrigger>
           <TooltipContent className="bg-[#1B171A]">
@@ -59,6 +61,15 @@ const Header = () => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
+      {/* LanguageChanger: Top-Right Corner */}
+      <div className='absolute top-2 right-6 flex items-center gap-x-2 rounded-md px-2 py-1'>
+        <Globe className='h-5 w-5 text-[#f7f0f0]' />
+        <LanguageChanger />
+      </div>
+
+
+
     </div>
   )
 }

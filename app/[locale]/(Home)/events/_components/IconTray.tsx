@@ -1,5 +1,5 @@
 import React from 'react'
-import CustomIcon from '@/app/components/CustomIcon'
+import CustomIcon from '@/app/[locale]/components/CustomIcon'
 import Link from 'next/link'
 
 interface IconTrayProps {

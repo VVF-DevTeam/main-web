@@ -1,5 +1,5 @@
 import React from 'react'
-import SignInForm from '../_components/SignInForm'
+import SignInForm from '@/app/[locale]/(auth)/_components/SignInForm'
 import Image from 'next/image'
 function signInPage() {
   return (

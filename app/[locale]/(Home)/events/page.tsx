@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
-import IconTray from './_components/IconTray'
-import Events from './_components/Events'
+import IconTray from '@/app/[locale]/(Home)/events/_components/IconTray'
+import Events from '@/app/[locale]/(Home)/events/_components/Events'
 import { socialMediaIcons } from '@/lib/socialIcons'
 const EventsPage = () => {
   const imageUrls = [

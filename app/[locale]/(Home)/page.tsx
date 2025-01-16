@@ -1,7 +1,9 @@
-import ImageCarousel from './_components/imageCarousel'
-import Contact from './_components/contact'
-import About from './_components/about'
-export default function Home() {
+import ImageCarousel from '@/app/[locale]/(Home)/_components/imageCarousel'
+import Contact from '@/app/[locale]/(Home)/_components/contact'
+import About from '@/app/[locale]/(Home)/_components/about'
+
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const imageUrls = [
     { id: '1', url: '/sample-images/image1.jpg' },
     { id: '2', url: '/sample-images/image2.jpg' },
@@ -11,8 +13,8 @@ export default function Home() {
   return (
     <div className="overflow-hidden">
       <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
-      <About />
-      <Contact />
+      <About locale={locale}/>
+      <Contact locale={locale}/>
     </div>
   )
 }

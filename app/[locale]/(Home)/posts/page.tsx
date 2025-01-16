@@ -1,4 +1,4 @@
-import PostList from './_components/PostList'
+import PostList from '@/app/[locale]/(Home)/posts/_components/PostList'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { PlusCircle, ArrowRight } from 'lucide-react'

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import PostBody from './_components/PostBody'
+import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
