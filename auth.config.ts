@@ -9,6 +9,10 @@ import { prisma } from './lib/db'
 import { PUBLIC_PATHS } from './lib/appRoutes'
 import { PRIVATE_PATHS } from './lib/appRoutes'
 import { AUTH_PATHS } from './lib/appRoutes'
+
+import { i18nRouter} from 'next-i18n-router'
+import i18nConfig from './i18nConfig'
+
 export default {
   providers: [
     Github({
@@ -81,15 +85,14 @@ export default {
       // Check what path the user is trying to access
       const path = request.nextUrl.pathname
 
-      console.log("authorized")
-
       // check if user is logged in
       const isLoggedIn = !!auth?.user
 
       // Check if user is trying to access a public path
       if (PUBLIC_PATHS.includes(path)) {
-        return true
+        return i18nRouter(request, i18nConfig)
       }
+
       // Check if user is trying to access a private path
       if (PRIVATE_PATHS.includes(path) && !isLoggedIn) {
         return NextResponse.redirect(new URL('/signIn', request.nextUrl.origin))
@@ -100,11 +103,12 @@ export default {
         return Response.redirect(new URL('/', request.nextUrl.origin))
       }
 
-      return true
+      return i18nRouter(request, i18nConfig)
     },
   },
   events: {
     linkAccount: async ({ user }) => {
+
       // Update user
       await prisma.user.update({
         where: { id: user.id },
