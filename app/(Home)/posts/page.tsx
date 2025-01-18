@@ -20,7 +20,7 @@ const Posts = async () => {
   })
 
   return (
-    <div className="my-20 flex w-full max-w-[1500px] mx-auto flex-col p-6">
+    <div className="mx-auto my-20 flex w-full max-w-[1500px] flex-col bg-[#A29DA5]/15 p-6">
       {/* Header */}
       <div className="flex w-full flex-col gap-y-2">
         <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
