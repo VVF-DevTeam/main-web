@@ -4,20 +4,10 @@ import React from 'react'
 import { Contact2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-<<<<<<< HEAD
 const Contact = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation()
 
-  const handleClick = () => {
-    window.location.href = 'https://www.instagram.com/vietvibe.foundation'
-  }
-
-=======
-const Contact = async ({ locale }: { locale: string }) => {
-  const { t } = await initTranslation(locale, ['homePage', 'common']);
-
->>>>>>> df05fc2 (Fix code for accessibility)
   return (
     <div className="h-[50vh] w-full bg-[#1B171A]/50">
       <div className="flex h-full w-full flex-col items-center justify-center gap-y-14 lg:gap-y-20">
@@ -26,13 +16,6 @@ const Contact = async ({ locale }: { locale: string }) => {
             {t('getInTouch-contact')}
           </h2>
         </div>
-<<<<<<< HEAD
-        <button
-          className="inline-flex items-center rounded-md border-b-2 border-[#EFB9A2] bg-[#1B171A] px-14 py-6 font-bold tracking-wide shadow-md hover:border-[#EFB9A2]/80 hover:bg-[#1B171A]/90 hover:text-white"
-          onClick={handleClick}
-        >
-          <a className="mx-auto flex items-center gap-x-4 text-[#EFB9A2]">
-=======
         <a
           href="https://www.instagram.com/vietvibe.foundation"
           target="_blank"
@@ -40,7 +23,6 @@ const Contact = async ({ locale }: { locale: string }) => {
           className="inline-flex items-center rounded-md border-b-2 border-[#EFB9A2] bg-[#1B171A] px-14 py-6 font-bold tracking-wide shadow-md hover:border-[#EFB9A2]/80 hover:bg-[#1B171A]/90 hover:text-white"
         >
           <span className="mx-auto flex items-center gap-x-4 text-[#EFB9A2]">
->>>>>>> df05fc2 (Fix code for accessibility)
             {t('chat-contact')}
             <Contact2 className="h-7 w-7" />
           </span>
