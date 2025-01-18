@@ -14,7 +14,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <div className="overflow-hidden">
       <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
       <About locale={locale}/>
-      <Contact locale={locale}/>
+      <Contact/>
     </div>
   )
 }
