@@ -89,9 +89,9 @@ export default {
       const isLoggedIn = !!auth?.user
 
       // Check if user is trying to access a public path
-      if (PUBLIC_PATHS.includes(path)) {
-        return true;
-      }
+      // if (PUBLIC_PATHS.includes(path)) {
+      //   return i18nRouter(request, i18nConfig);
+      // }
 
       // Check if user is trying to access a private path
       if (PRIVATE_PATHS.includes(path) && !isLoggedIn) {
