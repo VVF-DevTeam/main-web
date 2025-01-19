@@ -6,7 +6,6 @@ import Google from 'next-auth/providers/google'
 import { NextResponse } from 'next/server'
 
 import { prisma } from './lib/db'
-import { PUBLIC_PATHS } from './lib/appRoutes'
 import { PRIVATE_PATHS } from './lib/appRoutes'
 import { AUTH_PATHS } from './lib/appRoutes'
 
@@ -87,11 +86,6 @@ export default {
 
       // check if user is logged in
       const isLoggedIn = !!auth?.user
-
-      // Check if user is trying to access a public path
-      // if (PUBLIC_PATHS.includes(path)) {
-      //   return i18nRouter(request, i18nConfig);
-      // }
 
       // Check if user is trying to access a private path
       if (PRIVATE_PATHS.includes(path) && !isLoggedIn) {
