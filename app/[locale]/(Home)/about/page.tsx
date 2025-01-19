@@ -1,9 +1,10 @@
 import OrgSummary from './_components/OrgSummary'
 import OrgMembers from './_components/OrgMembers'
+
 const AboutPage = () => {
   return (
     <div className="h-full w-full">
-      {/* <OrgSummary /> */}
+      <OrgSummary />
       <OrgMembers />
     </div>
   )

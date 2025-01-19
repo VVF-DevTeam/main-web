@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import MemberDescription from './MemberDescription'
 import MemberImage from './MemberImage'
 
