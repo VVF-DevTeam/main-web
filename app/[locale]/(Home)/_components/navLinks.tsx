@@ -18,7 +18,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
     <div
       className={cn(
         mode === 'desktop'
-          ? 'flex h-full w-full items-center gap-x-6'
+          ? 'flex h-full w-full items-center gap-x-3 lg:gap-x-6'
           : 'flex h-full w-full flex-col items-center justify-center gap-y-4'
       )}
     >

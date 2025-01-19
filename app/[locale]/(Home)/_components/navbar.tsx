@@ -20,14 +20,16 @@ const Navbar = async ({locale}:{ locale: string }) => {
           {session?.user?.id && (
             <button
               className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
-              <User2 className="h-6 w-6" />
-              <span>{session?.user?.name?.split(' ')[0]}</span>
+              <User2 className="h-5 w-5" />
+              <span className="text-[#1B171A]">
+                {session?.user?.name?.split(' ')[0]}
+              </span>
             </button>
           )}
         </div>
 
         {/* Nav Links */}
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-3 lg:gap-x-6">
           <div className="hidden sm:block">
             <NavLinks mode="desktop" locale={locale} />
           </div>

@@ -30,10 +30,10 @@ const About = async ({locale}:{ locale: string }) => {
   const { t } = await initTranslation(locale, ['homePage', 'common']);
 
   return (
-    <div className="bg-[#EFB9A2]/20">
+    <div className="bg-[#ffe6b3]">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-y-12 p-12">
         <div className="flex flex-col items-center justify-center gap-y-6 p-6">
-          <h2 className="cursor-default text-5xl font-bold tracking-wider text-[#B83AB3] transition-all duration-100 ease-out hover:text-[#B83AB3]/80">
+          <h2 className="cursor-default text-5xl font-bold tracking-wider text-[#c54b34] transition-all duration-100 ease-out hover:text-[#B83AB3]/80">
             {t('header-aboutUs')}
           </h2>
           <Separator className="w-1/2 bg-[#B83AB3]" />

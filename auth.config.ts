@@ -90,7 +90,7 @@ export default {
 
       // Check if user is trying to access a public path
       if (PUBLIC_PATHS.includes(path)) {
-        return i18nRouter(request, i18nConfig)
+        return true;
       }
 
       // Check if user is trying to access a private path

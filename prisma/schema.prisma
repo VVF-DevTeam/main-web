@@ -99,6 +99,7 @@ model User {
   purchases     Purchase[]
   posts         Post[]
   likedPosts    PostLikes[]
+  visitedPosts  PostVisits[]
 }
 
 // Posts made by admins
@@ -112,7 +113,8 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  postLikes PostLikes[]
+  postLikes  PostLikes[]
+  postVisits PostVisits[]
 
   // relation
   userId String
@@ -135,6 +137,18 @@ model PostLikes {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([postId, userId])
+}
+
+model PostVisits {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // relations
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([postId, userId])
 }
 
