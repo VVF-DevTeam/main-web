@@ -24,6 +24,11 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
       - Make sure __all__ checks have passed in your PR: 
          ![image](https://github.com/user-attachments/assets/30f67fa3-b284-4576-a23e-268f52368cc3)
 
+   For database, run (ensure DATABASE_URL is in .env):
+    ```sh
+   npx prisma studio
+   ```
+    
 4. Deployment:
 
    This project uses AWS Amplify and Vercel to host the production and dev branches:
