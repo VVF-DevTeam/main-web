@@ -45,7 +45,7 @@ const AuthButtons = ({ userExists }: AuthButtonProps) => {
   return (
     <button
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
-      className="flex items-center justify-center gap-x-2 text-sm text-[#1B171A] transition-all hover:text-[#1B171A]/70"
+      className="flex items-center justify-center gap-x-2 text-sm text-[#1B171A] transition-all hover:underline hover:text-blue-500"
     >
       <LogIn className="h-5 w-5" />
       <span>{userExists ? t('logout-nav') : t('login-nav')}</span>
