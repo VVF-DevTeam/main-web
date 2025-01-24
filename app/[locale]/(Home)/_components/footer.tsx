@@ -22,7 +22,7 @@ const Footer = async ({locale}:{ locale: string }) => {
                   <Link
                     key={index}
                     href={route.path}
-                    className="text-slate-300 hover:text-[#EFB9A2]"
+                    className="text-slate-300 hover:text-[#EFB9A2] hover:underline"
                   >
                     {t(route.label.toLowerCase() + '-footer')}
                   </Link>

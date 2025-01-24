@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { LogIn } from 'lucide-react'
 import { signOutAction } from '@/lib/actions/signoutAction'
@@ -12,6 +12,8 @@ interface AuthButtonProps {
 }
 const AuthButtons = ({ userExists }: AuthButtonProps) => {
   const router = useRouter()
+  const pathname = usePathname()
+  const isActive = pathname.includes('signIn')
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation()
 
@@ -45,7 +47,7 @@ const AuthButtons = ({ userExists }: AuthButtonProps) => {
   return (
     <button
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
-      className="flex items-center justify-center gap-x-2 text-sm text-[#1B171A] transition-all hover:text-[#1B171A]/70"
+      className={`flex items-center justify-center gap-x-2 text-sm text-[#1B171A] transition-all ${isActive ? 'text-blue-500 underline' : 'text-[#1B171A] hover:underline hover:text-blue-500'}`}
     >
       <LogIn className="h-5 w-5" />
       <span>{userExists ? t('logout-nav') : t('login-nav')}</span>
