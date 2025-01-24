@@ -9,7 +9,7 @@ import { prisma } from './lib/db'
 import { PRIVATE_PATHS } from './lib/appRoutes'
 import { AUTH_PATHS } from './lib/appRoutes'
 
-import { i18nRouter} from 'next-i18n-router'
+import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
 
 export default {
@@ -82,7 +82,10 @@ export default {
     },
     authorized: ({ request, auth }) => {
       // Check what path the user is trying to access
-      const path = request.nextUrl.pathname
+      let path = request.nextUrl.pathname
+
+      // extract the locale from the path
+      path = '/' + path.split('/')[2]
 
       // check if user is logged in
       const isLoggedIn = !!auth?.user
@@ -102,7 +105,6 @@ export default {
   },
   events: {
     linkAccount: async ({ user }) => {
-
       // Update user
       await prisma.user.update({
         where: { id: user.id },

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Post, PostLikes } from '@prisma/client'
+import { Post, PostLikes, PostVisits } from '@prisma/client'
 import PostCard from './PostCard'
 
 interface PostListProps {
-  posts: (Post & { postLikes: PostLikes[] })[]
+  posts: (Post & { postLikes: PostLikes[] } & { postVisits: PostVisits[] })[]
   userId: string | null
 }
 
@@ -15,7 +15,9 @@ const PostList = ({ posts, userId }: PostListProps) => {
           <PostCard
             userId={userId}
             postLikes={post.postLikes.length}
+            postViews={post.postVisits.length}
             hasLiked={!!post.postLikes.some((like) => like.userId === userId)}
+            hasViewed={!!post.postVisits.some((view) => view.userId === userId)}
             key={post.id}
             id={post.id}
             title={post.title}

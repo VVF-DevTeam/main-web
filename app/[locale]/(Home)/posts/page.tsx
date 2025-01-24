@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { PlusCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { auth } from '@/auth'
+
 const Posts = async () => {
   // TODO: Abstract this code to a db function.
   const session = await auth()
@@ -13,11 +14,25 @@ const Posts = async () => {
     },
     include: {
       postLikes: true,
+      postVisits: true,
     },
     orderBy: {
       updatedAt: 'desc',
     },
   })
+  const userEmail = session?.user?.email
+  // if (!userEmail) return <div>You are not logged in</div>
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: userEmail || '',
+    },
+  })
+
+  let isAdmin = false
+  if (user?.role === 'ADMIN') {
+    isAdmin = true
+  }
 
   return (
     <div className="mx-auto my-20 flex w-full max-w-[1500px] flex-col p-6">
@@ -39,28 +54,30 @@ const Posts = async () => {
           No posts to show.
         </p>
       )}
-      {/* TODO: Add button to create a new post only for admins */}
-      <div className="mt-6 flex w-full items-center justify-end gap-x-4 px-6">
-        <Link href="/posts/allPosts" className="group mb-2 py-6">
-          <Button
-            variant={'ghost'}
-            className="flex items-center gap-x-2 bg-slate-200 p-6 text-black hover:bg-slate-300/90 hover:text-black/90"
-          >
-            <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
-            <span className="text-xl">All Posts</span>
-          </Button>
-        </Link>
 
-        <Link href="/posts/createNewPost" className="group mb-2 py-6">
-          <Button
-            variant={'ghost'}
-            className="flex items-center gap-x-2 bg-[#1B171A] p-6 text-slate-200 hover:bg-[#1B171A]/90 hover:text-slate-200/90"
-          >
-            <PlusCircle className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
-            <span className="text-xl">New Post</span>
-          </Button>
-        </Link>
-      </div>
+      {isAdmin && (
+        <div className="mt-6 flex w-full items-center justify-end gap-x-4 px-6">
+          <Link href="/posts/allPosts" className="group mb-2 py-6">
+            <Button
+              variant={'ghost'}
+              className="flex items-center gap-x-2 bg-slate-200 p-6 text-black hover:bg-slate-300/90 hover:text-black/90"
+            >
+              <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
+              <span className="text-xl">All Posts</span>
+            </Button>
+          </Link>
+
+          <Link href="/posts/createNewPost" className="group mb-2 py-6">
+            <Button
+              variant={'ghost'}
+              className="flex items-center gap-x-2 bg-[#1B171A] p-6 text-slate-200 hover:bg-[#1B171A]/90 hover:text-slate-200/90"
+            >
+              <PlusCircle className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
+              <span className="text-xl">New Post</span>
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   )
 }

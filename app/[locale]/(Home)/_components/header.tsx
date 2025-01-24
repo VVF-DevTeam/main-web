@@ -50,7 +50,7 @@ const Header = () => {
             <button
               type="button"
               className="group flex items-center gap-x-2 hover:text-[#EFB9A2] focus:outline-none focus:ring-2 focus:ring-[#EFB9A2] focus:ring-offset-2 rounded-md p-1"
-              onClick={() => handleClick("admingoogle@vietvibe.org")}
+              onClick={() => handleClick("media@vietvibe.org")}
               aria-label="Copy email address to clipboard"
             >
               <Mail className="h-5 w-5" /> <span>media@vietvibe.org</span>
@@ -66,13 +66,10 @@ const Header = () => {
       </TooltipProvider>
 
       {/* LanguageChanger: Top-Right Corner */}
-      <div className='absolute top-2 right-6 flex items-center gap-x-2 rounded-md px-2 py-1'>
-        <Globe className='h-5 w-5 text-[#f7f0f0]' />
+      <div className="absolute right-6 top-2 flex items-center gap-x-2 rounded-md px-2 py-1">
+        <Globe className="h-5 w-5 text-[#f7f0f0]" />
         <LanguageChanger />
       </div>
-
-
-
     </div>
   )
 }

@@ -4,11 +4,15 @@ import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import { auth } from '@/auth'
+
 interface PostPageProps {
   params: Promise<{ postId: string }>
 }
 const PostPage = async ({ params }: PostPageProps) => {
   const { postId } = await params
+  const session = await auth()
+
   if (!postId) return redirect('/')
 
   // get the post along with author
@@ -24,14 +28,44 @@ const PostPage = async ({ params }: PostPageProps) => {
       },
     },
   })
-
   if (!post) return null
-  //   todo create a not found page
 
+  const isLoggedIn = session?.user?.id
+  let isVisited = null
+
+  if (isLoggedIn) {
+    isVisited = await prisma.user.findUnique({
+      where: {
+        id: session?.user?.id || '',
+      },
+      select: {
+        visitedPosts: {
+          where: {
+            postId: postId,
+            userId: session?.user?.id || '',
+          },
+        },
+      },
+    })
+    if (isVisited && isVisited.visitedPosts.length === 0) {
+      console.log(isVisited.visitedPosts)
+      await prisma.postVisits.create({
+        data: {
+          postId: postId,
+          userId: session?.user?.id!,
+        },
+      })
+    }
+  }
+
+  //   todo create a not found page
   return (
-    <div className="mx-auto flex max-w-7xl flex-col my-20">
-      <Link href="/posts" className='p-6'>
-        <Button variant={'ghost'} className="bg-[#620BC4] text-slate-50 hover:bg-[#620BC4]/70 hover:text-slate-200 transition-all flex items-center gap-x-2">
+    <div className="mx-auto my-20 flex max-w-7xl flex-col">
+      <Link href="/posts" className="p-6">
+        <Button
+          variant={'ghost'}
+          className="flex items-center gap-x-2 bg-[#620BC4] text-slate-50 transition-all hover:bg-[#620BC4]/70 hover:text-slate-200"
+        >
           <ArrowLeft className="h-6 w-6" />
           Go back
         </Button>

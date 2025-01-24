@@ -11,7 +11,9 @@ interface PostProps {
   createdAt: Date
   summary: string
   postLikes: number
+  postViews: number
   hasLiked: boolean
+  hasViewed: boolean
   userId: string | null
 }
 
@@ -22,11 +24,13 @@ const PostCard = ({
   createdAt,
   id,
   postLikes,
+  postViews,
   hasLiked,
-  userId
+  hasViewed,
+  userId,
 }: PostProps) => {
   return (
-    <div className="trasnsition-all grid h-full w-full gap-x-6 overflow-hidden rounded-md border bg-slate-50 shadow-lg duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
+    <div className="grid h-full w-full gap-x-6 overflow-hidden rounded-md border bg-slate-50 shadow-lg transition-all duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -50,7 +54,14 @@ const PostCard = ({
         </p>
         <div className="flex items-center justify-between">
           {/* Post stats */}
-          <PostStats postLikes={postLikes} hasLiked={hasLiked} postId={id} userId={userId}/>
+          <PostStats
+            postLikes={postLikes}
+            hasLiked={hasLiked}
+            postId={id}
+            userId={userId}
+            postViews={postViews}
+            hasViewed={hasViewed}
+          />
 
           <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-12">
             <Button

@@ -5,39 +5,39 @@ const memberData = [
   {
     id: 1,
     descriptions: [
-      "You'll notice as soon as you step into our clinic, it just feels and looks different than you’re typically used to. It’s open, spacious, beautifully crafted, and built for functionality.",
-      'Our facility was designed from the ground up to be equipped with tools necessary for rehabilitation, education, and therapy. We want our clinic to be a place of discovery for you and your therapist, in order to get you on the right track to recovery, no matter where your starting point is.',
+      'A doctor, a guitarist, a data analyst, a programmer and a life-time learner.',
+      'I love the job of helping others to relieve their pains and improve their quality of life. However, I realize that I cannot help thousands or millions of people if I keep working as current. That’s why I have been learning and working in computer science and data science to help more and more people in the world.',
     ],
-    imageUrl: '/sample-images/image1.jpg',
-    title: 'First director',
+    imageUrl: '/sample-images/trong-nguyen.jpg',
+    title: 'Trong Nguyen',
   },
   {
     id: 2,
     descriptions: [
-      'Our clinic lighting was specifically designed to be dimmable and colour adjusting. You’ll notice the lights shine horizontally as to avoid shining too brightly downward. When our patients are exercising in the gym, the horizontal lights limit eye strain and irritation when looking up at the ceiling.',
+      'Bass player, singer, songwriter, and guitarist.',
+      'Love Spanish songs, especially the ones that are about love and romance. I also love to sing and play guitar.',
     ],
-    imageUrl: '/sample-images/image2.jpg',
-    title: 'Second director',
+    imageUrl: '/sample-images/tue-nguyen.jpg',
+    title: 'Tue Nguyen',
   },
   {
     id: 3,
     descriptions: [
-      'In our treatment rooms, the lighting can be tailored to your preference in order to suit your needs.',
-      'Maybe you prefer a more relaxing, soothing environment for your hands-on portion of treatment if you are having an RMT session. Others may prefer a brighter environment, especially in the middle of the day.',
-      'Just ask your therapist! We want to make you feel comfortable.',
+      'Drummer, singer, songwriter, and guitarist.',
+      'Young and energetic, I love to sing and play guitar. Leading a band and performing in concerts are my passions, currently I am in charge of multiple bands at my school.',
     ],
-    imageUrl: '/sample-images/image3.jpg',
-    title: 'Third director',
+    imageUrl: '/sample-images/eattle-nguyen.jpg',
+    title: 'Eattle Nguyen',
   },
 ]
 
 const OrgMembers = () => {
   return (
     <div className="bg-slate-300 px-6 py-32">
-      <h1 className="mb-20 text-center text-3xl font-semibold tracking-wide md:text-4xl lg:text-5xl">
+      <h1 className="mb-20 text-center text-3xl font-semibold tracking-wide text-[#620BC4] md:text-4xl lg:text-5xl">
         Meet Our Founders
       </h1>
-      <div className="flex flex-col gap-y-6">
+      <div className="mx-auto flex max-w-[1500px] flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
         {memberData.map((member) => (
           <OrgMemberCard key={member.id} {...member} />
         ))}

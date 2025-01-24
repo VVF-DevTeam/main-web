@@ -15,14 +15,14 @@ const OrgMemberCard = ({
   title,
 }: OrgMemberCardProps) => {
   return (
-    <div>
+    <div className="h-full w-full">
       {id % 2 === 0 ? (
-        <div className="grid grid-cols-2 gap-x-12 p-12 md:grid-cols-[50%_50%]">
+        <div className="flex flex-col-reverse gap-x-6 gap-y-6 lg:grid lg:grid-cols-[50%_50%] lg:justify-items-center">
           <MemberDescription title={title} descriptions={descriptions} />
           <MemberImage imageUrl={imageUrl} />
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-x-12 p-12 md:grid-cols-[50%_50%]">
+        <div className="flex flex-col gap-x-6 gap-y-6 lg:grid lg:grid-cols-[50%_50%] lg:justify-items-center">
           <MemberImage imageUrl={imageUrl} />
           <MemberDescription title={title} descriptions={descriptions} />
         </div>
