@@ -6,8 +6,7 @@ import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 import { auth } from '@/auth'
 import AuthButtons from './authButtons'
 
-const Navbar = async ({locale}:{ locale: string }) => {
-
+const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
@@ -18,8 +17,7 @@ const Navbar = async ({locale}:{ locale: string }) => {
 
           {/* User Button */}
           {session?.user?.id && (
-            <button
-              className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
+            <button className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
               <User2 className="h-5 w-5" />
               <span className="text-[#1B171A]">
                 {session?.user?.name?.split(' ')[0]}
@@ -34,13 +32,9 @@ const Navbar = async ({locale}:{ locale: string }) => {
             <NavLinks mode="desktop" locale={locale} />
           </div>
           <div className="block sm:hidden">
-            <MobileSidebar locale={locale}/>
+            <MobileSidebar locale={locale} />
           </div>
-          <AuthButtons userExists={!!session?.user} />
         </div>
-
-
-
       </div>
     </nav>
   )
