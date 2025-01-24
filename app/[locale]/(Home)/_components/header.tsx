@@ -44,7 +44,7 @@ const Header = () => {
             <div
               className="group flex items-center gap-x-2 hover:text-[#EFB9A2]"
               onClick={() => {
-                navigator.clipboard.writeText('admingoogle@vietvibe.org')
+                navigator.clipboard.writeText('media@vietvibe.org')
                 toast({
                   title: 'Copied to clipboard',
                 })
@@ -63,13 +63,10 @@ const Header = () => {
       </TooltipProvider>
 
       {/* LanguageChanger: Top-Right Corner */}
-      <div className='absolute top-2 right-6 flex items-center gap-x-2 rounded-md px-2 py-1'>
-        <Globe className='h-5 w-5 text-[#f7f0f0]' />
+      <div className="absolute right-6 top-2 flex items-center gap-x-2 rounded-md px-2 py-1">
+        <Globe className="h-5 w-5 text-[#f7f0f0]" />
         <LanguageChanger />
       </div>
-
-
-
     </div>
   )
 }

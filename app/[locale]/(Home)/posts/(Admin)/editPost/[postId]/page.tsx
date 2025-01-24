@@ -1,17 +1,23 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import TitleForm from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/TitleForm'
-
 import PostSummary from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/SummaryForm'
 import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
+import { adminCheck } from '@/utils/adminCheck'
+
 interface EditPostProps {
   params: Promise<{ postId: string }>
 }
 const EditPost = async ({ params }: EditPostProps) => {
+  // check if the current user is an admin to allow access to the post control page
+  if ((await adminCheck()) === false) {
+    return redirect('/posts')
+  }
+
   // TODO: Check if user is admin
   const { postId } = await params
 
@@ -68,7 +74,7 @@ const EditPost = async ({ params }: EditPostProps) => {
         {/* Form */}
         <div className="flex flex-col gap-y-12">
           {/* First Row */}
-          <div className="flex flex-col gap-y-8 gap-x-8 md:flex-row">
+          <div className="flex flex-col gap-x-8 gap-y-8 md:flex-row">
             <div className="flex w-full flex-col gap-y-4">
               <div className="flex items-center gap-x-4">
                 <BookType className="h-6 w-6 md:h-8 md:w-8" />
