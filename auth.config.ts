@@ -92,7 +92,7 @@ export default {
 
       // Check if user is trying to access a private path
       if (PRIVATE_PATHS.includes(path) && !isLoggedIn) {
-        return NextResponse.redirect(new URL('/signIn', request.nextUrl.origin))
+        return NextResponse.redirect(new URL('/signIn?message=sign-in-required', request.nextUrl.origin))
       }
 
       // Check if user is trying to access an auth path

@@ -1,6 +1,7 @@
 import React from 'react'
 import SignInForm from '@/app/[locale]/(auth)/_components/SignInForm'
 import Image from 'next/image'
+
 function signInPage() {
   return (
     <div className="my-20 flex p-6 lg:p-12 w-full h-full">

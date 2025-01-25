@@ -25,13 +25,31 @@ import { signInSchema } from '@/lib/zodSchema/signinSchema'
 
 import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
+import { useSearchParams } from 'next/navigation'
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
+
+  const searchParams = useSearchParams()
   const { toast } = useToast()
 
   useEffect(() => {
+    // Retrieve the 'message' parameter from the URL query string
+    const message = searchParams.get('message') || ''
+
+    // Check if the message is 'sign-in-required'
+    if (message === 'sign-in-required') {
+      toast({
+        variant: 'default',
+        title: 'Sign In Required',
+        description: 'You need to sign in to access the requested page',
+      })
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    // Redirect to home page if the user is already logged in
     if (shouldRedirect === false) {
       return
     }
@@ -50,7 +68,7 @@ const SignInForm = () => {
     try {
       const response = await signinAction(data)
 
-      if (response.success === "true") {
+      if (response.success === 'true') {
         toast({
           variant: 'default',
           title: 'Success',
@@ -58,21 +76,19 @@ const SignInForm = () => {
         })
 
         setShouldRedirect(true)
-      } else if (response.success === "false") {
+      } else if (response.success === 'false') {
         toast({
           variant: 'destructive',
           title: 'Error',
           description: response.message,
         })
-
+      } else if (response.success === 'pending') {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        })
       }
-      else if (response.success === "pending") {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: response.message,
-        })
-    }
     } catch (error) {
       console.log(error)
       toast({
@@ -88,7 +104,7 @@ const SignInForm = () => {
       {/* form header */}
       <div className="mb-24 flex items-center gap-x-4 lg:mb-36">
         <CustomIcon height={100} width={100} />
-        <h1 className="text-xl">Company Name</h1>
+        <h1 className="text-xl">Viet Vibe Foundation</h1>
       </div>
       <h1 className="text-2xl font-semibold text-[#620BC4]">Login</h1>
       <p className="mt-8 text-sm text-muted-foreground">
@@ -160,12 +176,12 @@ const SignInForm = () => {
                 type="submit"
                 className="w-full bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
               >
-                LogIn
+                Login
               </Button>
               {/* <p className="text-center text-sm font-bold">OR</p> */}
               <ProviderButtons />
               <p className="text-center text-sm font-bold">OR</p>
-              <p className="text-sm text-center">
+              <p className="text-center text-sm">
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/signUp"

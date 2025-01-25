@@ -6,11 +6,13 @@ import { LogIn } from 'lucide-react'
 import { signOutAction } from '@/lib/actions/signoutAction'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
 interface AuthButtonProps {
   userExists: boolean
+  mode: string
 }
-const AuthButtons = ({ userExists }: AuthButtonProps) => {
+const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const isActive = pathname.includes('signIn')
@@ -47,7 +49,11 @@ const AuthButtons = ({ userExists }: AuthButtonProps) => {
   return (
     <button
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
-      className={`flex items-center justify-center gap-x-2 text-sm text-[#1B171A] transition-all ${isActive ? 'text-blue-500 underline' : 'text-[#1B171A] hover:underline hover:text-blue-500'}`}
+      className={cn(
+        mode === 'desktop'
+          ? `flex items-center justify-center gap-x-2 whitespace-nowrap text-sm text-[#1B171A] transition-all ${isActive ? 'text-blue-500 underline' : 'text-[#1B171A] hover:text-blue-500 hover:underline'}`
+          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl transition-all ${isActive ? 'text-blue-500 underline' : 'text-slate-200 hover:bg-[#620BC4] hover:text-blue-500 hover:underline'}`
+      )}
     >
       <LogIn className="h-5 w-5" />
       <span>{userExists ? t('logout-nav') : t('login-nav')}</span>
