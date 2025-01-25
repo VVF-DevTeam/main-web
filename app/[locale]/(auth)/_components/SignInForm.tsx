@@ -25,13 +25,27 @@ import { signInSchema } from '@/lib/zodSchema/signinSchema'
 
 import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
+import { useSearchParams } from 'next/navigation';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const { toast } = useToast()
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
+    // Check if need to show sign in required message
+    const message = searchParams.get('message')
+    if (message === 'sign-in-required') {
+      toast({
+        variant: 'default',
+        title: 'Sign In Required',
+        description: 'You need to sign in to access the requested page',
+      });
+    }
+
+    // Redirect to home page if the user is already logged in
     if (shouldRedirect === false) {
       return
     }

@@ -4,7 +4,6 @@ import NavLinks from './navLinks'
 import { User2 } from 'lucide-react'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 import { auth } from '@/auth'
-import AuthButtons from './authButtons'
 
 const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()

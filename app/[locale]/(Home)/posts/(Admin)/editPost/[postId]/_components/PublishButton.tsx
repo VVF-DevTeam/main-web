@@ -21,9 +21,9 @@ const PublishButton = ({
 }: PublishButtonProps) => {
   const { toast } = useToast()
   const router = useRouter()
-  const action = isPublished ? 'unpublish' : 'publish'
+  const action = isPublished ? 'Unpublish' : 'Publish'
 
-  const publishOrUnpublish = async (action: 'publish' | 'unpublish') => {
+  const publishOrUnpublish = async (action: 'Unpublish' | 'Publish') => {
     try {
       await axios.patch(`/api/${domain}/${action}/${id}`)
       toast({
