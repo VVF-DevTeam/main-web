@@ -10,7 +10,8 @@ const MemberImage = ({ imageUrl }: MemberImageProps) => {
       <Image
         src={imageUrl}
         alt="Org Members"
-        className="cover absolute rounded-xl shadow-lg"
+        // To do change image
+        className="object-cover absolute rounded-xl shadow-lg"
         fill
       />
     </div>

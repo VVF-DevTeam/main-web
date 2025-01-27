@@ -9,7 +9,7 @@ interface GridCardProps {
 const GridCard = ({ name, desc, logo: Logo }: GridCardProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-y-2 p-2 md:p-4 md:gap-y-4">
-      {Logo && <Logo className="h-12 w-12 text-[#B83AB3]/70" />}
+      {Logo && <Logo className="h-12 w-12 text-[#7f0000]/70" />}
       <h2
         className={cn(
           !Logo
