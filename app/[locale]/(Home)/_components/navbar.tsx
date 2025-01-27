@@ -4,24 +4,25 @@ import NavLinks from './navLinks'
 import { User2 } from 'lucide-react'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 import { auth } from '@/auth'
+import Link from 'next/link'
 
 const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="h-[110px] w-full bg-[#EFB9A2]/20 p-6">
+    <nav className="h-[110px] w-full bg-[#ffebdd] p-6">
       <div className="flex h-full w-full items-center justify-between">
         <div className="flex h-full w-full items-center gap-x-4">
           <CompanyLogo />
 
           {/* User Button */}
           {session?.user?.id && (
-            <button className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70">
+            <Link className="flex items-center justify-center gap-x-2 text-[#1B171A] transition-all hover:text-[#1B171A]/70" href="/profile">
               <User2 className="h-5 w-5" />
               <span className="text-[#1B171A]">
                 {session?.user?.name?.split(' ')[0]}
               </span>
-            </button>
+            </Link>
           )}
         </div>
 
