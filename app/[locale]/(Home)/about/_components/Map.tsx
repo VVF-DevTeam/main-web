@@ -83,11 +83,11 @@ const Map: React.FC<MapProps> = ({ address }) => {
   }, [address])
 
   return (
-    <div className="bg-white px-6 py-32">
+    <div className="bg-[#EFB9A2]/20 px-6 py-32">
         <h1 className="mb-20 text-center text-3xl font-semibold tracking-wide md:text-4xl lg:text-5xl">
             Our Location
         </h1>
-        <div style={{ height: "600px", width: "100%" }} ref={mapRef} />
+        <div className="h-[600px] w-full" ref={mapRef}/>
     </div>
   )
 }

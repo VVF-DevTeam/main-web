@@ -7,7 +7,7 @@ const AboutPage = () => {
     <div className="h-full w-full">
       <OrgSummary />
       <OrgMembers />
-      <Map address='6975 Vivian St, Vancouver, BC, Canada'/>
+      <Map address='3549 Monmouth Avenue, V5R5S1'/>
     </div>
   )
 }
