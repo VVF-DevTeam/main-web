@@ -33,7 +33,7 @@ const memberData = [
 
 const OrgMembers = () => {
   return (
-    <div className="bg-slate-300 px-6 py-32">
+    <div className="px-6 py-32 bg-white">
       <h1 className="mb-20 text-center text-3xl font-semibold tracking-wide text-[#620BC4] md:text-4xl lg:text-5xl">
         Meet Our Founders
       </h1>

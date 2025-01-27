@@ -25,7 +25,7 @@ const PublishButton = ({
 
   const publishOrUnpublish = async (action: 'Unpublish' | 'Publish') => {
     try {
-      await axios.patch(`/api/${domain}/${action}/${id}`)
+      await axios.patch(`/api/${domain}/${action.toLowerCase()}/${id}`)
       toast({
         variant: 'default',
         title: 'Success',

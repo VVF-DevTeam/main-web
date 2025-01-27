@@ -3,6 +3,7 @@ import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
+import Footer from '@/app/[locale]/(Home)/_components/footer'
 
 const i18nNamespaces = ['homePage', 'common']
 
@@ -22,10 +23,13 @@ const Layout = async ({
       locale={locale}
       resources={resources}
     >
-      <div className="relative h-full min-h-fit w-full min-w-full bg-[#EFB9A2]/20">
+      <div className="relative h-full min-h-fit w-full min-w-full bg-[url(/sample-images/bg-login.png)] bg-cover bg-center bg-no-repeat">
         <Header />
         <Navbar locale={locale} />
         <div className="min-h-screen">{children}</div>
+        <div className="mt-auto">
+          <Footer locale={locale} />
+        </div>
       </div>
     </TranslationsProvider>
   )

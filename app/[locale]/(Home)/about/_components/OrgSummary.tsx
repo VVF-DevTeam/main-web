@@ -22,7 +22,7 @@ const cardsData = [
 ]
 const OrgSummary = () => {
   return (
-    <div className="bg-[#8F27DB]/10 py-12 lg:py-16">
+    <div className="bg-[#ffffff] py-12 lg:py-16">
       <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-center gap-y-10 p-6">
         <div className="flex flex-col items-center justify-center p-6 lg:px-10">
           <div className="relative aspect-video min-h-[180px] min-w-[180px] lg:w-[23vw] xl:h-[18vh]">
