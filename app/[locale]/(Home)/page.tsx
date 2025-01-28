@@ -1,5 +1,4 @@
 import ImageCarousel from '@/app/[locale]/(Home)/_components/imageCarousel'
-import Contact from '@/app/[locale]/(Home)/_components/contact'
 import About from '@/app/[locale]/(Home)/_components/about'
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
@@ -14,7 +13,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <div className="overflow-hidden">
       <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
       <About locale={locale}/>
-      <Contact/>
     </div>
   )
 }

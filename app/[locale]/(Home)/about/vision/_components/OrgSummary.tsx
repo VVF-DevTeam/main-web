@@ -1,5 +1,5 @@
 import React from 'react'
-import GridCard from '../../_components/gridCard'
+import GridCard from '../../../_components/gridCard'
 import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
 const cardsData = [
