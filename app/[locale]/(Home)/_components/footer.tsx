@@ -1,11 +1,12 @@
-import React from 'react'
-import { navRoutes } from '@/lib/navRoutes'
-import Link from 'next/link'
+import React from 'react';
+import { navRoutes } from '@/lib/navRoutes';
+import Link from 'next/link';
+import { Separator } from '@radix-ui/react-separator';
+import { SiFacebook, SiInstagram } from 'react-icons/si'; // Import Simple Icons
+import initTranslation from '@/app/i18n';
 
-import { Separator } from '@radix-ui/react-separator'
-import initTranslation from '@/app/i18n'
 const Footer = async ({ locale }: { locale: string }) => {
-  const { t } = await initTranslation(locale, ['homePage', 'common'])
+  const { t } = await initTranslation(locale, ['homePage', 'common']);
 
   return (
     <footer className="w-full">
@@ -53,6 +54,30 @@ const Footer = async ({ locale }: { locale: string }) => {
                       {t('address-footer')}
                     </span>
                   </p>
+                  <iframe
+                    src="https://www.google.com/maps/d/u/0/embed?mid=1Bid48QaiPGoMB5agPc-ZaoZfLrtYc3g&ehbc=2E312F&noprof=1"
+                    width="300"
+                    height="200"
+                  ></iframe>
+                  {/* Social Media Links */}
+                  <div className="mt-4 flex space-x-4">
+                    <a
+                      href="https://www.facebook.com/profile.php?id=61570910920072"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-300 hover:text-[#EFB9A2]"
+                    >
+                      <SiFacebook className="w-6 h-6" />
+                    </a>
+                    <a
+                      href="https://www.instagram.com/vietvibe.foundation"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-300 hover:text-[#EFB9A2]"
+                    >
+                      <SiInstagram className="w-6 h-6" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -60,7 +85,7 @@ const Footer = async ({ locale }: { locale: string }) => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

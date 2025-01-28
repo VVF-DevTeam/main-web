@@ -6,6 +6,8 @@ import initTranslation from '@/app/i18n'
 import AuthButtons from './authButtons'
 import { auth } from '@/auth'
 
+import NavAbout  from './navAbout'
+
 type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
   mode: screenSize
@@ -14,7 +16,7 @@ interface NavLinkProps {
 const NavLinks = async ({ mode, locale }: NavLinkProps) => {
   const session = await auth()
   const { t } = await initTranslation(locale, ['homePage', 'common'])
-
+  
   // TODO: Concat navroute and auth routes
   return (
     <div
@@ -33,6 +35,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
           mode={mode}
         />
       ))}
+      <NavAbout title={t('about-navLink')} vision={t('vision-navLink')}  directors={t('directors-navLink')} mode = {mode}/>
       <AuthButtons userExists={!!session?.user} mode={mode} />
     </div>
   )
