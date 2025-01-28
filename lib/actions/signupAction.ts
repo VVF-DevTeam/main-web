@@ -48,15 +48,20 @@ export const signupAction = async (formData: signupActionProps) => {
     }
     console.log('Before checking user')
     // CHECK IF THE USER ALREADY EXISTS
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findFirst({
       where: {
-        email: email,
+        OR: [
+          {
+            email: email,
+          },
+          { phone: phoneNumber },
+        ],
       },
     })
 
     if (existingUser) {
       return {
-        message: 'Account with this email already exists',
+        message: 'An account with this email or phone number exists',
         success: false,
       }
     }
@@ -83,7 +88,7 @@ export const signupAction = async (formData: signupActionProps) => {
     // Send Verification Email
     const verificationToken = await createToken(user.email)
     if (verificationToken && user) {
-      console.log("before sending email")
+      console.log('before sending email')
       await sendEmail({
         firstName: user.name!,
         to: user.email,
@@ -94,7 +99,8 @@ export const signupAction = async (formData: signupActionProps) => {
     }
 
     return {
-      message: 'Account created successfully. A verification link has been sent to your email',
+      message:
+        'Account created successfully. A verification link has been sent to your email',
       success: true,
     }
   } catch (error) {

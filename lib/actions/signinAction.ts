@@ -4,6 +4,8 @@ import { signInSchema } from '../zodSchema/signinSchema'
 import { AuthError } from 'next-auth'
 import { isRedirectError } from 'next/dist/client/components/redirect'
 import { prisma } from '../db'
+import { sendEmail } from '../utilFunctions/sendEmail'
+import { createToken } from '../dbQueries/token'
 
 export const signinAction = async (data: {
   email: string
@@ -14,7 +16,7 @@ export const signinAction = async (data: {
     if (!parsedCredentials.success) {
       return {
         message: parsedCredentials.error.message,
-        success: "false",
+        success: false,
       }
     }
     const { email, password } = parsedCredentials.data
@@ -29,28 +31,35 @@ export const signinAction = async (data: {
       console.log("User doesn't exist")
       return {
         message: "User doesn't exist",
-        success: "false",
+        success: false,
       }
     }
 
     if (!userExists.emailVerified) {
-      console.log("email not verified")
+      console.log('email not verified')
+      const newToken = await createToken(email)
+      sendEmail({
+        firstName: userExists.name!,
+        to: userExists.email,
+        token: newToken?.id!,
+      })
+
       return {
         message: 'A verification link has been sent to your email',
-        success: "pending",
+        success: true,
       }
     }
-    console.log("pre signin")
+    console.log('pre signin')
     // Sign in the user
     await signIn('credentials', {
       email: email,
       password: password,
       redirect: false,
     })
-    console.log("post signin")
+    console.log('post signin')
     return {
       message: 'Signed in successfully',
-      success: "true",
+      success: true,
     }
   } catch (error) {
     if (isRedirectError(error)) throw error
@@ -60,19 +69,19 @@ export const signinAction = async (data: {
         case 'CredentialsSignin': {
           return {
             message: 'Invalid credentials',
-            success: "false",
+            success: false,
           }
         }
         case 'CallbackRouteError': {
           return {
             message: error.cause?.err?.toString() || 'Something went wrong',
-            success: "false",
+            success: false,
           }
         }
         default: {
           return {
             message: 'Something went wrong',
-            success: "false",
+            success: false,
           }
         }
       }
