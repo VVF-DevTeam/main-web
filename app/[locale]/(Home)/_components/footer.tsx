@@ -56,6 +56,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                   </p>
                   <iframe
                     src="https://www.google.com/maps/d/u/0/embed?mid=1Bid48QaiPGoMB5agPc-ZaoZfLrtYc3g&ehbc=2E312F&noprof=1"
+                    title = "Our location"
                     width="300"
                     height="200"
                   ></iframe>

@@ -5,6 +5,8 @@ import { Ribbon, ChevronDown } from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
 
+import Link from 'next/link'
+
 type screenSize = 'mobile' | 'desktop'
 
 interface NavAboutProps {
@@ -69,27 +71,29 @@ const NavAbout: React.FC<NavAboutProps> = ({
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
       >
-        <a href="/about/vision" 
+        <Link href="/about/vision" 
           className={classNames(
             'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:bg-gray-100',
             mode === 'desktop'
               ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
               : 'text-xl text-slate-200 hover:text-blue-500'
           )}
+          onClick={() => setIsOpen(!isOpen)}
         >
           {vision}
-        </a>
+        </Link>
         <div className="border-b border-gray-200" />
-        <a href="/about/directors" 
+        <Link href="/about/directors" 
           className={classNames(
             'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:bg-gray-100',
             mode === 'desktop'
               ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
               : 'text-xl text-slate-200 hover:text-blue-500'
           )}
+          onClick={() => setIsOpen(!isOpen)}
         >
           {directors}
-        </a>
+        </Link>
       </div>
     </div>
   )
