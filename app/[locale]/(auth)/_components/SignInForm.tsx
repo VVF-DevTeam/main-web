@@ -26,6 +26,7 @@ import { signInSchema } from '@/lib/zodSchema/signinSchema'
 import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
 import { useSearchParams } from 'next/navigation'
+import { ServerActionResponse } from '@/lib/types/serverAction'
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -66,9 +67,9 @@ const SignInForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
-      const response = await signinAction(data)
+      const response: ServerActionResponse = await signinAction(data)
 
-      if (response.success === 'true') {
+      if (response.success === true) {
         toast({
           variant: 'default',
           title: 'Success',
@@ -76,13 +77,7 @@ const SignInForm = () => {
         })
 
         setShouldRedirect(true)
-      } else if (response.success === 'false') {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: response.message,
-        })
-      } else if (response.success === 'pending') {
+      } else {
         toast({
           variant: 'destructive',
           title: 'Error',

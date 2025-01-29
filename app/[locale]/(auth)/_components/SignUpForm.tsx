@@ -239,7 +239,7 @@ const SignUpForm = () => {
                     htmlFor="confirmPassword"
                     className="text-[#620BC4]"
                   >
-                    confirm Password
+                    Confirm Password
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
