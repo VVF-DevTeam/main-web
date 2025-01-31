@@ -22,17 +22,20 @@ model Event {
   id          String  @id @default(cuid())
   title       String
   description String?
-
+  thumbnail   String?
+  
   // Metadata
   eventCategory   EventCategory @relation(fields: [eventCategoryId], references: [id])
   eventCategoryId String
   location        String?
-  isFree          Boolean       @default(false)
-  startTime       DateTime
-  endTime         DateTime
-  allDay          Boolean?
+  price           Int       @default(0)
+  startDate       DateTime  @default(now())
+  endDate         DateTime  @default(now())
+  duration        String
+  dates           String[]
   capacity        Int?
   ticketsSold     Int?
+  startTime       DateTime
 
   // States
   published   Boolean  @default(false)

@@ -1,81 +1,76 @@
-import Image from 'next/image'
+import EventList from './_components/EventList'
 
-import IconTray from '@/app/[locale]/(Home)/events/_components/IconTray'
-import Events from '@/app/[locale]/(Home)/events/_components/Events'
-import { socialMediaIcons } from '@/lib/socialIcons'
 const EventsPage = () => {
-  const imageUrls = [
-    { id: '1', url: '/sample-images/image1.jpg' },
-    { id: '2', url: '/sample-images/image2.jpg' },
-  ]
-
   const eventList = [
     {
-      id: '3',
-      name: 'Friday Chill 3',
-      thumbnail: '/sample-images/image3.jpg',
-      day: '13 Dec',
-      location: 'Vancouver',
-      end: 'True',
-    },
-    {
-      id: '2',
-      name: 'Friday Chill 2',
-      thumbnail: '/sample-images/image2.jpg',
-      day: '25 Oct',
-      location: 'Vancouver',
-      end: 'True',
-    },
-    {
       id: '1',
-      name: 'Friday Chill 1',
-      thumbnail: '/sample-images/image1.jpg',
-      day: '16 Aug',
-      location: 'Vancouver',
-      end: 'True',
+      eventType: 'class',
+      title: 'Beginner Guitar Lessons',
+      description: 'asdsad',
+      eventCategoryId: '1',
+      thumbnail: '/bg/guitar-background.jpg',
+      startDate: new Date('2025-02-10T00:00:00'),
+      endDate: new Date('2025-06-10T00:00:00'),
+      dates: ['Sat'],
+      duration: '1.5 hours',
+      capacity: 10,
+      ticketsSold: 5,
+      published: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdById: '1',
+      price: 8.5,
+      location: 'Metro Vancouver',
+      startTime: new Date('2025-03-10T02:00:00'),
+    },
+    {
+      id: 'elenaDance',
+      eventType: 'class',
+      title: ' Beginner Dance Lessons (Coming Soon)',
+      description: 'asdsad',
+      eventCategoryId: '1',
+      thumbnail: '/bg/dance-bg.jpg',
+      startDate: new Date('2025-03-10T00:00:00'),
+      endDate: new Date('2025-07-10T00:00:00'),
+      dates: ['Fri', 'Sun'],
+      duration: '1 hour',
+      capacity: 0,
+      ticketsSold: 0,
+      published: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdById: '1',
+      price: 0,
+      location: 'Downtown Vancouver',
+      startTime: new Date('2025-03-10T15:00:00'),
+    },
+    {
+      id: 'fridaychill',
+      eventType: 'concert',
+      title: 'Friday Chill 3',
+      description: 'asdsad',
+      eventCategoryId: '1',
+      thumbnail: '/sample-images/image3.jpg',
+      startDate: new Date('2024-12-13T18:00:00'),
+      endDate: new Date('2024-12-13T21:00:00'),
+      dates: ['Fri'],
+      duration: '3 hours',
+      capacity: 10,
+      ticketsSold: 10,
+      published: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdById: '1',
+      price: 15,
+      location: '139 Keefer Street',
+      startTime: new Date('2025-03-10T01:00:00'),
     },
   ]
   return (
     <div className="w-full overflow-hidden">
-      <div className="flex h-[70vh] flex-col justify-between gap-y-4 py-10 md:py-12 lg:flex-row">
-        {/* Event title and description */}
-        <div className="flex h-full basis-1/2 flex-col gap-y-4 px-6 md:px-12 lg:mt-4 xl:mt-6 xl:gap-y-7">
-          <div className="flex flex-col text-3xl font-bold uppercase md:text-4xl lg:text-7xl xl:text-[84px] xl:font-extrabold xl:tracking-widest">
-            <span>Friday</span>
-            <span>Chill</span>
-          </div>
-          <p className="md:text-md text-sm font-[400] uppercase">
-            Vietnamese Acoustic Shows
-          </p>
-          <div>
-            <IconTray iconList={socialMediaIcons} isLink={true} />
-          </div>
-        </div>
-
-        {/* Event image */}
-        <div className="relative flex h-full w-full basis-1/2 xl:h-[90%]">
-          {/* large image */}
-          <div className="z-1 h-full w-[50%] max-w-4xl lg:aspect-square">
-            <Image
-              src={imageUrls[0].url}
-              fill
-              alt="Event Image"
-              className="rounded-md object-cover"
-            />
-          </div>
-          {/* small image */}
-          <div className="z-2 absolute bottom-0 left-[-15%] right-0 top-[25%] hidden h-[45%] w-[35%] lg:block">
-            <Image
-              src={imageUrls[1].url}
-              fill
-              alt="Event Image"
-              className="rounded-md object-cover"
-            />
-          </div>
-        </div>
+      <div className="">
+        <EventList events={eventList} />
       </div>
-      {/* Shows */}
-      <Events events={eventList} />
     </div>
   )
 }

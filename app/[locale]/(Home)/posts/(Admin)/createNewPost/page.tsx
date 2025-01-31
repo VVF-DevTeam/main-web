@@ -1,7 +1,7 @@
 import CreatePostForm from '@/app/[locale]/(Home)/posts/(Admin)/createNewPost/_components/CreatePostForm'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/utils/adminCheck'
+import { adminCheck } from '@/lib/utilFunctions/adminCheck'
 
 const NewPost = async () => {
   // check if the current user is an admin to allow access to the post control page

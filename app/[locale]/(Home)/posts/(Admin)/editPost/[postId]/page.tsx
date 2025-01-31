@@ -7,7 +7,7 @@ import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_co
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
-import { adminCheck } from '@/utils/adminCheck'
+import { adminCheck } from '@/lib/utilFunctions/adminCheck'
 
 interface EditPostProps {
   params: Promise<{ postId: string }>

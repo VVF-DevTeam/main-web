@@ -1,15 +1,17 @@
-import Image from "next/image";
+import Image from 'next/image'
 import React from 'react'
 
 interface logoProps {
-  height?: number;
-  width?: number;
+  height?: number
+  width?: number
   src?: string
 }
-const CustomIcon = ({height=120, width=120, src="/company-logo.png"}: logoProps) => {
-  return (
-   <Image src={src} alt="Org Logo" width={height} height={width}/>
-  )
+const CustomIcon = ({
+  height = 120,
+  width = 100,
+  src = '/logo/main-logo.jpg',
+}: logoProps) => {
+  return <Image src={src} alt="Org Logo" width={height} height={width} />
 }
 
 export default CustomIcon

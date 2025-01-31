@@ -1,9 +1,15 @@
-import OrgSummary from './_components/OrgSummary'
+import About from '@/app/[locale]/(Home)/_components/about'
 
-const AboutPageVision = () => {
+const AboutPageVision = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) => {
+  const { locale } = await params
+
   return (
-    <div className="h-full w-full">
-      <OrgSummary />
+    <div>
+      <About locale={locale} />
     </div>
   )
 }
