@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { NextAuthConfig } from 'next-auth'
 import Github from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
+import Facebook from 'next-auth/providers/facebook'
 import { NextResponse } from 'next/server'
 
 import { prisma } from './lib/db'
@@ -19,9 +20,13 @@ export default {
       clientSecret: process.env.GITHUB_TEST_SECRET,
     }),
     Google({
-      clientId: process.env.LOGIN_GOOGLE_CLIENT_ID,
-      clientSecret: process.env.LOGIN_GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    }),    
     Credentials({
       credentials: {
         email: { name: 'email', type: 'email', placeholder: 'email' },
