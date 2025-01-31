@@ -10,16 +10,17 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="h-[110px] w-full bg-[#d2d0d0] bg-[url(/bg/skating-bg-blur.jpg)] bg-cover bg-no-repeat p-6 bg-blend-overlay shadow-md bg-center">
+    <nav className="h-[110px] w-full bg-[#d2d0d0] bg-[url(/bg/skating-bg-blur.jpg)] bg-cover bg-center bg-no-repeat p-6 bg-blend-overlay shadow-md">
       <div className="flex h-full w-full items-center justify-between">
         <div className="flex h-full w-full items-center gap-x-4">
-          <CompanyLogo />
-
+          <Link href="/">
+            <CompanyLogo />
+          </Link>
           {/* User Button */}
           {session?.user?.id && (
             <Link
               className="-ml-10 flex items-center justify-center gap-x-2 text-[#212121] transition-all hover:text-[#C54B3E]"
-              href="/profile"
+              href=""
             >
               <User2 className="h-5 w-5" />
               <span>{session?.user?.name?.split(' ')[0]}</span>

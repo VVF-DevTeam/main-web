@@ -1,6 +1,5 @@
 import ScheduleItem from './ScheduleItem'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 
 interface ClassDescriptionProps {
   description: string
@@ -80,7 +79,7 @@ const ClassDescription = ({
       </div>
 
       {/* Buy Button */}
-      <Link href='https://forms.gle/Z2z2gfggF5AyG5Rr9'><Button>Reserve Now</Button></Link>
+      <a href='https://forms.gle/Z2z2gfggF5AyG5Rr9' target="_blank" rel="noopener noreferrer"><Button>Reserve Now</Button></a>
     </div>
   )
 }
