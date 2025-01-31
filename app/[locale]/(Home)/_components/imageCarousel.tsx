@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-
+import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 interface ImageCarouselProps {
   imageUrls: {
@@ -51,39 +51,47 @@ const ImageCarousel = ({
   const totalwidth = `${imageUrls.length * 100}vw`
 
   return (
-    <div className="relative h-[75vh] w-[400vw]">
-      <div className="flex h-full w-full items-center">
-        {imageUrls.map((img) => (
-          <div
-            key={img.id}
-            style={{
-              width: totalwidth,
-              transform: `translateX(-${imageIndex * 100}%)`,
-            }}
-            className="relative h-full transition-transform duration-500 ease-out"
-          >
-            <Image
-              src={img.url}
-              alt={`Image ${img.id}`}
-              fill
-              className="object-cover"
-            />
-          </div>
-        ))}
+    <div>
+      <div className="flex flex-col items-center justify-center">
+        <Separator className="w-1/2 bg-[#7f0000]" />
+        <span className="flex mb-7 py-6 font-[Poppins] text-4xl font-semibold italic leading-[3rem] tracking-wider text-[#3d3a3a]">
+          Our Achievements
+        </span>
       </div>
-      <div className="absolute inset-0 z-20 flex h-full max-w-[100vw] items-center justify-between px-4">
-        <button aria-label="prev-image">
-          <ArrowLeft
-            className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
-            onClick={() => changeImage('left')}
-          />
-        </button>
-        <button aria-label="next-image">
-          <ArrowRight
-            className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
-            onClick={() => changeImage('right')}
-          />
-        </button>
+      <div className="relative h-[75vh] w-[400vw]">
+        <div className="flex h-full w-full items-center">
+          {imageUrls.map((img) => (
+            <div
+              key={img.id}
+              style={{
+                width: totalwidth,
+                transform: `translateX(-${imageIndex * 100}%)`,
+              }}
+              className="relative h-full transition-transform duration-500 ease-out"
+            >
+              <Image
+                src={img.url}
+                alt={`Image ${img.id}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="absolute inset-0 z-20 flex h-full max-w-[100vw] items-center justify-between px-4">
+          <button aria-label="prev-image">
+            <ArrowLeft
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
+              onClick={() => changeImage('left')}
+            />
+          </button>
+          <button aria-label="next-image">
+            <ArrowRight
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
+              onClick={() => changeImage('right')}
+            />
+          </button>
+        </div>
       </div>
     </div>
   )

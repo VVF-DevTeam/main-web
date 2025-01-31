@@ -5,6 +5,8 @@
       "error",
       {"ts-ignore": "allow-with-description"}
     ],
-    "@typescript-eslint/no-non-null-asserted-optional-chain": "off"
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off"
   }
 }

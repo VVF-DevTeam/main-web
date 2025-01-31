@@ -3,12 +3,19 @@ import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
 import Header from '@/app/[locale]/(Home)/_components/header'
+import Copyright from './_components/copyright'
 
-const i18nNamespaces = ['homePage', 'common'];
+const i18nNamespaces = ['homePage', 'common']
 
-const Layout = async ({ children, params }: { children: React.ReactNode, params: Promise<{ locale: string }> }) => {
-  const { locale } = await params;
-  const { resources } = await initTranslation(locale, i18nNamespaces);
+const Layout = async ({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) => {
+  const { locale } = await params
+  const { resources } = await initTranslation(locale, i18nNamespaces)
 
   return (
     <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
@@ -16,15 +23,15 @@ const Layout = async ({ children, params }: { children: React.ReactNode, params:
       locale={locale}
       resources={resources}
     >
-      <div className="relative h-full min-h-screen w-full bg-[#EFB9A2]/20">
-
+      <div className="relative h-full min-h-screen w-full bg-white">
         <div>
           <Header />
-          <Navbar locale={locale}/>
+          <Navbar locale={locale} />
         </div>
         <div className="min-h-screen">{children}</div>
         <div className="mt-auto">
           <Footer locale={locale} />
+          <Copyright/>
         </div>
       </div>
     </TranslationsProvider>

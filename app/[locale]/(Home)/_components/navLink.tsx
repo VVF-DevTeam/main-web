@@ -35,8 +35,8 @@ const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
       href={path}
       className={cn(
         mode === 'desktop'
-          ? `flex items-center justify-center gap-x-[5px] whitespace-nowrap text-sm transition-all ${isActive ? 'text-blue-500 underline' : 'text-[#1B171A] hover:text-blue-500 hover:underline'}`
-          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl transition-all ${isActive ? 'text-blue-500 underline' : 'text-slate-200 hover:bg-[#620BC4] hover:text-blue-500 hover:underline'}`
+          ? `flex items-center justify-center gap-x-[5px] whitespace-nowrap text-sm font-semibold tracking-wide transition-all ${isActive ? 'text-[#C54B3E]' : 'text-[#212121] hover:text-[#C54B3E] hover:underline'}`
+          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-slate-200 hover:bg-[#620BC4]/40'}`
       )}
     >
       <Icon className="h-5 w-5" />

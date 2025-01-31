@@ -97,13 +97,15 @@ const SignInForm = () => {
   return (
     <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
       {/* form header */}
-      <div className="mb-24 flex items-center gap-x-4 lg:mb-36">
+      <div className="mb-24 flex items-center gap-x-4 font-[Poppins] lg:mb-36">
         <CustomIcon height={100} width={100} />
-        <h1 className="text-xl">Viet Vibe Foundation</h1>
+        <h1 className="text-3xl">Viet Vibe Foundation</h1>
       </div>
-      <h1 className="text-2xl font-semibold text-[#620BC4]">Login</h1>
-      <p className="mt-8 text-sm text-muted-foreground">
-        Login to your account to book event tickets or lessons.
+      <h1 className="font-[Poppins] text-4xl font-semibold text-[#620BC4]">
+        Login
+      </h1>
+      <p className="mt-8 font-[Poppins] text-lg text-muted-foreground">
+        Login to your account to book event tickets or lessons
       </p>
       <Separator className="my-4 h-[1px] w-full bg-gray-300" />
       {/* form */}
@@ -119,7 +121,9 @@ const SignInForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Email</FormLabel>
+                  <FormLabel className="font-[Poppins] text-lg text-[#620BC4]">
+                    Email
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="JoeSmith@gmail.com"
@@ -139,7 +143,10 @@ const SignInForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="password" className="text-[#620BC4]">
+                  <FormLabel
+                    htmlFor="password"
+                    className="font-[Poppins] text-lg text-[#620BC4]"
+                  >
                     Password
                   </FormLabel>
                   <FormControl>

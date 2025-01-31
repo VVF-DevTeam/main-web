@@ -41,11 +41,11 @@ const Footer = async ({ locale }: { locale: string }) => {
                 </h5>
                 <Separator className="h-[2px] w-1/4 bg-slate-700" />
                 <div className="mt-4 flex flex-col gap-y-2 text-sm">
-                  <p className="text-slate-500">
+                  {/* <p className="text-slate-500">
                     <span className="text-slate-300">
                       {t('phoneNumber-footer')}
                     </span>
-                  </p>
+                  </p> */}
                   <p className="text-slate-500">
                     <span className="text-slate-300">{t('email-footer')}</span>
                   </p>
@@ -54,12 +54,6 @@ const Footer = async ({ locale }: { locale: string }) => {
                       {t('address-footer')}
                     </span>
                   </p>
-                  <iframe
-                    src="https://www.google.com/maps/d/u/0/embed?mid=1Bid48QaiPGoMB5agPc-ZaoZfLrtYc3g&ehbc=2E312F&noprof=1"
-                    title = "Our location"
-                    width="300"
-                    height="200"
-                  ></iframe>
                   {/* Social Media Links */}
                   <div className="mt-4 flex space-x-4">
                     <a

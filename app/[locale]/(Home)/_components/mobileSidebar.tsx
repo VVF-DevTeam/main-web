@@ -11,12 +11,12 @@ import {
 } from '@/components/ui/sheet'
 import NavLinks from './navLinks'
 
-const MobileSidebar = ({locale}:{ locale: string }) => {
+const MobileSidebar = ({ locale }: { locale: string }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button className="flex items-center justify-center">
-          <Menu className="h-8 w-8 text-[#1B171A] transition-all hover:h-9 hover:w-9 hover:text-[#620BC4]" />
+          <Menu className="h-8 w-8 text-[#212121] transition-all hover:text-[#C54B3E]" />
         </button>
       </SheetTrigger>
       <SheetContent className="w-[300px] bg-[#1B171A]">
@@ -24,7 +24,7 @@ const MobileSidebar = ({locale}:{ locale: string }) => {
           <SheetTitle className="text-[#1B171A]">Menu</SheetTitle>
 
           <SheetDescription>
-            <NavLinks mode="mobile" locale={locale}/>
+            <NavLinks mode="mobile" locale={locale} />
           </SheetDescription>
         </SheetHeader>
 

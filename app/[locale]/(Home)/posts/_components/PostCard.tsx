@@ -30,7 +30,7 @@ const PostCard = ({
   userId,
 }: PostProps) => {
   return (
-    <div className="grid h-full w-full gap-x-6 overflow-hidden rounded-md border bg-slate-50 shadow-lg transition-all duration-200 ease-in hover:bg-slate-100/90 md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
+    <div className="grid h-full w-full gap-x-6 overflow-hidden rounded-md border bg-[#EFB9A2]/20 shadow-lg transition-all duration-200 ease-in hover:bg-[#F2E3D5] md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -66,10 +66,10 @@ const PostCard = ({
           <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-12">
             <Button
               variant={'ghost'}
-              className="flex items-center gap-x-2 bg-[#620BC4] text-sm text-white hover:bg-[#620BC4]/90 hover:text-white/90 md:text-base"
+              className="flex items-center gap-x-2 bg-[#C54B3E] text-sm text-white hover:bg-[#C54B3E]/90 hover:text-white/90 md:text-base"
             >
               <span>Read More</span>
-              <ArrowBigRightDash className="h-5 w-5 duration-100 ease-in group-hover:translate-x-1 group-hover:text-red-500" />
+              <ArrowBigRightDash className="h-5 w-5 duration-100 ease-in group-hover:translate-x-1" />
             </Button>
           </Link>
         </div>
