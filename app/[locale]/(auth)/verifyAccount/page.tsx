@@ -49,7 +49,7 @@ const VerifyAccountPage = () => {
 
   return (
     <div className="flex min-h-screen justify-center">
-      <div className="min-w-56 my-24 flex max-w-md flex-col items-center justify-center rounded-md bg-[url(/bg/tennis-racket-blur.jpg)] bg-cover bg-center p-8 shadow-lg">
+      <div className="min-w-56 my-24 flex max-w-lg flex-col items-center justify-center rounded-md bg-[url(/bg/cave-water-blur.jpg)] bg-cover bg-center p-8 shadow-lg bg-[#bfbebe] bg-blend-overlay">
         {loading ? (
           <ClipLoader
             loading={loading}
