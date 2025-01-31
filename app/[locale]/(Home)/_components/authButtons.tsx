@@ -52,7 +52,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
       className={cn(
         mode === 'desktop'
           ? `flex items-center justify-center gap-x-2 whitespace-nowrap text-sm font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-[#212121] hover:text-[#C54B3E] hover:underline'}`
-          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-slate-200 hover:bg-[#620BC4]'}`
+          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-slate-200 hover:bg-[#C54B3E]/40'}`
       )}
     >
       <LogIn className="h-5 w-5" />

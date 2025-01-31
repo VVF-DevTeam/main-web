@@ -70,7 +70,7 @@ const PostImage = ({ post }: PostImageProps) => {
           onClick={() => setEditing(!editing)}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-[#620BC4] hover:text-slate-700'
+            !editing && 'text-[#C54B3E] hover:text-slate-700'
           )}
         >
           {editing ? (

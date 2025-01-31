@@ -86,7 +86,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#620BC4]">Post Title</FormLabel>
+                <FormLabel className="text-[#C54B3E]">Post Title</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
@@ -104,7 +104,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-[#620BC4] font-bold text-white hover:bg-[#620BC4]/90 hover:text-white/90"
+              className="text-md max-w-fit bg-[#C54B3E] font-bold text-white hover:bg-[#C54B3E]/90 hover:text-white/90"
               type="submit"
             >
               Create Post

@@ -71,7 +71,7 @@ const SignUpForm = () => {
   return (
     <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
       {/* form header */}
-      <h1 className="mt-8 text-xl font-semibold text-[#620BC4] md:text-3xl lg:mt-12">
+      <h1 className="mt-8 text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
         Register
       </h1>
       <p className="mt-6 text-sm text-muted-foreground">
@@ -91,7 +91,7 @@ const SignUpForm = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">First Name</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">First Name</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Joe"
@@ -110,7 +110,7 @@ const SignUpForm = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Last Name</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">Last Name</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Smith"
@@ -128,7 +128,7 @@ const SignUpForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Email</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="JoeSmith@gmail.com"
@@ -147,7 +147,7 @@ const SignUpForm = () => {
               name="age"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Age</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">Age</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 26"
@@ -166,7 +166,7 @@ const SignUpForm = () => {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Phone No</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">Phone No</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 1234567890"
@@ -185,7 +185,7 @@ const SignUpForm = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#620BC4]">Address</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">Address</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 123 Main St"
@@ -203,7 +203,7 @@ const SignUpForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="password" className="text-[#620BC4]">
+                  <FormLabel htmlFor="password" className="text-[#C54B3E]">
                     Password
                   </FormLabel>
                   <FormControl>
@@ -237,7 +237,7 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="confirmPassword"
-                    className="text-[#620BC4]"
+                    className="text-[#C54B3E]"
                   >
                     Confirm Password
                   </FormLabel>
@@ -267,7 +267,7 @@ const SignUpForm = () => {
             <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="max-w-60 bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
+                className="max-w-60 bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
               >
                 Create Account
               </Button>
@@ -275,7 +275,7 @@ const SignUpForm = () => {
                 Already have an account?{' '}
                 <Link
                   href="/signIn"
-                  className="text-[#620BC4] decoration-2 transition-all hover:underline hover:opacity-80"
+                  className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
                   Login
                 </Link>

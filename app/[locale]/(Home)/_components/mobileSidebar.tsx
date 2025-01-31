@@ -31,7 +31,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
         <SheetFooter className="mt-20 flex items-center">
           <SheetClose asChild>
             <button>
-              <X className="h-12 w-12 rounded-md p-1 text-[#EFB9A2] transition-all hover:border-2 hover:border-[#620BC4]" />
+              <X className="h-12 w-12 rounded-md p-1 text-[#EFB9A2] transition-all hover:border-2 hover:border-[#C54B3E]" />
             </button>
           </SheetClose>
         </SheetFooter>

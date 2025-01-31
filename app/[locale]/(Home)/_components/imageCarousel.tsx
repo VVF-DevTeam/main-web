@@ -81,13 +81,13 @@ const ImageCarousel = ({
         <div className="absolute inset-0 z-20 flex h-full max-w-[100vw] items-center justify-between px-4">
           <button aria-label="prev-image">
             <ArrowLeft
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
               onClick={() => changeImage('left')}
             />
           </button>
           <button aria-label="next-image">
             <ArrowRight
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#620BC4]"
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
               onClick={() => changeImage('right')}
             />
           </button>

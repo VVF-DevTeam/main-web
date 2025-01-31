@@ -130,7 +130,7 @@ export const columns: ColumnDef<Post>[] = [
           <Button
             variant={'default'}
             size={'sm'}
-            className="bg-[#620BC4] hover:bg-[#620BC4]/90"
+            className="bg-[#C54B3E] hover:bg-[#C54B3E]/90"
           >
             Edit
           </Button>

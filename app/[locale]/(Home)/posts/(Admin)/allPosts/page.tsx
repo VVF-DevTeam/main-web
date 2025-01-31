@@ -24,7 +24,7 @@ const AllPosts = async () => {
       </h1>
       <p className="mb-12 text-sm text-muted-foreground">
         All published and unpublished posts appear here. Click on the
-        <span className="font-semibold text-[#620BC4] transition-all hover:text-[#620BC4]/70">
+        <span className="font-semibold text-[#C54B3E] transition-all hover:text-[#C54B3E]/70">
           {' '}
           &quot;Edit&quot;
         </span>{' '}

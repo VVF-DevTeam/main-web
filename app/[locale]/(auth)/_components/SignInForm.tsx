@@ -101,7 +101,7 @@ const SignInForm = () => {
         <CustomIcon height={100} width={100} />
         <h1 className="text-3xl">Viet Vibe Foundation</h1>
       </div>
-      <h1 className="font-[Poppins] text-4xl font-semibold text-[#620BC4]">
+      <h1 className="font-[Poppins] text-4xl font-semibold text-[#C54B3E]">
         Login
       </h1>
       <p className="mt-8 font-[Poppins] text-lg text-muted-foreground">
@@ -121,7 +121,7 @@ const SignInForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-[Poppins] text-lg text-[#620BC4]">
+                  <FormLabel className="font-[Poppins] text-lg text-[#C54B3E]">
                     Email
                   </FormLabel>
                   <FormControl>
@@ -145,7 +145,7 @@ const SignInForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="password"
-                    className="font-[Poppins] text-lg text-[#620BC4]"
+                    className="font-[Poppins] text-lg text-[#C54B3E]"
                   >
                     Password
                   </FormLabel>
@@ -176,7 +176,7 @@ const SignInForm = () => {
             <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="w-full bg-[#620BC4] font-[600] text-white transition-all hover:scale-105 hover:bg-[#620BC4]/80"
+                className="w-full bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
               >
                 Login
               </Button>
@@ -187,7 +187,7 @@ const SignInForm = () => {
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/signUp"
-                  className="text-[#620BC4] decoration-2 transition-all hover:underline hover:opacity-80"
+                  className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
                   Sign Up
                 </Link>

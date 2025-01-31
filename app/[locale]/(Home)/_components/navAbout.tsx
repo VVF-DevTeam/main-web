@@ -61,7 +61,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
             : `mt-2 h-full w-full rounded-md p-4 text-xl ${
                 isActive
                   ? 'text-[#C54B3E]'
-                  : 'px-5 text-slate-200 hover:bg-[#620BC4]/40'
+                  : 'px-5 text-slate-200 hover:bg-[#C54B3E]/40'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
