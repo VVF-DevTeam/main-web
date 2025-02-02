@@ -1,4 +1,5 @@
 import EventStep from './EventStep'
+import initTranslation from '@/app/i18n'
 
 const EventStepList = [
   {
@@ -21,20 +22,26 @@ const EventStepList = [
   },
 ]
 
-const EventInstruction = () => {
+interface EventInstructionProps {
+  locale: string
+}
+
+const EventInstruction = async ({ locale }: EventInstructionProps) => { 
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = await initTranslation(locale, ['event', 'common'])
+
   return (
     <div className="w-full bg-gray-100 px-12 py-16">
       <div className='max-w-[1500px] mx-auto'>
         <h1 className="text-center text-3xl font-bold tracking-wide">
-          How It Works
+          {t('header-eventInstruction')}
         </h1>
         <div className="grid grid-cols-1 gap-x-12 gap-y-10 py-10 md:grid-cols-2 lg:grid-cols-3">
           {EventStepList.map((stage, index) => (
             <EventStep
               key={index}
               step={stage.step}
-              title={stage.title}
-              description={stage.description}
+              locale={locale}
             />
           ))}
         </div>

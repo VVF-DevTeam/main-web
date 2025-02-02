@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+
 interface ImageCarouselProps {
   imageUrls: {
     id: string
@@ -20,6 +22,8 @@ const ImageCarousel = ({
   autoSlide = false,
   duration = 7000,
 }: ImageCarouselProps) => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation()
   const [imageIndex, setImageIndex] = useState(0)
   const changeImage = (direction: Direction) => {
     let newIndex = 0
@@ -55,7 +59,7 @@ const ImageCarousel = ({
       <div className="flex flex-col items-center justify-center">
         <Separator className="w-1/2 bg-[#7f0000]" />
         <span className="flex mb-7 py-6 font-[Poppins] text-4xl font-semibold italic leading-[3rem] tracking-wider text-[#3d3a3a]">
-          Our Achievements
+          {t('header-achievement')}
         </span>
       </div>
       <div className="relative h-[75vh] w-[400vw]">

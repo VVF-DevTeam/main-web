@@ -1,9 +1,14 @@
 import OrgMembers from './_components/OrgMembers'
 
-const AboutPageDirectors = () => {
+const AboutPageDirectors = async({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) => {
+  const { locale } = await params
   return (
     <div className="h-full w-full">
-      <OrgMembers />
+      <OrgMembers locale={locale}/>
     </div>
   )
 }

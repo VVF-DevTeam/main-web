@@ -5,7 +5,7 @@ import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
 import Footer from '@/app/[locale]/(Home)/_components/footer'
 
-const i18nNamespaces = ['homePage', 'common']
+const i18nNamespaces = ['signIn-signUp', 'common', 'homePage']
 
 const Layout = async ({
   children,

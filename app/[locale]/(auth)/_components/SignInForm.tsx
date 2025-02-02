@@ -27,8 +27,11 @@ import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
 import { useSearchParams } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
+import { useTranslation } from 'react-i18next'
 
 const SignInForm = () => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
@@ -102,10 +105,10 @@ const SignInForm = () => {
         <h1 className="text-3xl">Viet Vibe Foundation</h1>
       </div>
       <h1 className="font-[Poppins] text-4xl font-semibold text-[#C54B3E]">
-        Login
+        {t('login')}
       </h1>
       <p className="mt-8 font-[Poppins] text-lg text-muted-foreground">
-        Login to your account to book event tickets or lessons
+        {t('description-signIn')}
       </p>
       <Separator className="my-4 h-[1px] w-full bg-gray-300" />
       {/* form */}
@@ -122,7 +125,7 @@ const SignInForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-[Poppins] text-lg text-[#C54B3E]">
-                    Email
+                    {t('email')}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -147,7 +150,7 @@ const SignInForm = () => {
                     htmlFor="password"
                     className="font-[Poppins] text-lg text-[#C54B3E]"
                   >
-                    Password
+                    {t('password')}
                   </FormLabel>
                   <FormControl>
                     <div className="relative max-w-[360px]">
@@ -178,18 +181,18 @@ const SignInForm = () => {
                 type="submit"
                 className="w-full bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
               >
-                Login
+                {t('login')}
               </Button>
               {/* <p className="text-center text-sm font-bold">OR</p> */}
               <ProviderButtons />
               <p className="text-center text-sm font-bold">OR</p>
               <p className="text-center text-sm">
-                Don&apos;t have an account?{' '}
+                {t('noAccount')}{' '}
                 <Link
                   href="/signUp"
                   className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
-                  Sign Up
+                  {t('signUp')}
                 </Link>
               </p>
             </div>

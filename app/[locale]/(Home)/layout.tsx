@@ -31,7 +31,7 @@ const Layout = async ({
         <div className="min-h-screen">{children}</div>
         <div className="mt-auto">
           <Footer locale={locale} />
-          <Copyright/>
+          <Copyright locale={locale}/>
         </div>
       </div>
     </TranslationsProvider>

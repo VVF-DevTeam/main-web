@@ -26,18 +26,18 @@ const cardsData = [
   },
 ]
 const About = async ({ locale }: { locale: string }) => {
-  const { t } = await initTranslation(locale, ['homePage', 'common'])
+  const { t } = await initTranslation(locale, ['about', 'common'])
 
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex max-w-[1500px] flex-col items-center justify-center gap-y-12 p-12">
         <div className="flex flex-col items-center justify-center gap-y-6 p-6">
           <h2 className="cursor-default text-5xl font-bold tracking-wider text-[#7f0000] transition-all duration-100 ease-out hover:text-[#7f0000]/80">
-            {t('header-aboutUs')}
+            {t('header-vision-aboutUs')}
           </h2>
           <Separator className="w-1/2 bg-[#7f0000]" />
           <p className="text-xl text-[#1B171A]/70">
-            {t('description-aboutUs')}
+            {t('description-vision-aboutUs')}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -1,6 +1,6 @@
 import EventList from './_components/EventList'
 
-const EventsPage = () => {
+const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) => {
   const eventList = [
     {
       id: '1',
@@ -66,10 +66,12 @@ const EventsPage = () => {
       startTime: new Date('2025-03-10T01:00:00'),
     },
   ]
+  const { locale } = await params
+
   return (
     <div className="w-full overflow-hidden">
       <div className="">
-        <EventList events={eventList} />
+        <EventList events={eventList} locale={locale} />
       </div>
     </div>
   )

@@ -23,8 +23,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
+import { useTranslation } from 'react-i18next'
 
 const SignUpForm = () => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation()  
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -72,10 +75,10 @@ const SignUpForm = () => {
     <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
       {/* form header */}
       <h1 className="mt-8 text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
-        Register
+        {t('register')}
       </h1>
       <p className="mt-6 text-sm text-muted-foreground">
-        Let us get you all set up.
+        {t('description-signUp')}
       </p>
       <Separator className="my-4 h-[1px] w-full bg-gray-300" />
       {/* form */}
@@ -91,7 +94,7 @@ const SignUpForm = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">First Name</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('firstName')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Joe"
@@ -110,7 +113,7 @@ const SignUpForm = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">Last Name</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('lastName')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Smith"
@@ -128,7 +131,7 @@ const SignUpForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">Email</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('email')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="JoeSmith@gmail.com"
@@ -147,7 +150,7 @@ const SignUpForm = () => {
               name="age"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">Age</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('age')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 26"
@@ -166,7 +169,7 @@ const SignUpForm = () => {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">Phone No</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('phoneNumber')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 1234567890"
@@ -185,7 +188,7 @@ const SignUpForm = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">Address</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">{t('address')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 123 Main St"
@@ -204,7 +207,7 @@ const SignUpForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel htmlFor="password" className="text-[#C54B3E]">
-                    Password
+                  {t('password')}
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
@@ -239,7 +242,7 @@ const SignUpForm = () => {
                     htmlFor="confirmPassword"
                     className="text-[#C54B3E]"
                   >
-                    Confirm Password
+                    {t('confirmPassword')}
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
@@ -269,15 +272,15 @@ const SignUpForm = () => {
                 type="submit"
                 className="max-w-60 bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
               >
-                Create Account
+                {t('createAccount')}
               </Button>
               <p className="text-sm">
-                Already have an account?{' '}
+                {t('alreadyHaveAccount')}{' '}
                 <Link
                   href="/signIn"
                   className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
                 >
-                  Login
+                  {t('login')}
                 </Link>
               </p>
             </div>

@@ -56,7 +56,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
       )}
     >
       <LogIn className="h-5 w-5" />
-      <span>{userExists ? t('logout-nav') : t('login-nav')}</span>
+      <span>{userExists ? t('logout-nav', { ns: 'homePage' }) : t('login-nav', { ns: 'homePage' })}</span>
     </button>
   )
 }
