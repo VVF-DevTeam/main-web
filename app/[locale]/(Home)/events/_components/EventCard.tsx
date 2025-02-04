@@ -58,7 +58,7 @@ const EventCard = ({ event }: EventCardProps) => {
               <span>{event.dates.map((date) => date).join(', ')}</span>
               <span className="ml-auto">
                 {' '}
-                at {event.startTime.toLocaleTimeString('en-GB', {})}
+                at {event.startTime.toLocaleTimeString('en-GB', {}).substring(0, 5)}
               </span>
             </div>
           </div>

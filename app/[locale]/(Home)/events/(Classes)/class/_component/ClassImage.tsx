@@ -7,6 +7,7 @@ interface ClassImageProps {
   startDate: Date
   endDate?: Date
   instructor: string
+  title:string
 }
 
 const ClassImage = ({
@@ -14,6 +15,7 @@ const ClassImage = ({
   location,
   startDate,
   instructor,
+  title
 }: ClassImageProps) => {
   return (
     <div className="mx-auto grid w-full max-w-[1300px] grid-cols-1 p-6 md:grid-cols-2">
@@ -29,12 +31,12 @@ const ClassImage = ({
         <span className="text-sm text-muted">
           {startDate.toLocaleDateString()} | {location}
         </span>
-        <h2 className="-mt-3 mb-1 text-3xl font-extrabold">{location}</h2>
+        <h2 className="-mt-3 mb-1 text-3xl font-extrabold">{title}</h2>
         <span>
           A class by <span className="font-bold">{instructor}</span>
         </span>
         <a
-          href="https://forms.gle/Z2z2gfggF5AyG5Rr9"
+          href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
           target="_blank"
           rel="noopener noreferrer"
         >

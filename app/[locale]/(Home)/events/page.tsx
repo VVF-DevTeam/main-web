@@ -9,9 +9,9 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       description: 'asdsad',
       eventCategoryId: '1',
       thumbnail: '/bg/guitar-background.jpg',
-      startDate: new Date('2025-02-10T00:00:00'),
+      startDate: new Date('2025-02-06T00:00:00'),
       endDate: new Date('2025-06-10T00:00:00'),
-      dates: ['Sat'],
+      dates: ['Thurs'],
       duration: '1.5 hours',
       capacity: 10,
       ticketsSold: 5,
@@ -20,8 +20,8 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       updatedAt: new Date(),
       createdById: '1',
       price: 8.5,
-      location: 'Metro Vancouver',
-      startTime: new Date('2025-03-10T02:00:00'),
+      location: 'Victoria - Fraser View',
+      startTime: new Date('2025-02-06T18:00:00'),
     },
     {
       id: 'elenaDance',
@@ -63,7 +63,7 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       createdById: '1',
       price: 15,
       location: '139 Keefer Street',
-      startTime: new Date('2025-03-10T01:00:00'),
+      startTime: new Date('2025-03-10T17:00:00'),
     },
   ]
   const { locale } = await params
