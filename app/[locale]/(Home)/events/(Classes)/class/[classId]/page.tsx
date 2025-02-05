@@ -61,12 +61,42 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   return (
     <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
       <Head>
-        <meta property="og:title" content="Beginner Guitar Lessons" />
-        <meta property="og:image" content="/bg/guitar-background.jpg" />
-        <meta property="og:description" content="Beginner Guitar Lessons" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="627" />
+        <title>Beginner Guitar Lessons</title>
+        <meta
+          name="description"
+          content="Beginner Guitar Lessons from Viet Vibe Foundation"
+        />
+
+        <meta
+          property="og:url"
+          content="https://www.vietvibe.org/en/events/class/beginnerGuitarLesson"
+        />
         <meta property="og:type" content="website" />
+        <meta property="og:title" content="Beginner Guitar Lessons" />
+        <meta
+          property="og:description"
+          content="Beginner Guitar Lessons from Viet Vibe Foundation"
+        />
+        <meta
+          property="og:image"
+          content="https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245"
+        />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="vietvibe.org" />
+        <meta
+          property="twitter:url"
+          content="https://www.vietvibe.org/en/events/class/beginnerGuitarLesson"
+        />
+        <meta name="twitter:title" content="Beginner Guitar Lessons" />
+        <meta
+          name="twitter:description"
+          content="Beginner Guitar Lessons from Viet Vibe Foundation"
+        />
+        <meta
+          name="twitter:image"
+          content="https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245"
+        />
       </Head>
 
       <ClassImage
