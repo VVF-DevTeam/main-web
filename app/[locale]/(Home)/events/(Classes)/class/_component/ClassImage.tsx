@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-
+import initTranslation from '@/app/i18n'
 interface ClassImageProps {
   imageUrl: string
   location: string
@@ -8,15 +8,19 @@ interface ClassImageProps {
   endDate?: Date
   instructor: string
   title:string
+  locale: string
 }
 
-const ClassImage = ({
+const ClassImage = async ({
   imageUrl,
   location,
   startDate,
   instructor,
-  title
+  title,
+  locale
 }: ClassImageProps) => {
+  const { t } = await initTranslation(locale, ['event', 'common'])
+
   return (
     <div className="mx-auto grid w-full max-w-[1300px] grid-cols-1 p-6 md:grid-cols-2">
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
@@ -31,9 +35,9 @@ const ClassImage = ({
         <span className="text-sm text-muted">
           {startDate.toLocaleDateString()} | {location}
         </span>
-        <h2 className="-mt-3 mb-1 text-3xl font-extrabold">{title}</h2>
+        <h2 className="-mt-3 mb-1 text-4xl font-extrabold font-[Poppins]">{t(title)}</h2>
         <span>
-          A class by <span className="font-bold">{instructor}</span>
+          {t('classBy-guitar')} <span className="font-bold">{instructor}</span>
         </span>
         <a
           href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
@@ -41,7 +45,7 @@ const ClassImage = ({
           rel="noopener noreferrer"
         >
           <Button className="w-fit bg-[#C54B3E] hover:bg-[#C54B3E]/80">
-            Reserve Now
+            {t('reserve-button')}
           </Button>
         </a>
       </div>

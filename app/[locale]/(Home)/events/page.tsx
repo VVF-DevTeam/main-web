@@ -3,10 +3,10 @@ import EventList from './_components/EventList'
 const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) => {
   const eventList = [
     {
-      id: '1',
+      id: 'beginnerGuitarLesson',
       eventType: 'class',
       title: 'Beginner Guitar Lessons',
-      description: 'asdsad',
+      description: 'The Basic Acoustic Guitar Class, organized by Viet Vibe Foundation (VVF), offers 90-minute weekly lessons (18:00-19:30 Thursday) from February 27th to June 5th 2025 (Performance night). Led by three experienced instructors—Michael Nguyen, Eattle Nguyen, and Eric Nguyen—the program is designed for a maximum of 12 participants, with a minimum of 5 students required.',
       eventCategoryId: '1',
       thumbnail: '/bg/guitar-background.jpg',
       startDate: new Date('2025-02-06T00:00:00'),

@@ -1,6 +1,6 @@
 import ScheduleItem from './ScheduleItem'
 import { Button } from '@/components/ui/button'
-
+import initTranslation from '@/app/i18n'
 interface ClassDescriptionProps {
   description: string
   startDate: Date
@@ -11,6 +11,7 @@ interface ClassDescriptionProps {
   capacity: number
   location: string
   instructor: string
+  locale: string
   schedules: {
     id: number
     startTime: Date
@@ -20,7 +21,7 @@ interface ClassDescriptionProps {
   }[]
 }
 
-const ClassDescription = ({
+const ClassDescription = async({
   description,
   startDate,
   startTime,
@@ -28,22 +29,27 @@ const ClassDescription = ({
   schedules,
   endTime,
   endDate,
+  locale
 }: ClassDescriptionProps) => {
+  const { t } = await initTranslation(locale, ['event', 'common'])
+
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
       {/* Time and Location */}
       <div className="grid w-full justify-between gap-x-4 gap-y-4 md:flex">
         <div>
           <h1 className="mb-2 font-[Poppins] text-xl font-extrabold md:text-3xl lg:text-4xl">
-            Time & Location
+            {t('headerInfo-guitar')}
           </h1>
           <p>
-            {startDate.toLocaleDateString('en-GB').substring(0, 5)} -{' '}
-            {endDate.toLocaleDateString('en-GB').substring(0, 5)} (End date
-            TBD), {startTime.toLocaleTimeString('en-GB').substring(0, 5)} -{' '}
-            {endTime.toLocaleTimeString('en-GB').substring(0, 5)}
+            {t('dateHeader-guitar')}:{' '}{startDate.toLocaleDateString('en-GB', {day:'numeric', month: 'short' })} -{' '}
+            {endDate.toLocaleDateString('en-GB', {day:'numeric', month: 'short' })}
           </p>
-          <p>{location}</p>
+          <p>
+          {t('timeHeader-guitar')}:{' '}{startTime.toLocaleTimeString('en-GB').substring(0, 6)} -{' '}
+          {endTime.toLocaleTimeString('en-GB').substring(0, 5)}
+          </p>
+          <p>{location} ({t('TBD')})</p>
         </div>
         <div>
           <iframe
@@ -59,18 +65,18 @@ const ClassDescription = ({
       {/* Event Description */}
       <div>
         <h1 className="mb-2 font-[Poppins] text-xl font-extrabold md:text-3xl lg:text-4xl">
-          About The Event
+          {t('headerAbout-guitar')}
         </h1>
-        <p>{description}</p>
+        <p>{t(description)}</p>
       </div>
 
       {/* Schedule */}
       <div className="min-w-full">
         <h1 className="mb-2 font-[Poppins] text-xl font-extrabold md:text-3xl lg:text-4xl">
-          Schedule
+        {t('headerSchedule-guitar')}
         </h1>
         <h3 className="mb-2 font-[Poppins] italic">
-          (May change according to instructor)
+          ({t('subHeaderSchedule-guitar')})
         </h3>
         <div className="flex flex-col gap-y-4">
           {schedules.map((schedule) => (
@@ -80,6 +86,7 @@ const ClassDescription = ({
               duration={schedule.duration}
               endTime={schedule.endTime}
               action={schedule.action}
+              locale={locale}
             />
           ))}
         </div>
@@ -91,7 +98,7 @@ const ClassDescription = ({
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Button>Reserve Now</Button>
+        <Button>{t('reserve-button')}</Button>
       </a>
     </div>
   )
