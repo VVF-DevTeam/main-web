@@ -1,6 +1,6 @@
 import ClassImage from '../_component/ClassImage'
 import ClassDescription from '../_component/ClassDescription'
-import Head from 'next/head'
+import { Metadata } from 'next';
 
 const eventList = [
   {
@@ -51,6 +51,23 @@ const eventList = [
   },
 ]
 
+export const metadata: Metadata ={
+  title: "Beginner Guitar Lessons",
+  description: "Beginner Guitar Lessons from Viet Vibe Foundation",
+  openGraph: {
+    title: "Beginner Guitar Lessons",
+    description: "Beginner Guitar Lessons from Viet Vibe Foundation",
+    images: [
+      {
+        url: "https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245", // Update with the correct path
+        width: 1200,
+        height: 630,
+        alt: "Someone is playing a guitar",
+      },
+    ],
+  },
+}
+
 interface ClassPageProps {
   params: Promise<{ locale: string }>
 }
@@ -60,45 +77,6 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   return (
     <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
-      <Head>
-        <title>Beginner Guitar Lessons</title>
-        <meta
-          name="description"
-          content="Beginner Guitar Lessons from Viet Vibe Foundation"
-        />
-
-        <meta
-          property="og:url"
-          content="https://www.vietvibe.org/en/events/class/beginnerGuitarLesson"
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Beginner Guitar Lessons" />
-        <meta
-          property="og:description"
-          content="Beginner Guitar Lessons from Viet Vibe Foundation"
-        />
-        <meta
-          property="og:image"
-          content="https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245"
-        />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="vietvibe.org" />
-        <meta
-          property="twitter:url"
-          content="https://www.vietvibe.org/en/events/class/beginnerGuitarLesson"
-        />
-        <meta name="twitter:title" content="Beginner Guitar Lessons" />
-        <meta
-          name="twitter:description"
-          content="Beginner Guitar Lessons from Viet Vibe Foundation"
-        />
-        <meta
-          name="twitter:image"
-          content="https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245"
-        />
-      </Head>
-
       <ClassImage
         imageUrl={eventList[0].thumbnail}
         location={eventList[0].location}
