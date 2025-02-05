@@ -12,6 +12,7 @@ interface ClassDescriptionProps {
   location: string
   instructor: string
   locale: string
+  dates: string[]
   schedules: {
     id: number
     startTime: Date
@@ -29,7 +30,8 @@ const ClassDescription = async({
   schedules,
   endTime,
   endDate,
-  locale
+  locale,
+  dates
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -43,10 +45,10 @@ const ClassDescription = async({
           </h1>
           <p>
             {t('dateHeader-guitar')}:{' '}{startDate.toLocaleDateString('en-GB', {day:'numeric', month: 'short' })} -{' '}
-            {endDate.toLocaleDateString('en-GB', {day:'numeric', month: 'short' })}
+            {endDate.toLocaleDateString('en-GB', {day:'numeric', month: 'short' })}, 
           </p>
           <p>
-          {t('timeHeader-guitar')}:{' '}{startTime.toLocaleTimeString('en-GB').substring(0, 6)} -{' '}
+          {t('timeHeader-guitar')}: {dates.map((date) => t(date)).join(', ')} {t('everyWeek')}, {' '}{startTime.toLocaleTimeString('en-GB').substring(0, 5)} -{' '}
           {endTime.toLocaleTimeString('en-GB').substring(0, 5)}
           </p>
           <p>{location} ({t('TBD')})</p>

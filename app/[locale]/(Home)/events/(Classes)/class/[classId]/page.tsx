@@ -12,7 +12,7 @@ const eventList = [
     thumbnail: '/bg/guitar-background.jpg',
     startDate: new Date('2025-02-06T00:00:00'),
     endDate: new Date('2025-06-05T00:00:00'),
-    dates: ['Sat'],
+    dates: ['thursday'],
     duration: '1.5 hours',
     capacity: 10,
     ticketsSold: 5,
@@ -97,6 +97,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         instructor={eventList[0].instructor}
         schedules={eventList[0].schedules}
         locale={locale}
+        dates={eventList[0].dates}
       />
     </div>
   )
