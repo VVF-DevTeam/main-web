@@ -8,8 +8,8 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       title: 'Beginner Guitar Lessons',
       description: 'The Basic Acoustic Guitar Class, organized by Viet Vibe Foundation (VVF), offers 90-minute weekly lessons (18:00-19:30 Thursday) from February 27th to June 5th 2025 (Performance night). Led by three experienced instructors—Michael Nguyen, Eattle Nguyen, and Eric Nguyen—the program is designed for a maximum of 12 participants, with a minimum of 5 students required.',
       eventCategoryId: '1',
-      thumbnail: '/bg/guitar-background.jpg',
-      startDate: new Date('2025-02-06T00:00:00'),
+      thumbnail: '/bg/acoustic-guitar-bg.jpg',
+      startDate: new Date('2025-02-27T00:00:00'),
       endDate: new Date('2025-06-10T00:00:00'),
       dates: ['Thurs'],
       duration: '1.5 hours',
@@ -19,9 +19,11 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       createdAt: new Date(),
       updatedAt: new Date(),
       createdById: '1',
-      price: 8.5,
+      price: 150,
+      priceMember: 105,
       location: 'Victoria - Fraser View',
-      startTime: new Date('2025-02-06T18:00:00'),
+      startTime: new Date('2025-02-27T19:00:00'),
+      sessionCount: 12
     },
     {
       id: 'elenaDance',
@@ -43,6 +45,7 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       price: 0,
       location: 'Downtown Vancouver',
       startTime: new Date('2025-03-10T15:00:00'),
+      sessionCount: 0
     },
     {
       id: 'fridaychill',
@@ -64,6 +67,7 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
       price: 15,
       location: '139 Keefer Street',
       startTime: new Date('2025-03-10T17:00:00'),
+      sessionCount: 0
     },
   ]
   const { locale } = await params

@@ -31,7 +31,7 @@ const ClassImage = async ({
           alt="Event Image"
         />
       </div>
-      <div className="flex flex-col justify-center gap-y-4 bg-[#1e1924] pb-6 pl-4 pt-2 text-left text-white md:h-[40vh] lg:h-[50vh] lg:pl-8">
+      <div className="flex flex-col justify-center gap-y-4 bg-[#242029] pb-6 pl-4 pt-2 text-left text-white md:h-[40vh] lg:h-[50vh] lg:pl-8">
         <span className="text-sm text-muted">
           {startDate.toLocaleDateString()} | {location}
         </span>

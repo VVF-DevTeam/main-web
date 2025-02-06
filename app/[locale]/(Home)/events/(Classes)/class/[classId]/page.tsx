@@ -9,8 +9,8 @@ const eventList = [
     title: 'title-guitar',
     description: 'description-guitar',
     eventCategoryId: '1',
-    thumbnail: '/bg/guitar-background.jpg',
-    startDate: new Date('2025-02-06T00:00:00'),
+    thumbnail: '/bg/acoustic-guitar-bg.jpg',
+    startDate: new Date('2025-02-27T00:00:00'),
     endDate: new Date('2025-06-05T00:00:00'),
     dates: ['thursday'],
     duration: '1.5 hours',
@@ -20,31 +20,32 @@ const eventList = [
     createdAt: new Date(),
     updatedAt: new Date(),
     createdById: '1',
-    price: 8.5,
+    price: 150,
+    priceMember: 105,
     location: 'Victoria - Fraser View',
-    startTime: new Date('2025-03-10T18:00:00'),
-    endTime: new Date('2025-03-10T19:30:00'),
+    startTime: new Date('2025-03-10T19:00:00'),
+    endTime: new Date('2025-03-10T20:30:00'),
     instructor: 'Michael Nguyen, Eattle Nguyen, and Eric Nguyen',
     schedules: [
       {
         id: 1,
-        startTime: new Date('2025-03-10T18:00:00'),
+        startTime: new Date('2025-03-10T19:00:00'),
         duration: '0.5 hours',
-        endTime: new Date('2025-03-10T18:30:00'),
+        endTime: new Date('2025-03-10T19:30:00'),
         action: 'action1-guitar',
       },
       {
         id: 2,
-        startTime: new Date('2025-03-10T18:30:00'),
+        startTime: new Date('2025-03-10T19:30:00'),
         duration: '0.5 hours',
-        endTime: new Date('2025-03-10T19:00:00'),
+        endTime: new Date('2025-03-10T20:00:00'),
         action: 'action2-guitar',
       },
       {
         id: 3,
-        startTime: new Date('2025-03-10T19:00:00'),
+        startTime: new Date('2025-03-10T20:00:00'),
         duration: '0.5 hours',
-        endTime: new Date('2025-03-10T19:30:00'),
+        endTime: new Date('2025-03-10T20:30:00'),
         action: 'action3-guitar',
       },
     ],
@@ -59,7 +60,7 @@ export const metadata: Metadata ={
     description: "Beginner Guitar Lessons from Viet Vibe Foundation",
     images: [
       {
-        url: "https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245", // Update with the correct path
+        url: "https://opengraph.b-cdn.net/production/images/22f3746e-1da8-4169-a19c-6d0b12780cc5.jpg?token=2qlqU9_CRU8KLwkQxrHa6iXeuxRmamJURNTlhSrkE00&height=800&width=1200&expires=33274801692", // Update with the correct path
         width: 1200,
         height: 630,
         alt: "Someone is playing a guitar",
@@ -98,6 +99,8 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         schedules={eventList[0].schedules}
         locale={locale}
         dates={eventList[0].dates}
+        price={eventList[0].price}
+        priceMember={eventList[0].priceMember}
       />
     </div>
   )

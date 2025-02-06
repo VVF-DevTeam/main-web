@@ -5,14 +5,16 @@
 
 import { Event } from '@prisma/client'
 import Image from 'next/image'
-import { Tag, MapPin, Ticket, CalendarDays } from 'lucide-react'
+import { Tag, MapPin, Ticket, CalendarDays, Armchair } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 interface EventCardProps {
   event: Event
 }
 
 const EventCard = ({ event }: EventCardProps) => {
+  const { t } = useTranslation()  
   const router = useRouter()
 
   return (
@@ -35,17 +37,23 @@ const EventCard = ({ event }: EventCardProps) => {
         </h2>
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-x-2">
-            <Tag className="h-5 w-5"></Tag>${event.price}
+            <Tag className="h-5 w-5"></Tag>${event.price}{event.priceMember? '/$' + event.priceMember: null} 
           </span>
           <span className="flex items-center gap-x-2">
             <Ticket className="h-5 w-5 rotate-45"></Ticket>
-            {event.capacity! - event.ticketsSold!} remaining
+            {event.capacity! - event.ticketsSold!} {t('remaining', { ns: 'event'}) }
           </span>
         </div>
-        <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
-          <MapPin className="h-5 w-5"></MapPin>
-          {event.location}
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
+            <MapPin className="h-5 w-5"></MapPin>
+            {event.location}
+          </span>
+          {event.sessionCount?<span className="flex items-center gap-x-2 text-xl text-muted-foreground">
+            <Armchair className="h-5 w-5"></Armchair>
+            {event.sessionCount} {t('sessions', { ns: 'event'})}
+          </span> : null}
+        </div>
         <div className="rounded-lg bg-[#C54B3E]/20">
           <div className="flex items-center justify-between p-4">
             <div className="flex flex-col text-left text-xs md:text-sm lg:text-lg">
