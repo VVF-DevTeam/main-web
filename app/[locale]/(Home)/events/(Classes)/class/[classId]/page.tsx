@@ -26,6 +26,7 @@ const eventList = [
     startTime: new Date('2025-03-10T19:00:00'),
     endTime: new Date('2025-03-10T20:30:00'),
     instructor: 'Michael Nguyen, Eattle Nguyen, and Eric Nguyen',
+    sessionCount: 12,
     schedules: [
       {
         id: 1,
@@ -101,6 +102,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         dates={eventList[0].dates}
         price={eventList[0].price}
         priceMember={eventList[0].priceMember}
+        sessionCount={eventList[0].sessionCount}
       />
     </div>
   )

@@ -15,6 +15,7 @@ interface ClassDescriptionProps {
   dates: string[]
   price: number
   priceMember: number
+  sessionCount: number
   schedules: {
     id: number
     startTime: Date
@@ -35,7 +36,8 @@ const ClassDescription = async({
   locale,
   dates,
   price,
-  priceMember
+  priceMember,
+  sessionCount
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -75,7 +77,9 @@ const ClassDescription = async({
         </h1>
         <p className='pb-5'>{t(description)}</p>
         <p><span className='font-bold'>{t('fee')}</span>: ${price} ({t('nonMember')}) {priceMember? '- $' + priceMember: null} ({t('member')})</p>
-        <p className="mb-2 font-[Poppins] italic">({t('memberProcess')})</p>
+        <p className="mb-2 font-[Poppins] italic pb-5">({t('memberProcess')})</p>
+        
+        <p><span className='font-bold capitalize'>{t('numberSessions')}</span>: {sessionCount}</p>
       </div>
 
       {/* Schedule */}
