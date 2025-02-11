@@ -5,6 +5,7 @@ import Sidebar from './SideBar'
 import ProfileInfo from './ProfileInfo'
 import Password from './ChangePassword'
 import DeleteAccount from './DeleteAccount'
+import MyProfile from './MyProfile'
 
 interface userProps {
   name: string | null
@@ -16,30 +17,75 @@ interface userProps {
   password: string | null
 }
 
-const ProfileClient = ({
-  user,
-  locale,
-}: {
-  user: userProps
-  locale: string
-}) => {
-  const [selectedComponent, setSelectedComponent] = useState('contact-info')
+interface Event {
+  title: string
+  location: string
+  date: string
+  price: number
+  status: 'Upcoming' | 'Ongoing' | 'Finished'
+}
+
+const ProfileClient = ({ user }: { user: userProps }) => {
+  const [selectedComponent, setSelectedComponent] = useState('my-profile')
+
+  const [events] = useState<Event[]>([
+    {
+      title: 'ORD001',
+      location: 'Vancouver',
+      date: '2024-01-15',
+      price: 299.99,
+      status: 'Upcoming',
+    },
+    {
+      title: 'ORD002',
+      location: 'Vancouver',
+      date: '2024-01-10',
+      price: 149.99,
+      status: 'Ongoing',
+    },
+    {
+      title: 'ORD003',
+      location: 'Vancouver',
+      date: '2024-01-05',
+      price: 89.99,
+      status: 'Finished',
+    },
+    {
+      title: 'ORD003',
+      location: 'Vancouver',
+      date: '2024-01-05',
+      price: 89.99,
+      status: 'Finished',
+    },
+    {
+      title: 'ORD003',
+      location: 'Vancouver',
+      date: '2024-01-05',
+      price: 89.99,
+      status: 'Finished',
+    },
+    {
+      title: 'ORD003',
+      location: 'Vancouver',
+      date: '2024-01-05',
+      price: 89.99,
+      status: 'Finished',
+    },
+  ])
 
   const renderComponent = () => {
     switch (selectedComponent) {
-      case 'contact-info':
+      case 'my-profile':
+        return <MyProfile user={user} events={events} />
+      case 'update-profile':
         return <ProfileInfo user={user} />
       case 'change-password':
         return <Password user={user} />
-      case 'delete-account':
-        return <DeleteAccount user={user} />
+      // case 'delete-account':
+      //   return <DeleteAccount user={user} />
       default:
-        return <ProfileInfo user={user} />
+        return <MyProfile user={user} events={events} />
     }
-  }
-
-  if (!user) {
-    return <p className="mt-10 text-center">No user data available.</p>
   }
 
   return (

@@ -2,19 +2,24 @@
 
 import { useState } from 'react'
 import { ChevronDown, Menu } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function Sidebar({
   onSelect,
 }: {
   onSelect: (component: string) => void
 }) {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation()
+
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedComponent, setSelectedComponent] = useState('contact-info')
+  const [selectedComponent, setSelectedComponent] = useState('my-profile')
 
   const components = {
-    'contact-info': 'Contact Info',
-    'change-password': 'Password',
-    'delete-account': 'Delete Account',
+    'my-profile': t('my-profile'),
+    'update-profile': t('update-profile'),
+    'change-password': t('change-password'),
+    // 'delete-account': t('delete-account'),
   }
 
   const handleSelect = (component: string) => {
@@ -51,7 +56,7 @@ export default function Sidebar({
         }`}
       >
         <h2 className="mb-4 hidden text-xl font-semibold text-gray-900 md:block">
-          Account Settings
+          {t('acc-setting')}
         </h2>
 
         <ul className="space-y-4">

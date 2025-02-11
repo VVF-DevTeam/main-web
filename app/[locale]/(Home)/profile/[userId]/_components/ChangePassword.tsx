@@ -3,20 +3,23 @@
 import { useState } from 'react'
 import { changePassword } from '@/lib/actions/changePassword'
 import { Eye, EyeOff } from 'lucide-react'
-
+import { useTranslation } from 'react-i18next'
 interface userPasswordProps {
   email: string
   password: string | null
 }
 
 const Password = ({ user }: { user: userPasswordProps }) => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation()
+
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
     repeatPassword: '',
   })
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [error, setError] = useState<string | null>('')
+  const [success, setSuccess] = useState<string | null>('')
   const [touched, setTouched] = useState({
     currentPassword: false,
     newPassword: false,
@@ -71,17 +74,17 @@ const Password = ({ user }: { user: userPasswordProps }) => {
     })
 
     if (user.password && !passwords.currentPassword) {
-      setError('Current password is required.')
+      setError(t('currentpassword-warning'))
       return
     }
 
     if (passwords.newPassword.length < 8) {
-      setError('New password must be at least 8 characters long.')
+      setError(t('newpassword-warning'))
       return
     }
 
     if (passwords.newPassword !== passwords.repeatPassword) {
-      setError("The repeat password doesn't match the new password.")
+      setError(t('passwordmatch-warning'))
       return
     }
 
@@ -93,7 +96,7 @@ const Password = ({ user }: { user: userPasswordProps }) => {
       })
 
       if (result.success) {
-        setSuccess('Your password was changed')
+        setSuccess(t('password-success'))
         setPasswords({
           currentPassword: '',
           newPassword: '',
@@ -109,7 +112,7 @@ const Password = ({ user }: { user: userPasswordProps }) => {
       }
     } catch (error) {
       console.log(error)
-      setError('Failed to update password.')
+      setError(t('password-failed'))
     }
   }
 
@@ -149,10 +152,10 @@ const Password = ({ user }: { user: userPasswordProps }) => {
 
       <div className="p-6 sm:p-6 lg:p-10">
         <h1 className="mb-6 text-2xl font-bold text-[#1E0A3C]">
-          Your password
+          {t('password-header')}
         </h1>
         <hr className="mb-6 border-t border-[#EEEDF2]" />
-        <p className="mb-6 text-[#6F7287]">Set a new password.</p>
+        <p className="mb-6 text-[#6F7287]">{t('password-command')}</p>
 
         <form onSubmit={handleSubmit} className="max-w-xl space-y-6">
           {user.password && (
@@ -160,7 +163,7 @@ const Password = ({ user }: { user: userPasswordProps }) => {
               <label className="block">
                 <div className="flex items-center">
                   <span className="text-sm text-[#1E0A3C]">
-                    Current Password
+                    {t('current-password')}
                   </span>
                   <span className="ml-1 text-[#C5162E]">*</span>
                 </div>
@@ -187,7 +190,7 @@ const Password = ({ user }: { user: userPasswordProps }) => {
                 </div>
                 {touched.currentPassword && !passwords.currentPassword && (
                   <p className="mt-1 text-sm text-[#C5162E]">
-                    Current password is required
+                    {t('currentpassword-warning')}
                   </p>
                 )}
               </label>
@@ -197,7 +200,9 @@ const Password = ({ user }: { user: userPasswordProps }) => {
           <div>
             <label className="block">
               <div className="flex items-center">
-                <span className="text-sm text-[#1E0A3C]">New Password</span>
+                <span className="text-sm text-[#1E0A3C]">
+                  {t('new-password')}
+                </span>
                 <span className="ml-1 text-[#C5162E]">*</span>
               </div>
               <div className="relative">
@@ -223,7 +228,7 @@ const Password = ({ user }: { user: userPasswordProps }) => {
               </div>
               {touched.newPassword && passwords.newPassword.length < 8 && (
                 <p className="mt-1 text-sm text-[#C5162E]">
-                  New password must be at least 8 characters
+                  {t('newpassword-warning')}
                 </p>
               )}
             </label>
@@ -232,7 +237,9 @@ const Password = ({ user }: { user: userPasswordProps }) => {
           <div>
             <label className="block">
               <div className="flex items-center">
-                <span className="text-sm text-[#1E0A3C]">Repeat Password</span>
+                <span className="text-sm text-[#1E0A3C]">
+                  {t('confirm-password')}
+                </span>
                 <span className="ml-1 text-[#C5162E]">*</span>
               </div>
               <div className="relative">
@@ -259,15 +266,13 @@ const Password = ({ user }: { user: userPasswordProps }) => {
               {touched.repeatPassword &&
                 passwords.repeatPassword.length < 8 && (
                   <p className="mt-1 text-sm text-[#C5162E]">
-                    Repeat password must be at least 8 characters
+                    {t('repeatpassword-warning')}
                   </p>
                 )}
             </label>
           </div>
 
-          <p className="text-sm text-[#6F7287]">
-            Your password must be at least 8 characters
-          </p>
+          <p className="text-sm text-[#6F7287]">{t('password-warning')}</p>
 
           <button
             type="submit"
