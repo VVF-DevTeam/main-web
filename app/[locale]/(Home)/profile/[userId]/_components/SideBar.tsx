@@ -19,7 +19,7 @@ export default function Sidebar({
     'my-profile': t('my-profile'),
     'update-profile': t('update-profile'),
     'change-password': t('change-password'),
-    // 'delete-account': t('delete-account'),
+    'delete-account': t('delete-account'),
   }
 
   const handleSelect = (component: string) => {

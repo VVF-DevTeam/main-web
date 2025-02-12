@@ -81,8 +81,8 @@ const ProfileClient = ({ user }: { user: userProps }) => {
         return <ProfileInfo user={user} />
       case 'change-password':
         return <Password user={user} />
-      // case 'delete-account':
-      //   return <DeleteAccount user={user} />
+      case 'delete-account':
+        return <DeleteAccount user={user} />
       default:
         return <MyProfile user={user} events={events} />
     }

@@ -7,6 +7,7 @@ import {
   FiMapPin,
   FiShoppingBag,
 } from 'react-icons/fi'
+import Image from 'next/image'
 
 import { useTranslation } from 'react-i18next'
 
@@ -52,7 +53,7 @@ const MyProfile = ({
               <div className="relative">
                 <div className="h-32 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                   {user?.image ? (
-                    <img
+                    <Image
                       src={user?.image}
                       alt="Profile"
                       className="h-full w-full object-cover"
