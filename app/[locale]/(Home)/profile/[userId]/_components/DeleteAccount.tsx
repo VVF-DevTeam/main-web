@@ -3,7 +3,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next' // Assuming you're using i18next for translations
 
-const DeleteAccount = ({ user }: { user: any }) => {
+interface useDeleteProps {
+  email: string
+  password: string | null
+}
+
+const DeleteAccount = ({ user }: { user: useDeleteProps }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation()
 
@@ -29,6 +34,8 @@ const DeleteAccount = ({ user }: { user: any }) => {
   
 
   }
+
+  console.log(user)
 
   return (
     <div className="p-6 sm:p-6 lg:p-10">
