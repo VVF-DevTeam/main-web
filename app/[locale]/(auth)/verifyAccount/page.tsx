@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/verifyToken'
 import ClipLoader from 'react-spinners/ClipLoader'
 import Image from 'next/image'
-import utilStyles from '@/lib/ui/cssModules/utils.module.css'
 
 type VerifyTokenResponse = {
   message: string
@@ -51,11 +50,11 @@ const VerifyAccountPage = () => {
   return (
     <div className=" relative flex min-h-screen justify-center">
       {/* NextJS Image and Dark Overlay */}
-      <div className={`${utilStyles.whiteOverlay}`}></div>
+      <div className={`whiteOverlay`}></div>
       <Image
         src="https://drive.google.com/thumbnail?id=1K6J4-M-RqxqJU7Z6YL1yxOhZ8h65nIHE&sz=w1000"
         alt="Intro"
-        className={`${utilStyles.nextBG}`}
+        className={`nextBG`}
         fill
         priority
       />

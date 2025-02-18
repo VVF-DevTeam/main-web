@@ -1,5 +1,4 @@
 // Components
-import { reverse } from 'dns'
 import IntroDescription from './IntroDescription'
 import IntroImage from './IntroImage'
 
