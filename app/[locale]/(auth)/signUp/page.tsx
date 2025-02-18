@@ -7,7 +7,7 @@ function signUpPage() {
       <div className="m-auto flex h-full max-h-[1700px] w-full max-w-7xl flex-col rounded-md bg-slate-100 shadow-md md:flex-row">
         <div className="relative hidden shrink-0 basis-[40%] md:block">
           <Image
-            src="/bg/antique-building.jpg"
+            src="https://drive.google.com/thumbnail?id=1qOdfbyKdQDXeRYCL8ctTMK8IlOxeDAgf&sz=w1000"
             alt="Org image"
             fill
             className="rounded-l-md object-cover"

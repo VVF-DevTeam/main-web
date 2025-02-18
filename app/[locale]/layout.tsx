@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/lib/ui/css/globals.css";
+import "@/lib/ui/css/utils.css";
 import { Toaster } from "@/components/ui/toaster";
+import { taipro } from "@/lib/ui/fonts/TaiHeritagePro"
+import { roboto } from "@/lib/ui/fonts/Roboto"
+
 export const metadata: Metadata = {
   title: "Viet Vibe Foundation",
   description: "Viet Vibe Foundation",
@@ -13,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`antialiased ${taipro.variable} ${roboto.variable}`}>
         <main>{children}</main>
         <Toaster />
       </body>

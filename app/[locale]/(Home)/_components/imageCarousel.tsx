@@ -27,7 +27,7 @@ const ImageCarousel = ({
   const [imageIndex, setImageIndex] = useState(0)
   const changeImage = (direction: Direction) => {
     let newIndex = 0
-    console.log('usecallback called')
+
     if (direction === 'left') {
       newIndex = imageIndex === 0 ? imageUrls.length - 1 : imageIndex - 1
     }
@@ -42,7 +42,7 @@ const ImageCarousel = ({
     if (!autoSlide) {
       return
     }
-    console.log('useEffect called')
+
     const timer = setTimeout(() => {
       changeImage('right')
     }, duration)

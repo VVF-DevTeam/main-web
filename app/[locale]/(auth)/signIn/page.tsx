@@ -8,10 +8,11 @@ async function signInPage() {
       <div className="m-auto flex h-full max-h-[1700px] w-full max-w-7xl flex-col rounded-md bg-slate-100 shadow-md md:flex-row">
         <div className="relative hidden shrink-0 basis-[55%] md:block">
           <Image
-            src="/sample-images/image7.jpg"
+            src="https://drive.google.com/thumbnail?id=1sfkb7WxViJqu-W0XIVkajaI9LrYZ3JQq&sz=w2000"
             alt="Org image"
             fill
             className="rounded-md object-cover"
+            priority
           />
         </div>
         <SignInForm />

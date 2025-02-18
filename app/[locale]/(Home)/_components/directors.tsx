@@ -18,7 +18,7 @@ const Directors = () => {
       <div className="grid grid-cols-[50%_50%] pb-5">
         <div className="grid w-full justify-end gap-x-6 border-r-[1px] border-[#3d3a3a] pl-10 pr-2 md:flex">
           <Image
-            src="/bio/trong-nguyen.jpg"
+            src="https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u&sz=w1000"
             alt="Trong Nguyen"
             width={200}
             height={50}
@@ -38,7 +38,7 @@ const Directors = () => {
         </div>
         <div className="grid w-full justify-start gap-x-6 pl-10 md:flex">
           <Image
-            src="/bio/eattle-nguyen-1.jpg"
+            src="https://drive.google.com/thumbnail?id=14oie7aYFMkMRwPYx9Ngty7B7wx-2NczG&sz=w1000"
             alt="Trong Nguyen"
             width={200}
             height={50}

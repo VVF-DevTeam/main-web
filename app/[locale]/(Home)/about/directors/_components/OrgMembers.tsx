@@ -10,7 +10,7 @@ const memberData = [
       'description-TrongNguyen',
       'bio-TrongNguyen',
     ],
-    imageUrl: '/bio/trong-nguyen.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u&sz=w1000',
     title: 'Trong Nguyen (Founder/CEO)',
   },
   {
@@ -19,7 +19,7 @@ const memberData = [
       'description-EricNguyen',
       'bio-EricNguyen',
     ],
-    imageUrl: '/bio/tue-nguyen.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=16dN0NDi0FsfBWoBRyK4rjm_yrLRY71ZG&sz=w1000',
     title: 'Tue Nguyen (Co-Founder/COO)',
   },
   {
@@ -28,7 +28,7 @@ const memberData = [
       'description-KhueLe',
       'bio-KhueLe',
     ],
-    imageUrl: '/bio/khue-le.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=15m1KsV9oU99fQ6GDpiGYclvbd46R4VAR&sz=w1000',
     title: 'Khue Le (Co-Founder/CHRO)',
   },  
   {
@@ -37,7 +37,7 @@ const memberData = [
       'description-EattleNguyen',
       'bio-EattleNguyen',
     ],
-    imageUrl: '/bio/eattle-nguyen.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1gwyOUEkQwoHVOk-pPt1WiV_rHKhirFRT&sz=w1000',
     title: 'Eattle Nguyen (Co-Founder/CMO)',
   },
   {
@@ -46,7 +46,7 @@ const memberData = [
       'description-DaoNguyen',
       'bio-DaoNguyen',
     ],
-    imageUrl: '/bio/dao-nguyen.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1d_6JXNRDej68-yl_4piUdXe47jTlD71p&sz=w1000',
     title: 'Dao Nguyen (CPO)',
   },
   {
@@ -55,7 +55,7 @@ const memberData = [
       'description-KhaiHung',
       'bio-KhaiHung',
     ],
-    imageUrl: '/bio/khai-hung.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1mmoqu-ALmc7mJ1ZmY9_Srfcb1AZD-0eh&sz=w1000',
     title: 'Khai Hung Luong (CTO)',
   },
   {
@@ -64,7 +64,7 @@ const memberData = [
       'description-AndyNguyen',
       'bio-AndyNguyen',
     ],
-    imageUrl: '/bio/andy-nguyen.jpg',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1sx23QaUry-Ed6yJ-whOrOKd4H3_rb0MJ&sz=w1000',
     title: 'Andy Nguyen (Supervisor)',
   },
 ]

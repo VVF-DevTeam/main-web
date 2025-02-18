@@ -10,10 +10,10 @@ export default async function Home({
 }) {
   const { locale } = await params
   const imageUrls = [
-    { id: '1', url: '/sample-images/image1.jpg' },
-    { id: '2', url: '/sample-images/image2.jpg' },
-    { id: '3', url: '/sample-images/image3.jpg' },
-    { id: '4', url: '/sample-images/image4.jpg' },
+    { id: '1', url: 'https://drive.google.com/thumbnail?id=1IcCi98pC_IQ9IrE-J6tay3dAzKSXZshb&sz=w2000' },
+    { id: '2', url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000' },
+    { id: '3', url: 'https://drive.google.com/thumbnail?id=1HsFliVn1V3lBc3yMhFlOPG629zOj83Lg&sz=w2000' },
+    { id: '4', url: 'https://drive.google.com/thumbnail?id=1M9hHWRlNCc6fFvlRfphq-uWwh2J12KFf&sz=w2000' },
   ]
 
   return (

@@ -23,7 +23,7 @@ const Layout = async ({
       locale={locale}
       resources={resources}
     >
-      <div className="relative h-full min-h-screen w-full bg-white">
+      <div className="relative h-full min-h-screen w-full">
         <div>
           <Header />
           <Navbar locale={locale} />

@@ -5,12 +5,22 @@ import { User2 } from 'lucide-react'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 import { auth } from '@/auth'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="h-[110px] w-full bg-[#d2d0d0] bg-[url(/bg/skating-bg-blur.jpg)] bg-cover bg-center bg-no-repeat p-6 bg-blend-overlay shadow-md">
+    <nav className="relative h-[110px] w-full p-6 shadow-md">
+      {/* NextJS Image and Dark Overlay */}
+      <div className={`whiteOverlay`}></div>
+      <Image
+        src="https://drive.google.com/thumbnail?id=1b17wtI8m9C1isfbJC7w-vbG_B5oe8wW9&sz=w1000"
+        alt="Intro"
+        className={`nextBG object-top`}
+        fill
+        priority
+      />
       <div className="flex h-full w-full items-center justify-between">
         <div className="flex h-full w-full items-center gap-x-4">
           <Link href="/">

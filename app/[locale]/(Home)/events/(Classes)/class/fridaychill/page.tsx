@@ -5,15 +5,15 @@ import { socialMediaIcons } from '@/lib/socialIcons'
 
 const EventsPage = () => {
   const imageUrls = [
-    { id: '1', url: '/sample-images/image1.jpg' },
-    { id: '2', url: '/sample-images/image2.jpg' },
+    { id: '1', url: 'https://drive.google.com/thumbnail?id=1IcCi98pC_IQ9IrE-J6tay3dAzKSXZshb&sz=w1000' },
+    { id: '2', url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w500' },
   ]
 
   const eventList = [
     {
       id: '3',
       name: 'Friday Chill 3',
-      thumbnail: '/sample-images/image3.jpg',
+      thumbnail: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w500',
       day: '13 Dec',
       location: 'Vancouver',
       end: 'True',
@@ -21,7 +21,7 @@ const EventsPage = () => {
     {
       id: '2',
       name: 'Friday Chill 2',
-      thumbnail: '/sample-images/image2.jpg',
+      thumbnail: 'https://drive.google.com/thumbnail?id=1IcCi98pC_IQ9IrE-J6tay3dAzKSXZshb&sz=w500',
       day: '25 Oct',
       location: 'Vancouver',
       end: 'True',
@@ -29,7 +29,7 @@ const EventsPage = () => {
     {
       id: '1',
       name: 'Friday Chill 1',
-      thumbnail: '/sample-images/image1.jpg',
+      thumbnail: 'https://drive.google.com/thumbnail?id=1HsFliVn1V3lBc3yMhFlOPG629zOj83Lg&sz=w500',
       day: '16 Aug',
       location: 'Vancouver',
       end: 'True',

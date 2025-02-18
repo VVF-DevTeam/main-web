@@ -1,17 +1,25 @@
+// Components
 import IntroCard from './IntroCard'
 import initTranslation from '@/app/i18n'
+import Image from 'next/image'
+
+// CSS Modules
+import headerMainStyles from '@/lib/ui/cssModules/headers/headerMain.module.css'
+import cardDefaultStyles from '@/lib/ui/cssModules/cards/cardDefault.module.css'
 
 const introductionData = [
   {
     id: 1,
     description: 'sport-description-introduction',
-    imageUrl: '/bg/tennisInstruction-home.jpg',
+    imageUrl:
+      'https://drive.google.com/thumbnail?id=1JLCsSSkUa9T6_dIksI8L3XWu8K0H6gKz&sz=w1000',
     title: 'sport-header-introduction',
   },
   {
     id: 2,
     description: 'music-description-introduction',
-    imageUrl: '/bg/pianoInstruction-home.jpg',
+    imageUrl:
+      'https://drive.google.com/thumbnail?id=1KZAEFIBNqDXd-HjNB6oLnf6zN6MvCjyj&sz=w1000',
     title: 'music-header-introduction',
   },
 ]
@@ -20,24 +28,39 @@ interface IntroductionProps {
   locale: string
 }
 
-const Introduction = async({locale}:IntroductionProps) => {
+const Introduction = async ({ locale }: IntroductionProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="bg-white">
-      <div className="blur-xs flex h-[90vh] flex-col items-center justify-center gap-y-8 bg-[#3a3635] bg-[url(/bg/guitar-background.jpg)] bg-cover bg-no-repeat text-center bg-blend-overlay">
-        <h1 className="font-[Poppins] text-2xl tracking-wide text-[#fff7f7] md:text-3xl lg:text-3xl">
+    <div>
+      <div
+        className={`${headerMainStyles.introFont} flexColCenter relative h-[90vh] gap-y-8`}
+      >
+        {/* NextJS Image and Dark Overlay */}
+        <div className={`darkOverlay`}></div>
+        <Image
+          src="https://drive.google.com/thumbnail?id=1ZREcmGQvqVeJGd5GLlk0FF7vjyYHFpkl&sz=w2000"
+          alt="Intro"
+          className={`nextBG`}
+          fill
+          priority
+        />
+
+        {/* Titles and Descriptions */}
+        <h1 className={`text-2xl tracking-wide md:text-3xl`}>
           Viet Vibe Foundation
         </h1>
-        <h1 className="max-w-[90vw] font-[Poppins] text-4xl font-semibold leading-[3rem] tracking-wider text-[#fff7f7] md:max-w-[80vw] md:text-5xl md:leading-[4rem] lg:max-w-[70vw]">
-          {t('title-small-introduction')}
+        <h1 className={`${headerMainStyles.big} max-w-[90vw]`}>
+          {t('title-big-introduction')}
         </h1>
-        <p className="max-w-[80vw] font-[Poppins] text-xl tracking-wide text-[#fff7f7] md:max-w-[70vw] md:text-2xl lg:max-w-[60vw] lg:text-2xl">
-        {t('title-big-introduction')}
+        <p
+          className={`${headerMainStyles.small}`}
+        >
+          {t('title-small-introduction')}
         </p>
       </div>
 
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-y-20 p-6 md:p-12 lg:gap-y-24 lg:p-16">
+      <div className={`${cardDefaultStyles.main} max-w-[1500px]`}>
         {introductionData.map((intro) => (
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}

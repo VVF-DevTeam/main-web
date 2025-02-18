@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/verifyToken'
 import ClipLoader from 'react-spinners/ClipLoader'
+import Image from 'next/image'
+import utilStyles from '@/lib/ui/cssModules/utils.module.css'
 
 type VerifyTokenResponse = {
   message: string
@@ -16,7 +18,6 @@ const VerifyAccountPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  console.log("outside")
   const getVerificationToken = async () => {
     if (!token) {
       setError(
@@ -48,8 +49,18 @@ const VerifyAccountPage = () => {
   }, [])
 
   return (
-    <div className="flex min-h-screen justify-center">
-      <div className="min-w-56 my-24 flex max-w-lg flex-col items-center justify-center rounded-md bg-[url(/bg/cave-water-blur.jpg)] bg-cover bg-center p-8 shadow-lg bg-[#bfbebe] bg-blend-overlay">
+    <div className=" relative flex min-h-screen justify-center">
+      {/* NextJS Image and Dark Overlay */}
+      <div className={`${utilStyles.whiteOverlay}`}></div>
+      <Image
+        src="https://drive.google.com/thumbnail?id=1K6J4-M-RqxqJU7Z6YL1yxOhZ8h65nIHE&sz=w1000"
+        alt="Intro"
+        className={`${utilStyles.nextBG}`}
+        fill
+        priority
+      />
+      
+      <div className="my-24 flex min-w-56 max-w-lg flex-col items-center justify-center rounded-md bg-white p-8 shadow-lg">
         {loading ? (
           <ClipLoader
             loading={loading}

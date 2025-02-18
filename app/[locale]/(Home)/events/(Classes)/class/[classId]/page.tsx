@@ -9,7 +9,7 @@ const eventList = [
     title: 'title-guitar',
     description: 'description-guitar',
     eventCategoryId: '1',
-    thumbnail: '/bg/acoustic-guitar-bg.jpg',
+    thumbnail: 'https://drive.google.com/thumbnail?id=1RcAKxLd76W-Nuu9FdNYlxNDdEDBD6RfU&sz=w1000',
     startDate: new Date('2025-02-27T00:00:00'),
     endDate: new Date('2025-06-05T00:00:00'),
     dates: ['thursday'],
