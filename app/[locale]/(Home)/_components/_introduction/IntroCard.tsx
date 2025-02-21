@@ -3,7 +3,8 @@ import IntroDescription from './IntroDescription'
 import IntroImage from './IntroImage'
 
 // CSS Modules
-import cardItemDefaultStyles from '@/lib/ui/cssModules/cards/cardItemDefault.module.css'
+import cardIntroItemStyles from '@/lib/ui/cssModules/introduction/cardIntroItem.module.css'
+
 interface IntroCardProps {
   id: number
   description: string
@@ -16,12 +17,12 @@ const IntroCard = ({ id, description, imageUrl, title }: IntroCardProps) => {
   return (
     <div className="h-full w-full">
       {id % 2 === 0 ? (
-        <div className={`${cardItemDefaultStyles.mainReverse}`}>
+        <div className={`${cardIntroItemStyles.mainReverse} flexDefault`}>
           <IntroDescription title={title} description={description} />
           <IntroImage imageUrl={imageUrl} direction="start" />
         </div>
       ) : (
-        <div className={`${cardItemDefaultStyles.main}`}>
+        <div className={`${cardIntroItemStyles.main} flexDefault`}>
           <IntroImage imageUrl={imageUrl} direction="end"/>
           <IntroDescription title={title} description={description} />
         </div>

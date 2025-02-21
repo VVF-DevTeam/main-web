@@ -1,11 +1,12 @@
+// Libraries
+import initTranslation from '@/app/i18n'
+
 // Components
 import IntroCard from './IntroCard'
-import initTranslation from '@/app/i18n'
 import Image from 'next/image'
 
-// CSS Modules
-import headerMainStyles from '@/lib/ui/cssModules/headers/headerMain.module.css'
-import cardDefaultStyles from '@/lib/ui/cssModules/cards/cardDefault.module.css'
+// CSS & CSS Modules
+import cardIntroStyles from '@/lib/ui/cssModules/introduction/cardIntro.module.css'
 
 const introductionData = [
   {
@@ -34,7 +35,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
   return (
     <div>
       <div
-        className={`${headerMainStyles.introFont} flexColCenter relative h-[90vh] gap-y-8`}
+        className={`headerFontWhite flexColCenter defaultGap relative h-[90vh]`}
       >
         {/* NextJS Image and Dark Overlay */}
         <div className={`darkOverlay`}></div>
@@ -50,17 +51,15 @@ const Introduction = async ({ locale }: IntroductionProps) => {
         <h1 className={`text-2xl tracking-wide md:text-3xl`}>
           Viet Vibe Foundation
         </h1>
-        <h1 className={`${headerMainStyles.big} max-w-[90vw]`}>
+        <h1 className={`headerBig max-w-[90vw]`}>
           {t('title-big-introduction')}
         </h1>
-        <p
-          className={`${headerMainStyles.small}`}
-        >
+        <p className={`headerText`}>
           {t('title-small-introduction')}
         </p>
       </div>
 
-      <div className={`${cardDefaultStyles.main} max-w-[1500px]`}>
+      <div className={`${cardIntroStyles.main} max-w-[1500px]`}>
         {introductionData.map((intro) => (
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}

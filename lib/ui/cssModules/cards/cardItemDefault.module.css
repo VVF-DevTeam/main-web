@@ -1,7 +1,0 @@
-.mainReverse {
-    @apply flex flex-col-reverse gap-x-20 gap-y-6 md:grid md:grid-cols-[50%_50%] lg:justify-items-end;
-}
-
-.main {
-    @apply flex flex-col gap-x-24 gap-y-6 md:grid md:grid-cols-[50%_50%] lg:justify-items-start;
-}

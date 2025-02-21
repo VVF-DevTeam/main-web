@@ -1,9 +1,15 @@
 'use client'
+
+// Libraries
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/verifyToken'
+
+// Components
 import ClipLoader from 'react-spinners/ClipLoader'
 import Image from 'next/image'
+
+// CSS & CSS Modules
 
 type VerifyTokenResponse = {
   message: string

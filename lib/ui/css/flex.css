@@ -1,0 +1,26 @@
+/* Below are some utility functions for flex */
+.flexDefault {
+  @apply flex gap-x-20 gap-y-6;
+}
+
+.flexColDefault {
+  @apply flex flex-col gap-x-20 gap-y-6;
+}
+
+/* flex center */
+.flexCenter {
+  @apply flex items-center justify-center;
+}
+
+.flexColCenter {
+  @apply flex flex-col items-center justify-center;
+}
+
+.flexBetween {
+  @apply flex items-center justify-between;
+}
+
+/* default gap */
+.defaultGap {
+  @apply gap-x-20 gap-y-6;
+}

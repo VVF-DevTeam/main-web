@@ -1,0 +1,8 @@
+/* Below are some utility functions for text */
+.textDefault {
+  @apply text-center md:text-left;
+}
+
+.textLine {
+    @apply text-sm text-gray-700;
+}

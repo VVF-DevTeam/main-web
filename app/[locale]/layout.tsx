@@ -1,19 +1,28 @@
-import type { Metadata } from "next";
-import "@/lib/ui/css/globals.css";
-import "@/lib/ui/css/utils.css";
-import { Toaster } from "@/components/ui/toaster";
-import { taipro } from "@/lib/ui/fonts/TaiHeritagePro"
-import { roboto } from "@/lib/ui/fonts/Roboto"
+// Libraries
+import type { Metadata } from 'next'
+
+// Components
+import { Toaster } from '@/components/ui/toaster'
+
+// CSS and CSS Modules
+import '@/lib/ui/css/globals.css'
+import '@/lib/ui/css/flex.css'
+import '@/lib/ui/css/bg.css'
+import '@/lib/ui/css/text.css'
+import '@/lib/ui/css/headers.css'
+import '@/lib/ui/css/button.css'
+import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
+import { roboto } from '@/lib/ui/fonts/Roboto'
 
 export const metadata: Metadata = {
-  title: "Viet Vibe Foundation",
-  description: "Viet Vibe Foundation",
-};
+  title: 'Viet Vibe Foundation',
+  description: 'Viet Vibe Foundation',
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -22,5 +31,5 @@ export default function RootLayout({
         <Toaster />
       </body>
     </html>
-  );
+  )
 }

@@ -13,15 +13,13 @@ const IntroDescription = ({ title, description }: IntroDescriptionProps) => {
   const router = useRouter()
 
   return (
-    <div className="my-auto flex basis-1/2 flex-col gap-y-8 pr-6 text-center text-[20px] font-light md:max-w-96 md:text-left">
+    <div className="flexColCenter textDefault defaultGap pr-6 md:max-w-96">
       <h1 className="text-3xl font-bold tracking-wide text-[#3d3a3a]">
         {t(title)}
       </h1>
-      <div className="flex flex-col gap-y-6">
-        <p className="text-sm text-gray-700">{t(description)}</p>
-      </div>
+      <p className="textLine">{t(description)}</p>
       <button
-        className="bg-[#C54B3E] p-3 text-sm font-semibold text-white md:place-self-start"
+        className="buttonDefault md:place-self-start"
         onClick={() => router.push('/events')}
       >
         {t('button-introduction')}

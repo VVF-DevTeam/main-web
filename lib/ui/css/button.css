@@ -1,0 +1,8 @@
+$buttonColor: #c54b3e;
+$textColor: white;
+
+.buttonDefault {
+  background-color: $buttonColor;
+  color: $textColor;
+  @apply p-3 text-sm font-semibold;
+}

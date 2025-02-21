@@ -1,9 +1,13 @@
+// Libraries
+import initTranslation from '@/app/i18n'
+
+// Components
 import { Event } from '@prisma/client'
 import EventCard from './EventCard'
 import EventInstruction from './EventInstruction'
-import initTranslation from '@/app/i18n'
 import Image from 'next/image'
-import headerMainStyles from '@/lib/ui/cssModules/headers/headerMain.module.css'
+
+// CSS & CSS Modules
 
 interface EventListProps {
   events: Event[]
@@ -16,7 +20,7 @@ const EventList = async ({ events, locale }: EventListProps) => {
   return (
     <div>
       <div
-        className={`${headerMainStyles.introFont} flexColCenter relative h-[70vh] gap-y-4 p-6`}
+        className={`headerFontWhite flexColCenter defaultGap relative h-[70vh] p-6`}
       >
         {/* NextJS Image and Dark Overlay */}
         <div className={`darkOverlay`}></div>
@@ -29,10 +33,10 @@ const EventList = async ({ events, locale }: EventListProps) => {
         />
 
         {/* Titles and Descriptions */}
-        <h2 className={`${headerMainStyles.big}`}>
+        <h2 className={`headerBig`}>
           {t('header-introduction')}
         </h2>
-        <span className={`${headerMainStyles.small}`}>
+        <span className={`headerSmall`}>
           {t('description-introduction')}
         </span>
       </div>

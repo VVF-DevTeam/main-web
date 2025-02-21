@@ -1,11 +1,14 @@
+// Libraries
 import React from 'react'
-import MobileSidebar from './mobileSidebar'
-import NavLinks from './navLinks'
-import { User2 } from 'lucide-react'
-import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 import { auth } from '@/auth'
+import { User2 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+
+// Components
+import MobileSidebar from './mobileSidebar'
+import NavLinks from './navLinks'
+import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 
 const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()

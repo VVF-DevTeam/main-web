@@ -56,9 +56,9 @@ const ImageCarousel = ({
 
   return (
     <div>
-      <div className="flex flex-col items-center justify-center">
+      <div className="flexColCenter defaultGap">
         <Separator className="w-1/2 bg-[#7f0000]" />
-        <span className="flex mb-7 py-6 font-[Poppins] text-4xl font-semibold italic leading-[3rem] tracking-wider text-[#3d3a3a]">
+        <span className="headerFontBlack headerSmall mb-7 py-6 italic">
           {t('header-achievement')}
         </span>
       </div>
@@ -82,16 +82,16 @@ const ImageCarousel = ({
             </div>
           ))}
         </div>
-        <div className="absolute inset-0 z-20 flex h-full max-w-[100vw] items-center justify-between px-4">
+        <div className="flexBetween absolute inset-0 z-20 h-full max-w-[100vw] px-4">
           <button aria-label="prev-image">
             <ArrowLeft
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[var(--brandColor)] transition-all hover:bg-[#EFB9A2]"
               onClick={() => changeImage('left')}
             />
           </button>
           <button aria-label="next-image">
             <ArrowRight
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
+              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[var(--brandColor)] transition-all hover:bg-[#EFB9A2]"
               onClick={() => changeImage('right')}
             />
           </button>
