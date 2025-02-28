@@ -1,12 +1,14 @@
-'use client'
-
+import initTranslation from '@/app/i18n'
 import React from 'react'
 import { Contact2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import Link from 'next/link'
 
-const Contact = () => {
+interface ContactProps {
+  locale: string
+}
+const Contact = async ({ locale }: ContactProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
     <div className="h-[60vh] w-full bg-[#EFB9A2]/20">
@@ -16,7 +18,7 @@ const Contact = () => {
             {t('header-contactUs')}
           </h2>
         </div>
-        <a
+        <Link
           href="https://www.instagram.com/vietvibe.foundation"
           target="_blank"
           rel="noopener noreferrer"
@@ -26,10 +28,10 @@ const Contact = () => {
             {t('button-contactUs')}
             <Contact2 className="h-7 w-7" />
           </span>
-        </a>
+        </Link>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Contact;
+export default Contact

@@ -29,8 +29,8 @@ const About = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['about', 'common'])
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="flex max-w-[1500px] flex-col items-center justify-center gap-y-12 p-12">
+    <div className="flex min-h-screen justify-center">
+      <div className="flex max-w-[1500px] flex-col gap-y-12 p-12 pt-60">
         <div className="flex flex-col items-center justify-center gap-y-6 p-6">
           <h2 className="cursor-default text-5xl font-bold tracking-wider text-[#7f0000] transition-all duration-100 ease-out hover:text-[#7f0000]/80">
             {t('header-vision-aboutUs')}

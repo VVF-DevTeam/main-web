@@ -30,18 +30,20 @@ const PostCard = ({
   userId,
 }: PostProps) => {
   return (
-    <div className="grid h-full w-full gap-x-6 overflow-hidden rounded-md border bg-[#EFB9A2]/20 shadow-lg transition-all duration-200 ease-in hover:bg-[#F2E3D5] md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
+    <div className="grid gap-x-6 overflow-hidden rounded-md border bg-[#EFB9A2]/20 shadow-lg transition-all duration-200 ease-in hover:bg-[#F2E3D5] md:grid-cols-[30%_70%] md:gap-x-8 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
           src={imageUrl}
-          alt={title}
+          alt={`${title} image`}
           fill
-          className="absolute object-cover duration-500 ease-in-out hover:scale-110"
+          priority={true}
+          sizes="(min-width: 1280px) 426px, (min-width: 780px) 396px, (min-width: 400px) calc(100vw - 98px), calc(13.75vw + 230px)"
+          className="object-cover duration-300 ease-in-out sm:hover:scale-110"
         />
       </div>
 
-      {/* Column2 - Content title createdAt */}
+      {/* Column2 - Content, title, createdAt */}
       <div className="flex flex-col flex-wrap gap-y-6 px-4 py-8 xl:px-8 xl:py-10">
         <h2 className="text-2xl font-bold tracking-wide xl:text-3xl">
           {title}
