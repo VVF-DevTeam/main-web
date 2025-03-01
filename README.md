@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
 ## Getting Started
 
-1. Run the development server:
+1. Run the development server (we will mainly use yarn for packages management):
 
    ```sh
    npm install --global yarn
@@ -12,9 +12,9 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
 2. Local Development: 
 
-   Open http://localhost:3000 in your browser to see the template home page. You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   a. Open http://localhost:3000 in your browser to see the template home page. You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-   *__Some important tips:__*
+   b. *__Some important tips:__*
       - Remember to add all the environment variables in this [document](https://docs.google.com/spreadsheets/d/1HWzT14xOBQg8zwtJ3RfTpdCH8ENshvoSRAO7LeGP1IM/edit?usp=sharing) (only accessible to officers who have VVF gmail account) 
       - When you add/modify **any** packages in package.json, please update yarn.lock by running:
 
@@ -24,19 +24,25 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
       - Make sure __all__ checks have passed in your PR: 
          ![image](https://github.com/user-attachments/assets/30f67fa3-b284-4576-a23e-268f52368cc3)
 
-   For the database, run (ensure DATABASE_URL is in .env):
+   c. For the database, run the following command to open local database studio (ensure DATABASE_URL is in .env, refer to this [document](https://docs.google.com/spreadsheets/d/1HWzT14xOBQg8zwtJ3RfTpdCH8ENshvoSRAO7LeGP1IM/edit?usp=sharing)):
     ```sh
    npx prisma studio
    ```
-    
+   d. Before pushing the code, __always__ remember to run (some errors only show as warning in development mode but will cause build to fail):
+   ```sh
+   yarn run build
+   ```
+
 4. Deployment:
 
-   This project uses AWS Amplify and Vercel to host the production and dev branches:
-   - Amplify: www.vietvibe.org
-   - Vercel: https://main-web-git-dev-khaihung-vvfs-projects.vercel.app
+   a. This project uses AWS Amplify and Vercel to host the production and dev branches:
+      - Amplify: www.vietvibe.org
+      - Vercel: https://main-web-git-dev-khaihung-vvfs-projects.vercel.app 
   
-   In addition, the branch is integrated with Vercel and Amplify bot to build every PR's preview automatically: 
+   b. In addition, the branch is integrated with Vercel and Amplify bot to build every PR's preview automatically. Please __always verify__ your PR after the build is finished:
+      - For Vercel, you will need a Vercel account to request access to the preview:
    ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
+      - For AWS, it is open to the public:
    ![image](https://github.com/user-attachments/assets/03c59fb7-dcf2-4608-a1ff-c9373b2a2a84)
 
 
