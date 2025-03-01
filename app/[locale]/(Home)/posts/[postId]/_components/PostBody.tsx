@@ -32,7 +32,7 @@ const PostBody = ({
           src={imageUrl}
           alt={title}
           fill
-          className="absolute object-cover duration-500 ease-in-out hover:scale-110"
+          className="absolute object-cover hover-focus-image"
         />
       </div>
       <div className='w-full mt-4 text-pretty'>

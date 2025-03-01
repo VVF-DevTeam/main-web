@@ -30,7 +30,7 @@ const About = async ({ locale }: { locale: string }) => {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="flex max-w-[1500px] flex-col items-center justify-center gap-y-12 p-12">
+      <div className="flex width-max-default flex-col items-center justify-center gap-y-12 p-12">
         <div className="flex flex-col items-center justify-center gap-y-6 p-6">
           <h2 className="cursor-default text-5xl font-bold tracking-wider text-[#7f0000] transition-all duration-100 ease-out hover:text-[#7f0000]/80">
             {t('header-vision-aboutUs')}
@@ -40,7 +40,7 @@ const About = async ({ locale }: { locale: string }) => {
             {t('description-vision-aboutUs')}
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="flex-col-default grid-all-cols-3">
           {cardsData.map((card) => (
             <GridCard
               key={card.id}

@@ -25,18 +25,29 @@ interface NavLinkProps {
 const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
   const Icon = navLogos[logo]
   const pathname = usePathname()
-
   const isActive =
     pathname.toLowerCase().includes(label.toLowerCase()) ||
-    (label.toLowerCase() === 'home' && pathname.split('/').length <= 2)
+    (label.toLowerCase() === 'home' && pathname.split('/').length <=  2)
+
+  // css variables
+  const baseClasses =
+    'flex-center whitespace-nowrap font-semibold transition-all tracking-wide'
+  const inactiveColor =
+    mode === 'desktop'
+      ? 'text-textColor hover:text-textColor-brand hover:underline'
+      : 'text-textColor-white hover:bg-background-brand'
+  const layoutClasses =
+    mode === 'desktop'
+      ? 'gap-x-[5px] text-sm'
+      : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl'
 
   return (
     <Link
       href={path}
       className={cn(
-        mode === 'desktop'
-          ? `flex items-center justify-center gap-x-[5px] whitespace-nowrap text-sm font-semibold tracking-wide transition-all ${isActive ? 'text-[#C54B3E]' : 'text-[#212121] hover:text-[#C54B3E] hover:underline'}`
-          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-slate-200 hover:bg-[#C54B3E]/40'}`
+        baseClasses,
+        layoutClasses,
+        isActive ? 'text-textColor-brand' : inactiveColor
       )}
     >
       <Icon className="h-5 w-5" />

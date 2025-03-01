@@ -1,5 +1,5 @@
 /* Below are some utility functions for background images*/
-.nextBG {
+.next-background {
     position: absolute;
     top: 0;
     left: 0;
@@ -10,7 +10,7 @@
     z-index: -2;
   }
   
-  .darkOverlay {
+  .dark-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -23,7 +23,7 @@
     opacity: 0.6;
   }
   
-  .whiteOverlay {
+  .white-overlay {
     position: absolute;
     top: 0;
     left: 0;

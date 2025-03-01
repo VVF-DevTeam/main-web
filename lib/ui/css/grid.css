@@ -1,0 +1,11 @@
+/* Below are some utility functions for grid */
+/* For grid-cols-1 please use flex & flex-col (MUST use md:grid because Tailwind does not merge utility classes dynamically) or flex-col-default */
+
+/* For all size screens */
+.grid-all-cols-3 {
+  @apply md:grid md:grid-cols-2 lg:grid-cols-3;
+}
+
+.grid-all-cols-2 {
+  @apply md:grid md:grid-cols-[50%_50%];
+}

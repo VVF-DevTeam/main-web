@@ -56,11 +56,11 @@ const VerifyAccountPage = () => {
   return (
     <div className=" relative flex min-h-screen justify-center">
       {/* NextJS Image and Dark Overlay */}
-      <div className={`whiteOverlay`}></div>
+      <div className="white-overlay"></div>
       <Image
         src="https://drive.google.com/thumbnail?id=1K6J4-M-RqxqJU7Z6YL1yxOhZ8h65nIHE&sz=w1000"
         alt="Intro"
-        className={`nextBG`}
+        className='next-background'
         fill
         priority
       />

@@ -5,9 +5,6 @@ import initTranslation from '@/app/i18n'
 import IntroCard from './IntroCard'
 import Image from 'next/image'
 
-// CSS & CSS Modules
-import cardIntroStyles from '@/lib/ui/cssModules/introduction/cardIntro.module.css'
-
 const introductionData = [
   {
     id: 1,
@@ -34,32 +31,28 @@ const Introduction = async ({ locale }: IntroductionProps) => {
 
   return (
     <div>
-      <div
-        className={`headerFontWhite flexColCenter defaultGap relative h-[90vh]`}
-      >
+      <div className="flex-col-center header-font-white default-gap relative h-[90vh] text-center">
         {/* NextJS Image and Dark Overlay */}
-        <div className={`darkOverlay`}></div>
+        <div className="dark-overlay"></div>
         <Image
           src="https://drive.google.com/thumbnail?id=1ZREcmGQvqVeJGd5GLlk0FF7vjyYHFpkl&sz=w2000"
-          alt="Intro"
-          className={`nextBG`}
+          alt="Intro image of someone playing a guitar"
+          className="next-background"
           fill
           priority
         />
 
         {/* Titles and Descriptions */}
-        <h1 className={`text-2xl tracking-wide md:text-3xl`}>
+        <h1 className="text-2xl tracking-wide md:text-3xl">
           Viet Vibe Foundation
         </h1>
-        <h1 className={`headerBig max-w-[90vw]`}>
+        <h1 className="header-main max-w-[90vw]">
           {t('title-big-introduction')}
         </h1>
-        <p className={`headerText`}>
-          {t('title-small-introduction')}
-        </p>
+        <p className="header-text">{t('title-small-introduction')}</p>
       </div>
 
-      <div className={`${cardIntroStyles.main} max-w-[1500px]`}>
+      <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-24 lg:p-16">
         {introductionData.map((intro) => (
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}

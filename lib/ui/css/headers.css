@@ -1,27 +1,24 @@
 $textWhite: #fff7f7;
-$textBlack: #3d3a3a;
 
 /* Header.module.css */
-.headerFontWhite {
+.header-font-white {
   font-family: var(--font-tai-heritage-pro);
-  color: $textWhite;
-  text-align: center;
+  @apply text-textColor-white;
 }
 
-.headerFontBlack {
+.header-font-black {
   font-family: var(--font-tai-heritage-pro);
-  color: $textBlack;
-  text-align: center;
+  @apply text-textColor;
 }
 
-.headerBig {
+.header-main {
   @apply text-4xl font-semibold leading-[3rem] tracking-wider md:max-w-[80vw] md:text-5xl md:leading-[4rem] lg:max-w-[70vw];
 }
 
-.headerSmall {
+.header-sub {
   @apply text-3xl font-semibold leading-[3rem] md:max-w-[80vw] md:text-4xl md:leading-[4rem] lg:max-w-[70vw] tracking-wide;
 }
 
-.headerText {
+.header-text {
   @apply max-w-[80vw] text-xl tracking-wide md:max-w-[70vw] md:text-2xl lg:max-w-[60vw] lg:text-2xl;
 }

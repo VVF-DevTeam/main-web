@@ -2,14 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   font-family: var(--font-roboto);
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: #ffffff;
+    --background-gray: #323335;
+    --background-alt: #fcf1ec;
+    --background-black: #1B171A;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -34,7 +36,11 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --brandColor: #C54B3E;
+    --brand-color: #C54B3E;
+    --brand-color-light: #EFB9A2;
+    --text-default: #323335;
+    --text-white: #fff7f7;
+    --text-gray: #71717A;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -61,17 +67,5 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  .c-space {
-    margin-top: 20px;
-  }  
-  body {
-    @apply bg-background text-foreground;
   }
 }

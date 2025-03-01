@@ -9,41 +9,40 @@ import Image from 'next/image'
 
 // CSS & CSS Modules
 
+// Interfaces
 interface EventListProps {
   events: Event[]
   locale: string
 }
 
+// Components
 const EventList = async ({ events, locale }: EventListProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
     <div>
-      <div
-        className={`headerFontWhite flexColCenter defaultGap relative h-[70vh] p-6`}
-      >
+      {/* Background Image and Headers */}
+      <div className="flex-col-center header-font-white default-gap relative h-[70vh] p-6 text-center">
         {/* NextJS Image and Dark Overlay */}
-        <div className={`darkOverlay`}></div>
+        <div className="dark-overlay"></div>
         <Image
           src="https://drive.google.com/thumbnail?id=13ci_qVojwKNcZlAAfp5ovVMTiLAbymVj&sz=w2000"
-          alt="Intro"
-          className={`nextBG object-top`}
+          alt="Event List Background"
+          className="next-background object-top"
           fill
           priority
         />
 
         {/* Titles and Descriptions */}
-        <h2 className={`headerBig`}>
-          {t('header-introduction')}
-        </h2>
-        <span className={`headerSmall`}>
-          {t('description-introduction')}
-        </span>
+        <h2 className="header-main">{t('header-introduction')}</h2>
+        <span className="header-text">{t('description-introduction')}</span>
       </div>
-      <div className="mt-10 flex items-center justify-center gap-4 py-2 text-3xl md:text-4xl lg:mt-20 lg:text-5xl">
-        <h1>{t('header-upcomingEvent')}</h1>
+
+      {/* Events */}
+      <div className="flex-center mt-10">
+        <h1 className="header-main">{t('header-upcomingEvent')}</h1>
       </div>
-      <div className="mx-auto mb-5 grid max-w-[1500px] grid-cols-1 gap-6 p-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 lg:p-12">
+      <div className="flex-col-default grid-all-cols-3 width-max-default gap-x-6 mx-auto mb-5 p-5 lg:p-12">
         {events.map((event) =>
           event.title !== 'Friday Chill 3' ? (
             <EventCard key={event.id} event={event} />
@@ -51,11 +50,10 @@ const EventList = async ({ events, locale }: EventListProps) => {
         )}
       </div>
       <EventInstruction locale={locale} />
-
-      <div className="mt-10 flex items-center justify-center gap-4 py-2 text-3xl md:text-4xl lg:mt-20 lg:text-5xl">
-        <h1>{t('header-pastEvent')}</h1>
+      <div className="flex-center mt-10">
+        <h1 className="header-main">{t('header-pastEvent')}</h1>
       </div>
-      <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-6 p-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 lg:p-12">
+      <div className="flex-col-default grid-all-cols-3 width-max-default mx-auto mb-5 p-5 lg:p-12">
         {events.map((event) =>
           event.title === 'Friday Chill 3' ? (
             <EventCard key={event.id} event={event} />

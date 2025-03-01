@@ -15,23 +15,23 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="flex items-center justify-center">
-          <Menu className="h-8 w-8 text-[#212121] transition-all hover:text-[#C54B3E]" />
+        <button className="flex-center">
+          <Menu className="h-8 w-8 text-textColor transition-all hover:text-textColor-brand" />
         </button>
       </SheetTrigger>
-      <SheetContent className="w-[300px] bg-[#1B171A]">
+      <SheetContent className="flex-col-center w-[300px] bg-background-black">
         <SheetHeader>
-          <SheetTitle className="text-[#1B171A]">Menu</SheetTitle>
+          <SheetTitle className="text-textColor-white">Menu</SheetTitle>
 
           <SheetDescription>
             <NavLinks mode="mobile" locale={locale} />
           </SheetDescription>
         </SheetHeader>
 
-        <SheetFooter className="mt-20 flex items-center">
+        <SheetFooter className="mt-20">
           <SheetClose asChild>
             <button>
-              <X className="h-12 w-12 rounded-md p-1 text-[#EFB9A2] transition-all hover:border-2 hover:border-[#C54B3E]" />
+              <X className="h-12 w-12 rounded-md p-1 text-textColor-brand-light hover:border-2 hover:border-[#C54B3E]" />
             </button>
           </SheetClose>
         </SheetFooter>

@@ -1,0 +1,4 @@
+/* Below are some utility functions for hover effects */
+.hover-focus-image {
+  @apply duration-500 ease-in-out hover:scale-110;
+}

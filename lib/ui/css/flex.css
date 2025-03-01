@@ -1,26 +1,34 @@
 /* Below are some utility functions for flex */
-.flexDefault {
-  @apply flex gap-x-20 gap-y-6;
+/* IMPORTANT: When using css flex properties in this file, if you want to use grid for bigger screens, you have to use flex custom classes from this file as well */
+/* If you use inline flex from tailwind, it will override any custom grid classes (because Tailwind does not merge utility classes dynamically) */
+
+/* flex default */
+.flex-default {
+  @apply flex gap-x-8 gap-y-6;
 }
 
-.flexColDefault {
-  @apply flex flex-col gap-x-20 gap-y-6;
+.flex-col-default {
+  @apply flex flex-col gap-x-8 gap-y-6;
 }
 
 /* flex center */
-.flexCenter {
+.flex-center {
   @apply flex items-center justify-center;
 }
 
-.flexColCenter {
+.flex-end {
+  @apply flex items-center justify-end;
+}
+
+.flex-col-center {
   @apply flex flex-col items-center justify-center;
 }
 
-.flexBetween {
+.flex-between {
   @apply flex items-center justify-between;
 }
 
 /* default gap */
-.defaultGap {
-  @apply gap-x-20 gap-y-6;
+.default-gap {
+  @apply gap-x-8 gap-y-6;
 }

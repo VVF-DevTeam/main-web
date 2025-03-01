@@ -7,7 +7,7 @@ interface ClassImageProps {
   startDate: Date
   endDate?: Date
   instructor: string
-  title:string
+  title: string
   locale: string
 }
 
@@ -17,12 +17,12 @@ const ClassImage = async ({
   startDate,
   instructor,
   title,
-  locale
+  locale,
 }: ClassImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="mx-auto grid w-full max-w-[1300px] grid-cols-1 p-6 md:grid-cols-2">
+    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid">
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
@@ -32,10 +32,12 @@ const ClassImage = async ({
         />
       </div>
       <div className="flex flex-col justify-center gap-y-4 bg-[#242029] pb-6 pl-4 pt-2 text-left text-white md:h-[40vh] lg:h-[50vh] lg:pl-8">
-        <span className="text-sm text-muted">
+        <span className="text-muted text-sm">
           {startDate.toLocaleDateString()} | {location}
         </span>
-        <h2 className="-mt-3 mb-1 text-4xl font-extrabold font-[Poppins]">{t(title)}</h2>
+        <h2 className="-mt-3 mb-1 font-[Poppins] text-4xl font-extrabold">
+          {t(title)}
+        </h2>
         <span>
           {t('classBy-guitar')} <span className="font-bold">{instructor}</span>
         </span>

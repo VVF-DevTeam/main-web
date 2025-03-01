@@ -23,14 +23,14 @@ const cardsData = [
 const OrgSummary = () => {
   return (
     <div className="bg-[#ffffff] py-12 lg:py-16">
-      <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-center gap-y-10 p-6">
+      <div className="width-max-default mx-auto flex flex-col items-center justify-center gap-y-10 p-6">
         <div className="flex flex-col items-center justify-center p-6 lg:px-10">
           <div className="relative aspect-video min-h-[180px] min-w-[180px] lg:w-[23vw] xl:h-[18vh]">
             <Image
               src="/company-logo.png"
               alt="Org Logo"
               fill
-              className="absolute object-contain duration-500 ease-in-out hover:scale-110"
+              className="absolute object-contain hover-focus-image"
             />
           </div>
           <Separator className="w-3/4 bg-[#B83AB3] xl:mt-4" />

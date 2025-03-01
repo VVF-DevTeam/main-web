@@ -9,13 +9,11 @@ const Contact = () => {
   const { t } = useTranslation()
 
   return (
-    <div className="h-[60vh] w-full bg-[#EFB9A2]/20">
-      <div className="flex h-full w-full flex-col items-center justify-center gap-y-14 lg:gap-y-20">
-        <div className="flex flex-col items-center justify-center gap-y-6">
-          <h2 className="cursor-default text-center text-3xl font-bold tracking-wide text-[#3d3a3a] transition-all duration-100 ease-out md:text-4xl lg:text-5xl">
-            {t('header-contactUs')}
-          </h2>
-        </div>
+    <div className="h-[60vh] w-full bg-background-alt">
+      <div className="flex-col-center h-full w-full gap-y-14 lg:gap-y-20">
+        <h2 className="header-sub cursor-default text-center header-sub lg:text-5xl">
+          {t('header-contactUs')}
+        </h2>
         <a
           href="https://www.instagram.com/vietvibe.foundation"
           target="_blank"

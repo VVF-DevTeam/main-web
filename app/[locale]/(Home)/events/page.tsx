@@ -73,8 +73,8 @@ const EventsPage = async({ params }: { params: Promise<{ locale: string }> }) =>
   const { locale } = await params
 
   return (
-    <div className="w-full overflow-hidden">
-      <div className="">
+    <div>
+      <div>
         <EventList events={eventList} locale={locale} />
       </div>
     </div>

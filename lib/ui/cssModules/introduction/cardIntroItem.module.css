@@ -1,7 +1,0 @@
-.mainReverse {
-    @apply flex-col-reverse md:grid md:grid-cols-[50%_50%] lg:justify-items-end;
-}
-
-.main {
-    @apply flex-col md:grid md:grid-cols-[50%_50%] lg:justify-items-start;
-}

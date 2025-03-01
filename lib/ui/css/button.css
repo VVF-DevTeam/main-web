@@ -1,8 +1,7 @@
-$buttonColor: #c54b3e;
 $textColor: white;
 
-.buttonDefault {
-  background-color: $buttonColor;
+.button-default {
+  background-color: var(--brand-color);
   color: $textColor;
   @apply p-3 text-sm font-semibold;
 }

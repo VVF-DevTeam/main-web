@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()  
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -77,7 +77,7 @@ const SignUpForm = () => {
       <h1 className="mt-8 text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
         {t('register')}
       </h1>
-      <p className="mt-6 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-6 text-sm">
         {t('description-signUp')}
       </p>
       <Separator className="my-4 h-[1px] w-full bg-gray-300" />
@@ -86,7 +86,7 @@ const SignUpForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mb-4 grid grid-cols-1 gap-x-6 gap-y-6 pt-2 md:grid-cols-2 md:gap-y-8 lg:gap-x-8"
+            className="flex-col-default grid-all-cols-2 mb-4 pr-5 pt-2 md:gap-y-8 lg:gap-x-6"
           >
             {/* first name */}
             <FormField
@@ -94,7 +94,9 @@ const SignUpForm = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('firstName')}</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">
+                    {t('firstName')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Joe"
@@ -113,7 +115,9 @@ const SignUpForm = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('lastName')}</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">
+                    {t('lastName')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Smith"
@@ -169,7 +173,9 @@ const SignUpForm = () => {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('phoneNumber')}</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">
+                    {t('phoneNumber')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 1234567890"
@@ -188,7 +194,9 @@ const SignUpForm = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('address')}</FormLabel>
+                  <FormLabel className="text-[#C54B3E]">
+                    {t('address')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 123 Main St"
@@ -207,7 +215,7 @@ const SignUpForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel htmlFor="password" className="text-[#C54B3E]">
-                  {t('password')}
+                    {t('password')}
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
@@ -221,7 +229,7 @@ const SignUpForm = () => {
                         variant="ghost"
                         size={'icon'}
                         type="button"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        className="text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <Eye className="h-7 w-7" />
@@ -256,7 +264,7 @@ const SignUpForm = () => {
                         variant="ghost"
                         size={'icon'}
                         type="button"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        className="text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <Eye className="h-7 w-7" />

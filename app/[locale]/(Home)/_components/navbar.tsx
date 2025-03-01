@@ -16,23 +16,28 @@ const Navbar = async ({ locale }: { locale: string }) => {
   return (
     <nav className="relative h-[110px] w-full p-6 shadow-md">
       {/* NextJS Image and Dark Overlay */}
-      <div className={`whiteOverlay`}></div>
+      <div className="white-overlay"></div>
       <Image
         src="https://drive.google.com/thumbnail?id=1b17wtI8m9C1isfbJC7w-vbG_B5oe8wW9&sz=w1000"
         alt="Intro"
-        className={`nextBG object-top`}
+        className="next-background object-top"
         fill
         priority
       />
-      <div className="flex h-full w-full items-center justify-between">
+
+      {/* Nav Links */}
+      <div className="flex-between h-full w-full">
         <div className="flex h-full w-full items-center gap-x-4">
-          <Link href="/">
+          {/* Company Logo with Slogan*/}
+          <Link href="/" className="flex-col-center -mt-5">
             <CompanyLogo />
+            <p className="-mt-7 text-[9px] header-font-black"> Grow together, Shine together</p>
           </Link>
+
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="-ml-10 flex items-center justify-center gap-x-2 text-[#212121] transition-all hover:text-[#C54B3E]"
+              className="flex-center -ml-10 md:-ml-5 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand"
               href=""
             >
               <User2 className="h-5 w-5" />
@@ -42,7 +47,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
         </div>
 
         {/* Nav Links */}
-        <div className="flex items-center gap-x-3 lg:gap-x-6">
+        <div className="flex-center gap-x-3 lg:gap-x-6">
           <div className="hidden sm:block">
             <NavLinks mode="desktop" locale={locale} />
           </div>
