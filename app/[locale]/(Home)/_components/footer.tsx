@@ -55,6 +55,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     href="https://www.facebook.com/profile.php?id=61570910920072"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Facebook Page"
                     className="hover:text-textColor-brandLight"
                   >
                     <SiFacebook className="h-6 w-6" />
@@ -63,6 +64,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     href="https://www.instagram.com/vietvibe.foundation"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Instagram Page"
                     className="hover:text-textColor-brandLight"
                   >
                     <SiInstagram className="h-6 w-6" />

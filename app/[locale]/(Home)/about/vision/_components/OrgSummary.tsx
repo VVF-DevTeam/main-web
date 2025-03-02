@@ -30,7 +30,7 @@ const OrgSummary = () => {
               src="/company-logo.png"
               alt="Org Logo"
               fill
-              className="absolute object-contain hover-focus-image"
+              className="absolute object-contain hover-focus-zoomIn"
             />
           </div>
           <Separator className="w-3/4 bg-[#B83AB3] xl:mt-4" />

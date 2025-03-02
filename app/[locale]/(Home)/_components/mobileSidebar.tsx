@@ -15,7 +15,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="flex-center">
+        <button className="flex-center" aria-label="Open mobile menu">
           <Menu className="h-8 w-8 text-textColor transition-all hover:text-textColor-brand" />
         </button>
       </SheetTrigger>
@@ -30,8 +30,8 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
 
         <SheetFooter className="mt-20">
           <SheetClose asChild>
-            <button>
-              <X className="h-12 w-12 rounded-md p-1 text-textColor-brand-light hover:border-2 hover:border-[#C54B3E]" />
+            <button aria-label="Close mobile menu">
+              <X className="text-textColor-brand-light h-12 w-12 rounded-md p-1 hover:border-2 hover:border-bgColor-brand" />
             </button>
           </SheetClose>
         </SheetFooter>

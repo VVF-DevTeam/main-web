@@ -18,6 +18,8 @@ interface EventListProps {
 // Components
 const EventList = async ({ events, locale }: EventListProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+  const eventClassName =
+    'flex-col-default grid-all-cols-3 width-max-default gap-x-6 mx-auto mb-5 p-5 lg:p-12'
 
   return (
     <div>
@@ -42,7 +44,7 @@ const EventList = async ({ events, locale }: EventListProps) => {
       <div className="flex-center mt-10">
         <h1 className="header-main">{t('header-upcomingEvent')}</h1>
       </div>
-      <div className="flex-col-default grid-all-cols-3 width-max-default gap-x-6 mx-auto mb-5 p-5 lg:p-12">
+      <div className={eventClassName}>
         {events.map((event) =>
           event.title !== 'Friday Chill 3' ? (
             <EventCard key={event.id} event={event} />
@@ -53,7 +55,7 @@ const EventList = async ({ events, locale }: EventListProps) => {
       <div className="flex-center mt-10">
         <h1 className="header-main">{t('header-pastEvent')}</h1>
       </div>
-      <div className="flex-col-default grid-all-cols-3 width-max-default mx-auto mb-5 p-5 lg:p-12">
+      <div className={eventClassName}>
         {events.map((event) =>
           event.title === 'Friday Chill 3' ? (
             <EventCard key={event.id} event={event} />

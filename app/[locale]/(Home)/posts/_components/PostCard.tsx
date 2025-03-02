@@ -37,7 +37,7 @@ const PostCard = ({
           src={imageUrl}
           alt={title}
           fill
-          className="absolute object-cover hover-focus-image"
+          className="absolute object-cover hover-focus-zoomIn"
         />
       </div>
 

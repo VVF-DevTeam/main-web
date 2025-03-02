@@ -11,6 +11,7 @@ import NavLinks from './navLinks'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 
 const Navbar = async ({ locale }: { locale: string }) => {
+  // TODO: Move session to parent component
   const session = await auth()
 
   return (
@@ -39,6 +40,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
             <Link
               className="flex-center -ml-10 md:-ml-5 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand"
               href=""
+              aria-label="Go to user profile"
             >
               <User2 className="h-5 w-5" />
               <span>{session?.user?.name?.split(' ')[0]}</span>

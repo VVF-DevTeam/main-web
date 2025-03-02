@@ -53,6 +53,7 @@ const Header = () => {
                 className="flex-center gap-x-2 rounded-md p-1 hover:text-textColor-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2"
                 onClick={() => handleClick('info@vietvibe.org')}
                 aria-label="Copy email address to clipboard"
+                aria-live="polite"
               >
                 <Mail className="h-5 w-5" /> <span>info@vietvibe.org</span>
               </button>

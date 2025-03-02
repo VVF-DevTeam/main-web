@@ -11,7 +11,7 @@ const Directors = () => {
 
   return (
     <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-8 md:p-12 lg:gap-y-12 lg:pb-28 lg:pt-14">
-      <Separator className="w-1/2 bg-[#7f0000]" />
+      <Separator className="w-1/2 bg-bgColor-brand" />
       <span className="header-font-black header-sub pb-8 italic">
         {t('header-director')}
       </span>

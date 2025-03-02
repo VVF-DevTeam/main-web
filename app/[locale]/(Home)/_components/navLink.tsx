@@ -49,8 +49,9 @@ const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
         layoutClasses,
         isActive ? 'text-textColor-brand' : inactiveColor
       )}
+      aria-current={isActive ? 'page' : undefined}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className="h-5 w-5" aria-hidden="true" />
       <span>{label}</span>
     </Link>
   )

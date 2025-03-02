@@ -19,7 +19,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
   return (
     <div
-      className="flex h-full w-full flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100 hover:scale-[103%] transition-all duration-300 ease-in-out"
+      className="flex h-full w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-200 hover-focus-zoomIn"
       onClick={() => event.id === 'elenaDance' ? '': router.push(`/events/class/${event.id}`)}
     >
       <div className="relative aspect-video h-full w-full basis-1/2">
@@ -35,16 +35,16 @@ const EventCard = ({ event }: EventCardProps) => {
         <h2 className="text-center text-3xl font-bold tracking-wider">
           {event.title}
         </h2>
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-x-2">
+        <div className="flex-between">
+          <span className="flex-center gap-x-2">
             <Tag className="h-5 w-5"></Tag>${event.price}{event.priceMember? '/$' + event.priceMember: null} 
           </span>
-          <span className="flex items-center gap-x-2">
+          <span className="flex-center gap-x-2">
             <Ticket className="h-5 w-5 rotate-45"></Ticket>
             {event.capacity! - event.ticketsSold!} {t('remaining', { ns: 'event'}) }
           </span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex-between">
           <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}
@@ -54,10 +54,10 @@ const EventCard = ({ event }: EventCardProps) => {
             {event.sessionCount} {t('sessions', { ns: 'event'})}
           </span> : null}
         </div>
-        <div className="rounded-lg bg-[#C54B3E]/20">
-          <div className="flex items-center justify-between p-4">
+        <div className="rounded-lg bg-bgColor-brand/20">
+          <div className="flex-between p-4">
             <div className="flex flex-col text-left text-xs md:text-sm lg:text-lg">
-              <span className="flex items-center gap-x-2 text-xs md:text-lg">
+              <span className="flex-center gap-x-2 text-xs md:text-lg">
                 <CalendarDays className="h-4 w-4 md:h-5 md:w-5"></CalendarDays>
                 {event.startDate.toLocaleDateString('en-GB', {})}
               </span>
