@@ -19,7 +19,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
           <Menu className="h-8 w-8 text-textColor transition-all hover:text-textColor-brand" />
         </button>
       </SheetTrigger>
-      <SheetContent className="flex-col-center w-[300px] bg-background-black">
+      <SheetContent className="flex-col-center w-[300px] bg-bgColor-black">
         <SheetHeader>
           <SheetTitle className="text-textColor-white">Menu</SheetTitle>
 

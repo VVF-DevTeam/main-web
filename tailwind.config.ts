@@ -12,19 +12,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: {
+        bgColor: {
           DEFAULT: 'hsl(var(--background-white))',
-          alt: 'hsl(var(--background-alt))',
           black: 'hsl(var(--background-black))',
           brand: 'hsl(var(--brand-color))',
-          'brand-light': 'hsl(var(--brand-color-light))',
+          brandLight: 'hsl(var(--brand-color-light))',
+          brandLighter: 'hsl(var(--brand-color-lighter))',
           gray: 'hsl(var(--background-gray))',
           destructive: 'hsl(var(--destructive))',
         },
         textColor: {
           DEFAULT: 'hsl(var(--text-black))',
           brand: 'hsl(var(--brand-color))',
-          'brand-light': 'hsl(var(--brand-color-light))',
+          brandLight: 'hsl(var(--brand-color-light))',
           white: 'hsl(var(--text-white))',
           gray: 'hsl(var(--text-gray))',
           destructive: 'hsl(var(--destructive))',

@@ -8,12 +8,11 @@ interface IntroImageProps {
 const IntroImage = ({ imageUrl, direction }: IntroImageProps) => {
   return (
     <div
-      className={`relative aspect-video h-[300px] w-full md:max-h-[500px] md:max-w-[400px]`}
-      style={{placeSelf: direction === 'start' ? 'flex-start' : 'flex-end'}}
+      className={`relative aspect-video h-[300px] w-full md:max-h-[500px] md:max-w-[400px] ${direction === 'start' ? 'place-self-start' : 'place-self-end'}`}
     >
       <Image
         src={imageUrl}
-        alt="Intro"
+        alt="Intro Images of Viet Vibe Foundation"
         // To do change image
         className="absolute object-cover shadow-lg"
         fill

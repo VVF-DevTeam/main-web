@@ -35,7 +35,7 @@ const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
   const inactiveColor =
     mode === 'desktop'
       ? 'text-textColor hover:text-textColor-brand hover:underline'
-      : 'text-textColor-white hover:bg-background-brand'
+      : 'text-textColor-white hover:bg-bgColor-brand'
   const layoutClasses =
     mode === 'desktop'
       ? 'gap-x-[5px] text-sm'

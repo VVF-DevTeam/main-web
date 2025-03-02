@@ -62,14 +62,14 @@ const PostTitle = ({ post }: PostTitleProps) => {
   }
 
   return (
-    <div className="mt-4 flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-slate-50 px-4 py-6">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Title</h1>
         <button
           onClick={() => setEditing(!editing)}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-[#C54B3E] hover:text-slate-700'
+            !editing && 'text-textColor-brand hover:text-slate-700'
           )}
         >
           {editing ? (

@@ -69,7 +69,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
         <h1 className="header-text header mb-2 font-semibold">
           Give a title to your post
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           What would you like to name your post? Do not worry, you can change
           this later
         </p>
@@ -105,7 +105,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md hover:bg-background-brand/90 hover:text-textColor-white/90 max-w-fit bg-background-brand font-bold text-textColor-white"
+              className="text-md max-w-fit bg-bgColor-brand font-bold text-textColor-white hover:bg-bgColor-brand/90 hover:text-textColor-white/90"
               type="submit"
             >
               Create Post

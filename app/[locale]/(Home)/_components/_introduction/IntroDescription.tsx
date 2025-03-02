@@ -20,6 +20,7 @@ const IntroDescription = ({ title, description }: IntroDescriptionProps) => {
       <p className="text-textColor text-sm">{t(description)}</p>
       <button
         className="button-default md:place-self-start"
+        aria-label={t('button-introduction') as string}
         onClick={() => router.push('/events')}
       >
         {t('button-introduction')}

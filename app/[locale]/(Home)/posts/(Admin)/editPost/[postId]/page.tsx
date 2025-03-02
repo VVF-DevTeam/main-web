@@ -41,7 +41,7 @@ const EditPost = async ({ params }: EditPostProps) => {
 
   const completedSteps = postFields.filter(Boolean).length
   const canPublish = completedSteps === postFields.length
-  const completionText = `(${completedSteps} / ${postFields.length})`
+  
   return (
     <div className="my-12 p-6 lg:my-20">
       <div className="mx-auto my-20 max-w-7xl">
@@ -55,7 +55,7 @@ const EditPost = async ({ params }: EditPostProps) => {
               Fill all the fields to edit your post.
             </p>
             <p className="text-muted-foreground text-sm">
-              Steps completed: {completionText}
+              Steps completed: ({completedSteps} / {postFields.length})
             </p>
           </div>
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">

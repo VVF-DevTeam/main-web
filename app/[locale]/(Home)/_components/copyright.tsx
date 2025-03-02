@@ -9,7 +9,7 @@ const Copyright = async ({ locale }: CopyrightProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex-center header-font-white h-[34px] bg-background-brand px-8">
+    <div className="flex-center header-font-white h-[34px] bg-bgColor-brand px-8">
       <span>{t('content-copyRight')}</span>
     </div>
   )

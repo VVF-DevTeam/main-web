@@ -10,10 +10,10 @@ body {
   :root {
     --background-white: 0 0% 100%;              /* #FFFFFF */
     --background-gray: 220 3% 20%;              /* #323335 */ 
-    --background-alt: 19 73% 96%;               /* #FCF1EC */
     --background-black: 315 8% 10%;             /* #1B171A */
     --brand-color: 6 54% 51%;                   /* #C54B3E */
     --brand-color-light: 18 71% 79%;            /* #EFB9A2 */
+    --brand-color-lighter: 19 73% 96%;          /* #FCF1EC */
     --text-black: 220 3% 20%;                   /* #323335 */
     --text-white: 0 0% 100%;                    /* #FFFFFF */
     --text-gray: 240 4% 46%;                    /* #71717A */

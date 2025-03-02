@@ -9,7 +9,7 @@ const Footer = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <footer className="bg-background-black py-6 sm:px-12 md:px-16 lg:px-24 text-slate-300">
+    <footer className="bg-bgColor-black py-6 sm:px-12 md:px-16 lg:px-24 text-slate-300">
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
         {/* Column 1 */}
         <div className="pl-6">
@@ -22,7 +22,7 @@ const Footer = async ({ locale }: { locale: string }) => {
               <Link
                 key={index}
                 href={route.path}
-                className="hover:text-[#EFB9A2] hover:underline"
+                className="hover:text-textColor-brandLight hover:underline"
               >
                 {t(route.label.toLowerCase() + '-footer')}
               </Link>
@@ -55,7 +55,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     href="https://www.facebook.com/profile.php?id=61570910920072"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-[#EFB9A2]"
+                    className="hover:text-textColor-brandLight"
                   >
                     <SiFacebook className="h-6 w-6" />
                   </a>
@@ -63,7 +63,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     href="https://www.instagram.com/vietvibe.foundation"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-[#EFB9A2]"
+                    className="hover:text-textColor-brandLight"
                   >
                     <SiInstagram className="h-6 w-6" />
                   </a>
