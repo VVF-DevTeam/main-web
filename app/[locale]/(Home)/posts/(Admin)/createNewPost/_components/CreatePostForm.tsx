@@ -25,7 +25,6 @@ interface CreatePostFormProps {
   author: string
 }
 const CreatePostForm = ({ author }: CreatePostFormProps) => {
-  
   const { toast } = useToast()
   const router = useRouter()
 
@@ -65,12 +64,12 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-y-8">
-      <div className="flex flex-col items-center gap-y-2">
-        <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
+    <div className="flex-col-center default-gap">
+      <div className="flex-col-center gap-y-2">
+        <h1 className="header-text header mb-2 font-semibold">
           Give a title to your post
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           What would you like to name your post? Do not worry, you can change
           this later
         </p>
@@ -86,11 +85,13 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#C54B3E]">Post Title</FormLabel>
+                <FormLabel className="text-textColor-brand">
+                  Post Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
-                    className="w-80 text-[#1B171A] xl:max-w-[400px]"
+                    className="w-80 text-textColor xl:max-w-[400px]"
                     {...field}
                   />
                 </FormControl>
@@ -104,7 +105,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-[#C54B3E] font-bold text-white hover:bg-[#C54B3E]/90 hover:text-white/90"
+              className="text-md hover:bg-background-brand/90 hover:text-textColor-white/90 max-w-fit bg-background-brand font-bold text-textColor-white"
               type="submit"
             >
               Create Post

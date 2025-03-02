@@ -13,7 +13,7 @@ const NewPost = async () => {
   const session = await auth()
 
   return (
-    <div className="mx-auto my-40 w-full max-w-5xl p-8 lg:p-12 xl:p-16">
+    <div className="mx-auto my-40 max-w-5xl p-8 lg:p-12 xl:p-16">
       <CreatePostForm author={session?.user?.id!} />
     </div>
   )

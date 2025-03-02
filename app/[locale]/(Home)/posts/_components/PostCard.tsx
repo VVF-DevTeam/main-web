@@ -30,7 +30,7 @@ const PostCard = ({
   userId,
 }: PostProps) => {
   return (
-    <div className="flex-col-default h-full w-full overflow-hidden rounded-md border bg-background-alt shadow-lg transition-all duration-200 ease-in hover:bg-[#F2E3D5] md:grid md:grid-cols-[30%_70%] md:gap-x-10 lg:gap-x-12">
+    <div className="flex-col-default h-full w-full overflow-hidden rounded-md border bg-background-alt shadow-lg hover:bg-[#F2E3D5] md:grid md:grid-cols-[30%_70%] md:gap-x-10 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
