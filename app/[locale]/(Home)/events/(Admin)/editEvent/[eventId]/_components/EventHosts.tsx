@@ -1,60 +1,39 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
-
+import HostsSearchBox from '@/app/[locale]/components/HostsSearchBox'
+import useDebounce from '@/hooks/useDebounce'
+import getUsers from '@/lib/actions/getUsersAction'
+import { Host } from '@/lib/types/HostType'
 interface EventHostsProps {
-  event: Event
+  event: Event & { hosts: Host[] }
 }
 
-const EventHostsSchema = z.object({
-  hosts: z
-    .string()
-    .array()
-    .min(1, { message: 'Please select at least one host' }),
-})
-
 const EventHosts = ({ event }: EventHostsProps) => {
+  const [hosts, setHosts] = useState<string[]>([])
+  const [hostData, setHostData] = useState<Host[]>([])
+
+  const [value, setValue] = useState('')
+  const [loading, setLoading] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+
+  const debouncedValue = useDebounce(value, 1500)
+
   const router = useRouter()
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof EventHostsSchema>>({
-    resolver: zodResolver(EventHostsSchema),
-    defaultValues: {
-      hosts: event.days || [],
-    },
-  })
-
-  const { isValid, isSubmitting } = form.formState
-
-  const onSubmit = async (data: z.infer<typeof EventHostsSchema>) => {
-    console.log(data)
+  console.log("hosts", hosts)
+  const searchHosts = async (debouncedValue: string) => {
+    setLoading(true)
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
-      console.log(response)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event Hosts updated successfully',
-      })
-      setIsEditing(false)
+      const response: Host[] = await getUsers(debouncedValue, 'HOST')
+      setHostData(response)
       router.refresh()
     } catch (error) {
       console.log(error)
@@ -63,8 +42,59 @@ const EventHosts = ({ event }: EventHostsProps) => {
         title: 'Error',
         description: 'Something went wrong',
       })
+    } finally {
+      setLoading(false)
     }
   }
+
+  const addHosts = async (hostIds: string[]) => {
+    if (hostIds.length === 0) return
+    setLoading(true)
+    try {
+      const response = await axios.put(
+        `/api/events/edit/${event.id}/hosts/edit`,
+        {
+          hostIds: hostIds,
+        }
+      )
+      console.log(response)
+      setHosts([])
+      toast({
+        title: 'Success',
+        description: 'Hosts added successfully',
+      })
+      router.refresh()
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteHost = async (hostId: string) => {
+    setLoading(true)
+    try {
+      const response = await axios.delete(
+        `/api/events/edit/${event.id}/hosts/edit`,
+        {
+          data: { hostId: hostId },
+        }
+      )
+      console.log(response)
+      toast({
+        title: 'Success',
+        description: 'Host deleted successfully',
+      })
+      router.refresh()
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    searchHosts(debouncedValue)
+  }, [debouncedValue])
 
   return (
     <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
@@ -90,50 +120,45 @@ const EventHosts = ({ event }: EventHostsProps) => {
       </div>
 
       {/* FORM */}
-      <div>
+      <div className="mt-2">
         {isEditing ? (
-          <>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  name={'hosts'}
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <p className="mt-3 text-xs text-muted-foreground">
-                  Pick your desired days.
-                </p>
-                <Button
-                  variant={'default'}
-                  className="mt-6"
-                  disabled={!isValid || isSubmitting}
-                >
-                  Save
-                </Button>
-              </form>
-            </Form>
-          </>
-        ) : event.days.length === 0 ? (
+          <div className="flex flex-col gap-y-6">
+            <HostsSearchBox
+              eventHosts={event.hosts}
+              deleteHost={deleteHost}
+              hosts={hosts}
+              setHosts={setHosts}
+              value={value}
+              setValue={setValue}
+              hostData={hostData}
+            />
+
+            <p className="-mt-2 text-xs text-muted-foreground">
+              Choose event hosts.
+            </p>
+            <Button
+              variant={'default'}
+              className="ml-auto"
+              disabled={loading || hosts.length === 0}
+              onClick={() => addHosts(hosts)}
+            >
+              Save
+            </Button>
+          </div>
+        ) : event.hosts.length === 0 ? (
           <p className="italic text-muted-foreground text-slate-500">
             Add the hosts for this event.
           </p>
         ) : (
           <div className="grid grid-cols-3 gap-3 text-muted-foreground">
-            {/* {eventDays.map((day, index) => (
+            {event.hosts.map((host, index) => (
               <div
                 className="flex items-center justify-center rounded-2xl border-2 border-slate-400 bg-slate-200 p-1 font-semibold"
                 key={index}
               >
-                {day.substring(0, 3)}
+                {host.name?.split(' ')[0]}
               </div>
-            ))} */}
+            ))}
           </div>
         )}
       </div>

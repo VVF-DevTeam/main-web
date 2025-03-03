@@ -33,7 +33,13 @@ const EditEventPage = async ({
         },
       },
       categories: true,
-      hosts: true,
+      hosts: {
+        select: {
+          name: true,
+          role: true,
+          id: true,
+        },
+      },
     },
   })
   // Fetch event categories
@@ -63,7 +69,7 @@ const EditEventPage = async ({
     event.categories.length === 0 ? false : true,
   ]
 
-  console.log(eventFields)
+  // console.log(eventFields)
   const completedFields = eventFields.filter(Boolean).length
   const completionText = `(${completedFields} / ${eventFields.length})`
 

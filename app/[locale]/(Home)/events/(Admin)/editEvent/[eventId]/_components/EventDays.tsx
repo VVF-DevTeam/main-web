@@ -15,8 +15,6 @@ import {
   Form,
   FormControl,
   FormField,
-  // FormItem,
-  // FormMessage,
 } from '@/components/ui/form'
 
 interface EventEndDays {
@@ -50,7 +48,6 @@ const EventDays = ({ event }: EventEndDays) => {
   const { isValid, isSubmitting } = form.formState
 
   const sorter: Record<string, number> = {
-    // "sunday": 0, // << if sunday is first day of week
     monday: 1,
     tuesday: 2,
     wednesday: 3,
@@ -120,7 +117,6 @@ const EventDays = ({ event }: EventEndDays) => {
                   control={form.control}
                   render={({ field }) => (
                     <FormControl>
-                      {' '}
                       <ToggleGroup
                         type="multiple"
                         variant={'outline'}
