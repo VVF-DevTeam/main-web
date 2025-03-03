@@ -1,26 +1,105 @@
+'use server'
+
 import { getInfo } from '@/lib/utilFunctions/getInfo'
-import initTranslation from '@/app/i18n'
-import TranslationsProvider from '@/components/translator/TranslationsProvider'
+import MyProfile from './_components/MyProfile'
+import ProfileForm from './_components/ProfileForm'
+import PasswordForm from './_components/PasswordForm'
+import DeleteForm from './_components/DeleteForm'
+import { Event } from '@prisma/client'
 
-const i18nNamespaces = ['profile']
-import ProfileClient from './_components/ProfileClient'
+const eventList = [
+  {
+    id: 'beginnerGuitarLesson',
+    eventType: 'class',
+    title: 'Beginner Guitar Lessons',
+    description:
+      'The Basic Acoustic Guitar Class, organized by Viet Vibe Foundation (VVF), offers 90-minute weekly lessons (18:00-19:30 Thursday) from February 27th to June 5th 2025 (Performance night). Led by three experienced instructors—Michael Nguyen, Eattle Nguyen, and Eric Nguyen—the program is designed for a maximum of 12 participants, with a minimum of 5 students required.',
+    eventCategoryId: '1',
+    thumbnail: '/bg/acoustic-guitar-bg.jpg',
+    startDate: new Date('2025-02-27T00:00:00'),
+    endDate: new Date('2025-06-10T00:00:00'),
+    dates: ['Thurs'],
+    duration: '1.5 hours',
+    capacity: 10,
+    ticketsSold: 5,
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdById: '1',
+    price: 150,
+    priceMember: 105,
+    location: 'Victoria - Fraser View',
+    startTime: new Date('2025-02-27T19:00:00'),
+    sessionCount: 12,
+  },
+  {
+    id: 'elenaDance',
+    eventType: 'class',
+    title: ' Beginner Dance Lessons (Coming Soon)',
+    description: 'asdsad',
+    eventCategoryId: '1',
+    thumbnail: '/bg/dance-bg.jpg',
+    startDate: new Date('2025-03-10T00:00:00'),
+    endDate: new Date('2025-07-10T00:00:00'),
+    dates: ['Fri', 'Sun'],
+    duration: '1 hour',
+    capacity: 0,
+    ticketsSold: 0,
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdById: '1',
+    price: 0,
+    location: 'Downtown Vancouver',
+    startTime: new Date('2025-03-10T15:00:00'),
+    sessionCount: 0,
+  },
+  {
+    id: 'fridaychill',
+    eventType: 'concert',
+    title: 'Friday Chill 3',
+    description: 'asdsad',
+    eventCategoryId: '1',
+    thumbnail: '/sample-images/image3.jpg',
+    startDate: new Date('2024-12-13T18:00:00'),
+    endDate: new Date('2024-12-13T21:00:00'),
+    dates: ['Fri'],
+    duration: '3 hours',
+    capacity: 10,
+    ticketsSold: 10,
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdById: '1',
+    price: 15,
+    location: '139 Keefer Street',
+    startTime: new Date('2025-03-10T17:00:00'),
+    sessionCount: 0,
+  },
+]
 
-const Profile = async ({ params }: { params: Promise<{ locale: string }> }) => {
-  const { locale } = await params
-  const { resources } = await initTranslation(locale, i18nNamespaces)
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ section?: string }>
+}) {
   const user = await getInfo()
-  if (!user) return <p className="mt-10 text-center">No user data available.</p>
-  return (
-    <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
-      namespaces={i18nNamespaces}
-      locale={locale}
-      resources={resources}
-    >
-      <div className="overflow-hidden">
-        <ProfileClient user={user} />
-      </div>
-    </TranslationsProvider>
-  )
-}
+  const { section } = await searchParams
+  if (!user) {
+    return <p className="mt-10 text-center">No user data available.</p>
+  }
 
-export default Profile
+  // ✅ Switch component based on searchParams
+  switch (section) {
+    case 'update-profile':
+      return <ProfileForm user={user} />
+    case 'change-password':
+      return <PasswordForm user={user} />
+    case 'delete-account':
+      return <DeleteForm user={user} />
+    default:
+      return (
+        <MyProfile user={user} events={eventList} upcoming_events={eventList} />
+      )
+  }
+}

@@ -1,99 +1,63 @@
 'use server'
 
-import { AuthError } from 'next-auth'
-import { isRedirectError } from 'next/dist/client/components/redirect'
 import { prisma } from '../db'
 import bcrypt from 'bcryptjs'
+import { z } from 'zod'
 
-import { passwordUpdateSchema } from '../zodSchema/updatePasswordSchema'
+// Define validation schema
+const passwordSchema = z.object({
+  email: z.string().email({ message: 'Invalid email format' }),
+  currentPassword: z.string().optional(), // Allow currentPassword to be omitted
+  newPassword: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+})
 
-
-export const changePassword = async (data: {
-  email: string
-  currentPassword: string
-  newPassword: string
-}) => {
+export const changePassword = async (data: { email: string; currentPassword?: string; newPassword: string }) => {
   try {
-    // Validate input data
-    const parsedData = passwordUpdateSchema.safeParse(data)
+    // Validate input
+    const parsedData = passwordSchema.safeParse(data)
     if (!parsedData.success) {
-      return {
-        message: parsedData.error.message,
-        success: false,
-      }
+      const errorMessage = Object.values(parsedData.error.format())
+        .flat()
+        .join(', ') // Convert validation errors to a readable string
+
+      return { success: false, message: errorMessage }
     }
+
     const { email, currentPassword, newPassword } = parsedData.data
-    // Check if user exists
+
+    // Fetch user from the database
     const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
+      where: { email },
+      select: { password: true }, // Only fetch password field
     })
 
-    if (!user || !user.password) {
-      return {
-        message: "User doesn't exist",
-        success: false,
+    if (!user) {
+      return { success: false, message: "User doesn't exist" }
+    }
+
+    // If currentPassword exists in the DB, compare it
+    if (user.password) {
+      if (!currentPassword) {
+        return { success: false, message: 'Current password is required' }
+      }
+      const isValidPassword = await bcrypt.compare(currentPassword, user.password)
+      if (!isValidPassword) {
+        return { success: false, message: 'Current password is incorrect' }
       }
     }
 
-    // Compare entered password with stored hashed password
-    const isValidPassword = await bcrypt.compare(currentPassword, user.password)
-
-    if (!isValidPassword) {
-        return {
-            message: 'Current password is incorrect',
-            success: false,
-        }
-    }   
-
-    // Hash new password
+    // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
-    // Update password in database
+    // Update password in the database
     await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        password: hashedPassword,
-      },
+      where: { email },
+      data: { password: hashedPassword },
     })
 
-    return {
-      message: 'Password updated successfully',
-      success: true,
-    }
+    return { success: true, message: 'Password updated successfully' }
   } catch (error) {
-    if (isRedirectError(error)) throw error
-
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin': {
-          return {
-            message: 'Invalid credentials',
-            success: false,
-          }
-        }
-        case 'CallbackRouteError': {
-          return {
-            message: error.cause?.err?.toString() || 'Something went wrong',
-            success: false,
-          }
-        }
-        default: {
-          return {
-            message: 'Something went wrong',
-            success: false,
-          }
-        }
-      }
-    }
-    
     console.error('Password update error:', error)
-    return {
-      message: 'Failed to update password',
-      success: false,
-    }
+    return { success: false, message: 'Failed to update password' }
   }
 }

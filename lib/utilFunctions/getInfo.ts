@@ -5,11 +5,22 @@ export async function getInfo() {
   const session = await auth()
   const userEmail = session?.user?.email
 
+  if (!userEmail) return null // No user session available
+
   const user = await prisma.user.findUnique({
-    where: {
-      email: userEmail || '',
-    },
+    where: { email: userEmail },
   })
 
-  return user
+  if (!user) return null // User not found in database
+
+  // Ensure all properties match expected `userProps` type
+  return {
+    name: user.name ?? '',
+    email: user.email, 
+    phone: user.phone ?? '',
+    address: user.address ?? '',
+    age: user.age ?? '',
+    image: user.image ?? undefined,
+    password: user.password ?? '',
+  }
 }
