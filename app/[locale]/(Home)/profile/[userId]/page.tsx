@@ -7,10 +7,9 @@ import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
 import { Event } from '@prisma/client'
 
-const eventList = [
+const eventList: Event[] = [
   {
     id: 'beginnerGuitarLesson',
-    eventType: 'class',
     title: 'Beginner Guitar Lessons',
     description:
       'The Basic Acoustic Guitar Class, organized by Viet Vibe Foundation (VVF), offers 90-minute weekly lessons (18:00-19:30 Thursday) from February 27th to June 5th 2025 (Performance night). Led by three experienced instructors—Michael Nguyen, Eattle Nguyen, and Eric Nguyen—the program is designed for a maximum of 12 participants, with a minimum of 5 students required.',
@@ -27,14 +26,11 @@ const eventList = [
     updatedAt: new Date(),
     createdById: '1',
     price: 150,
-    priceMember: 105,
     location: 'Victoria - Fraser View',
     startTime: new Date('2025-02-27T19:00:00'),
-    sessionCount: 12,
   },
   {
     id: 'elenaDance',
-    eventType: 'class',
     title: ' Beginner Dance Lessons (Coming Soon)',
     description: 'asdsad',
     eventCategoryId: '1',
@@ -52,11 +48,9 @@ const eventList = [
     price: 0,
     location: 'Downtown Vancouver',
     startTime: new Date('2025-03-10T15:00:00'),
-    sessionCount: 0,
   },
   {
     id: 'fridaychill',
-    eventType: 'concert',
     title: 'Friday Chill 3',
     description: 'asdsad',
     eventCategoryId: '1',
@@ -74,7 +68,6 @@ const eventList = [
     price: 15,
     location: '139 Keefer Street',
     startTime: new Date('2025-03-10T17:00:00'),
-    sessionCount: 0,
   },
 ]
 
