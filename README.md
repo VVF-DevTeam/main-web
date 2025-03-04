@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
 ## Getting Started
 
-1. Run the development server (we will mainly use yarn for packages management):
+1. Packages installment (we will mainly use yarn for packages management):
 
    ```sh
    npm install --global yarn
