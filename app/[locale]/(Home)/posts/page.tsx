@@ -65,11 +65,11 @@ const Posts = async ({ params }: PostsProps) => {
 
         {/* Admin Buttons */}
         {isAdmin && (
-          <div className="flex-end mt-6 w-full px-6 gap-x-4">
+          <div className="flex-end mt-6 w-full gap-x-4 px-6">
             <Link href="/posts/allPosts" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}
-                className="flex-center gap-x-2 bg-slate-200 p-6 text-black hover:bg-slate-300/90 hover:text-black/90"
+                className="flex-center gap-x-2 bg-bgColor-gray/15 p-6 text-textColor hover:bg-bgColor-gray/25 hover:text-textColor/90"
               >
                 <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
                 <span className="text-xl">{t('allPost')}</span>
@@ -79,7 +79,7 @@ const Posts = async ({ params }: PostsProps) => {
             <Link href="/posts/createNewPost" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}
-                className="flex-center gap-x-2 bg-[#1B171A] p-6 text-slate-200 hover:bg-[#1B171A]/90 hover:text-slate-200/90"
+                className="flex-center gap-x-2 bg-bgColor-black p-6 text-textColor-white hover:bg-bgColor-black/90 hover:text-textColor-white/90"
               >
                 <PlusCircle className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
                 <span className="text-xl">{t('newPost')}</span>

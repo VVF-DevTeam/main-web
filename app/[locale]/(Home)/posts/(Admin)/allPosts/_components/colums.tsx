@@ -13,7 +13,7 @@ export const columns: ColumnDef<Post>[] = [
     cell: ({ row }) => {
       const title = (row.getValue('title') as string) || null
       return (
-        <div className="flex items-center justify-center">
+        <div className="flex-center">
           {title ? (
             <span>{title}</span>
           ) : (
@@ -45,7 +45,7 @@ export const columns: ColumnDef<Post>[] = [
     cell: ({ row }) => {
       const image = (row.getValue('imgUrl') as string) || null
       return (
-        <div className="flex items-center justify-center">
+        <div className="flex-center">
           {image ? (
             <Image
               src={image}
@@ -68,7 +68,8 @@ export const columns: ColumnDef<Post>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className="mx-auto flex items-center justify-center font-semibold"
+          className="mx-auto flex-center font-semibold"
+          aria-label="Sort by Last Updated"
         >
           Last Updated
           <ArrowUpDown className="h-4 w-4" />
@@ -98,7 +99,8 @@ export const columns: ColumnDef<Post>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className="mx-auto flex items-center justify-center font-semibold"
+          className="mx-auto flex-center font-semibold"
+          aria-label="Sort by Status"
         >
           Status
           <ArrowUpDown className="h-4 w-4" />
@@ -125,12 +127,11 @@ export const columns: ColumnDef<Post>[] = [
       return (
         <Link
           href={`/posts/editPost/${id}`}
-          className="flex items-center justify-center"
+          className="flex-center"
         >
           <Button
             variant={'default'}
             size={'sm'}
-            className="bg-[#C54B3E] hover:bg-[#C54B3E]/90"
           >
             Edit
           </Button>

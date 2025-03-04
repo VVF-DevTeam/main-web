@@ -46,7 +46,7 @@ const EditPost = async ({ params }: EditPostProps) => {
     <div className="my-12 p-6 lg:my-20">
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
-        <div className="mb-24 flex items-center justify-between">
+        <div className="mb-24 flex-between">
           <div className="flex flex-col gap-y-2">
             <h1 className="text-3xl font-semibold text-textColor lg:text-4xl">
               Edit Post

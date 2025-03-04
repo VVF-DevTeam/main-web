@@ -21,7 +21,7 @@ const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
             <Link
               href={icon.url}
               key={icon.id}
-              className="transition-all hover:scale-110 hover:text-textColor-brandLight hover:shadow-md"
+              className="hover-focus-zoomIn duration-100 hover:text-textColor-brandLight hover:shadow-md"
             >
               <CustomIcon src={icon.icon} height={30} width={30} />
             </Link>

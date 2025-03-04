@@ -6,7 +6,7 @@ interface MemberImageProps {
 
 const MemberImage = ({ imageUrl }: MemberImageProps) => {
   return (
-    <div className="relative aspect-video h-[400px] w-full basis-1/2 place-self-center md:max-h-[500px] md:max-w-[600px]">
+    <div className="relative aspect-video w-full md:max-h-[500px] md:max-w-[600px]">
       <Image
         src={imageUrl}
         alt="Org Members"

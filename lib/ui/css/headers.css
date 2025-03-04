@@ -1,6 +1,10 @@
 $textWhite: #fff7f7;
 
 /* Header.module.css */
+.header-font-default {
+  font-family: var(--font-tai-heritage-pro);
+}
+
 .header-font-white {
   font-family: var(--font-tai-heritage-pro);
   @apply text-textColor-white;

@@ -1,4 +1,4 @@
-import OrgMembers from './_components/OrgMembers'
+import OrgMembers from '../../_components/_directors/OrgMembers'
 
 const AboutPageDirectors = async({
   params,

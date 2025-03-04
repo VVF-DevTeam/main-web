@@ -60,13 +60,15 @@ const PostStats = ({
     <div className="flex items-center gap-x-6 text-sm text-muted-foreground">
       <button
         onClick={() => updateLikes(hasLiked ? 'unlike' : 'like')}
-        className="group flex items-center justify-center gap-x-1 rounded-2xl border-none border-black bg-[#909394]/20 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
+        className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray/10 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
+        aria-label={hasLiked ? 'Unlike post' : 'Like post'}
       >
         <ThumbsUp
           className={cn(
+            'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg]',
             hasLiked
-              ? 'h-4 w-4 fill-sky-300 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg] group-hover:fill-blue-700/80'
-              : 'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg] group-hover:fill-red-700/80'
+              ? 'fill-sky-300 group-hover:fill-blue-700/80'
+              : 'group-hover:fill-red-700/80'
           )}
         />{' '}
         <span className="text-xs font-semibold text-foreground">
@@ -74,12 +76,14 @@ const PostStats = ({
         </span>
       </button>
 
-      <div className="group flex items-center justify-center gap-x-1 rounded-2xl border-none border-black bg-[#909394]/20 p-[9px] text-sm text-muted-foreground lg:gap-x-2">
+      <div
+        className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray/10 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
+        aria-label="Post views"
+      >
         <Eye
           className={cn(
-            hasViewed
-              ? 'h-4 w-4 text-sky-700 transition-all duration-100 ease-out group-hover:scale-110 group-hover:fill-blue-700/80'
-              : 'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:scale-110 group-hover:fill-red-700/80'
+            'h-4 w-4 transition-all duration-100 ease-out group-hover:scale-110',
+            hasViewed ? 'text-sky-700' : 'text-black'
           )}
         />
         <span className="text-xs font-semibold text-foreground">

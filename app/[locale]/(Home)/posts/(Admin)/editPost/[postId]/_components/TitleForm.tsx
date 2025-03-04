@@ -62,20 +62,20 @@ const PostTitle = ({ post }: PostTitleProps) => {
   }
 
   return (
-    <div className="flex-col-default mt-4 w-full rounded-md bg-slate-50 px-4 py-6">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray/10 px-4 py-6">
       <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Title</h1>
         <button
           onClick={() => setEditing(!editing)}
           className={cn(
-            'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-textColor-brand hover:text-slate-700'
+            'text-sm font-semibold text-textColor-gray transition-all hover:text-textColor-brand',
+            !editing && 'text-textColor-brand hover:text-textColor-gray'
           )}
         >
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Title <Pencil className="h-4 w-4" />
             </span>
           )}
@@ -100,12 +100,12 @@ const PostTitle = ({ post }: PostTitleProps) => {
           </form>
         </Form>
       ) : !post?.title ? (
-        <p className="italic text-muted-foreground text-slate-500">
+        <p className="italic text-textColor-gray">
           Add a title for this post.
         </p>
       ) : (
         <div>
-          <p className="text-[#1B171A]/70">{post?.title}</p>
+          <p className="text-textColor-black/50">{post?.title}</p>
         </div>
       )}
     </div>

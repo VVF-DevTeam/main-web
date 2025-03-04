@@ -9,3 +9,7 @@
 .grid-all-cols-2 {
   @apply md:grid md:grid-cols-[50%_50%];
 }
+
+.grid-lg-cols-2 {
+  @apply lg:grid lg:grid-cols-[50%_50%];
+}

@@ -35,9 +35,10 @@ const PostCard = ({
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
           src={imageUrl}
-          alt={title}
+          alt={`Thumbnail for ${title}`}
           fill
           className="absolute object-cover hover-focus-zoomIn"
+          priority
         />
       </div>
 
