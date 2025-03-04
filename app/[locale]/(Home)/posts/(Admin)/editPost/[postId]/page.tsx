@@ -59,6 +59,7 @@ const EditPost = async ({ params }: EditPostProps) => {
             </p>
           </div>
           <div className="flex flex-col items-center gap-x-4 gap-y-4 md:flex-row">
+            {/* TODO: Add delete button */}
             {/* Buttons */}
             <Button variant={'destructive'}>Delete Post</Button>
             <PublishButton

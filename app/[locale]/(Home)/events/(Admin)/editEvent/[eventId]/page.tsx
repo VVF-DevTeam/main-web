@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-// import { Button } from '@/components/ui/button'
+
+import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
 
 import EventStartDate from './_components/EventStartDate'
 import EventTitle from './_components/EventTitle'
@@ -14,6 +15,8 @@ import EventPrice from './_components/EventPrice'
 import EventLocation from './_components/EventLocation'
 import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
+import EventDescription from './_components/EventDescription'
+import EventCapacity from './_components/EventCapacity'
 
 const EditEventPage = async ({
   params,
@@ -61,7 +64,6 @@ const EditEventPage = async ({
     !!event.price,
     !!event.startDate,
     !!event.endDate,
-    !!event.capacity,
     !!event.startTime,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
@@ -72,21 +74,33 @@ const EditEventPage = async ({
   // console.log(eventFields)
   const completedFields = eventFields.filter(Boolean).length
   const completionText = `(${completedFields} / ${eventFields.length})`
+  const canPublish = completedFields === eventFields.length
 
   return (
     <div className="my-12 p-6 lg:my-20">
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col gap-y-3">
-          <h1 className="text-2xl font-bold tracking-wide md:text-3xl xl:text-5xl">
-            Edit Event
-          </h1>
-          <span className="text-sm text-muted-foreground">
-            Fill all the fields to publish your event.
-          </span>
-          <span className="mt-1 text-sm text-muted-foreground">
-            Steps completed: {completionText}
-          </span>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-y-3">
+            <h1 className="text-2xl font-bold tracking-wide md:text-3xl xl:text-5xl">
+              Edit Event
+            </h1>
+            <span className="text-sm text-muted-foreground">
+              Fill all the fields to publish your event.
+            </span>
+            <span className="mt-1 text-sm text-muted-foreground">
+              Steps completed: {completionText}
+            </span>
+          </div>
+
+          {/* Publish Button */}
+          <PublishButton
+            id={event.id}
+            type={'event'}
+            canPublish={canPublish}
+            isPublished={event.isPublished}
+            domain={'events'}
+          />
         </div>
 
         {/* Event Body */}
@@ -112,7 +126,7 @@ const EditEventPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step III :</span> Description
             </h2>
-            <EventPrice event={event} />
+            <EventDescription event={event} />
           </div>
 
           {/* Price */}
@@ -128,7 +142,7 @@ const EditEventPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step V :</span> Capacity
             </h2>
-            <EventPrice event={event} />
+            <EventCapacity event={event} />
           </div>
 
           {/* Location */}

@@ -26,7 +26,7 @@ const ClassImage = async ({
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
-          className="absolute object-cover"
+          className="object-cover"
           fill
           alt="Event Image"
         />
