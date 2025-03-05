@@ -4,13 +4,12 @@ import { Event } from '@prisma/client'
 import Image from 'next/image'
 import { Tag, MapPin, Ticket, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
+import EventButton from './EventButton'
 interface EventCardProps {
   event: Event
 }
 
 const EventCard = ({ event }: EventCardProps) => {
-
   return (
     <div className="group relative flex w-[470px] cursor-pointer flex-col rounded-lg bg-slate-50 shadow-xl transition-all duration-300 ease-in-out hover:bg-slate-100 md:w-[370px] xl:w-[400px]">
       <Image
@@ -49,10 +48,13 @@ const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Location */}
-        <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
-          <MapPin className="h-5 w-5"></MapPin>
-          {event.location}
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
+            <MapPin className="h-5 w-5"></MapPin>
+            {event.location}
+          </span>
+          <EventButton eventId={event.id} eventType={event.eventType}/>
+        </div>
 
         {/* Timings */}
         <div className="ease flex items-center justify-between rounded-lg bg-[#C54B3E]/90 p-4 text-[#f7f1f1] transition-all duration-100 group-hover:bg-[#C54B3E]/90">

@@ -1,36 +1,38 @@
-import initTranslation from "@/app/i18n"
+import initTranslation from '@/app/i18n'
 
 interface ScheduleItemProps {
-  startTime: Date
-  duration: string
-  endTime: Date
-  action: string
+  startTime: string
+  endTime: string
+  description: string
   locale: string
 }
 
-const ScheduleItem = async({
+const ScheduleItem = async ({
   startTime,
-  duration,
   endTime,
-  action,
-  locale
+  description,
+  locale,
 }: ScheduleItemProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
+  const duration = '0.5 hours'
+
+  // TODO: Add a duration calculator function
+  // const calcDuration = (startTime: string, endTime: string) => {}
+
   return (
-    <div className='border-b-2 border-gray-500 py-6 flex gap-x-24 min-w-full'>
-      {/* Time Div */}
-      <div className='flex flex-col'>
+    <div className="flex min-w-full gap-x-24 border-b-2 border-gray-500 py-6">
+      {/* Time */}
+      <div className="flex flex-col">
         <span>
-          {startTime.toLocaleTimeString('en-GB').substring(0, 5)} -{' '}
-          {endTime.toLocaleTimeString('en-GB').substring(0, 5)}
+          {startTime} - {endTime}
         </span>
-        <span className='text-muted-foreground'>{duration}</span>
+        <span className="text-muted-foreground">{duration}</span>
       </div>
 
-      {/* Action Div */}
-      <div className='flex flex-col'>
-        <span>{t(action)}</span>
+      {/* Action */}
+      <div className="flex flex-col">
+        <span>{t(description)}</span>
       </div>
     </div>
   )

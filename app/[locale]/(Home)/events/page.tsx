@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
+import { Suspense } from 'react'
 
 const EventsPage = async ({
   params,
@@ -10,7 +11,7 @@ const EventsPage = async ({
   params: Promise<{ locale: string }>
 }) => {
   const { locale } = await params
-  
+
   // Get all events
   const allEvents = await prisma.event.findMany({
     where: {
@@ -28,7 +29,15 @@ const EventsPage = async ({
   return (
     <div className="flex flex-col gap-y-6">
       <EventHeroImage locale={locale} />
-      <EventList events={allEvents} />
+      <Suspense
+        fallback={
+          <p className="text-center text-xl text-muted-foreground">
+            loading...
+          </p>
+        }
+      >
+        <EventList events={allEvents} />
+      </Suspense>
       <EventAdminButtons />
       <EventInstruction locale={locale} />
     </div>
