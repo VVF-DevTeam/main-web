@@ -1,3 +1,4 @@
+// Components
 import { Menu, X } from 'lucide-react'
 import {
   Sheet,
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui/sheet'
 import NavLinks from './navLinks'
 
+// Main Component
 const MobileSidebar = ({ locale }: { locale: string }) => {
   return (
     <Sheet>

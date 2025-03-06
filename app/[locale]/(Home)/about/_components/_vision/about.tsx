@@ -1,9 +1,13 @@
+// Libraries
 import React from 'react'
-import GridCard from './gridCard'
-import { Separator } from '@/components/ui/separator'
-import { Users, Volleyball, Guitar } from 'lucide-react'
 import initTranslation from '@/app/i18n'
 
+// Components
+import GridCard from '../../../_components/gridCard'
+import { Separator } from '@/components/ui/separator'
+import { Users, Volleyball, Guitar } from 'lucide-react'
+
+// Data
 const cardsData = [
   {
     id: 1,
@@ -25,6 +29,8 @@ const cardsData = [
     desc: 'volunteerDescription-aboutUs',
   },
 ]
+
+// Main Component
 const About = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['about', 'common'])
 

@@ -1,17 +1,24 @@
 'use client'
+
+// Components
 import React from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { LogIn } from 'lucide-react'
+
+// Libraries
 import { signOutAction } from '@/lib/actions/signoutAction'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
+// Interfaces
 interface AuthButtonProps {
   userExists: boolean
   mode: string
 }
+
+// Main Component
 const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
   const router = useRouter()
   const pathname = usePathname()

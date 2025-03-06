@@ -27,6 +27,7 @@ interface IntroductionProps {
   locale: string
 }
 
+// Main Component
 const Introduction = async ({ locale }: IntroductionProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
@@ -48,17 +49,17 @@ const Introduction = async ({ locale }: IntroductionProps) => {
           Viet Vibe Foundation
         </h1>
         <h1 className="header-main max-w-[90vw]">
-          {t('title-big-introduction')}
+        {t('title-small-introduction')}
         </h1>
-        <p className="header-text">{t('title-small-introduction')}</p>
+        <p className="header-text">{t('title-big-introduction')}</p>
       </div>
 
-      <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-24 lg:p-16">
+      <div className="width-max-default mx-auto flex flex-col gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
         {introductionData.map((intro) => (
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}
       </div>
-      <Separator className="mx-auto mt-12 w-1/2 bg-[#7f0000]" />
+      <Separator className="mx-auto mt-12 w-2/3 md:w-1/2 bg-bgColor-brandDark" />
     </div>
   )
 }

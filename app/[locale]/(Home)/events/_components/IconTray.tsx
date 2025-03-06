@@ -1,7 +1,11 @@
+// Libraries
 import React from 'react'
+
+// Components
 import CustomIcon from '@/app/[locale]/components/CustomIcon'
 import Link from 'next/link'
 
+// Interfaces
 interface IconTrayProps {
   iconList: {
     id: string
@@ -12,6 +16,7 @@ interface IconTrayProps {
   isLink?: boolean
 }
 
+// Component
 const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
   return (
     <div>

@@ -1,10 +1,13 @@
+// Components
 import Image from 'next/image'
 
+// Interfaces
 interface IntroImageProps {
   imageUrl: string
   direction: string
 }
 
+// Main Component
 const IntroImage = ({ imageUrl, direction }: IntroImageProps) => {
   return (
     <div

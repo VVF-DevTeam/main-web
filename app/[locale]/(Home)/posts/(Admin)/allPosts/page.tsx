@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db'
 import { DataTable } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/data-table'
 import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/colums'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/lib/utilFunctions/adminCheck'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
 
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page

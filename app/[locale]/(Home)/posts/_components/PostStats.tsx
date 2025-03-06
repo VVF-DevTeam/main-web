@@ -1,11 +1,16 @@
 'use client'
+
+// Libraries
 import React from 'react'
-import { ThumbsUp, Eye } from 'lucide-react'
 import axios from 'axios'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 
+// Components
+import { ThumbsUp, Eye } from 'lucide-react'
+
+// Interfaces
 interface PostStatsProps {
   postLikes: number
   postViews: number
@@ -14,6 +19,8 @@ interface PostStatsProps {
   postId: string
   userId: string | null
 }
+
+// Main Component
 const PostStats = ({
   postLikes,
   hasLiked,

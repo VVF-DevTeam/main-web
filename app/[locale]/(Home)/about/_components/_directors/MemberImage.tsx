@@ -1,9 +1,12 @@
+// Components
 import Image from 'next/image'
 
+// Interfaces
 interface MemberImageProps {
   imageUrl: string
 }
 
+// Main Component
 const MemberImage = ({ imageUrl }: MemberImageProps) => {
   return (
     <div className="relative aspect-video w-full md:max-h-[500px] md:max-w-[600px]">

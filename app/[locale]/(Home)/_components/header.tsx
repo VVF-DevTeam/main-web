@@ -1,15 +1,20 @@
 'use client'
+
+// Components
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useToast } from '@/hooks/use-toast'
 import { Mail, Copy, Globe } from 'lucide-react'
+
+// Libraries
+import { useToast } from '@/hooks/use-toast'
 import LanguageChanger from '@/components/translator/LanguageChanger'
 import React from 'react'
 
+// Main Component
 const Header = () => {
   const { toast } = useToast()
 

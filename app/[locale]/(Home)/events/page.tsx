@@ -8,12 +8,12 @@ import EventInstruction from './_components/EventInstruction'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/db'
 
+// Main Component
 const EventsPage = async ({
   params,
 }: {
   params: Promise<{ locale: string }>
 }) => {
-
   const { locale } = await params
 
   // Get all events

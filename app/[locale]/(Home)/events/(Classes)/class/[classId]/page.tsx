@@ -6,6 +6,7 @@ import ClassDescription from '../_component/ClassDescription'
 import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 
+// Metadata
 export const metadata: Metadata = {
   title: 'Beginner Guitar Lessons',
   description: 'Beginner Guitar Lessons from Viet Vibe Foundation',
@@ -23,10 +24,12 @@ export const metadata: Metadata = {
   },
 }
 
+// Interfaces
 interface ClassPageProps {
   params: Promise<{ locale: string; classId: string }>
 }
 
+// Main Component
 const ClassPage = async ({ params }: ClassPageProps) => {
   const { locale, classId } = await params
 

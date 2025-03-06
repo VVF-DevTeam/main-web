@@ -1,11 +1,15 @@
 'use client'
 
+// Libraries
 import React from 'react'
-import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { Home, CalendarDays, Newspaper, LucideIcon, Ribbon } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
+// Components
+import Link from 'next/link'
+import { Home, CalendarDays, Newspaper, LucideIcon, Ribbon } from 'lucide-react'
+
+//Interfaces
 const navLogos: Record<string, LucideIcon> = {
   home: Home,
   events: CalendarDays,
@@ -14,7 +18,6 @@ const navLogos: Record<string, LucideIcon> = {
 }
 
 type screenSize = 'mobile' | 'desktop'
-
 interface NavLinkProps {
   label: string
   path: string
@@ -22,6 +25,7 @@ interface NavLinkProps {
   mode: screenSize
 }
 
+// Main Component
 const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
   const Icon = navLogos[logo]
   const pathname = usePathname()

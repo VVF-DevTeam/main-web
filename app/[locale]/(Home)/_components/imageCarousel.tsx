@@ -1,10 +1,15 @@
 'use client'
+
+// Libraries
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+
+//Components
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
 
+// Interfaces & Types
 interface ImageCarouselProps {
   imageUrls: {
     id: string
@@ -15,8 +20,9 @@ interface ImageCarouselProps {
   autoSlide?: boolean
   duration?: number
 }
-
 type Direction = 'left' | 'right'
+
+// Main Component
 const ImageCarousel = ({
   imageUrls,
   autoSlide = false,
@@ -57,8 +63,7 @@ const ImageCarousel = ({
   return (
     <div>
       {/* Title & Separator */}
-      <div className="flex-col-center default-gap mt-12 md:mt-16 lg:mt-24">
-        <Separator className="w-1/2 bg-bgColor-brand" />
+      <div className="flex-col-center default-gap lg:mt-6">
         <span className="header-font-black header-sub mb-7 py-6 italic">
           {t('header-achievement')}
         </span>
@@ -103,7 +108,7 @@ const ImageCarousel = ({
           </button>
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-1/2 bg-bgColor-brand" />
+      <Separator className="mx-auto mt-12 w-2/3 md:w-1/2 bg-bgColor-brand" />
     </div>
   )
 }

@@ -1,14 +1,15 @@
 'use client'
 
+// Libraries
 import { useState, useRef, useEffect } from 'react'
-import { Ribbon, ChevronDown } from 'lucide-react'
-
 import { usePathname } from 'next/navigation'
 
+// Components
+import { Ribbon, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
+// Interfaces
 type screenSize = 'mobile' | 'desktop'
-
 interface NavAboutProps {
   title: string
   vision: string
@@ -17,6 +18,7 @@ interface NavAboutProps {
   currentPath?: string
 }
 
+// Main Component
 const NavAbout: React.FC<NavAboutProps> = ({
   title,
   vision,

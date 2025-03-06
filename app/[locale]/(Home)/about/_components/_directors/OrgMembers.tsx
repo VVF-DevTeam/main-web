@@ -1,8 +1,12 @@
+// Libraries
 import React from 'react'
-import OrgMemberCard from './OrgMemberCard'
-import { Separator } from '@/components/ui/separator'
 import initTranslation from '@/app/i18n'
 
+// Components
+import OrgMemberCard from './OrgMemberCard'
+import { Separator } from '@/components/ui/separator'
+
+// Data
 const directors = [
   {
     id: 1,
@@ -72,10 +76,12 @@ const honoraryMembers = [
   },
 ]
 
+// Interfaces
 interface OrgMembersProps {
   locale: string
 }
 
+// Main Component
 const OrgMembers = async ({ locale }: OrgMembersProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = await initTranslation(locale, ['about', 'common'])

@@ -16,11 +16,13 @@ import '@/lib/ui/css/hover.css'
 import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
 import { roboto } from '@/lib/ui/fonts/Roboto'
 
+// Metadata
 export const metadata: Metadata = {
   title: 'Viet Vibe Foundation',
   description: 'Viet Vibe Foundation',
 }
 
+// Main Component
 export default function RootLayout({
   children,
 }: Readonly<{

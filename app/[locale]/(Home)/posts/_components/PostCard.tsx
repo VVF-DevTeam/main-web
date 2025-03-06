@@ -1,9 +1,14 @@
+// Libraries
 import React from 'react'
+
+// Components
 import Image from 'next/image'
 import { ArrowBigRightDash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import PostStats from './PostStats'
 import Link from 'next/link'
+
+// Interfaces
 interface PostProps {
   id: string
   title: string
@@ -17,6 +22,7 @@ interface PostProps {
   userId: string | null
 }
 
+// Main Component
 const PostCard = ({
   title,
   summary,
@@ -39,7 +45,7 @@ const PostCard = ({
           fill
           priority={true}
           sizes="(min-width: 1280px) 426px, (min-width: 780px) 396px, (min-width: 400px) calc(100vw - 98px), calc(13.75vw + 230px)"
-          className="object-cover hover-focus-zoomIn"
+          className="hover-focus-zoomIn object-cover"
         />
       </div>
 
@@ -48,7 +54,7 @@ const PostCard = ({
         <h2 className="text-2xl font-bold tracking-wide xl:text-3xl">
           {title}
         </h2>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           {createdAt.toLocaleString()}
         </p>
         <p className="mt-4 text-wrap break-words text-textColor-gray md:max-w-[90%]">
@@ -67,8 +73,8 @@ const PostCard = ({
 
           <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-12">
             <Button
-              variant={'ghost'}
-              className="flex-center gap-x-2 button-default text-sm md:text-base"
+              variant={'default'}
+              className="flex-center gap-x-2 text-sm md:text-base"
             >
               <span>Read More</span>
               <ArrowBigRightDash className="h-5 w-5 duration-100 ease-in group-hover:translate-x-1" />

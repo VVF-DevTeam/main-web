@@ -1,5 +1,7 @@
-import OrgMembers from '../../_components/_directors/OrgMembers'
+// Components
+import OrgMembers from '../_components/_directors/OrgMembers'
 
+// Main Component
 const AboutPageDirectors = async({
   params,
 }: {

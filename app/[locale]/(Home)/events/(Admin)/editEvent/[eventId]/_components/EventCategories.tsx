@@ -127,7 +127,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
           onClick={() => setIsEditing(!isEditing)}
           className={cn(
             isEditing
-              ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
+              ? 'text-gray-700 transition-all font-semibold duration-75 hover:text-red-700'
               : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
           )}
         >

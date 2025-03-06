@@ -1,6 +1,10 @@
-import EventStep from './EventStep'
+// Libraries
 import initTranslation from '@/app/i18n'
 
+// Components
+import EventStep from './EventStep'
+
+// Data
 const EventStepList = [
   {
     step: '01',
@@ -22,6 +26,7 @@ const EventStepList = [
   },
 ]
 
+// Main Component
 interface EventInstructionProps {
   locale: string
 }

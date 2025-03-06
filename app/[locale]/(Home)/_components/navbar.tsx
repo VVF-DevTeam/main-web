@@ -3,13 +3,14 @@ import React from 'react'
 import { auth } from '@/auth'
 import { User2 } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
+// import Image from 'next/image'
 
 // Components
-import MobileSidebar from './mobileSidebar'
-import NavLinks from './navLinks'
+import MobileSidebar from './_navbar/mobileSidebar'
+import NavLinks from './_navbar/navLinks'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
 
+// Main Component
 const Navbar = async ({ locale }: { locale: string }) => {
   // TODO: Move session to parent component
   const session = await auth()

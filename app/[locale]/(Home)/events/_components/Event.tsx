@@ -1,7 +1,11 @@
+// Libraries
 import React from 'react'
-import Image from 'next/image'
 
+// Components
+import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
+
+// Interfaces
 interface EventProps {
   day: string
   name: string
@@ -10,6 +14,7 @@ interface EventProps {
   end: string
 }
 
+// Main Component
 const Event = ({ day, location, thumbnail, end }: EventProps) => {
   return (
     <div className="py-6">

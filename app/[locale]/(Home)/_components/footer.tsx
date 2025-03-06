@@ -1,10 +1,14 @@
+// Libraries
 import React from 'react'
+import initTranslation from '@/app/i18n'
 import { navRoutes } from '@/lib/navRoutes'
+
+// Components
 import Link from 'next/link'
 import { Separator } from '@radix-ui/react-separator'
 import { SiFacebook, SiInstagram } from 'react-icons/si' // Import Simple Icons
-import initTranslation from '@/app/i18n'
 
+// Main Component
 const Footer = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 

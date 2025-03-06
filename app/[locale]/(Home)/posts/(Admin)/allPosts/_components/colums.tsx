@@ -1,4 +1,6 @@
 'use client'
+
+// Components
 import { Post } from '@prisma/client'
 import { ColumnDef } from '@tanstack/react-table'
 import Image from 'next/image'
@@ -6,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 
+// Main Component
 export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'title',

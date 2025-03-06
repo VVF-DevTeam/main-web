@@ -1,5 +1,7 @@
+// Libraries
 import initTranslations from '@/app/i18n'
 
+// Interfaces
 interface MemberDescriptionProps {
   title: string
   description: string
@@ -8,6 +10,7 @@ interface MemberDescriptionProps {
   bio: string
 }
 
+// Main Component
 const MemberDescription = async ({
   title,
   description,

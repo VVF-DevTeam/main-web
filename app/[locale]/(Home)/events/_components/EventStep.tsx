@@ -1,10 +1,13 @@
+// Libraries
 import initTranslation from '@/app/i18n'
 
+// Interfaces
 interface EventStepProp {
   step: string
   locale: string
 }
 
+// Main Component
 const EventStep = async ({ step, locale }: EventStepProp) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = await initTranslation(locale, ['event', 'common'])

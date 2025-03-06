@@ -1,6 +1,8 @@
+// Components
 import MemberDescription from './MemberDescription'
 import MemberImage from './MemberImage'
 
+// Interfaces
 interface OrgMemberCardProps {
   id: number
   description: string
@@ -11,6 +13,7 @@ interface OrgMemberCardProps {
   locale: string
 }
 
+// Main Component
 const OrgMemberCard = async ({
   id,
   description,
