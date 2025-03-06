@@ -1,0 +1,6 @@
+/* Below are some utility functions for dimension */
+
+.width-max-default { 
+    /* Please note that default width will be full screen size, and you only need this class to centralize items such as intro headers */
+    @apply max-w-[1500px];
+}

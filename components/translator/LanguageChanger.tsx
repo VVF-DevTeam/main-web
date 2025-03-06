@@ -38,7 +38,7 @@ export default function LanguageChanger() {
   };
 
   return (
-    <select onChange={handleChange} value={currentLocale} style={{ color: 'black' }}>
+    <select onChange={handleChange} value={currentLocale} className='text-textColor'>
       <option value="en">English</option>
       <option value="vi">Tiếng Việt</option>
       <option value="fr">Français</option>

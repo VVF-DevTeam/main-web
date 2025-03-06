@@ -1,20 +1,23 @@
+// Components
 import Image from 'next/image'
 
+// Interfaces
 interface IntroImageProps {
   imageUrl: string
   direction: string
 }
 
+// Main Component
 const IntroImage = ({ imageUrl, direction }: IntroImageProps) => {
   return (
     <div
-      className="relative aspect-video h-[300px] w-full basis-1/2 md:max-h-[500px] md:max-w-[400px]"
-      style={{ placeSelf: direction === 'start' ? 'flex-start' : 'flex-end' }}
+      className={`relative aspect-video h-[300px] w-full md:max-h-[500px] md:max-w-[400px] ${direction === 'start' ? 'place-self-start' : 'place-self-end'}`}
     >
       <Image
         src={imageUrl}
-        alt="Intro Image"
+        alt="Intro"
         decoding="async"
+        // To do change image
         className="absolute rounded-sm object-cover shadow-lg"
         sizes="(min-width: 780px) 531px, calc(100vw - 46px)"
         fill

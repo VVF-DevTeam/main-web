@@ -1,0 +1,6 @@
+/* Below are some utility functions for text */
+
+/* text position */  
+.text-place-default {
+  @apply text-center md:text-left;
+}

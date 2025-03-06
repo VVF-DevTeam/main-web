@@ -7,7 +7,7 @@ import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_co
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
-import { adminCheck } from '@/lib/utilFunctions/adminCheck'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
 
 interface EditPostProps {
   params: Promise<{ postId: string }>
@@ -41,24 +41,24 @@ const EditPost = async ({ params }: EditPostProps) => {
 
   const completedSteps = postFields.filter(Boolean).length
   const canPublish = completedSteps === postFields.length
-  const completionText = `(${completedSteps} / ${postFields.length})`
+  
   return (
     <div className="my-12 p-6 lg:my-20">
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
-        <div className="mb-24 flex items-center justify-between">
+        <div className="mb-24 flex-between">
           <div className="flex flex-col gap-y-2">
-            <h1 className="text-3xl font-semibold text-[#1B171A] lg:text-4xl">
+            <h1 className="text-3xl font-semibold text-textColor lg:text-4xl">
               Edit Post
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Fill all the fields to edit your post.
             </p>
-            <p className="text-sm text-muted-foreground">
-              Steps completed: {completionText}
+            <p className="text-muted-foreground text-sm">
+              Steps completed: ({completedSteps} / {postFields.length})
             </p>
           </div>
-          <div className="flex flex-col items-center gap-x-4 gap-y-4 md:flex-row">
+          <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
             {/* TODO: Add delete button */}
             {/* Buttons */}
             <Button variant={'destructive'}>Delete Post</Button>
@@ -74,9 +74,9 @@ const EditPost = async ({ params }: EditPostProps) => {
 
         {/* Form */}
         <div className="flex flex-col gap-y-12">
-          {/* First Row */}
-          <div className="flex flex-col gap-x-8 gap-y-8 md:flex-row">
-            <div className="flex w-full flex-col gap-y-4">
+          {/* Step I & Step II */}
+          <div className="flex-col-default md:flex-row">
+            <div className="flex-col-default w-full">
               <div className="flex items-center gap-x-4">
                 <BookType className="h-6 w-6 md:h-8 md:w-8" />
                 <h1 className="text-xl font-semibold md:text-2xl">
@@ -85,7 +85,7 @@ const EditPost = async ({ params }: EditPostProps) => {
               </div>
               <TitleForm post={post} />
             </div>
-            <div className="flex w-full flex-col gap-y-4">
+            <div className="flex-col-default w-full">
               <div className="flex items-center gap-x-4">
                 <BookText className="h-6 w-6 md:h-8 md:w-8" />
                 <h1 className="text-xl font-semibold md:text-2xl">
@@ -97,8 +97,8 @@ const EditPost = async ({ params }: EditPostProps) => {
             </div>
           </div>
 
-          {/* Second Row */}
-          <div className="flex w-full flex-col gap-y-4">
+          {/* Step III */}
+          <div className="flex-col-default w-full">
             <div className="flex items-center gap-x-4">
               <FileImage className="h-6 w-6 md:h-8 md:w-8" />
               <h1 className="text-xl font-semibold md:text-2xl">
@@ -108,8 +108,9 @@ const EditPost = async ({ params }: EditPostProps) => {
             </div>
             <PostImage post={post} />
           </div>
-          {/* Third Row */}
-          <div className="flex w-full flex-col gap-y-4">
+
+          {/* Step IV */}
+          <div className="flex-col-default w-full">
             <div className="flex items-center gap-x-4">
               <FileText className="h-6 w-6 md:h-8 md:w-8" />
               <h1 className="text-xl font-semibold md:text-2xl">

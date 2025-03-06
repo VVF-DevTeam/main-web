@@ -17,8 +17,8 @@ const PostBody = ({
   createdAt,
 }: PostBodyProps) => {
   return (
-    <div className="flex w-full flex-col items-center gap-y-4 p-6 md:p-12 lg:p-16">
-      <h1 className="mb-2 text-4xl font-bold text-[#1B171A] hover:text-[#1B171A]/80 md:text-5xl lg:text-6xl">
+    <div className="flex-col-center gap-y-4 p-6 md:p-12 lg:p-16">
+      <h1 className="mb-2 text-4xl font-bold text-textColor hover:text-textColor/80 md:text-5xl lg:text-6xl">
         {title}
       </h1>
       <span className="text-sm text-muted-foreground">
@@ -33,7 +33,7 @@ const PostBody = ({
           alt={title}
           fill
           loading="eager"
-          className="absolute object-cover duration-500 ease-in-out hover:scale-110"
+          className="absolute object-cover hover-focus-zoomIn"
         />
       </div>
       <div className="mt-4 w-full text-pretty">

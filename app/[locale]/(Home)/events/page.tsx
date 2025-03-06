@@ -1,16 +1,19 @@
+// Components
 import EventList from './_components/EventList'
-import { prisma } from '@/lib/db'
 import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
-import { Suspense } from 'react'
 
+// Libraries
+import { Suspense } from 'react'
+import { prisma } from '@/lib/db'
+
+// Main Component
 const EventsPage = async ({
   params,
 }: {
   params: Promise<{ locale: string }>
 }) => {
-
   const { locale } = await params
 
   // Get all events

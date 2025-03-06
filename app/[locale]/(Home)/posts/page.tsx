@@ -42,13 +42,13 @@ const Posts = async ({ params }: PostsProps) => {
 
   return (
     <div>
-      <div className="py-12 mx-auto flex w-full max-w-[1500px] flex-col p-6 min-h-screen">
+      <div className="width-max-default flex-col-default mx-auto min-h-screen p-6 pt-12">
         {/* Header */}
-        <div className="flex w-full flex-col gap-y-2">
-          <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
+        <div className="flex flex-col gap-y-2">
+          <h1 className="header-font-black header-sub lg:text-5xl">
             {t('header')}
           </h1>
-          <p className="mb-12 text-sm text-muted-foreground">
+          <p className="header-font-black text-sm text-textColor">
             {t('description-header')}
           </p>
         </div>
@@ -57,17 +57,18 @@ const Posts = async ({ params }: PostsProps) => {
         {publishedPosts.length > 0 ? (
           <PostList posts={publishedPosts} userId={session?.user?.id || null} />
         ) : (
-          <p className="flex items-center justify-center text-2xl font-semibold">
+          <p className="flex-center header-font-black header-sub">
             {t('noPost')}
           </p>
         )}
 
+        {/* Admin Buttons */}
         {isAdmin && (
-          <div className="mt-6 flex w-full items-center justify-end gap-x-4 px-6">
+          <div className="flex-end mt-6 w-full gap-x-4 px-6">
             <Link href="/posts/allPosts" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}
-                className="flex items-center gap-x-2 bg-slate-200 p-6 text-black hover:bg-slate-300/90 hover:text-black/90"
+                className="flex-center gap-x-2 bg-bgColor-gray/15 p-6 text-textColor hover:bg-bgColor-gray/25 hover:text-textColor/90"
               >
                 <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
                 <span className="text-xl">{t('allPost')}</span>
@@ -77,7 +78,7 @@ const Posts = async ({ params }: PostsProps) => {
             <Link href="/posts/createNewPost" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}
-                className="flex items-center gap-x-2 bg-[#1B171A] p-6 text-slate-200 hover:bg-[#1B171A]/90 hover:text-slate-200/90"
+                className="flex-center gap-x-2 bg-bgColor-black p-6 text-textColor-white hover:bg-bgColor-black/90 hover:text-textColor-white/90"
               >
                 <PlusCircle className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
                 <span className="text-xl">{t('newPost')}</span>

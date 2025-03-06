@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db'
 import { DataTable } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/data-table'
 import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/colums'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/lib/utilFunctions/adminCheck'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
 
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
@@ -18,13 +18,11 @@ const AllPosts = async () => {
   })
 
   return (
-    <div className="mx-auto my-20 flex w-full max-w-[1500px] flex-col gap-y-2 p-6">
-      <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
-        All Posts
-      </h1>
-      <p className="mb-12 text-sm text-muted-foreground">
+    <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
+      <h1 className="header-sub">All Posts</h1>
+      <p className="text-muted-foreground mb-12 text-sm">
         All published and unpublished posts appear here. Click on the
-        <span className="font-semibold text-[#C54B3E] transition-all hover:text-[#C54B3E]/70">
+        <span className="hover:text-textColor-brand/70 font-semibold text-textColor-brand transition-all">
           {' '}
           &quot;Edit&quot;
         </span>{' '}

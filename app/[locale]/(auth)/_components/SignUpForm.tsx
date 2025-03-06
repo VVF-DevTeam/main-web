@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()  
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -73,33 +73,36 @@ const SignUpForm = () => {
   }
   return (
     <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
-      {/* form header */}
-      <h1 className="mt-8 text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
+      {/* Form Header */}
+      <h1 className="header-font-default mt-8 text-3xl font-semibold text-textColor-brand lg:mt-12">
         {t('register')}
       </h1>
-      <p className="mt-6 text-sm text-muted-foreground">
+      <p className="mt-6 text-sm text-textColor-gray">
         {t('description-signUp')}
       </p>
-      <Separator className="my-4 h-[1px] w-full bg-gray-300" />
-      {/* form */}
+      <Separator className="my-4 h-[1px] w-full bg-bgColor-gray" />
+
+      {/* Form */}
       <div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mb-4 grid grid-cols-1 gap-x-6 gap-y-6 pt-2 md:grid-cols-2 md:gap-y-8 lg:gap-x-8"
+            className="flex-col-default grid-all-cols-2 mb-4 pr-5 pt-2 md:gap-y-8 lg:gap-x-6"
           >
-            {/* first name */}
+            {/* First Name */}
             <FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('firstName')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('firstName')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Joe"
                       {...field}
-                      className="border-2 text-[#1B171A] lg:max-w-[360px]"
+                      className="border-2 text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
 
@@ -107,120 +110,140 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            {/* last name */}
+
+            {/* Last Name */}
             <FormField
               control={form.control}
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('lastName')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('lastName')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: Smith"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* email */}
+
+            {/* Email */}
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('email')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('email')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="JoeSmith@gmail.com"
                       type="email"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* age */}
+
+            {/* Age */}
             <FormField
               control={form.control}
               name="age"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('age')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('age')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 26"
                       type="number"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* phone number */}
+
+            {/* Phone Number */}
             <FormField
               control={form.control}
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('phoneNumber')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('phoneNumber')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 1234567890"
                       type="number"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* address */}
+
+            {/* Address */}
             <FormField
               control={form.control}
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#C54B3E]">{t('address')}</FormLabel>
+                  <FormLabel className="text-textColor-brand">
+                    {t('address')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="eg: 123 Main St"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* password */}
+
+            {/* Password */}
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="password" className="text-[#C54B3E]">
-                  {t('password')}
+                  <FormLabel
+                    htmlFor="password"
+                    className="text-textColor-brand"
+                  >
+                    {t('password')}
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={!showPassword ? 'password' : 'text'}
-                        placeholder="Enter your password"
+                        placeholder="Enter password"
                         {...field}
-                        className="text-[#1B171A] lg:max-w-[360px]"
+                        className="text-textColor lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
                         size={'icon'}
                         type="button"
+                        aria-label="Toggle password visibility"
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -232,7 +255,8 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            {/* confirm password */}
+
+            {/* Confirm Password */}
             <FormField
               control={form.control}
               name="confirmPassword"
@@ -240,7 +264,7 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="confirmPassword"
-                    className="text-[#C54B3E]"
+                    className="text-textColor-brand"
                   >
                     {t('confirmPassword')}
                   </FormLabel>
@@ -250,12 +274,13 @@ const SignUpForm = () => {
                         type={!showPassword ? 'password' : 'text'}
                         placeholder="Confirm password"
                         {...field}
-                        className="text-[#1B171A] lg:max-w-[360px]"
+                        className="text-textColor lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
                         size={'icon'}
                         type="button"
+                        aria-label="Toggle confirm password visibility"
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -270,22 +295,24 @@ const SignUpForm = () => {
             <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="max-w-60 bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
+                className="max-w-60 bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"
               >
                 {t('createAccount')}
               </Button>
-              <p className="text-sm">
-                {t('alreadyHaveAccount')}{' '}
-                <Link
-                  href="/signIn"
-                  className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
-                >
-                  {t('login')}
-                </Link>
-              </p>
             </div>
           </form>
         </Form>
+        
+        {/* Have Account? */}
+        <p className="text-sm">
+          {t('alreadyHaveAccount')}{' '}
+          <Link
+            href="/signIn"
+            className="text-textColor-brand decoration-2 transition-all hover:text-textColor-brand/80 hover:underline"
+          >
+            {t('login')}
+          </Link>
+        </p>
       </div>
     </div>
   )

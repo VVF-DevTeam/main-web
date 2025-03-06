@@ -34,7 +34,7 @@ import { useToast } from '@/hooks/use-toast'
 interface CreateEventFormProps {
   author: string
 }
-// TODO: Abstract the craeteEventSchema to a separate file
+// TODO: Abstract the createEventSchema to a separate file
 const createEventSchema = z.object({
   title: z
     .string({ required_error: 'Title is required' })

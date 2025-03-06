@@ -1,30 +1,33 @@
+// Libraries
 import React from 'react'
 import initTranslation from '@/app/i18n'
+
+// Components
 import Image from 'next/image'
+
+// Interfaces
 interface EventHeroImageProps {
   locale: string
 }
+
+// Main Component
 const EventHeroImage = async ({ locale }: EventHeroImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
   return (
-    <div className="relative flex flex-col items-center justify-center overflow-hidden">
+    <div className="flex-col-center header-font-white default-gap relative h-[70vh] p-6 text-center">
+      {/* NextJS Image and Dark Overlay */}
+      <div className="dark-overlay"></div>
       <Image
-        src="/bg/tennis-team-bg.jpg"
-        alt="event section backround image"
-        height={1333}
-        width={2000}
-        className="relative z-0 h-[70vh] min-w-full object-cover blur-sm brightness-50"
-        sizes="100vw"
+        src="https://drive.google.com/thumbnail?id=13ci_qVojwKNcZlAAfp5ovVMTiLAbymVj&sz=w2000"
+        alt="Event List Background"
+        className="next-background object-top"
+        fill
         priority
       />
-      <div className="z-5 absolute flex flex-col items-center justify-center gap-y-12 text-[#fff7f7]">
-        <h1 className="text-4xl tracking-wide md:text-5xl lg:text-6xl">
-          {t('header-introduction')}
-        </h1>
-        <p className="max-w-[60vw] text-pretty text-center text-2xl font-semibold tracking-wider md:text-3xl">
-          {t('description-introduction')}
-        </p>
-      </div>
+
+      {/* Titles and Descriptions */}
+      <h2 className="header-main">{t('header-introduction')}</h2>
+      <span className="header-text">{t('description-introduction')}</span>
     </div>
   )
 }
