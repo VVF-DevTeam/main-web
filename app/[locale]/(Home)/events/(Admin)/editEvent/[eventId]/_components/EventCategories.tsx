@@ -59,7 +59,6 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   }
   const saveTags = async (data: EventCategory[]) => {
     setLoading(true)
-    const dataWithId = data.map((item) => ({ ...item, eventId: event.id }))
 
     try {
       const response = await axios.post(

@@ -4,7 +4,6 @@ import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
 import { adminCheck } from '@/lib/utilFunctions/adminCheck'
-import { redirect } from 'next/navigation'
 
 // import { Suspense } from 'react'
 

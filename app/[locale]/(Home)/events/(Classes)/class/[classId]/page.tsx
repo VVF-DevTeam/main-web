@@ -1,15 +1,14 @@
-import type { Metadata, ResolvingMetadata } from 'next'
+import type { Metadata } from 'next'
 
 import ClassImage from '../_component/ClassImage'
 import ClassDescription from '../_component/ClassDescription'
 import { prisma } from '@/lib/db'
 
-export const generateMetadata = async ({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ classId: string }>
-  parent: ResolvingMetadata
-}): Promise<Metadata> => {
+}): Promise<Metadata> {
   const { classId } = await params
   const publishedClass = await prisma.event.findUnique({
     where: {

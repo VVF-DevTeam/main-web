@@ -45,7 +45,6 @@ const ScheduleItem = ({
   isEditable = true,
   eventId,
   scheduleItemId,
-  position,
 }: ScheduleItemProps) => {
   const router = useRouter()
   const { toast } = useToast()

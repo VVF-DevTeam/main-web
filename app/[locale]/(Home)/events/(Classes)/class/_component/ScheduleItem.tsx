@@ -16,8 +16,8 @@ const ScheduleItem = async ({
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   const calcDuration = (startTime: string, endTime: string) => {
-    let splitStart = startTime.split(':')
-    let splitEnd = endTime.split(':')
+    const splitStart = startTime.split(':')
+    const splitEnd = endTime.split(':')
 
     let hours = 0
     let minutes = 0
