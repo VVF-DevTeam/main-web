@@ -10,6 +10,7 @@ const EventsPage = async ({
 }: {
   params: Promise<{ locale: string }>
 }) => {
+
   const { locale } = await params
 
   // Get all events

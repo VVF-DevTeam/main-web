@@ -36,7 +36,7 @@ const EventCard = ({ event }: EventCardProps) => {
         {/* Price and availability */}
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-x-2">
-            <Tag className="h-5 w-5"></Tag>${event.price}
+            <Tag className="h-5 w-5"></Tag>${event.price}{event.priceMember? '/$' + event.priceMember: null} 
           </span>
           <span className="flex items-center gap-x-2">
             <Ticket className="h-5 w-5 rotate-45"></Ticket>

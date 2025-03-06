@@ -5,7 +5,7 @@ import initTranslation from '@/app/i18n'
 import Header from '@/app/[locale]/(Home)/_components/header'
 import Copyright from './_components/copyright'
 
-const i18nNamespaces = ['homePage', 'common']
+const i18nNamespaces = ['homePage', 'common', 'event']
 
 const Layout = async ({
   children,
