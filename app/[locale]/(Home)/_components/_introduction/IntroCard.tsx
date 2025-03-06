@@ -6,13 +6,13 @@ interface IntroCardProps {
   id: number
   description: string
   imageUrl: string
-  title: string
+  title: string,
   locale: string
 }
 
-const IntroCard = ({ id, description, imageUrl, title }: IntroCardProps) => {
+const IntroCard = ({ id, description, imageUrl, title, locale }: IntroCardProps) => {
   return (
-    <div>
+    <div className="mt-6 lg:mt-12">
       {id % 2 === 0 ? (
         <div className="flex-default grid-all-cols-2 flex-col-reverse gap-x-20 lg:justify-items-end">
           <IntroDescription title={title} description={description} />

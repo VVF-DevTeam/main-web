@@ -1,9 +1,9 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Separator } from '@/components/ui/separator'
 
 interface ImageCarouselProps {
   imageUrls: {
@@ -57,7 +57,7 @@ const ImageCarousel = ({
   return (
     <div>
       {/* Title & Separator */}
-      <div className="flex-col-center default-gap">
+      <div className="flex-col-center default-gap mt-12 md:mt-16 lg:mt-24">
         <Separator className="w-1/2 bg-bgColor-brand" />
         <span className="header-font-black header-sub mb-7 py-6 italic">
           {t('header-achievement')}
@@ -80,6 +80,7 @@ const ImageCarousel = ({
                 src={img.url}
                 alt={`Image ${img.id}`}
                 fill
+                sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -102,6 +103,7 @@ const ImageCarousel = ({
           </button>
         </div>
       </div>
+      <Separator className="mx-auto mt-12 w-1/2 bg-bgColor-brand" />
     </div>
   )
 }

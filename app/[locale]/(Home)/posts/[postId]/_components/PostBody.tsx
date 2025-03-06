@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import TextPreview from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/TextPreview'
+import TextPreview from '../../(Admin)/editPost/[postId]/_components/TextPreview'
 interface PostBodyProps {
   title: string
   content: string
@@ -32,10 +32,11 @@ const PostBody = ({
           src={imageUrl}
           alt={title}
           fill
+          loading="eager"
           className="absolute object-cover hover-focus-zoomIn"
         />
       </div>
-      <div className='w-full mt-4 text-pretty'>
+      <div className="mt-4 w-full text-pretty">
         <TextPreview value={content} />
       </div>
     </div>

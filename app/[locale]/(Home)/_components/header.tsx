@@ -58,7 +58,7 @@ const Header = () => {
                 <Mail className="h-5 w-5" /> <span>info@vietvibe.org</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent className="bg-[#1B171A]">
+            <TooltipContent className="bg-bgColor-black">
               <p className="flex gap-x-2 text-sm text-textColor-brand-light">
                 Copy
                 <Copy className="h-4 w-4" />

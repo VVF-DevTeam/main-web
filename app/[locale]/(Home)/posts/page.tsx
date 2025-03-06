@@ -28,7 +28,6 @@ const Posts = async ({ params }: PostsProps) => {
     },
   })
   const userEmail = session?.user?.email
-  // if (!userEmail) return <div>You are not logged in</div>
 
   const user = await prisma.user.findUnique({
     where: {

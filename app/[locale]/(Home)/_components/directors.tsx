@@ -1,17 +1,17 @@
-'use client'
 import Image from 'next/image'
-import { Separator } from '@/components/ui/separator'
-import { useRouter } from 'next/navigation'
-import { useTranslation } from 'react-i18next'
+import initTranslation from '@/app/i18n'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-const Directors = () => {
+interface DirectorsProps {
+  locale: string
+}
+const Directors = async ({ locale }: DirectorsProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
-  const router = useRouter()
+  const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
     <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-8 md:p-12 lg:gap-y-12 lg:pb-28 lg:pt-14">
-      <Separator className="w-1/2 bg-bgColor-brand" />
       <span className="header-font-black header-sub pb-8 italic">
         {t('header-director')}
       </span>
@@ -23,7 +23,7 @@ const Directors = () => {
             alt="Trong Nguyen"
             width={200}
             height={50}
-            className="h-[120px] w-[120px] rounded-full object-cover"
+            className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex flex-col gap-y-2">
             <span className="header-font-black text-xl font-bold">
@@ -44,7 +44,7 @@ const Directors = () => {
             alt="Eattle Nguyen"
             width={200}
             height={50}
-            className="h-[120px] w-[120px] rounded-full object-cover"
+            className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex flex-col gap-y-2">
             <span className="header-font-black text-xl font-bold">
@@ -59,12 +59,11 @@ const Directors = () => {
           </div>
         </div>
       </div>
-      <button
-        className="button-default w-36"
-        onClick={() => router.push('/about/directors')}
-      >
-        {t('button-director')}
-      </button>
+      <Link href={'/about/directors'}>
+        <Button className="w-36 p-3" variant={'default'}>
+          {t('button-director')}
+        </Button>
+      </Link>
     </div>
   )
 }

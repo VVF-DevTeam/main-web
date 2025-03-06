@@ -15,19 +15,19 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="relative h-[110px] w-full p-6 shadow-md">
-      {/* NextJS Image and Dark Overlay */}
-      <div className="white-overlay"></div>
+    <nav className="sticky z-10 h-[90px] w-full bg-[#d2d0d0]/50 px-6 shadow-sm backdrop-blur-sm">
+      {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
+      {/* <div className="white-overlay"></div>
       <Image
         src="https://drive.google.com/thumbnail?id=1b17wtI8m9C1isfbJC7w-vbG_B5oe8wW9&sz=w1000"
         alt="Intro"
         className="next-background object-top"
         fill
         priority
-      />
+      /> */}
 
       {/* Nav Links */}
-      <div className="flex-between h-full w-full">
+      <div className="flex-between">
         <div className="flex h-full w-full items-center gap-x-4">
           {/* Company Logo with Slogan*/}
           <Link href="/" className="flex-col-center -mt-5">

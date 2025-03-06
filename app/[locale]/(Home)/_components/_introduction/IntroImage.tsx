@@ -12,9 +12,11 @@ const IntroImage = ({ imageUrl, direction }: IntroImageProps) => {
     >
       <Image
         src={imageUrl}
-        alt="Intro Images of Viet Vibe Foundation"
+        alt="Intro"
+        decoding="async"
         // To do change image
-        className="absolute object-cover shadow-lg"
+        className="absolute rounded-sm object-cover shadow-lg"
+        sizes="(min-width: 780px) 531px, calc(100vw - 46px)"
         fill
       />
     </div>

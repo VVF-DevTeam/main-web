@@ -17,11 +17,12 @@ export default async function Home({
   ]
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden flex flex-col gap-y-12">
       <Introduction locale={locale} />
+      {/* Intro cards */}
       <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
-      <Directors />
-      <Contact />
+      <Directors locale={locale} />
+      <Contact locale={locale} />
     </div>
   )
 }

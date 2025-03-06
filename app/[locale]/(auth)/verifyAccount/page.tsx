@@ -40,7 +40,6 @@ const VerifyAccountPage = () => {
           'Token verification failed. This could happen because the token has expired, or the account is already verified.'
         )
       }
-      console.log(isTokenVerified)
     } catch (err) {
       console.log(err)
       setError('An unexpected error occurred. Please try again later.')
