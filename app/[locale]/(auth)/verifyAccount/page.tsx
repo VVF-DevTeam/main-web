@@ -16,7 +16,6 @@ const VerifyAccountPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  console.log("outside")
   const getVerificationToken = async () => {
     if (!token) {
       setError(
@@ -34,7 +33,6 @@ const VerifyAccountPage = () => {
           'Token verification failed. This could happen because the token has expired, or the account is already verified.'
         )
       }
-      console.log(isTokenVerified)
     } catch (err) {
       console.log(err)
       setError('An unexpected error occurred. Please try again later.')
@@ -49,7 +47,7 @@ const VerifyAccountPage = () => {
 
   return (
     <div className="flex min-h-screen justify-center">
-      <div className="min-w-56 my-24 flex max-w-lg flex-col items-center justify-center rounded-md bg-[url(/bg/cave-water-blur.jpg)] bg-cover bg-center p-8 shadow-lg bg-[#bfbebe] bg-blend-overlay">
+      <div className="my-24 flex min-w-56 max-w-lg flex-col items-center justify-center rounded-md bg-[#bfbebe] bg-[url(/bg/cave-water-blur.jpg)] bg-cover bg-center p-8 bg-blend-overlay shadow-lg">
         {loading ? (
           <ClipLoader
             loading={loading}

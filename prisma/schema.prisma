@@ -11,41 +11,57 @@ datasource db {
 }
 
 model EventCategory {
-  id          String  @id @default(cuid())
-  title       String
-  description String?
-  published   Boolean @default(false)
-  events      Event[]
+  id        String       @id @default(cuid())
+  title     String
+  bgColor   String
+  textColor String
+  isBold    Boolean      @default(false)
+  isItalic  Boolean      @default(false)
+  type      CategoryType
+  eventId   String?
+  event     Event[]
 }
 
 model Event {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
+  eventType   EventType
   description String?
-  thumbnail   String?
-  
+  imgUrl      String?
+
   // Metadata
-  eventCategory   EventCategory @relation(fields: [eventCategoryId], references: [id])
-  eventCategoryId String
-  location        String?
-  price           Int       @default(0)
-  startDate       DateTime  @default(now())
-  endDate         DateTime  @default(now())
-  duration        String
-  dates           String[]
-  capacity        Int?
-  ticketsSold     Int?
-  startTime       DateTime
+  location    String?
+  price       Int?      @default(0)
+  startDate   DateTime? @default(now())
+  endDate     DateTime  @default(now())
+  days        String[]
+  capacity    Int?
+  ticketsSold Int?
+  startTime   String?
+  endTime     String?
 
   // States
-  published   Boolean  @default(false)
+  isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdById String
 
   // Relations
-  tickets Ticket[]
+  hosts      User[]
+  categories EventCategory[]
+  tickets    Ticket[]
+  schedules  EventSchedule[]
+
+  @@index([id])
+}
+
+model EventSchedule {
+  id          String  @id @default(cuid())
+  description String?
+  startTime   String?
+  endTime     String?
+  position    Int
+  eventId     String
+  event       Event   @relation(fields: [eventId], references: [id])
 }
 
 // Ticket tiers
@@ -98,11 +114,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  createdEvents Event[]
-  purchases     Purchase[]
-  posts         Post[]
-  likedPosts    PostLikes[]
-  visitedPosts  PostVisits[]
+  purchases    Purchase[]
+  posts        Post[]
+  likedPosts   PostLikes[]
+  visitedPosts PostVisits[]
+  EventHost    Event[]
 }
 
 // Posts made by admins
@@ -123,8 +139,9 @@ model Post {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // TODO: Add Category
   @@unique([id, userId])
+  // TODO: Add Category
+  @@index([id])
 }
 
 model PostLikes {
@@ -144,14 +161,15 @@ model PostLikes {
 }
 
 model PostVisits {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // relations
-  postId String
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([postId, userId])
 }
 
@@ -188,4 +206,15 @@ model VerificationToken {
 enum Role {
   USER
   ADMIN
+  HOST
+}
+
+enum EventType {
+  CLASS
+  CONCERT
+}
+
+enum CategoryType {
+  Primary
+  Secondary
 }

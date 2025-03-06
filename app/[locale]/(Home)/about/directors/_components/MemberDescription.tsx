@@ -21,6 +21,7 @@ const MemberDescription = async ({ title, descriptions, locale}: MemberDescripti
             className="text-center tracking-wide text-gray-700 lg:text-pretty"
             key={index}
           >
+    
             {t(description)}
           </p>
         ))}

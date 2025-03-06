@@ -4,14 +4,16 @@ import Image from 'next/image'
 
 async function signInPage() {
   return (
-    <div className="my-20 flex p-6 lg:p-12 w-full h-full">
+    <div className="my-20 flex h-full w-full p-6 lg:p-12">
       <div className="m-auto flex h-full max-h-[1700px] w-full max-w-7xl flex-col rounded-md bg-slate-100 shadow-md md:flex-row">
-        <div className="relative hidden shrink-0 basis-[55%] md:block">
+        <div className="relative hidden shrink-0 basis-[55%] overflow-hidden md:block">
           <Image
             src="/sample-images/image7.jpg"
             alt="Org image"
             fill
-            className="rounded-md object-cover"
+            className="rounded-l-md object-cover hover:scale-[103%] hover:brightness-90 transition-all ease-in"
+            priority
+            sizes="(min-width: 1280px) 1514px, 1539px"
           />
         </div>
         <SignInForm />

@@ -10,7 +10,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="h-[110px] w-full bg-[#d2d0d0] bg-[url(/bg/skating-bg-blur.jpg)] bg-cover bg-center bg-no-repeat p-6 bg-blend-overlay shadow-md">
+    <nav className="sticky z-10 h-[70px] w-full bg-[#d2d0d0]/50 px-6 shadow-sm backdrop-blur-sm">
       <div className="flex h-full w-full items-center justify-between">
         <div className="flex h-full w-full items-center gap-x-4">
           <Link href="/">

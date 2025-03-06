@@ -1,18 +1,18 @@
-'use client'
 import Image from 'next/image'
-import { Separator } from '@/components/ui/separator'
-import { useRouter } from 'next/navigation'
-import { useTranslation } from 'react-i18next'
+import initTranslation from '@/app/i18n'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-const Directors = () => {
+interface DirectorsProps {
+  locale: string
+}
+const Directors = async ({ locale }: DirectorsProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
-  const router = useRouter()
+  const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-y-10 pb-10 pt-8 md:p-12 lg:gap-y-12 lg:pb-28 lg:pt-14">
-      <Separator className="w-1/2 bg-[#7f0000]" />
-      <span className="pb-8 font-[Poppins] text-4xl font-semibold italic tracking-wide text-[#3d3a3a] md:text-5xl">
+    <div className="mt-12 flex flex-col items-center justify-center gap-y-10 pb-10 pt-8 md:mt-16 md:p-12 lg:mt-24 lg:gap-y-12 lg:pb-28 lg:pt-14">
+      <span className="pb-8 text-4xl font-semibold italic tracking-wide text-[#3d3a3a] md:text-5xl">
         {t('header-director')}
       </span>
       <div className="grid grid-cols-[50%_50%] pb-5">
@@ -22,16 +22,16 @@ const Directors = () => {
             alt="Trong Nguyen"
             width={200}
             height={50}
-            className="h-[120px] w-[120px] rounded-full object-cover"
+            className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex flex-col gap-y-2">
-            <span className="font-[Poppins] text-xl font-semibold text-[#3d3a3a]">
+            <span className="text-xl font-semibold text-[#3d3a3a]">
               {t('name1-director')}
             </span>
-            <span className="font-[Poppins] text-sm font-semibold text-[#C54B3E]">
+            <span className="text-sm font-semibold text-[#C54B3E]">
               {t('title1-director')}
             </span>
-            <span className="max-w-[300px] font-[Poppins] text-sm text-[#1B171A]">
+            <span className="max-w-[300px] text-sm text-[#1B171A]">
               {t('description1-director')}
             </span>
           </div>
@@ -42,27 +42,26 @@ const Directors = () => {
             alt="Trong Nguyen"
             width={200}
             height={50}
-            className="h-[120px] w-[120px] rounded-full object-cover"
+            className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex flex-col gap-y-2">
-            <span className="font-[Poppins] text-xl font-semibold text-[#3d3a3a]">
+            <span className="text-xl font-semibold text-[#3d3a3a]">
               {t('name2-director')}
             </span>
-            <span className="font-[Poppins] text-sm font-semibold text-[#C54B3E]">
+            <span className="text-sm font-semibold text-[#C54B3E]">
               {t('title2-director')}
             </span>
-            <span className="max-w-[300px] font-[Poppins] text-sm text-[#1B171A]">
+            <span className="max-w-[300px] text-sm text-[#1B171A]">
               {t('description2-director')}
             </span>
           </div>
         </div>
       </div>
-      <button
-        className="w-36 bg-[#C54B3E] p-3 text-sm font-semibold text-white"
-        onClick={() => router.push('/about/directors')}
-      >
-        {t('button-director')}
-      </button>
+      <Link href={'/about/directors'}>
+        <Button className="w-36 bg-[#C54B3E] p-3 text-sm font-semibold text-white">
+          {t('button-director')}
+        </Button>
+      </Link>
     </div>
   )
 }

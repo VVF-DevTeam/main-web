@@ -21,7 +21,7 @@ const Header = () => {
   }
 
   return (
-    <div className="flex h-[60px] w-full flex-row items-center justify-between bg-[#2E2E2E] px-8 text-slate-300">
+    <div className="flex h-[40px] w-full flex-row items-center justify-between bg-[#2E2E2E] px-8 text-slate-300">
       <div className="flex gap-x-2">
         <TooltipProvider>
           <Tooltip>

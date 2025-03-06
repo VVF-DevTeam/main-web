@@ -5,11 +5,11 @@ import { adminCheck } from '@/lib/utilFunctions/adminCheck'
 
 const NewPost = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if ((await adminCheck()) === false) {
+  const isAdmin = await adminCheck()
+  if (!isAdmin) {
     return redirect('/posts')
   }
 
-  // TODO: check if user is logged in and send user data
   const session = await auth()
 
   return (

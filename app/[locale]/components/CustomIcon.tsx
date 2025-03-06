@@ -8,10 +8,18 @@ interface logoProps {
 }
 const CustomIcon = ({
   height = 120,
-  width = 100,
+  width = 120,
   src = '/logo/main-logo.jpg',
 }: logoProps) => {
-  return <Image src={src} alt="Org Logo" width={height} height={width} />
+  return (
+    <Image
+      src={src}
+      alt="Org Logo"
+      width={height}
+      height={width}
+      priority
+    />
+  )
 }
 
 export default CustomIcon
