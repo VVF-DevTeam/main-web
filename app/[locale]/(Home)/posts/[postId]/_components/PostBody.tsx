@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import TextPreview from '../../(Admin)/editPost/[postId]/_components/TextPreview'
+import TextPreview from '../../../../components/TextPreview'
 interface PostBodyProps {
   title: string
   content: string

@@ -19,8 +19,8 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-import Editor from './Editor'
-import TextPreview from './TextPreview'
+import Editor from '../../../../../../components/Editor'
+import TextPreview from '../../../../../../components/TextPreview'
 
 interface PostContentProps {
   post: Post

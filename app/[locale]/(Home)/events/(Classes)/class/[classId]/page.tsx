@@ -1,23 +1,38 @@
+import type { Metadata, ResolvingMetadata } from 'next'
+
 import ClassImage from '../_component/ClassImage'
 import ClassDescription from '../_component/ClassDescription'
-import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 
-export const metadata: Metadata = {
-  title: 'Beginner Guitar Lessons',
-  description: 'Beginner Guitar Lessons from Viet Vibe Foundation',
-  openGraph: {
-    title: 'Beginner Guitar Lessons',
-    description: 'Beginner Guitar Lessons from Viet Vibe Foundation',
-    images: [
-      {
-        url: 'https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245', // Update with the correct path
-        width: 1200,
-        height: 630,
-        alt: 'Someone is playing a guitar',
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ classId: string }>
+  parent: ResolvingMetadata
+}): Promise<Metadata> => {
+  const { classId } = await params
+  const publishedClass = await prisma.event.findUnique({
+    where: {
+      id: classId,
+    },
+    select: {
+      title: true,
+      imgUrl: true,
+    },
+  })
+
+  return {
+    title: publishedClass?.title,
+    description: publishedClass?.title + ' from Viet Vibe Foundation',
+    openGraph: {
+      title: publishedClass?.title,
+      description: publishedClass?.title + ' from Viet Vibe Foundation',
+      images: {
+        url: publishedClass?.imgUrl!,
+        alt: publishedClass?.title,
       },
-    ],
-  },
+    },
+  }
 }
 
 interface ClassPageProps {

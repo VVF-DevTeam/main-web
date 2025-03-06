@@ -19,14 +19,26 @@ const Posts = async ({ params }: PostsProps) => {
     where: {
       isPublished: true,
     },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      imgUrl: true,
+      createdAt: true,
       postLikes: true,
       postVisits: true,
+      _count: {
+        select: {
+          postLikes: true,
+          postVisits: true,
+        },
+      },
     },
     orderBy: {
       updatedAt: 'desc',
     },
   })
+
   const userEmail = session?.user?.email
 
   const user = await prisma.user.findUnique({
@@ -42,7 +54,7 @@ const Posts = async ({ params }: PostsProps) => {
 
   return (
     <div>
-      <div className="py-12 mx-auto flex w-full max-w-[1500px] flex-col p-6 min-h-screen">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col p-6 py-12">
         {/* Header */}
         <div className="flex w-full flex-col gap-y-2">
           <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">

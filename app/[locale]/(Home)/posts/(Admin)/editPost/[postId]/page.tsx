@@ -6,7 +6,7 @@ import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
-import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
+import PublishButton from '@/app/[locale]/components/PublishButton'
 import { adminCheck } from '@/lib/utilFunctions/adminCheck'
 
 interface EditPostProps {

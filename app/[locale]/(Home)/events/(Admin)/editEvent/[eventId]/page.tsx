@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 
-import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
+import PublishButton from '@/app/[locale]/components/PublishButton'
 
 import EventStartDate from './_components/EventStartDate'
 import EventTitle from './_components/EventTitle'

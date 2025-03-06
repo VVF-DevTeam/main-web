@@ -73,7 +73,7 @@ const ClassDescription = async ({
 
       {/* Event Description */}
       <div>
-        <h1 className="mb-4 text-xl font-extrabold md:text-3xl lg:text-4xl">
+        <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
           {t('headerAbout-guitar')}
         </h1>
         <p>{t(description)}</p>
@@ -85,7 +85,7 @@ const ClassDescription = async ({
 
       {/* Schedule */}
       <div className="min-w-full">
-        <h1 className="mb-4 text-xl font-extrabold md:text-3xl lg:text-4xl">
+        <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
           {t('headerSchedule-guitar')}
         </h1>
         <h3 className="mb-2 italic">({t('subHeaderSchedule-guitar')})</h3>

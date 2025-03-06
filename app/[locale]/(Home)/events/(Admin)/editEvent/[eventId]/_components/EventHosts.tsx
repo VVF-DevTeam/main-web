@@ -28,7 +28,6 @@ const EventHosts = ({ event }: EventHostsProps) => {
   const router = useRouter()
   const { toast } = useToast()
 
-  console.log("hosts", hosts)
   const searchHosts = async (debouncedValue: string) => {
     setLoading(true)
     try {
