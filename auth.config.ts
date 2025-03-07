@@ -26,7 +26,7 @@ export default {
     Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    }),    
+    }),
     Credentials({
       credentials: {
         email: { name: 'email', type: 'email', placeholder: 'email' },
@@ -110,7 +110,13 @@ export default {
         return Response.redirect(new URL('/', request.nextUrl.origin))
       }
 
-      return i18nRouter(request, i18nConfig)
+      // Wrap with the i18n response for internationalization and translations
+      const response = i18nRouter(request, i18nConfig)
+
+      // Add a custom header
+      response.headers.set('current-path', request.nextUrl.pathname)
+
+      return response
     },
   },
   events: {

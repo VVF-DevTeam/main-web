@@ -72,7 +72,7 @@ const SignUpForm = () => {
     }
   }
   return (
-    <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
+    <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-28">
       {/* Form Header */}
       <h1 className="header-font-default mt-8 text-3xl font-semibold text-textColor-brand lg:mt-12">
         {t('register')}

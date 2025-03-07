@@ -1,5 +1,9 @@
+// Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
+
+// Components
 import TitleForm from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/TitleForm'
 import PostSummary from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/SummaryForm'
 import { BookType, BookText, FileText, FileImage } from 'lucide-react'
@@ -7,11 +11,14 @@ import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_co
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
-import { adminCheck } from '@/lib/dbQueries/adminCheck'
+import BackButton from '@/components/ui/back-button'
 
+// Interfaces
 interface EditPostProps {
   params: Promise<{ postId: string }>
 }
+
+// Main Component
 const EditPost = async ({ params }: EditPostProps) => {
   // check if the current user is an admin to allow access to the post control page
   if ((await adminCheck()) === false) {
@@ -41,20 +48,24 @@ const EditPost = async ({ params }: EditPostProps) => {
 
   const completedSteps = postFields.filter(Boolean).length
   const canPublish = completedSteps === postFields.length
-  
+
   return (
     <div className="my-12 p-6 lg:my-20">
+      {/* Back Button To Parent Page */}
+      <BackButton />
+
+      {/* Form */}
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
-        <div className="mb-24 flex-between">
+        <div className="flex-between mb-24">
           <div className="flex flex-col gap-y-2">
             <h1 className="text-3xl font-semibold text-textColor lg:text-4xl">
               Edit Post
             </h1>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Fill all the fields to edit your post.
             </p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Steps completed: ({completedSteps} / {postFields.length})
             </p>
           </div>
