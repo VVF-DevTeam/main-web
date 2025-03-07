@@ -155,7 +155,7 @@ const SignInForm = () => {
                     {t('password')}
                   </FormLabel>
                   <FormControl>
-                    <div className="relative max-w-[360px]">
+                    <div className="relative lg:max-w-[360px]">
                       <Input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter password"

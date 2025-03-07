@@ -16,7 +16,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="sticky z-10 h-[90px] w-full bg-[#d2d0d0]/50 px-6 shadow-sm backdrop-blur-sm">
+    <nav className="sticky z-10 h-[90px] w-full bg-[#d2d0d0]/50 px-6 shadow-md backdrop-blur-sm">
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
       {/* <div className="white-overlay"></div>
       <Image
