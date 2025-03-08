@@ -11,7 +11,7 @@ import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_component
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if ((await adminCheck()) === false) {
+  if (!(await adminCheck())) {
     return redirect('/posts')
   }
 

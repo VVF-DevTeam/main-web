@@ -14,7 +14,7 @@ import { Event } from '@prisma/client'
 interface EventCardProps {
   event: Event
 }
-import { Event } from '@prisma/client'
+
 const EventCard = ({ event }: EventCardProps) => {
   return (
     <div className="hover-focus-zoomIn group relative flex w-[calc(100%-3px)] cursor-pointer flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">

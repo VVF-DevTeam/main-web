@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Pencil } from 'lucide-react'
 
+import Editor from '@/app/[locale]/components/Editor'
+import TextPreview from '@/app/[locale]/components/TextPreview'
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 
 import {
   Form,
@@ -96,11 +97,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Description"
-                      className="min-h-36 w-full"
-                    />
+                    <Editor onChange={field.onChange} value={field.value} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -114,7 +111,9 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
           Add a description for this event.
         </p>
       ) : (
-        <div className="text-muted-foreground">{event.description}</div>
+        <div className="text-muted-foreground">
+          <TextPreview value={event.description} />
+        </div>
       )}
     </div>
   )

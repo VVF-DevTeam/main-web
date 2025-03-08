@@ -19,14 +19,26 @@ const Posts = async ({ params }: PostsProps) => {
     where: {
       isPublished: true,
     },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      imgUrl: true,
+      createdAt: true,
       postLikes: true,
       postVisits: true,
+      _count: {
+        select: {
+          postLikes: true,
+          postVisits: true,
+        },
+      },
     },
     orderBy: {
       updatedAt: 'desc',
     },
   })
+
   const userEmail = session?.user?.email
 
   const user = await prisma.user.findUnique({

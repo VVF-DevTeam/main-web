@@ -48,7 +48,7 @@ model Event {
   // Relations
   hosts      User[]
   categories EventCategory[]
-  tickets    Ticket[]
+  tickets    EventTicket[]
   schedules  EventSchedule[]
 
   @@index([id])
@@ -64,13 +64,25 @@ model EventSchedule {
   event       Event   @relation(fields: [eventId], references: [id])
 }
 
+model EventTicket {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  type      TicketType
+  price     Float
+  capacity  Int
+
+  // relation
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
 // Ticket tiers
 model Ticket {
   id          String  @id @default(cuid())
   title       String?
   description String?
   price       Float
-  event       Event   @relation(fields: [eventId], references: [id])
   eventId     String
 
   // States
@@ -217,4 +229,10 @@ enum EventType {
 enum CategoryType {
   Primary
   Secondary
+}
+
+enum TicketType {
+  NonMember
+  Member
+  DropIn
 }

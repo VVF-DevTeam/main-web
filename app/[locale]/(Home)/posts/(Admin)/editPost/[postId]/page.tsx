@@ -10,7 +10,7 @@ import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
 import { Button } from '@/components/ui/button'
-import PublishButton from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/PublishButton'
+import PublishButton from '@/app/[locale]/components/PublishButton'
 import BackButton from '@/components/ui/back-button'
 
 // Interfaces
@@ -21,7 +21,7 @@ interface EditPostProps {
 // Main Component
 const EditPost = async ({ params }: EditPostProps) => {
   // check if the current user is an admin to allow access to the post control page
-  if ((await adminCheck()) === false) {
+  if (!(await adminCheck())) {
     return redirect('/posts')
   }
 
@@ -48,6 +48,7 @@ const EditPost = async ({ params }: EditPostProps) => {
 
   const completedSteps = postFields.filter(Boolean).length
   const canPublish = completedSteps === postFields.length
+  const completionText = `(${completedSteps} / ${postFields.length})`
 
   return (
     <div className="my-12 p-6 lg:my-20">
@@ -66,7 +67,7 @@ const EditPost = async ({ params }: EditPostProps) => {
               Fill all the fields to edit your post.
             </p>
             <p className="text-sm text-muted-foreground">
-              Steps completed: ({completedSteps} / {postFields.length})
+              Steps completed: {completionText}
             </p>
           </div>
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">

@@ -1,12 +1,14 @@
+// Libraries
+import { prisma } from '@/lib/db'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
+
 // Components
 import EventList from './_components/EventList'
 import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
 
-// Libraries
-import { Suspense } from 'react'
-import { prisma } from '@/lib/db'
+// import { Suspense } from 'react'
 
 // Main Component
 const EventsPage = async ({
@@ -15,6 +17,8 @@ const EventsPage = async ({
   params: Promise<{ locale: string }>
 }) => {
   const { locale } = await params
+
+  const admin = await adminCheck()
 
   // Get all events
   const allEvents = await prisma.event.findMany({
@@ -33,16 +37,8 @@ const EventsPage = async ({
   return (
     <div className="flex flex-col gap-y-6">
       <EventHeroImage locale={locale} />
-      <Suspense
-        fallback={
-          <p className="text-center text-xl text-muted-foreground">
-            loading...
-          </p>
-        }
-      >
-        <EventList events={allEvents} />
-      </Suspense>
-      <EventAdminButtons />
+      <EventList events={allEvents} />
+      {admin && <EventAdminButtons />}
       <EventInstruction locale={locale} />
     </div>
   )
