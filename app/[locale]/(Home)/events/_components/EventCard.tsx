@@ -17,7 +17,7 @@ interface EventCardProps {
 
 const EventCard = ({ event }: EventCardProps) => {
   return (
-    <div className="hover-focus-zoomIn group relative flex w-[calc(100%-3px)] cursor-pointer flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
+    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
       <Image
         src={event.imgUrl!}
         alt="event thumbnail"
@@ -58,7 +58,7 @@ const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Location */}
-        <div className="flex-between">
+        <div className="flex-between gap-x-2">
           <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}

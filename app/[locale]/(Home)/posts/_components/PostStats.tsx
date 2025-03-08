@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 
 // Components
-import { ThumbsUp, Eye } from 'lucide-react'
+import { ThumbsUp, ChartNoAxesColumn } from 'lucide-react'
 
 // Interfaces
 interface PostStatsProps {
@@ -74,7 +74,7 @@ const PostStats = ({
           className={cn(
             'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg]',
             hasLiked
-              ? 'fill-sky-300 group-hover:fill-blue-700/80'
+              ? 'fill-sky-400 group-hover:fill-blue-700/80'
               : 'group-hover:fill-red-700/80'
           )}
         />{' '}
@@ -87,7 +87,7 @@ const PostStats = ({
         className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray/10 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
         aria-label="Post views"
       >
-        <Eye
+        <ChartNoAxesColumn
           className={cn(
             'h-4 w-4 transition-all duration-100 ease-out group-hover:scale-110',
             hasViewed ? 'text-sky-700' : 'text-black'
