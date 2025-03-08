@@ -16,11 +16,16 @@ const BackButton = async () => {
   const currentPath = header.get('current-path')
   let parentPath = currentPath?.split('/').slice(0, -1).join('/') || '/'
   
-  // For Edit Post Page only, since the parent is from allPosts to editPost
+  // For Edit Post Page, the flow is from allPosts to editPost
   if (parentPath.split('/').at(-1) === 'editPost') {
     parentPath = parentPath.replace('editPost', 'allPosts')
   }
-  
+
+  // For Edit Post Page, the flow is from allPosts to editPost
+  if (parentPath.split('/').at(-1) === 'editEvent') {
+    parentPath = parentPath.replace('editEvent', 'allEvents')
+  }  
+
   return (
     <Link href={parentPath as string} className="absolute left-3 top-[170px]">
       <Button variant="default" className="w-[100px]">

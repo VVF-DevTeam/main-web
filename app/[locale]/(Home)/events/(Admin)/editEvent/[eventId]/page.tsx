@@ -1,8 +1,9 @@
+// Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 
+// Components
 import PublishButton from '@/app/[locale]/components/PublishButton'
-
 import EventStartDate from './_components/EventStartDate'
 import EventTitle from './_components/EventTitle'
 import EventEndDate from './_components/EventEndDate'
@@ -17,7 +18,9 @@ import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
+import BackButton from '@/components/ui/back-button'
 
+// Main Component
 const EditEventPage = async ({
   params,
 }: {
@@ -78,6 +81,9 @@ const EditEventPage = async ({
 
   return (
     <div className="my-12 p-6 lg:my-20">
+      {/* Back Button To Parent Page */}
+      <BackButton />
+      
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">
