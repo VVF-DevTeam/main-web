@@ -1,22 +1,39 @@
-import type { Metadata } from "next";
-import '../../app/globals.css'
-import { Toaster } from "@/components/ui/toaster";
-export const metadata: Metadata = {
-  title: "Viet Vibe Foundation",
-  description: "Viet Vibe Foundation",
-};
+// Libraries
+import type { Metadata } from 'next'
 
+// Components
+import { Toaster } from '@/components/ui/toaster'
+
+// CSS and CSS Modules
+import '@/lib/ui/css/globals.css'
+import '@/lib/ui/css/flex.css'
+import '@/lib/ui/css/bg.css'
+import '@/lib/ui/css/text.css'
+import '@/lib/ui/css/headers.css'
+import '@/lib/ui/css/grid.css'
+import '@/lib/ui/css/dimension.css'
+import '@/lib/ui/css/hover.css'
+import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
+import { roboto } from '@/lib/ui/fonts/Roboto'
+
+// Metadata
+export const metadata: Metadata = {
+  title: 'Viet Vibe Foundation',
+  description: 'Viet Vibe Foundation',
+}
+
+// Main Component
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`antialiased ${taipro.variable} ${roboto.variable}`}>
         <main>{children}</main>
         <Toaster />
       </body>
     </html>
-  );
+  )
 }

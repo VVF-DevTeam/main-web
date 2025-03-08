@@ -11,11 +11,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField } from '@/components/ui/form'
 
 interface EventEndDays {
   event: Event

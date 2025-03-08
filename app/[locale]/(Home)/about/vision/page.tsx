@@ -1,5 +1,7 @@
-import About from '@/app/[locale]/(Home)/_components/about'
+// Components
+import About from '@/app/[locale]/(Home)/about/_components/_vision/about'
 
+// Main Component
 const AboutPageVision = async ({
   params,
 }: {

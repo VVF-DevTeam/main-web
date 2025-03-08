@@ -1,7 +1,12 @@
+// Libraries
+import initTranslation from '@/app/i18n'
+
+// Components
 import ScheduleItem from './ScheduleItem'
 import { Button } from '@/components/ui/button'
-import initTranslation from '@/app/i18n'
 import Link from 'next/link'
+
+// Interfaces & Types
 import { EventSchedule } from '@prisma/client'
 interface ClassDescriptionProps {
   description: string
@@ -17,6 +22,7 @@ interface ClassDescriptionProps {
   schedules: EventSchedule[]
 }
 
+// Main Code
 const ClassDescription = async ({
   description,
   startDate,
@@ -76,11 +82,11 @@ const ClassDescription = async ({
         <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
           {t('headerAbout-guitar')}
         </h1>
-        <p>{t(description)}</p>
-        <p className="mt-2 text-muted-foreground">
+      <p>{t(description)}</p>
+        {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
           the reserve button below)
-        </p>
+        </p> */}
       </div>
 
       {/* Schedule */}

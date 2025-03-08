@@ -1,7 +1,11 @@
+// Libraries
 import React from 'react'
+
+// Components
 import { Post, PostLikes, PostVisits } from '@prisma/client'
 import PostCard from './PostCard'
 
+// Interfaces
 interface PostListProps {
   posts: (Pick<Post, 'id' | 'title' | 'createdAt' | 'imgUrl' | 'summary'> & {
     _count: { postLikes: number; postVisits: number }
@@ -11,9 +15,10 @@ interface PostListProps {
   userId: string | null
 }
 
+// Main Component
 const PostList = ({ posts, userId }: PostListProps) => {
   return (
-    <div className="mx-auto flex w-full max-w-[1500px] flex-col justify-center gap-y-12 px-6 py-12 md:gap-y-16 lg:px-8 xl:px-36">
+    <div className="width-max-default flex-col-center mx-auto gap-y-12 px-6 py-12 md:gap-y-16 lg:px-8 xl:px-36">
       {posts &&
         posts.map((post) => (
           <PostCard

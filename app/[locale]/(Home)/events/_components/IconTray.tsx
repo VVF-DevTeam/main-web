@@ -1,7 +1,11 @@
+// Libraries
 import React from 'react'
+
+// Components
 import CustomIcon from '@/app/[locale]/components/CustomIcon'
 import Link from 'next/link'
 
+// Interfaces
 interface IconTrayProps {
   iconList: {
     id: string
@@ -12,6 +16,7 @@ interface IconTrayProps {
   isLink?: boolean
 }
 
+// Component
 const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
   return (
     <div>
@@ -21,7 +26,7 @@ const IconTray = ({ iconList, isLink = false }: IconTrayProps) => {
             <Link
               href={icon.url}
               key={icon.id}
-              className="transition-all hover:scale-110 hover:text-[#EFB9A2] hover:shadow-md"
+              className="hover-focus-zoomIn duration-100 hover:text-textColor-brandLight hover:shadow-md"
             >
               <CustomIcon src={icon.icon} height={30} width={30} />
             </Link>

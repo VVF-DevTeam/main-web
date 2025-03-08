@@ -64,7 +64,7 @@ const PostPage = async ({ params }: PostPageProps) => {
       <Link href="/posts" className="p-6">
         <Button
           variant={'ghost'}
-          className="flex items-center gap-x-2 bg-[#C54B3E] text-slate-50 transition-all hover:bg-[#C54B3E]/70 hover:text-slate-200"
+          className="flex items-center gap-x-2 bg-bgColor-brand text-textColor-white transition-all hover:bg-bgColor-brand/70 hover:text-slate-200"
         >
           <ArrowLeft className="h-6 w-6" />
           Go back

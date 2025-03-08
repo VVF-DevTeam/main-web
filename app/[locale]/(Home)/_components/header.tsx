@@ -1,15 +1,20 @@
 'use client'
+
+// Components
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useToast } from '@/hooks/use-toast'
 import { Mail, Copy, Globe } from 'lucide-react'
+
+// Libraries
+import { useToast } from '@/hooks/use-toast'
 import LanguageChanger from '@/components/translator/LanguageChanger'
 import React from 'react'
 
+// Main Component
 const Header = () => {
   const { toast } = useToast()
 
@@ -21,10 +26,10 @@ const Header = () => {
   }
 
   return (
-    <div className="flex h-[40px] w-full flex-row items-center justify-between bg-[#2E2E2E] px-8 text-slate-300">
+    <div className="flex-between text-textColor-white bg-bgColor-blackLight h-[60px] w-full px-8">
       <div className="flex gap-x-2">
-        <TooltipProvider>
-          <Tooltip>
+        {/* <TooltipProvider>
+          <Tooltip> */}
             {/* <TooltipTrigger asChild>
               <button
                 type="button"
@@ -36,29 +41,30 @@ const Header = () => {
                 <span>{'+1 (778) 583-7088'}</span>
               </button>
             </TooltipTrigger> */}
-            <TooltipContent className="bg-[#1B171A]">
-              <p className="flex gap-x-2 text-sm text-[#EFB9A2]">
+            {/* <TooltipContent>
+              <p className="flex gap-x-2 text-sm text-textColor-brand">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider> */}
 
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="group flex items-center gap-x-2 rounded-md p-1 hover:text-[#EFB9A2] focus:outline-none focus:ring-2 focus:ring-[#EFB9A2] focus:ring-offset-2"
+                className="flex-center gap-x-2 rounded-md p-1 hover:text-textColor-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2"
                 onClick={() => handleClick('info@vietvibe.org')}
                 aria-label="Copy email address to clipboard"
+                aria-live="polite"
               >
                 <Mail className="h-5 w-5" /> <span>info@vietvibe.org</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent className="bg-[#1B171A]">
-              <p className="flex gap-x-2 text-sm text-[#EFB9A2]">
+            <TooltipContent className="bg-bgColor-black">
+              <p className="flex gap-x-2 text-sm text-textColor-brand-light">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
@@ -68,8 +74,8 @@ const Header = () => {
       </div>
 
       {/* LanguageChanger: Top-Right Corner */}
-      <div className="flex items-center gap-x-2 rounded-md pl-7">
-        <Globe className="h-5 w-5 text-[#f7f0f0]" />
+      <div className="flex-center gap-x-2 pl-7">
+        <Globe className="h-5 w-5" />
         <LanguageChanger />
       </div>
     </div>

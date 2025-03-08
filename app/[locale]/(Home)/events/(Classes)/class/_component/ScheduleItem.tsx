@@ -1,5 +1,7 @@
+// Libraries
 import initTranslation from '@/app/i18n'
 
+// Interfaces
 interface ScheduleItemProps {
   startTime: string
   endTime: string
@@ -7,6 +9,7 @@ interface ScheduleItemProps {
   locale: string
 }
 
+// Main Code
 const ScheduleItem = async ({
   startTime,
   endTime,

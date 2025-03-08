@@ -1,12 +1,16 @@
-import EventList from './_components/EventList'
+// Libraries
 import { prisma } from '@/lib/db'
+import { adminCheck } from '@/lib/dbQueries/adminCheck'
+
+// Components
+import EventList from './_components/EventList'
 import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
-import { adminCheck } from '@/lib/utilFunctions/adminCheck'
 
 // import { Suspense } from 'react'
 
+// Main Component
 const EventsPage = async ({
   params,
 }: {

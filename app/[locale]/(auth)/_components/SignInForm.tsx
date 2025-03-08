@@ -54,7 +54,7 @@ const SignInForm = () => {
 
   useEffect(() => {
     // Redirect to home page if the user is already logged in
-    if (shouldRedirect === false) {
+    if (!shouldRedirect) {
       return
     }
     redirect('/')
@@ -72,7 +72,7 @@ const SignInForm = () => {
     try {
       const response: ServerActionResponse = await signinAction(data)
 
-      if (response.success === true) {
+      if (response.success) {
         toast({
           variant: 'default',
           title: 'Success',
@@ -99,30 +99,34 @@ const SignInForm = () => {
 
   return (
     <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
-      {/* form header */}
-      <div className="mb-24 flex items-center gap-x-4 lg:mb-32">
+
+      {/* Form Header */}
+      <div className="flex-center header-font-black mb-24 gap-x-4 lg:mb-36">
         <CustomIcon height={100} width={100} />
         <h1 className="text-3xl">Viet Vibe Foundation</h1>
       </div>
-      <h1 className="text-4xl font-semibold text-[#C54B3E]">{t('login')}</h1>
-      <p className="mt-8 text-lg text-muted-foreground">
+      <h1 className="header-font-default text-4xl font-semibold text-textColor-brand">
+        {t('login')}
+      </h1>
+      <p className="mt-8 text-base text-muted-foreground">
         {t('description-signIn')}
       </p>
       <Separator className="my-4 h-[1px] w-full bg-gray-300" />
-      {/* form */}
+
+      {/* Form */}
       <div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-4 grid grid-cols-1 gap-y-8 pb-8 pt-2"
+            className="mt-4 flex flex-col default-gap pb-6"
           >
-            {/* email */}
+            {/* Email */}
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg text-[#C54B3E]">
+                  <FormLabel className="header-font-default text-lg text-textColor-brand">
                     {t('email')}
                   </FormLabel>
                   <FormControl>
@@ -130,7 +134,7 @@ const SignInForm = () => {
                       placeholder="JoeSmith@gmail.com"
                       type="email"
                       {...field}
-                      className="text-[#1B171A] lg:max-w-[360px]"
+                      className="text-textColor lg:max-w-[360px]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -138,7 +142,7 @@ const SignInForm = () => {
               )}
             />
 
-            {/* password */}
+            {/* Password */}
             <FormField
               control={form.control}
               name="password"
@@ -146,22 +150,23 @@ const SignInForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="password"
-                    className="text-lg text-[#C54B3E]"
+                    className="header-font-default text-lg text-textColor-brand"
                   >
                     {t('password')}
                   </FormLabel>
                   <FormControl>
-                    <div className="relative max-w-[360px]">
+                    <div className="relative lg:max-w-[360px]">
                       <Input
-                        type={showPassword ? 'password' : 'text'}
-                        placeholder="Enter your password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter password"
                         {...field}
-                        className="text-[#1B171A] lg:max-w-[360px]"
+                        className="text-textColor lg:max-w-[360px]"
                       />
                       <Button
                         variant="ghost"
                         size={'icon'}
                         type="button"
+                        aria-label="Toggle password visibility"
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -174,21 +179,22 @@ const SignInForm = () => {
               )}
             />
 
-            <div className="mt-6 flex flex-col gap-y-4 self-stretch">
+            {/* Submit & Other Actions */}
+            <div className="mt-6 flex-center flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="w-full bg-[#C54B3E] font-[600] text-white transition-all hover:scale-105 hover:bg-[#C54B3E]/80"
+                className="w-full bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"
               >
                 {t('login')}
               </Button>
               {/* <p className="text-center text-sm font-bold">OR</p> */}
               <ProviderButtons />
-              <p className="text-center text-sm font-bold">OR</p>
-              <p className="text-center text-sm">
+              <p className="text-sm font-bold">OR</p>
+              <p className="text-sm">
                 {t('noAccount')}{' '}
                 <Link
                   href="/signUp"
-                  className="text-[#C54B3E] decoration-2 transition-all hover:underline hover:opacity-80"
+                  className="text-textColor-brand decoration-2 transition-all hover:underline hover:text-textColor-brand/70"
                 >
                   {t('signUp')}
                 </Link>

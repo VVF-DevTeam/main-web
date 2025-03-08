@@ -1,30 +1,34 @@
-
-import { Button } from '@/components/ui/button'
+// Libraries
 import initTranslation from '@/app/i18n'
-import Link from 'next/link'
 
+// Components
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+
+//Interfaces
 interface IntroDescriptionProps {
   title: string
   description: string
   locale: string
 }
 
-const IntroDescription = async({ title, description, locale }: IntroDescriptionProps) => {
+// Main Component
+const IntroDescription = async ({
+  title,
+  description,
+  locale,
+}: IntroDescriptionProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="my-auto flex basis-1/2 flex-col gap-y-8 pr-6 text-center text-[20px] font-light md:max-w-96 md:text-left">
-      <h1 className="text-3xl font-bold tracking-wide text-[#3d3a3a]">
+    <div className="flex-col-center text-place-default default-gap pr-6 md:max-w-96">
+      <h1 className="text-3xl font-bold tracking-wide text-textColor">
         {t(title)}
       </h1>
-      <div className="flex flex-col gap-y-6">
-        <p className="text-sm text-gray-700">{t(description)}</p>
-      </div>
-      <Link href={'/events'}>
-        <Button className="bg-[#C54B3E] p-3 text-sm font-semibold text-white">
-          {t('button-introduction')}
-        </Button>
+      <p className="text-sm text-textColor">{t(description)}</p>
+      <Link href={'/events'} className="md:place-self-start">
+        <Button variant={'default'}>{t('button-introduction')}</Button>
       </Link>
     </div>
   )

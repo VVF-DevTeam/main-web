@@ -63,14 +63,14 @@ const PostImage = ({ post }: PostImageProps) => {
   }
 
   return (
-    <div className="mt-4 flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <div className="mt-4 w-full flex-col-default rounded-md bg-bgColor-gray/10 px-4 py-6">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Image</h1>
         <button
           onClick={() => setEditing(!editing)}
           className={cn(
-            'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-[#C54B3E] hover:text-slate-700'
+            'text-sm font-semibold text-textColor-gray transition-all hover:text-textColor-brand',
+            !editing && 'text-textColor-brand hover:text-textColor-gray'
           )}
         >
           {editing ? (
@@ -104,7 +104,7 @@ const PostImage = ({ post }: PostImageProps) => {
           </form>
         </Form>
       ) : !post?.imgUrl ? (
-        <p className="text-sm italic text-muted-foreground text-slate-500">
+        <p className="text-sm italic text-textColor-gray">
           Add an image for this post.
         </p>
       ) : (

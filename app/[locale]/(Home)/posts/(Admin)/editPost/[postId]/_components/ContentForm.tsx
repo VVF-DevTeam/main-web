@@ -64,20 +64,20 @@ const PostContent = ({ post }: PostContentProps) => {
   }
 
   return (
-    <div className="mt-4 flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <div className="mt-4 w-full flex-col-default rounded-md bg-bgColor-gray/10 px-4 py-6">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Content</h1>
         <button
           onClick={() => setEditing(!editing)}
           className={cn(
-            'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-[#C54B3E] hover:text-slate-700'
+            'text-sm font-semibold text-textColor-gray transition-all hover:text-textColor-brand',
+            !editing && 'text-textColor-brand hover:text-textColor-gray'
           )}
         >
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Content <Pencil className="h-4 w-4" />
             </span>
           )}
@@ -105,11 +105,11 @@ const PostContent = ({ post }: PostContentProps) => {
           </form>
         </Form>
       ) : !post?.content ? (
-        <p className="text-sm italic text-muted-foreground text-slate-500">
+        <p className="text-sm italic text-textColor-gray">
           Add content for this post.
         </p>
       ) : (
-        <div className="h-fit text-slate-700">
+        <div className="h-fit text-textColor-black/50">
           <TextPreview value={post?.content} />
         </div>
       )}

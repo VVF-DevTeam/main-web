@@ -1,10 +1,15 @@
 'use client'
+
+// Libraries
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+
+//Components
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
 
+// Interfaces & Types
 interface ImageCarouselProps {
   imageUrls: {
     id: string
@@ -15,8 +20,9 @@ interface ImageCarouselProps {
   autoSlide?: boolean
   duration?: number
 }
-
 type Direction = 'left' | 'right'
+
+// Main Component
 const ImageCarousel = ({
   imageUrls,
   autoSlide = false,
@@ -27,7 +33,7 @@ const ImageCarousel = ({
   const [imageIndex, setImageIndex] = useState(0)
   const changeImage = (direction: Direction) => {
     let newIndex = 0
-    console.log('usecallback called')
+
     if (direction === 'left') {
       newIndex = imageIndex === 0 ? imageUrls.length - 1 : imageIndex - 1
     }
@@ -42,7 +48,7 @@ const ImageCarousel = ({
     if (!autoSlide) {
       return
     }
-    console.log('useEffect called')
+
     const timer = setTimeout(() => {
       changeImage('right')
     }, duration)
@@ -55,12 +61,15 @@ const ImageCarousel = ({
   const totalwidth = `${imageUrls.length * 100}vw`
 
   return (
-    <div className="mt-12 md:mt-16 lg:mt-24">
-      <div className="flex flex-col items-center justify-center">
-        <span className="mb-7 flex py-6 font-[Poppins] text-4xl font-semibold italic leading-[3rem] tracking-wider text-[#3d3a3a]">
+    <div>
+      {/* Title & Separator */}
+      <div className="flex-col-center default-gap lg:mt-6">
+        <span className="header-font-black header-sub mb-7 py-6 italic">
           {t('header-achievement')}
         </span>
       </div>
+
+      {/* Image Carousel */}
       <div className="relative h-[75vh] w-[400vw]">
         <div className="flex h-full w-full items-center">
           {imageUrls.map((img) => (
@@ -82,22 +91,24 @@ const ImageCarousel = ({
             </div>
           ))}
         </div>
-        <div className="absolute inset-0 z-20 flex h-full max-w-[100vw] items-center justify-between px-4">
+
+        {/* Navigation Buttons */}
+        <div className="flex-between absolute inset-0 z-20 h-full max-w-[100vw] px-4">
           <button aria-label="prev-image">
             <ArrowLeft
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
+              className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight"
               onClick={() => changeImage('left')}
             />
           </button>
           <button aria-label="next-image">
             <ArrowRight
-              className="h-11 w-11 rounded-full bg-[#1B171A] p-2 text-[#EFB9A2] transition-all hover:bg-[#EFB9A2] hover:text-[#C54B3E]"
+              className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight"
               onClick={() => changeImage('right')}
             />
           </button>
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-1/2 bg-[#7f0000]" />
+      <Separator className="mx-auto mt-12 w-2/3 md:w-1/2 bg-bgColor-brand" />
     </div>
   )
 }

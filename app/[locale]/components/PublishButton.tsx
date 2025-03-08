@@ -44,7 +44,7 @@ const PublishButton = ({
   return (
     <Button
       onClick={() => publishOrUnpublish(action)}
-      variant={'default'}
+      variant={'black'}
       disabled={!canPublish}
     >
       {action}

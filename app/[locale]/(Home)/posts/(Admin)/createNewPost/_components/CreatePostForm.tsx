@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { z } from 'zod'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -25,7 +25,6 @@ interface CreatePostFormProps {
   author: string
 }
 const CreatePostForm = ({ author }: CreatePostFormProps) => {
-  
   const { toast } = useToast()
   const router = useRouter()
 
@@ -56,18 +55,34 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast({
+            variant: 'destructive',
+            title: 'Duplicate Post',
+            description: 'There is already a post with this title',
+          })
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error making request to database',
+            description: 'Something went wrong. Please contact the admin',
+          })
+        }
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Something went wrong. Please contact the admin',
+        })
+      }
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-y-8">
-      <div className="flex flex-col items-center gap-y-2">
-        <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
+    <div className="flex-col-center default-gap">
+      <div className="flex-col-center gap-y-2">
+        <h1 className="header-text header mb-2 font-semibold">
           Give a title to your post
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -86,11 +101,13 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#C54B3E]">Post Title</FormLabel>
+                <FormLabel className="text-textColor-brand">
+                  Post Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
-                    className="w-80 text-[#1B171A] xl:max-w-[400px]"
+                    className="w-80 text-textColor xl:max-w-[400px]"
                     {...field}
                   />
                 </FormControl>
@@ -101,10 +118,10 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
           />
           <div className="flex gap-x-6">
             <Button
-              variant={'outline'}
+              variant={'default'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-[#C54B3E] font-bold text-white hover:bg-[#C54B3E]/90 hover:text-white/90"
+              className="text-md max-w-fit"
               type="submit"
             >
               Create Post

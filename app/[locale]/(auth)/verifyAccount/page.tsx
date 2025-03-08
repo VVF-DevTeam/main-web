@@ -1,8 +1,15 @@
 'use client'
+
+// Libraries
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/verifyToken'
+
+// Components
 import ClipLoader from 'react-spinners/ClipLoader'
+import Image from 'next/image'
+
+// CSS & CSS Modules
 
 type VerifyTokenResponse = {
   message: string
@@ -46,19 +53,29 @@ const VerifyAccountPage = () => {
   }, [])
 
   return (
-    <div className="flex min-h-screen justify-center">
-      <div className="my-24 flex min-w-56 max-w-lg flex-col items-center justify-center rounded-md bg-[#bfbebe] bg-[url(/bg/cave-water-blur.jpg)] bg-cover bg-center p-8 bg-blend-overlay shadow-lg">
+    <div className="flex-center relative min-h-screen">
+      {/* NextJS Image and Dark Overlay */}
+      <div className="white-overlay"></div>
+      <Image
+        src="https://drive.google.com/thumbnail?id=1K6J4-M-RqxqJU7Z6YL1yxOhZ8h65nIHE&sz=w1000"
+        alt="Intro"
+        className="next-background"
+        fill
+        priority
+      />
+
+      <div className="flex-col-center mx-10 my-24 max-w-lg rounded-md bg-white p-8 shadow-lg">
         {loading ? (
           <ClipLoader
             loading={loading}
             size={50}
             aria-label="Loading Spinner"
             data-testid="loader"
-            color="white"
+            color="black"
           />
         ) : (
           <div
-            className={`w-full rounded-md px-6 py-4 text-center ${
+            className={`rounded-md px-6 py-4 text-center ${
               error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
             }`}
           >

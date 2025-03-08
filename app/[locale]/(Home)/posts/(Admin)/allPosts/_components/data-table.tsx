@@ -40,7 +40,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
-    }
+    },
   })
 
   return (
@@ -51,8 +51,18 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const isSorted = header.column.getIsSorted()
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      aria-sort={
+                        isSorted
+                          ? isSorted === 'asc'
+                            ? 'ascending'
+                            : 'descending'
+                          : 'none'
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -95,7 +105,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex-end space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"
