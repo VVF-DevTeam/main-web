@@ -30,7 +30,6 @@ export const columns: ColumnDef<Event>[] = [
     accessorKey: 'eventType',
     header: () => <div className="text-center font-semibold">Event Type</div>,
     cell: ({ row }) => {
-      console.log(row)
       const content = (row.getValue('eventType') as string) || null
       return (
         <div className="text-center">

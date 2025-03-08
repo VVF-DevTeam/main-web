@@ -70,7 +70,7 @@ const ImageCarousel = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="relative h-[75vh] w-[400vw]">
+      <div className="relative h-[50vh] w-[400vw] md:h-[60vh] xl:h-[70vh]">
         <div className="flex h-full w-full items-center">
           {imageUrls.map((img) => (
             <div
@@ -108,7 +108,7 @@ const ImageCarousel = ({
           </button>
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-2/3 md:w-1/2 bg-bgColor-brand" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
     </div>
   )
 }

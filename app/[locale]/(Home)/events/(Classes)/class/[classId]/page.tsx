@@ -7,8 +7,8 @@ import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 
 export async function generateMetadata({
-                                         params,
-                                       }: {
+  params,
+}: {
   params: Promise<{ classId: string }>
 }): Promise<Metadata> {
   const { classId } = await params

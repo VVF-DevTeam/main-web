@@ -17,7 +17,7 @@ const Contact = async ({ locale }: ContactProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="h-[60vh] w-full bg-bgColor-brandLighter">
+    <div className="h-[30vh] w-full bg-bgColor-brandLighter">
       <div className="flex-col-center h-full w-full gap-y-14 lg:gap-y-20">
         <h2 className="header-sub cursor-default text-center text-bgColor-blackLight lg:text-5xl">
           {t('header-contactUs')}
