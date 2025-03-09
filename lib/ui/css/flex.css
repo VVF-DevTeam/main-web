@@ -24,6 +24,10 @@
   @apply flex flex-col items-center justify-center;
 }
 
+.flex-center-md {
+  @apply md:flex md:items-center md:justify-center;
+}
+
 /* flex between */
 .flex-between {
   @apply flex items-center justify-between;

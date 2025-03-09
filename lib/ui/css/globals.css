@@ -66,4 +66,19 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  @import '@/lib/ui/css/flex.css';  
+}
+
+@layer components {
+  @import '@/lib/ui/css/bg.css';
+  @import '@/lib/ui/css/text.css';
+  @import '@/lib/ui/css/headers.css';
+  @import '@/lib/ui/css/grid.css';
+  @import '@/lib/ui/css/dimension.css';
+}
+
+@layer utilities {
+  @import '@/lib/ui/css/hover.css';
+  /* @import '@/lib/ui/css/scroll.css'; For scroll animation, please import to specific component as it is not a commonly used utility */
 }

@@ -1,0 +1,64 @@
+.scroll-opacity-default {
+  opacity: 0;
+}
+
+p,
+h1 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+p {
+  font-size: 1.5rem;
+  line-height: 1.5;
+}
+
+.scroll-animation-fromRight {
+  view-timeline: --subjectReveal block;
+  animation-timeline: --subjectReveal;
+
+  animation-name: appear-fromRight;
+  animation-range-start: entry 60%; /* animation start when the object enter the viewport 60% */
+  animation-range-end: cover 50%; /* animation end at 50% of the viewport */
+  animation-fill-mode: forwards;
+  animation-duration: 100ms; /* Firefox requires this to apply the animation */
+}
+
+@keyframes appear-fromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.scroll-animation-fromLeft {
+    view-timeline: --subjectReveal block;
+    animation-timeline: --subjectReveal;
+  
+    animation-name: appear-fromLeft;
+    animation-range-start: entry 60%; /* animation start when the object enter the viewport 60% */
+    animation-range-end: cover 50%; /* animation end at 50% of the viewport */
+    animation-fill-mode: forwards;
+    animation-duration: 100ms; /* Firefox requires this to apply the animation */
+  }
+  
+  @keyframes appear-fromLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+  
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  

@@ -14,6 +14,7 @@ interface NavAboutProps {
   title: string
   vision: string
   directors: string
+  founders: string
   mode: screenSize
   currentPath?: string
 }
@@ -23,6 +24,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
   title,
   vision,
   directors,
+  founders,
   mode,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -106,6 +108,18 @@ const NavAbout: React.FC<NavAboutProps> = ({
           onClick={() => setIsOpen(!isOpen)}
         >
           {directors}
+        </Link>
+        <Link
+          href="/about/founders"
+          className={classNames(
+            'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:rounded-md hover:bg-gray-100',
+            mode === 'desktop'
+              ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
+              : 'text-xl text-[#1B171A] hover:text-blue-500'
+          )}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {founders}
         </Link>
       </div>
     </div>
