@@ -42,6 +42,7 @@ const PostImage = ({ post }: PostImageProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof PostImageSchema>) => {
+    console.log(values)
     try {
       await axios.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)

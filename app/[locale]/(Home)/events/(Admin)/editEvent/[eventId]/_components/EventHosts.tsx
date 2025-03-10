@@ -56,6 +56,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
           hostIds: hostIds,
         }
       )
+      console.log(response)
       setHosts([])
       toast({
         title: 'Success',
@@ -78,6 +79,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
           data: { hostId: hostId },
         }
       )
+      console.log(response)
       toast({
         title: 'Success',
         description: 'Host deleted successfully',

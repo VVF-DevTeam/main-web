@@ -76,6 +76,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           startDate={publishedClass.startDate!}
           hosts={publishedClass.hosts}
           title={publishedClass.title}
+          formLink={publishedClass.formLink!}
           locale={locale}
         />
         <ClassDescription
@@ -89,6 +90,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           hosts={publishedClass.hosts}
           schedules={publishedClass.schedules}
           days={publishedClass.days!}
+          formLink={publishedClass.formLink!}
           locale={locale}
         />
       </div>

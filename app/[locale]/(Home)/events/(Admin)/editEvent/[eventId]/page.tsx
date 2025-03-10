@@ -19,6 +19,7 @@ import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
+import EventFormLink from './_components/EventFormLink'
 import BackButton from '@/components/ui/back-button'
 
 // Main Component
@@ -28,7 +29,10 @@ const EditEventPage = async ({
   params: Promise<{ eventId: string }>
 }) => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+  if (
+    !(await roleCheck({ role: 'ADMIN' })) &&
+    !(await roleCheck({ role: 'HOST' }))
+  ) {
     return redirect('/events')
   }
 
@@ -74,6 +78,7 @@ const EditEventPage = async ({
     !!event.startDate,
     !!event.endDate,
     !!event.startTime,
+    !!event.formLink,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
     event.schedules.length === 0 ? false : true,
@@ -89,7 +94,7 @@ const EditEventPage = async ({
     <div className="my-12 p-6 lg:my-20">
       {/* Back Button To Parent Page */}
       <BackButton />
-      
+
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -227,6 +232,14 @@ const EditEventPage = async ({
               <span className="text-gray-500">Step XIV :</span> Event Categories
             </h2>
             <EventCategories event={event} categories={categories} />
+          </div>
+
+          {/* Event Registration Form Link */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XV :</span> Event Registration Form
+            </h2>
+            <EventFormLink event={event} />
           </div>
         </div>
       </div>

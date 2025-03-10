@@ -20,6 +20,7 @@ interface ClassDescriptionProps {
   hosts: { name: string | null }[]
   locale: string
   days: string[]
+  formLink: string
   schedules: EventSchedule[]
 }
 
@@ -34,6 +35,7 @@ const ClassDescription = async ({
   endDate,
   locale,
   days,
+  formLink,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -113,13 +115,13 @@ const ClassDescription = async ({
       </div>
 
       {/* Buy Button */}
-      {/* <Link
-        href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
+      <Link
+        href={formLink}
         target="_blank"
         rel="noopener noreferrer"
       >
         <Button>{t('reserve-button')}</Button>
-      </Link> */}
+      </Link>
     </div>
   )
 }

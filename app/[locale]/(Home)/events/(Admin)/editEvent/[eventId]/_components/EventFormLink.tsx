@@ -20,29 +20,29 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 
-interface EventTitleProps {
+interface EventFormLinkProps {
   event: Event
 }
 
-const EventTitileSchema = z.object({
-  title: z
+const EventFormLinkSchema = z.object({
+  formLink: z
     .string()
-    .min(6, { message: 'Event title must be at least 6 characters' }),
+    .url({ message: 'Invalid URL format' }),
 })
 
-const EventTitle = ({ event }: EventTitleProps) => {
+const EventTitle = ({ event }: EventFormLinkProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof EventTitileSchema>>({
-    resolver: zodResolver(EventTitileSchema),
+  const form = useForm<z.infer<typeof EventFormLinkSchema>>({
+    resolver: zodResolver(EventFormLinkSchema),
     defaultValues: {
-      title: event.title || '',
+        formLink: event.formLink || '',
     },
   })
 
-  const onSubmit = async (data: z.infer<typeof EventTitileSchema>) => {
+  const onSubmit = async (data: z.infer<typeof EventFormLinkSchema>) => {
     try {
       const response = await axios.put(`/api/events/edit/${event.id}`, data)
       toast({
@@ -66,13 +66,13 @@ const EventTitle = ({ event }: EventTitleProps) => {
   return (
     <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold">Event Title</h3>
+        <h3 className="text-lg font-bold">Event Registration Form Link</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
           className={cn(
             isEditing
-              ? 'text-gray-700 transition-all font-semibold duration-75 hover:text-red-700'
+              ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
               : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
           )}
         >
@@ -93,7 +93,7 @@ const EventTitle = ({ event }: EventTitleProps) => {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
-                  name="title"
+                  name="formLink"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
@@ -113,12 +113,12 @@ const EventTitle = ({ event }: EventTitleProps) => {
               </form>
             </Form>
           </>
-        ) : !event.title ? (
+        ) : !event.formLink ? (
           <p className="italic text-muted-foreground text-slate-500">
-            Add a title for this event.
+            Add a link to registration form for this event.
           </p>
         ) : (
-          <p className="text-muted-foreground">{event.title}</p>
+          <p className="text-muted-foreground">{event.formLink}</p>
         )}
       </div>
     </div>

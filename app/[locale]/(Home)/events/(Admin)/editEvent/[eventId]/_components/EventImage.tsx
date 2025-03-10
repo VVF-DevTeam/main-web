@@ -42,6 +42,7 @@ const EventImage = ({ event }: EventImageProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventImageSchema>) => {
+    console.log(values)
     try {
       await axios.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)

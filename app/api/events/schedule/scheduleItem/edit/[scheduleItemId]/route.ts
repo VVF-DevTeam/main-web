@@ -22,6 +22,7 @@ export const PUT = async (
         { status: 404 }
       )
     }
+    console.log(scheduleItemExists)
     // Update the data in the item and save it.
     const updatedItem = await prisma.eventSchedule.update({
       where: {

@@ -45,6 +45,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventDescriptionSchema>) => {
+    console.log(values)
     try {
       await axios.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)

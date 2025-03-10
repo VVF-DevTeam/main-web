@@ -49,6 +49,7 @@ const createEventSchema = z.object({
 
 // Main Component
 const CreateEventForm = ({ author }: CreateEventFormProps) => {
+  console.log(author)
   const { toast } = useToast()
   const router = useRouter()
 
