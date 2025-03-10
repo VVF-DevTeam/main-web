@@ -64,7 +64,6 @@ const ScheduleItem = ({
       const response = await axios.delete(
         `/api/events/schedule/scheduleItem/delete/${itemId}`
       )
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',
@@ -91,7 +90,6 @@ const ScheduleItem = ({
         `/api/events/schedule/scheduleItem/add`,
         data
       )
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',
@@ -122,7 +120,6 @@ const ScheduleItem = ({
           data
         )
       }
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',

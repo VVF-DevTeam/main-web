@@ -61,7 +61,6 @@ const EventDays = ({ event }: EventEndDays) => {
   const onSubmit = async (data: z.infer<typeof EventDaysSchema>) => {
     try {
       const response = await axios.put(`/api/events/edit/${event.id}`, data)
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',

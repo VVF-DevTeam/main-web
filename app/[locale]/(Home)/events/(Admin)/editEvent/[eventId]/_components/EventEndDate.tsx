@@ -62,7 +62,6 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
     // Save the end date
     try {
       const response = await axios.put(`/api/events/edit/${event.id}`, data)
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',

@@ -46,7 +46,7 @@ const ScheduleItem = async ({
   return (
     <div className="flex min-w-full gap-x-24 border-b-2 border-gray-500 py-6">
       {/* Time */}
-      <div className="flex flex-col">
+      <div className="flex flex-col text-nowrap">
         <span>
           {startTime} - {endTime}
         </span>

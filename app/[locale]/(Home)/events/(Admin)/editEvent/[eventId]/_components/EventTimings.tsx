@@ -50,7 +50,6 @@ const EventTimings = ({ event }: EventTimingsProps) => {
         title: 'Success',
         description: 'Event Timings updated successfully',
       })
-      console.log(response)
       setIsEditing(false)
       router.refresh()
     } catch (error) {

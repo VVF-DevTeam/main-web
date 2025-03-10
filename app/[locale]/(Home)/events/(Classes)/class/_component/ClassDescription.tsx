@@ -113,13 +113,13 @@ const ClassDescription = async ({
       </div>
 
       {/* Buy Button */}
-      <Link
+      {/* <Link
         href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
         target="_blank"
         rel="noopener noreferrer"
       >
         <Button>{t('reserve-button')}</Button>
-      </Link>
+      </Link> */}
     </div>
   )
 }

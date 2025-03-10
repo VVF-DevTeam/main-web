@@ -49,7 +49,6 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
         title: 'Success',
         description: 'Event Start Date updated successfully',
       })
-      console.log(response)
       setIsEditing(false)
       router.refresh()
     } catch (error) {

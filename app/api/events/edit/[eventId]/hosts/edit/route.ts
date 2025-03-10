@@ -20,7 +20,6 @@ export const PUT = async (
     }
 
     // Add the hosts to the event
-    console.log('first')
     const updatedEvent = await prisma.event.update({
       where: {
         id: eventId,
@@ -60,7 +59,6 @@ export const DELETE = async (
     }
 
     // Add the hosts to the event
-    console.log('second')
     const updatedEvent = await prisma.event.update({
       where: {
         id: eventId,

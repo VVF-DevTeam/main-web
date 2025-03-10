@@ -50,7 +50,6 @@ const EventTitle = ({ event }: EventTitleProps) => {
         title: 'Success',
         description: 'Event title updated successfully',
       })
-      console.log(response)
       setIsEditing(false)
       router.refresh()
     } catch (error) {

@@ -65,7 +65,6 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
         `/api/events/edit/${event.id}/categories/edit`,
         data
       )
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',
@@ -94,7 +93,6 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
         `/api/events/edit/${event.id}/categories/edit/`,
         { data: { categoryId: tagId } }
       )
-      console.log(response)
       toast({
         variant: 'default',
         title: 'Success',
