@@ -1,6 +1,7 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
 
 // Components
 import PublishButton from '@/app/[locale]/components/PublishButton'
@@ -26,6 +27,11 @@ const EditEventPage = async ({
 }: {
   params: Promise<{ eventId: string }>
 }) => {
+  // check if the current user is an admin to allow access to the post control page
+  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+    return redirect('/events')
+  }
+
   const { eventId } = await params
   // Fetch the Event data
   const event = await prisma.event.findUnique({

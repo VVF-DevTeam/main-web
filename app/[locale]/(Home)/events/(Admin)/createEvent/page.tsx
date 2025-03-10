@@ -8,7 +8,7 @@ import CreateEventForm from '../_components/CreateEvent'
 // Main Component
 const CreateEventPage = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' }))) {
+  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
     return redirect('/events')
   }
 
