@@ -5,6 +5,7 @@ import initTranslation from '@/app/i18n'
 import ScheduleItem from './ScheduleItem'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import TextPreview from '@/app/[locale]/components/TextPreview'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
@@ -59,16 +60,17 @@ const ClassDescription = async ({
           </p>
           <p>
             {t('timeHeader-guitar')}:{' '}
-            {days.map((day) => t(day).toLowerCase()).join(', ')}{' '}
+            {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
             {t('everyWeek')}, {startTime} - {endTime}
           </p>
           <p>
-            {location} ({t('TBD')})
+            {t('location')}: {location}
           </p>
         </div>
+
         <div>
           <iframe
-            src="https://www.google.com/maps/d/u/5/embed?mid=1pqdfvsCcNlRJQx5ZQfFsx7TFghOn44o&ehbc=2E312F"
+            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
             title="VVF Beginner Guitar Lesson"
             width="300"
             height="250"
@@ -82,7 +84,9 @@ const ClassDescription = async ({
         <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
           {t('headerAbout-guitar')}
         </h1>
-      <p>{t(description)}</p>
+        <div className="mt-4 w-full text-pretty">
+          <TextPreview value={description} />
+        </div>
         {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
           the reserve button below)

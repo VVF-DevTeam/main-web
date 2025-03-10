@@ -72,7 +72,7 @@ const Founder = async ({ params }: { params: Promise<{ locale: string }> }) => {
       </div>
 
       {/* Founding Story */}
-      <div className="flex-col-center md:gap-y-30 gap-y-20 border-black pl-5 max-md:border-l-2 lg:gap-y-40">
+      <div className="flex-col-center md:gap-y-30 gap-y-20 border-black pl-5 max-md:border-l-2 lg:gap-y-40"> {/* Timeline border for small screens */}
         {foundingStory.map((story) => (
           <FounderStoryCard key={story.id} locale={locale} {...story} />
         ))}

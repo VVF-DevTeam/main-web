@@ -1,14 +1,15 @@
 // Components
 import ClassImage from '../_component/ClassImage'
 import ClassDescription from '../_component/ClassDescription'
+import BackButton from '@/components/ui/back-button'
 
 // Libraries
 import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 
 export async function generateMetadata({
-                                         params,
-                                       }: {
+  params,
+}: {
   params: Promise<{ classId: string }>
 }): Promise<Metadata> {
   const { classId } = await params
@@ -67,6 +68,8 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   return (
     <div>
       <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
+        <BackButton />
+
         <ClassImage
           imageUrl={publishedClass.imgUrl!}
           location={publishedClass.location!}

@@ -20,7 +20,7 @@ const FounderStoryDescription = async ({
 
   return (
     <div className="flex-col-center my-auto gap-y-8">
-      <div className="flex-col-center gap-y-6 text-center tracking-wide text-textColor lg:text-pretty">
+      <div className="flex-col-center gap-y-6 text-center tracking-wide text-textColor lg:text-pretty lg:text-lg">
         <p
           className={cn(
             'scroll-opacity-default',

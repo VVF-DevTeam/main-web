@@ -26,7 +26,7 @@ const ClassImage = async ({
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid">
+    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid pt-20">
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
         <Image
           src={imageUrl}

@@ -31,8 +31,10 @@ const FounderStoryCard = async ({
           />
 
           <div className="flex-center-md relative h-full w-full">
+            {/* Dots */}
             <div className="absolute top-1/2 z-10 box-content h-2 w-2 rounded-full border-[5px] border-primary-foreground/95 bg-foreground max-md:left-[-30px]" />
-            {/* gap-y-20 md:gap-y-30 lg:gap-y-40 */}
+
+            {/* Connect the dots */}
             <div className="w-[2px] bg-black md:h-[calc(100%+160px)]" />
           </div>
           <FounderStoryImage imageUrl={imageUrl} id={id} />
@@ -41,9 +43,11 @@ const FounderStoryCard = async ({
         <div className="flex-col-center default-gap md:grid md:grid-cols-[40%_10%_40%] md:justify-items-center">
           <FounderStoryImage imageUrl={imageUrl} id={id} />
           <div className="flex-center-md relative h-10 w-full md:h-full">
+            {/* Dots */}
             <div className="absolute top-1/2 z-10 box-content h-2 w-2 rounded-full border-[5px] border-primary-foreground/95 bg-foreground max-md:left-[-30px]" />
-            <div className="w-[2px] bg-black md:h-[calc(100%+160px)]" />{' '}
-            {/* 160 is the gap between the two items (gap-y-40) */}
+
+            {/* Connect the dots */}
+            <div className="w-[2px] bg-black md:h-[calc(100%+160px)]" /> {/* 160 is the gap between the two items (gap-y-40) */}
           </div>
           <FounderStoryDescription
             description={description}

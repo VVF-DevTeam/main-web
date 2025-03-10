@@ -1,6 +1,6 @@
 // Libraries
 import { prisma } from '@/lib/db'
-import { adminCheck } from '@/lib/dbQueries/adminCheck'
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
 
 // Components
 import EventList from './_components/EventList'
@@ -18,7 +18,7 @@ const EventsPage = async ({
 }) => {
   const { locale } = await params
 
-  const admin = await adminCheck()
+  const admin = await roleCheck({ role: 'ADMIN' })
 
   // Get all events
   const allEvents = await prisma.event.findMany({
@@ -37,7 +37,7 @@ const EventsPage = async ({
   return (
     <div className="flex flex-col gap-y-6">
       <EventHeroImage locale={locale} />
-      <EventList events={allEvents} />
+      <EventList events={allEvents} locale={locale} />
       {admin && <EventAdminButtons />}
       <EventInstruction locale={locale} />
     </div>

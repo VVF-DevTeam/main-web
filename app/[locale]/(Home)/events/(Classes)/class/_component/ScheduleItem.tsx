@@ -40,7 +40,7 @@ const ScheduleItem = async ({
       hours += parseInt(splitEnd[0]) - parseInt(splitStart[0])
     }
 
-    return `${hours}h : ${minutes}m`
+    return `${hours===0? '':''+hours+'h'} ${minutes}m`
   }
 
   return (

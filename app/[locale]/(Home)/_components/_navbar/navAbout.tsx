@@ -55,17 +55,17 @@ const NavAbout: React.FC<NavAboutProps> = ({
     <div ref={dropdownRef} className="relative w-full">
       <button
         className={classNames(
-          'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
+          'flex items-center justify-center gap-x-[5px] font-semibold transition-all pr-1',
           mode === 'desktop'
             ? `whitespace-nowrap text-sm ${
                 isActive
-                  ? 'text-[#C54B3E]'
-                  : 'text-[#212121] hover:text-[#C54B3E] hover:underline'
+                  ? 'text-textColor-brand'
+                  : 'text-textColor hover:text-textColor-brand hover:underline'
               }`
             : `mt-2 h-full w-full rounded-md p-4 text-xl ${
                 isActive
-                  ? 'text-[#C54B3E]'
-                  : 'px-5 text-slate-200 hover:bg-[#C54B3E]/40'
+                  ? 'text-textColor-brand'
+                  : 'px-5 text-slate-200 hover:bg-bgColor-brand'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
@@ -87,10 +87,10 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/vision"
           className={classNames(
-            'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:rounded-md hover:bg-gray-100',
+            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-textColor hover:text-textColor-brand',
             mode === 'desktop'
-              ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
-              : 'text-xl text-[#1B171A] hover:text-blue-500'
+              ? 'whitespace-nowrap text-sm '
+              : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -100,22 +100,24 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/directors"
           className={classNames(
-            'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:rounded-md hover:bg-gray-100',
+            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
             mode === 'desktop'
-              ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
-              : 'text-xl text-[#1B171A] hover:text-blue-500'
+              ? 'whitespace-nowrap text-sm '
+              : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
           {directors}
         </Link>
+
+        <div className="border-b border-gray-200" />
         <Link
           href="/about/founders"
           className={classNames(
-            'flex items-center justify-center gap-x-[5px] p-2 transition-all hover:rounded-md hover:bg-gray-100',
+            'flex p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
             mode === 'desktop'
-              ? 'whitespace-nowrap text-sm text-[#1B171A] hover:text-blue-500'
-              : 'text-xl text-[#1B171A] hover:text-blue-500'
+              ? 'whitespace-nowrap text-sm'
+              : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
