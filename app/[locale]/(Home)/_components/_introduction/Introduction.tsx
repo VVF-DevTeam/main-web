@@ -33,7 +33,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
 
   return (
     <div>
-      <div className="flex-col-center header-font-white default-gap relative h-[90vh] text-center">
+      <div className="flex-col-center header-font-white default-gap relative h-[80vh] lg:h-[85vh] text-center">
         {/* NextJS Image and Dark Overlay */}
         <div className="dark-overlay"></div>
         <Image

@@ -8,7 +8,7 @@ import Link from 'next/link'
 // Interfaces
 const EventAdminButtons = () => {
   return (
-    <div className="my-6 flex-end gap-x-4 px-6">
+    <div className="flex-col-end my-6 gap-x-4 gap-y-3 px-6 md:flex-row flex-end-md">
       {/* Create Event */}
       <Link href={'/events/createEvent'}>
         <Button variant={'default'} size={'lg'}>
