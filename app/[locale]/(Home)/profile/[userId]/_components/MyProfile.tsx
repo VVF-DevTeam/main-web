@@ -1,10 +1,8 @@
-'use client'
-
 import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi'
 
 import { RiCalendarEventFill } from 'react-icons/ri'
 
-import { useTranslation } from 'react-i18next'
+import initTranslation from '@/app/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Event } from '@prisma/client'
@@ -28,17 +26,18 @@ const getEventStatus = (
   return 'Finished'
 }
 
-const MyProfile = ({
+const MyProfile = async ({
   user,
+  locale,
   events,
   upcoming_events,
 }: {
   user: UserInfoProps
+  locale: string
   events: Event[]
   upcoming_events: Event[]
 }) => {
-  // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = await initTranslation(locale, ['profile'])
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -48,10 +47,10 @@ const MyProfile = ({
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="col-span-1 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+          <div className="bg-bgColor-white col-span-1 rounded-lg p-6 shadow-lg dark:bg-bgColor-gray">
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
-                <div className="h-32 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                <div className="h-32 w-32 overflow-hidden rounded-full bg-bgColor-gray/20">
                   {user?.image ? (
                     <Image
                       src={user.image}
@@ -75,34 +74,33 @@ const MyProfile = ({
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <FiMail className="text-gray-500" />
+                <FiMail className="text-textColor-gray" />
                 <span>{user.email}</span>
               </div>
               <div className="flex items-center gap-3">
-                <FiPhone className="text-gray-500" />
+                <FiPhone className="text-textColor-gray" />
                 <span>{user.phone || 'N/A'}</span>
               </div>
               <div className="flex items-center gap-3">
-                <FiMapPin className="text-gray-500" />
+                <FiMapPin className="text-textColor-gray" />
                 <span>{user.address || 'N/A'}</span>
               </div>
             </div>
           </div>
 
-          <div className="col-span-2 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+          <div className="bg-bgColor-white col-span-2 rounded-lg p-6 shadow-lg">
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
               {t('event-history')}
             </h3>
-            <div className="max-h-64 overflow-y-auto rounded-md border border-gray-300">
+            <div className="max-h-64 overflow-y-auto rounded-md border">
               <table className="w-full">
-                <thead className="sticky top-0 bg-gray-100">
-                  <tr className="border-b dark:border-gray-700">
+                <thead className="sticky top-0 bg-bgColor-gray/20">
+                  <tr className="border-b">
                     <th className="px-4 py-3 text-left">{t('title')}</th>
                     <th className="px-4 py-3 text-left">{t('start-date')}</th>
                     <th className="px-4 py-3 text-left">{t('end-date')}</th>
                     <th className="px-4 py-3 text-left">{t('dates')}</th>
-                    <th className="px-4 py-3 text-left">{t('duration')}</th>
                     <th className="px-4 py-3 text-left">{t('price')}</th>
                     <th className="px-4 py-3 text-left">{t('location')}</th>
                     <th className="px-4 py-3 text-left">{t('status')}</th>
@@ -111,45 +109,43 @@ const MyProfile = ({
                 <tbody className="divide-y">
                   {events.length > 0 ? (
                     events.map((event, index) => {
-                      const status = getEventStatus(
-                        event.startDate,
-                        event.endDate
-                      )
+                      const startDate = event.startDate
+                        ? event.startDate
+                        : event.endDate
+
+                      const status = getEventStatus(startDate, event.endDate)
                       return (
                         <tr
                           key={index}
-                          className="cursor-pointer border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                          className="bg-bgColor-white cursor-pointer border-b"
                         >
                           <td className="px-4 py-3">
                             <Link
                               href={`/events/class/${event.id}`}
-                              className="text-blue-600 hover:underline"
+                              className="text-textColor-blue hover:underline"
                             >
                               {event.title}
                             </Link>
                           </td>
                           <td className="px-4 py-3">
-                            {new Date(event.startDate).toLocaleDateString()}
+                            {new Date(startDate).toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
                             {new Date(event.endDate).toLocaleDateString()}
                           </td>
+                          <td className="px-4 py-3">{event.days.join(', ')}</td>
                           <td className="px-4 py-3">
-                            {event.dates.join(', ')}
-                          </td>
-                          <td className="px-4 py-3">{event.duration}</td>
-                          <td className="px-4 py-3">
-                            ${event.price.toFixed(2)}
+                            ${event.price?.toFixed(2)}
                           </td>
                           <td className="px-4 py-3">{event.location}</td>
                           <td className="px-4 py-3">
                             <span
                               className={`rounded-full px-2 py-1 text-sm ${
                                 status === 'Upcoming'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-bgColor-blue/20 text-textColor-blue'
                                   : status === 'Ongoing'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-green-100 text-green-800'
+                                    ? 'bg-bgColor-green/20 text-textColor-green'
+                                    : 'bg-bgColor-yellow/20 text-textColor-yellow'
                               }`}
                             >
                               {status}
@@ -162,7 +158,7 @@ const MyProfile = ({
                     <tr>
                       <td
                         colSpan={8}
-                        className="px-4 py-3 text-center text-gray-500"
+                        className="px-4 py-3 text-center text-textColor-gray/50"
                       >
                         {t('no-event')}
                       </td>
@@ -175,7 +171,7 @@ const MyProfile = ({
         </div>
 
         {/* Wishlist Section */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+        <div className="bg-bgColor-white mb-8 rounded-lg p-6 shadow-lg">
           <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
             <FiHeart />
             {t('upcoming-event')}
@@ -187,17 +183,17 @@ const MyProfile = ({
                 className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl"
               >
                 <Image
-                  src={item.thumbnail!}
+                  src={item.imgUrl!}
                   alt={item.title}
                   width={140}
                   height={140}
                   className="h-48 w-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="p-4 text-center text-white">
+                  <div className="p-4 text-center text-textColor-white">
                     <Link
                       href={`/events/class/${item.id}`}
-                      className="p-4 text-center text-white"
+                      className="p-4 text-center text-textColor-white"
                     >
                       {item.title}
                     </Link>

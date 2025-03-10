@@ -83,7 +83,7 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
 
   return (
     <div className="flex flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
-      <h1 className="mt-8 text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
+      <h1 className="mt-8 text-xl font-semibold md:text-3xl lg:mt-12">
         {t('profile-info-header')}
       </h1>
       <Form {...form}>
@@ -93,7 +93,7 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
         >
           {/* Profile Image Upload */}
           <div className="col-span-2 flex flex-col items-center">
-            <label className="relative h-48 w-48 cursor-pointer rounded-lg border-2 border-dashed border-gray-400 p-4 hover:bg-gray-50">
+            <label className="relative h-48 w-48 cursor-pointer rounded-lg border-2 border-dashed border-bgColor-black p-4 hover:bg-bgColor-gray/10">
               {imagePreview ? (
                 <div className="flex items-center justify-center">
                   <Image
@@ -103,8 +103,8 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
                     objectFit="cover"
                     className="rounded-lg"
                   />
-                  <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
-                    <FiEdit2 className="h-4 w-4 text-white" />
+                  <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-bgColor-blue p-2 transition-colors hover:bg-bgColor-blue/50">
+                    <FiEdit2 className="h-4 w-4 text-textColor-white" />
                     <input
                       type="file"
                       className="hidden"
@@ -116,10 +116,10 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
               ) : (
                 <div className="flex flex-col items-center space-y-2 text-center">
                   <User className="h-10 w-10" />
-                  <p className="text-lg font-bold uppercase text-blue-600">
+                  <p className="text-lg font-bold uppercase text-textColor-blue">
                     {t('profile-photo-add')}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-textColor-gray">
                     {t('profile-photo-change')}
                   </p>
                 </div>
@@ -212,7 +212,7 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
           <div className="col-span-2 mt-6 flex justify-center">
             <Button
               type="submit"
-              className="bg-[#C54B3E] text-white hover:bg-[#C54B3E]/80"
+              className="bg-bgColor-brand text-textColor-white hover:bg-bgColor-brandLight"
             >
               {t('Save')}
             </Button>

@@ -89,7 +89,7 @@ const DeleteForm = ({
 
   return (
     <div className="flex max-w-2xl flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
-      <h1 className="text-xl font-semibold text-[#C54B3E] md:text-3xl lg:mt-12">
+      <h1 className="text-xl font-semibold text-textColor-brand md:text-3xl lg:mt-12">
         {t('delete-account')}
       </h1>
       <p className="mt-6 font-medium">{t('delete-account-message')}</p>
@@ -132,7 +132,7 @@ const DeleteForm = ({
           <div className="col-span-1 mt-6 flex justify-center">
             <Button
               type="submit"
-              className="bg-[#C54B3E] text-white hover:bg-[#C54B3E]/80"
+              className="bg-bgColor-brand text-textColor-white hover:bg-bgColor-brandLight"
             >
               {t('delete-account')}
             </Button>

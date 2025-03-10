@@ -28,7 +28,7 @@ export default async function Layout({
       locale={locale}
       resources={resources}
     >
-      <div className="flex min-h-screen flex-col bg-white md:flex-row">
+      <div className="bg-bgColor-white flex min-h-screen flex-col md:flex-row">
         {/* Sidebar (Passes locale & userId for navigation) */}
         <Sidebar locale={locale} userId={userId} />
 

@@ -27,11 +27,11 @@ export default function Sidebar({
   }
 
   return (
-    <div className="relative w-full bg-gray-200 p-4 md:w-64 md:p-6">
+    <div className="relative w-full bg-bgColor-grayLight p-4 md:w-64 md:p-6">
       {/* ✅ Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between text-lg font-semibold text-gray-800 md:hidden"
+        className="text-textColor-black flex w-full items-center justify-between text-lg font-semibold md:hidden"
         aria-label="Toggle Sidebar"
       >
         <div className="flex items-center gap-2">
@@ -39,7 +39,7 @@ export default function Sidebar({
           <span>Menu</span>
         </div>
         <ChevronDown
-          className={`h-5 w-5 text-gray-400 transition-transform ${
+          className={`text-textColor-black h-5 w-5 transition-transform ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -47,11 +47,11 @@ export default function Sidebar({
 
       {/* ✅ Sidebar Menu (Uses `Link` to update searchParams) */}
       <div
-        className={`absolute left-0 w-full rounded-lg bg-gray-200 p-4 shadow-md transition-all duration-300 md:static md:block md:shadow-none ${
+        className={`absolute left-0 w-full rounded-lg bg-bgColor-grayLight p-4 shadow-md transition-all duration-300 md:static md:block md:shadow-none ${
           isOpen ? 'block' : 'hidden'
         }`}
       >
-        <h2 className="mb-4 text-xl font-semibold text-gray-900 md:block">
+        <h2 className="text-textColor-black mb-4 text-xl font-semibold md:block">
           {t('acc-setting')}
         </h2>
 
@@ -62,8 +62,8 @@ export default function Sidebar({
                 href={`/${locale}/profile/${userId}?section=${key}`}
                 className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
                   currentSection === key
-                    ? 'bg-white font-medium text-gray-900 shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'text-textColor-black bg-white font-medium shadow-sm'
+                    : 'text-textColor-black hover:bg-bgColor-white'
                 }`}
               >
                 {label}
