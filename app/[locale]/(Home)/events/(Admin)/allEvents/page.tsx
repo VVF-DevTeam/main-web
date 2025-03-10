@@ -12,7 +12,7 @@ import { columns } from './_components/columns'
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
   if (!(await roleCheck({ role: 'ADMIN' }))) {
-    return redirect('/posts')
+    return redirect('/events')
   }
 
   // Get all published and unpublished posts
