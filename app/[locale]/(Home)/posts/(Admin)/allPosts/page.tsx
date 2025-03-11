@@ -1,7 +1,7 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/lib/dbQueries/adminCheck'
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
 
 // Components
 import BackButton from '@/components/ui/back-button'
@@ -11,7 +11,7 @@ import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_component
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await adminCheck())) {
+  if (!(await roleCheck({ role: 'ADMIN' }))) {
     return redirect('/posts')
   }
 

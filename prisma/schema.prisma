@@ -28,6 +28,7 @@ model Event {
   eventType   EventType
   description String?
   imgUrl      String?
+  formLink    String?
 
   // Metadata
   location    String?

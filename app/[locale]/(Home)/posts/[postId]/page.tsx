@@ -48,7 +48,6 @@ const PostPage = async ({ params }: PostPageProps) => {
       },
     })
     if (isVisited && isVisited.visitedPosts.length === 0) {
-      console.log(isVisited.visitedPosts)
       await prisma.postVisits.create({
         data: {
           postId: postId,

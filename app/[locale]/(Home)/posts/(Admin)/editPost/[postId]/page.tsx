@@ -1,7 +1,7 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/lib/dbQueries/adminCheck'
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
 
 // Components
 import TitleForm from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/TitleForm'
@@ -21,7 +21,7 @@ interface EditPostProps {
 // Main Component
 const EditPost = async ({ params }: EditPostProps) => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await adminCheck())) {
+  if (!(await roleCheck({ role: 'ADMIN' }))) {
     return redirect('/posts')
   }
 

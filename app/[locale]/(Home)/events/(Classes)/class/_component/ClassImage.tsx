@@ -12,6 +12,7 @@ interface ClassImageProps {
   endDate?: Date
   hosts: { name: string | null }[]
   title: string
+  formLink: string
   locale: string
 }
 
@@ -22,11 +23,12 @@ const ClassImage = async ({
   hosts,
   title,
   locale,
+  formLink
 }: ClassImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid">
+    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid pt-20">
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
@@ -48,7 +50,7 @@ const ClassImage = async ({
           </span>
         </span>
         <a
-          href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
+          href={formLink}
           target="_blank"
           rel="noopener noreferrer"
         >

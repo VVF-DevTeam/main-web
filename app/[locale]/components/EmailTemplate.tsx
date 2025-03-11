@@ -1,4 +1,3 @@
-'user server'
 import React from 'react'
 interface EmailTemplateProps {
   firstName: string

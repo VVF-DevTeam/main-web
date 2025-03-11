@@ -1,12 +1,15 @@
 'use client'
+// Libraries
 import { createPostSchema } from '@/lib/zodSchema/createPostSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+
+// Components
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 import {
   Form,
@@ -21,9 +24,12 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
 
+// Interfaces
 interface CreatePostFormProps {
   author: string
 }
+
+// Main Component
 const CreatePostForm = ({ author }: CreatePostFormProps) => {
   const { toast } = useToast()
   const router = useRouter()
@@ -53,6 +59,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
 
       form.reset()
       router.refresh()
+      router.push(`/posts/editPost/${response.data.id}`)
     } catch (error) {
       console.log(error)
       if (error instanceof AxiosError) {
