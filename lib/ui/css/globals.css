@@ -13,6 +13,9 @@ body {
     --background-gray: 240 4% 46%;              /* #71717A */
     --background-black-light: 220 3% 20%;       /* #323335 */ 
     --background-black: 315 8% 10%;             /* #1B171A */
+    --background-blue: 219 100% 57%;            /* #2563EB */
+    --background-yellow: 45 100% 50%;           /* #FFB800 */
+    --background-green: 152 76% 40%;            /* #12805D */
     --brand-color-dark: 0 100% 25%;             /* #7f0000 */ 
     --brand-color: 6 54% 51%;                   /* #C54B3E */
     --brand-color-light: 18 71% 79%;            /* #EFB9A2 */
@@ -20,6 +23,9 @@ body {
     --text-black: 220 3% 20%;                   /* #323335 */
     --text-white: 0 0% 100%;                    /* #FFFFFF */
     --text-gray: 240 4% 46%;                    /* #71717A */
+    --text-blue: 219 100% 57%;                  /* #2563EB */
+    --text-yellow: 45 100% 50%;                 /* #FFB800 */
+    --text-green: 152 76% 40%;                  /* #12805D */
     --destructive: 0 84% 60%;                   /* #EF4444 */
     --foreground: 240 10% 3.9%;                 /* #09090B */
     --card: 0 0% 100%;                          /* #FFFFFF */

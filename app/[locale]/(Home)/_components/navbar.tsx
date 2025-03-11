@@ -33,14 +33,17 @@ const Navbar = async ({ locale }: { locale: string }) => {
           {/* Company Logo with Slogan*/}
           <Link href="/" className="flex-col-center -mt-5">
             <CompanyLogo />
-            <p className="-mt-7 text-[9px] header-font-black"> Grow together, Shine together</p>
+            <p className="header-font-black -mt-7 text-[9px]">
+              {' '}
+              Grow together, Shine together
+            </p>
           </Link>
 
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="flex-center -ml-10 md:-ml-5 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand"
-              href=""
+              className="flex-center -ml-10 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-5"
+              href={`/profile/${session?.user?.name}`}
               aria-label="Go to user profile"
             >
               <User2 className="h-5 w-5" />
