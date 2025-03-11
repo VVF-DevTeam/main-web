@@ -43,7 +43,11 @@ const Navbar = async ({ locale }: { locale: string }) => {
           {session?.user?.id && (
             <Link
               className="flex-center -ml-10 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-5"
+<<<<<<< HEAD
               href=""
+=======
+              href={`/profile/${session?.user?.name}`}
+>>>>>>> ddc876b3dc18535293c4ae7925838fdb83fa12d8
               aria-label="Go to user profile"
             >
               <User2 className="h-5 w-5" />

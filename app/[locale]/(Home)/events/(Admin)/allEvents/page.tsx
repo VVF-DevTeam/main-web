@@ -1,7 +1,7 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import { adminCheck } from '@/lib/dbQueries/adminCheck'
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
 
 // Components
 import BackButton from '@/components/ui/back-button'
@@ -11,8 +11,8 @@ import { columns } from './_components/columns'
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await adminCheck())) {
-    return redirect('/posts')
+  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+    return redirect('/events')
   }
 
   // Get all published and unpublished posts
@@ -21,7 +21,11 @@ const AllPosts = async () => {
       updatedAt: 'desc',
     },
   })
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> ddc876b3dc18535293c4ae7925838fdb83fa12d8
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}

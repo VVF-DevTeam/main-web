@@ -46,6 +46,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
         title={t('about-navLink')}
         vision={t('vision-navLink')}
         directors={t('directors-navLink')}
+        founders={t('founders-navLink')}
         mode={mode}
       />
       <AuthButtons userExists={!!session?.user} mode={mode} />

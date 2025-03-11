@@ -3,6 +3,7 @@
 
 // Libraries
 import { cn } from '@/lib/utils'
+import initTranslation from '@/app/i18n'
 
 // Components
 import Image from 'next/image'
@@ -13,11 +14,14 @@ import EventButton from './EventButton'
 import { Event } from '@prisma/client'
 interface EventCardProps {
   event: Event
+  locale: string
 }
 
-const EventCard = ({ event }: EventCardProps) => {
+const EventCard = async ({ event, locale }: EventCardProps) => {
+  const { t } = await initTranslation(locale, ['event', 'common'])
+
   return (
-    <div className="hover-focus-zoomIn group relative flex w-[calc(100%-3px)] cursor-pointer flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
+    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
       <Image
         src={event.imgUrl!}
         alt="event thumbnail"
@@ -53,12 +57,12 @@ const EventCard = ({ event }: EventCardProps) => {
             {event.capacity! - event.ticketsSold! === 0
               ? 'Sold Out'
               : event.capacity! - event.ticketsSold!}{' '}
-            remaining
+            {t('slot-event')}
           </span>
         </div>
 
         {/* Location */}
-        <div className="flex-between">
+        <div className="flex-between gap-x-2">
           <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}
@@ -76,7 +80,7 @@ const EventCard = ({ event }: EventCardProps) => {
           <div className="flex flex-col text-right text-sm md:text-base xl:text-lg">
             <span>
               {event?.days?.map((day) => (
-                <span key={day}>{day.substring(0, 3)}, </span>
+                <span key={day}>{t(day.toLowerCase())}, </span>
               ))}
             </span>
             <span className="ml-auto">

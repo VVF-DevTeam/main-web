@@ -38,7 +38,7 @@ const About = async ({ locale }: { locale: string }) => {
     <div className="flex-center min-h-screen">
       <div className="flex-col-center width-max-default default-gap p-12">
         <div className="flex-col-center default-gap p-6">
-          <h2 className="cursor-default text-5xl font-bold tracking-wider text-textColor-brandDark">
+          <h2 className="cursor-default text-5xl font-bold tracking-wider text-textColor-brandDark header-font-default">
             {t('header-vision-aboutUs')}
           </h2> 
           <Separator className="w-1/2 bg-bgColor-brandDark" />
