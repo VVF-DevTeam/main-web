@@ -36,9 +36,9 @@ const SearchBox = () => {
   }, [])
 
   return (
-    <div className="flex w-80 items-center bg-red-200/70">
+    <div className="flex w-80 items-center rounded-lg bg-slate-100 px-4">
       <div>
-        <Search className="h-6 w-6" />
+        <Search className="h-6 w-6 text-slate-400" />
       </div>
       <div className="relative flex w-full items-center overflow-hidden text-[16px]">
         <input
@@ -47,7 +47,7 @@ const SearchBox = () => {
           onFocus={() => placeholderHidden()}
           onBlur={() => placeholderHidden()}
           placeholder="Search"
-          className="h-full w-full rounded-lg border-none bg-slate-200 px-3 py-3 text-slate-900 outline-none placeholder:text-slate-600 focus:outline-none"
+          className="h-full w-full rounded-lg border-none bg-inherit px-3 py-3 text-slate-900 outline-none placeholder:text-slate-600 focus:outline-none"
         />
         <div
           id="dynamic-placeholder"
