@@ -33,7 +33,7 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>
 
-const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
+const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation()
   const { toast } = useToast()
@@ -83,7 +83,7 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
 
   return (
     <div className="flex flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
-      <h1 className="mt-8 text-xl font-semibold md:text-3xl lg:mt-12">
+      <h1 className="text-textColor-black text-xl font-semibold md:text-3xl lg:mt-12">
         {t('profile-info-header')}
       </h1>
       <Form {...form}>
@@ -223,4 +223,4 @@ const ProfileForm = ({ user }: { user: ProfileFormValues }) => {
   )
 }
 
-export default ProfileForm
+export default UpdateProfileForm
