@@ -11,7 +11,10 @@ import { columns } from './_components/columns'
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+  if (
+    !(await roleCheck({ role: 'ADMIN' })) &&
+    !(await roleCheck({ role: 'HOST' }))
+  ) {
     return redirect('/events')
   }
 
@@ -21,11 +24,6 @@ const AllPosts = async () => {
       updatedAt: 'desc',
     },
   })
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> ddc876b3dc18535293c4ae7925838fdb83fa12d8
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}

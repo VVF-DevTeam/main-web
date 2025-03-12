@@ -23,12 +23,12 @@ const ClassImage = async ({
   hosts,
   title,
   locale,
-  formLink
+  formLink,
 }: ClassImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="width-max-default grid-all-cols-2 mx-auto flex w-full flex-col p-6 md:grid pt-20">
+    <div className="grid-all-cols-2 mx-auto flex w-full flex-col p-6 pt-20 md:grid">
       <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
@@ -42,18 +42,16 @@ const ClassImage = async ({
         <span className="text-sm text-muted">
           {startDate.toLocaleDateString()} | {location}
         </span>
-        <h2 className="-mt-3 mb-1 text-4xl font-extrabold">{t(title)}</h2>
+        <h2 className="-mt-3 mb-1 text-center text-4xl font-extrabold">
+          {t(title)}
+        </h2>
         <span>
           {t('classBy-guitar')}{' '}
           <span className="font-bold">
             {hosts.map((h) => h.name).join(', ')}
           </span>
         </span>
-        <a
-          href={formLink}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={formLink} target="_blank" rel="noopener noreferrer">
           <Button className="w-fit bg-bgColor-brand hover:bg-bgColor-brand/80">
             {t('reserve-button')}
           </Button>

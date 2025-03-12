@@ -31,8 +31,8 @@ const BackButton = async ({ style }: BackButtonProps) => {
   }
 
   return (
-    <Link href={parentPath as string} className={`${style}`}>
-      <Button variant="default" className="w-[100px]">
+    <Link href={parentPath as string}>
+      <Button variant="default" className={`${style} w-[100px]`}>
         <ArrowBigLeft className="h-5 w-5" />
         Previous
       </Button>

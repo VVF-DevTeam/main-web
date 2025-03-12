@@ -6953,6 +6953,11 @@ sucrase@^3.35.0:
     pirates "^4.0.1"
     ts-interface-checker "^0.1.9"
 
+suneditor-react@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/suneditor-react/-/suneditor-react-3.6.1.tgz#62bd64784a48f5402e8bae19362fd3d32a7c2fd3"
+  integrity sha512-12f9KLnEB6pAdyHJINTzRBg3UOWVZZ+jVYSEtwdBTDYQW4amUZr0xOnpikbBAlxb9rcTYV5RHAsad3gnNhLsuA==
+
 supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
