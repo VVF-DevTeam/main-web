@@ -24,7 +24,8 @@ model EventCategory {
 
 model Event {
   id          String    @id @default(cuid())
-  title       String
+  title       String    @unique
+  keyName     String    @unique
   eventType   EventType
   description String?
   imgUrl      String?

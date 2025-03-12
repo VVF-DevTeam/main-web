@@ -40,7 +40,7 @@ const EditEventPage = async ({
   // Fetch the Event data
   const event = await prisma.event.findUnique({
     where: {
-      id: eventId,
+      keyName: eventId,
     },
     include: {
       schedules: {
@@ -112,7 +112,7 @@ const EditEventPage = async ({
 
           {/* Publish Button */}
           <PublishButton
-            id={event.id}
+            id={event.keyName}
             type={'event'}
             canPublish={canPublish}
             isPublished={event.isPublished}

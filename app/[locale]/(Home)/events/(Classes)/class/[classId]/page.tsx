@@ -13,9 +13,11 @@ export async function generateMetadata({
   params: Promise<{ classId: string }>
 }): Promise<Metadata> {
   const { classId } = await params
+
+  // TODO:Simplify code to only query once to get data
   const publishedClass = await prisma.event.findUnique({
     where: {
-      id: classId,
+      keyName: classId,
     },
     select: {
       title: true,
@@ -48,7 +50,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   const publishedClass = await prisma.event.findUnique({
     where: {
-      id: classId,
+      keyName: classId,
     },
     include: {
       schedules: true,
