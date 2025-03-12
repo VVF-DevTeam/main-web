@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
 
 const placeholders = ['Friday Chill', 'Guitar class', 'Tennis']
 const SearchBox = () => {
