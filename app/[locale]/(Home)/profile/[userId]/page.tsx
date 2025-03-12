@@ -1,8 +1,8 @@
 'use server'
 
-import { getInfo } from '@/lib/utilFunctions/getInfo'
+import { getUserInfo } from '@/lib/utilFunctions/getUserInfo'
 import MyProfile from './_components/MyProfile'
-import ProfileForm from './_components/ProfileForm'
+import UpdateProfileForm from './_components/UpdateProfileForm'
 import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
 import { prisma } from '@/lib/db'
@@ -14,7 +14,7 @@ export default async function ProfilePage({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ section?: string }>
 }) {
-  const user = await getInfo()
+  const user = await getUserInfo()
   // Get all events
   const eventList = await prisma.event.findMany({
     where: {
@@ -30,7 +30,7 @@ export default async function ProfilePage({
   // ✅ Switch component based on searchParams
   switch (section) {
     case 'update-profile':
-      return <ProfileForm user={user} />
+      return <UpdateProfileForm user={user} />
     case 'change-password':
       return <PasswordForm user={user} />
     case 'delete-account':

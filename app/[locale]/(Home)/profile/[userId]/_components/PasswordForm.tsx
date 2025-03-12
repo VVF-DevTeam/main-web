@@ -80,7 +80,7 @@ const PasswordForm = ({
 
   return (
     <div className="flex max-w-xl flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-32">
-      <h1 className="text-xl font-semibold md:text-3xl lg:mt-12">
+      <h1 className="text-textColor-black text-xl font-semibold md:text-3xl lg:mt-12">
         {t('password-header')}
       </h1>
       <Form {...form}>

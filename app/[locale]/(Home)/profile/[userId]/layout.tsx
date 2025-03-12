@@ -1,6 +1,6 @@
 'use server'
 
-import { getInfo } from '@/lib/utilFunctions/getInfo'
+import { getUserInfo } from '@/lib/utilFunctions/getUserInfo'
 import initTranslation from '@/app/i18n'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import Sidebar from './_components/SideBar'
@@ -16,7 +16,7 @@ export default async function Layout({
 }) {
   const { locale, userId } = await params
   const { resources } = await initTranslation(locale, i18nNamespaces)
-  const user = await getInfo()
+  const user = await getUserInfo()
 
   if (!user) {
     return <p className="mt-10 text-center">No user data available.</p>
