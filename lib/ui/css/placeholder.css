@@ -1,0 +1,30 @@
+@keyframes place-holder-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25% {
+    opcacity: 0.2;
+    transform: translateY(15px);
+  }
+  50% {
+    opcacity: 0;
+    transform: translateY(30px);
+  }
+
+  75% {
+    opcacity: 0.8;
+    transform: translateY(15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.place-holder-animation {
+  animation: place-holder-fade 2s infinite;
+  background-color: black;
+  border-radius: 100px;
+}

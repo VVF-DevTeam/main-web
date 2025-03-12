@@ -5,6 +5,7 @@ import { PlusCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { auth } from '@/auth'
 import initTranslations from '@/app/i18n'
+import SearchBox from '../../components/SearchBox'
 interface PostsProps {
   params: Promise<{ locale: string }>
 }
@@ -60,9 +61,15 @@ const Posts = async ({ params }: PostsProps) => {
           <h1 className="header-font-black header-sub lg:text-5xl">
             {t('header')}
           </h1>
-          <p className="header-font-black text-sm text-textColor">
+          <p className="header-font-black md:text-md text-sm text-muted-foreground">
             {t('description-header')}
           </p>
+        </div>
+
+        {/* Seearch box */}
+
+        <div className="mt-6 md:mt-10 lg:mt-12">
+          <SearchBox />
         </div>
 
         {/* Posts */}
