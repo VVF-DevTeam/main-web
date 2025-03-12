@@ -10,17 +10,17 @@ import Link from 'next/link'
 import { EventType as PrismaEventType } from '@prisma/client'
 
 interface EventButtonProps {
-  eventId: string
+  eventKeyName: string
   eventType: keyof typeof PrismaEventType
 }
 
 // Component
-const EventButton = ({ eventId, eventType }: EventButtonProps) => {
+const EventButton = ({ eventKeyName, eventType }: EventButtonProps) => {
 
   const eventUrl =
     eventType === 'CONCERT'
-      ? `/events/concert/${eventId}`
-      : `/events/class/${eventId}`
+      ? `/events/concert/${eventKeyName}`
+      : `/events/class/${eventKeyName}`
 
   return (
     <Link href={eventUrl}>

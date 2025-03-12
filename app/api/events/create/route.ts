@@ -6,7 +6,7 @@ export const POST = async (req: Request) => {
     // TODO: Check if user is admin
 
     // Destructure the request body
-    const { title, eventType } = await req.json()
+    const { title, eventType, keyName } = await req.json()
 
     // Check if an event with ths title and type already exists
     const existingEvent = await prisma.event.findFirst({
@@ -25,6 +25,7 @@ export const POST = async (req: Request) => {
       data: {
         title: title,
         eventType: eventType,
+        keyName: keyName,
       },
     })
 

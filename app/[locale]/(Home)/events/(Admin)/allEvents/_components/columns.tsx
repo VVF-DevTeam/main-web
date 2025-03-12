@@ -127,10 +127,10 @@ export const columns: ColumnDef<Event>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const id = row.original.id
+      const keyName = row.original.keyName
       return (
         <Link
-          href={`/events/editEvent/${id}`}
+          href={`/events/editEvent/${keyName}`}
           className="flex-center"
         >
           <Button

@@ -67,7 +67,7 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}
           </span>
-          <EventButton eventId={event.id} eventType={event.eventType} />
+          <EventButton eventKeyName={event.keyName} eventType={event.eventType} />
         </div>
 
         {/* Timings */}
