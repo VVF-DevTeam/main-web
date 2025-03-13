@@ -18,7 +18,7 @@ export default {
             fontsize: '0px',
             transform: 'translateY(-30px)',
           },
-          '5%': {
+          '3%': {
             opcacity: '0',
             fontsize: '0px',
             transform: 'translateY(-30px)',
@@ -28,7 +28,7 @@ export default {
             fontsize: 'inherit',
             transform: 'translateY(0)',
           },
-          '95%': {
+          '97%': {
             opacity: '1',
             fontsize: 'inherit',
             transform: 'translateY(0)',
@@ -82,7 +82,7 @@ export default {
         },
       },
       animation: {
-        placeHolderFade: 'placeHolderFade 3s ease-in infinite 0.2s',
+        placeHolderFade: 'placeHolderFade 3s ease-in infinite',
         roll: 'roll 3s linear infinite 0.2s',
       },
 
