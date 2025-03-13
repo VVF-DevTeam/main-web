@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 
 // Components
@@ -64,10 +64,19 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     console.log(data)
+
+    //Format title to trims whitespaces
+    const title = data.title.replace(/\s+/g, ' ').trim()
+
+    // Format title to keyName, which is used for pathname
+    const keyName = title.replace(/\s+/g, '-').toLowerCase()
+    console.log(keyName)
+
     try {
       const eventData = {
-        title: data.title,
+        title: title,
         eventType: data.eventType,
+        keyName: keyName,
       }
       const response = await axios.post('/api/events/create', eventData)
       if (response.status === 200) {
@@ -82,12 +91,30 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
       router.refresh()
       router.push(`/events/editEvent/${response.data.id}`)
     } catch (error) {
+      // TODO: Format error message for all events and posts
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      if (error instanceof AxiosError) {
+        console.log(error.response?.status)
+        if (error.response?.status === 409) {
+          toast({
+            variant: 'destructive',
+            title: 'Duplicate Event Title',
+            description: 'There is already an event with this title',
+          })
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error making request to database',
+            description: 'Something went wrong. Please contact the admin',
+          })
+        }
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Something went wrong. Please contact the admin',
+        })
+      }
     }
   }
 
@@ -113,7 +140,9 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">Event Title</FormLabel>
+                <FormLabel className="text-textColor-brand">
+                  Event Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"

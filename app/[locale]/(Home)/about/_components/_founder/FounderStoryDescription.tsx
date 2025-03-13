@@ -23,7 +23,7 @@ const FounderStoryDescription = async ({
       <div className="flex-col-center gap-y-6 text-center tracking-wide text-textColor lg:text-pretty lg:text-lg">
         <p
           className={cn(
-            'scroll-opacity-default',
+            'scroll-opacity-default whitespace-pre-line',
             id % 2 === 0
               ? 'scroll-animation-fromLeft'
               : 'scroll-animation-fromRight'

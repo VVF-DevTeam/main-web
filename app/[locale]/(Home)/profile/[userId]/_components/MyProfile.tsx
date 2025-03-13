@@ -28,6 +28,7 @@ const MyProfile = async ({
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
 
+  console.log(user?.image)
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -41,6 +42,7 @@ const MyProfile = async ({
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
                 <div className="h-32 w-32 overflow-hidden rounded-full bg-bgColor-gray/20">
+                
                   {user?.image ? (
                     <Image
                       src={user.image}
