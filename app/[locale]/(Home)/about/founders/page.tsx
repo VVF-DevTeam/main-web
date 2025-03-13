@@ -9,7 +9,7 @@ const foundingStory = [
     description:
       'The idea was born in 2024 when a group of passionate friends decided to start an non-profit organization to connect Vietnamese people in Vancouver through arts and cultures.',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1U4MQAnkqL2PnPIdMdCkaLoe3IRzHEsuC&sz=w500',
+      'https://drive.google.com/thumbnail?id=1TFVDc5PTJqmk7xpW-81eBWCdkg3skoZ1&sz=w1000',
   },
   {
     id: 2,
@@ -28,9 +28,9 @@ const foundingStory = [
   {
     id: 4,
     description:
-      'After months of hard work and gathering more members, our group finally hit the running ground and decided to officially launch in 2025.',
+      `After months of hard work and gathering more members, our group finally hit the running ground and decided to officially launch in November, 2024. \n (Did you know that our mascots are these cute little penguins?)`,
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1U4MQAnkqL2PnPIdMdCkaLoe3IRzHEsuC&sz=w2000',
+      'https://drive.google.com/thumbnail?id=1HtNEPTTQe47KF_3r95yGDzKv0c9uNASw&sz=w1000',
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ const foundingStory = [
     description:
       'Since then, the foundation has grown to become a thriving organization that connects Vietnamese people in Vancouver through arts and cultures. Finally, we want to send our thanks for our users - the greatest motivation that we need to keep fighting. Thank you, and see you in our next events.',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1U4MQAnkqL2PnPIdMdCkaLoe3IRzHEsuC&sz=w2000',
+      'https://drive.google.com/thumbnail?id=1EO8cNCeVbtlpCegRkMYsa92ylatyeDcJ&sz=w1000',
   },
 ]
 
@@ -61,8 +61,6 @@ const Founder = async ({ params }: { params: Promise<{ locale: string }> }) => {
         </h1>
         <Separator className="bg-bgColor-brandDark w-[170%]" />
       </div>
-
-
 
       {/* Intro */}
       <div className="flex-col-center gap-y-3 text-center">
