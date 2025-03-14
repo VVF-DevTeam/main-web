@@ -1,44 +1,32 @@
-import PostList from '@/app/[locale]/(Home)/posts/_components/PostList'
-import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { PlusCircle, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Suspense } from 'react'
+
 import { auth } from '@/auth'
-import initTranslations from '@/app/i18n'
+import { getPublishedPostsByTitle } from '@/lib/dbQueries/Post'
+import { prisma } from '@/lib/db'
+import { PlusCircle, ArrowRight } from 'lucide-react'
+
+import PostList from '@/app/[locale]/(Home)/posts/_components/PostList'
 import SearchBox from '../../components/SearchBox'
+import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
+
+import { Button } from '@/components/ui/button'
+import initTranslations from '@/app/i18n'
 interface PostsProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    title: string
+  }>
 }
 
-const Posts = async ({ params }: PostsProps) => {
+const Posts = async ({ params, searchParams }: PostsProps) => {
   const { locale } = await params
+  const { title } = await searchParams
   const { t } = await initTranslations(locale, ['post', 'common'])
 
   // TODO: Abstract this code to a db function.
   const session = await auth()
-  const publishedPosts = await prisma.post.findMany({
-    where: {
-      isPublished: true,
-    },
-    select: {
-      id: true,
-      title: true,
-      summary: true,
-      imgUrl: true,
-      createdAt: true,
-      postLikes: true,
-      postVisits: true,
-      _count: {
-        select: {
-          postLikes: true,
-          postVisits: true,
-        },
-      },
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  const publishedPosts = await getPublishedPostsByTitle(title || '')
 
   const userEmail = session?.user?.email
 
@@ -70,20 +58,40 @@ const Posts = async ({ params }: PostsProps) => {
 
         <div className="mt-6 md:mt-10 lg:mt-12">
           <SearchBox />
+          <p className="mt-2 pl-4 text-sm text-muted-foreground">
+            {publishedPosts !== null && publishedPosts.length > 0 ? (
+              <>
+                Showing {publishedPosts.length} posts{' '}
+                {title && (
+                  <>
+                    with title{' '}
+                    <span className="font-semibold">&quot;{title}&quot;</span>
+                  </>
+                )}
+              </>
+            ) : (
+              'No results found'
+            )}
+          </p>
         </div>
 
         {/* Posts */}
-        {publishedPosts.length > 0 ? (
-          <PostList posts={publishedPosts} userId={session?.user?.id || null} />
-        ) : (
-          <p className="flex-center header-font-black header-sub">
-            {t('noPost')}
-          </p>
-        )}
+        <Suspense fallback={<PostsSkeleton />}>
+          {publishedPosts !== null && publishedPosts.length > 0 ? (
+            <PostList
+              posts={publishedPosts}
+              userId={session?.user?.id || null}
+            />
+          ) : (
+            <p className="flex-center header-font-black mx-auto my-auto text-2xl text-muted-foreground">
+              {t('noPost')}
+            </p>
+          )}
+        </Suspense>
 
         {/* Admin Buttons */}
         {isAdmin && (
-          <div className="flex-end mt-6 w-full gap-x-4 px-6">
+          <div className="flex-end mt-6 w-full flex-wrap gap-x-4 pl-4 sm:px-6">
             <Link href="/posts/allPosts" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}

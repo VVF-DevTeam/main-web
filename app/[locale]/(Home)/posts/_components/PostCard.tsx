@@ -36,7 +36,7 @@ const PostCard = ({
   userId,
 }: PostProps) => {
   return (
-    <div className="flex-col-default h-full w-full overflow-hidden rounded-md border bg-bgColor-brandLighter shadow-lg hover:bg-[#F2E3D5] md:grid md:grid-cols-[30%_70%] md:gap-x-10 lg:gap-x-12">
+    <div className="flex-col-default h-full w-full gap-y-1 overflow-hidden rounded-md border bg-bgColor-brandLighter shadow-lg hover:bg-[#F2E3D5] md:grid md:grid-cols-[30%_70%] md:gap-x-10 md:gap-y-6 lg:gap-x-12">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -50,14 +50,14 @@ const PostCard = ({
       </div>
 
       {/* Column2 - Content title createdAt */}
-      <div className="flex-col-default flex-wrap px-4 py-8 xl:px-8 xl:py-10">
+      <div className="flex-col-default flex-wrap gap-y-3 px-4 py-8 md:gap-y-6 xl:px-8 xl:py-10">
         <h2 className="text-2xl font-bold tracking-wide xl:text-3xl">
           {title}
         </h2>
         <p className="text-sm text-muted-foreground">
           {createdAt.toLocaleString()}
         </p>
-        <p className="mt-4 text-wrap break-words text-textColor-gray md:max-w-[90%]">
+        <p className="mt-1 text-wrap break-words text-textColor-gray md:mt-4 md:max-w-[90%]">
           {summary}
         </p>
         <div className="flex-between">

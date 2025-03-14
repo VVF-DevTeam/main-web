@@ -16,7 +16,7 @@ const SearchBox = () => {
 
   const category = searchParams.get('category')
 
-  const debouncedValue = useDebounce(value, 500)
+  const debouncedValue = useDebounce(value, 1000)
 
   const placeholderRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -39,14 +39,8 @@ const SearchBox = () => {
 
   // UseEffect for dynamically changing placeholders.
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null
-
-    if (value.length !== 0 && interval !== null) {
-      clearInterval(interval)
-      return
-    }
-
-    interval = setInterval(() => {
+    if (value.length !== 0) return
+    const interval = setInterval(() => {
       changePlaceHolder()
     }, 3000)
 
@@ -55,8 +49,6 @@ const SearchBox = () => {
     }
   }, [value])
 
-  // UseEffect for selecting placeholder
-
   const changePlaceHolder = () => {
     setIndex((prev) => {
       prev = prev === placeholders.length - 1 ? 0 : prev + 1
@@ -64,15 +56,26 @@ const SearchBox = () => {
     })
   }
 
-  const placeholderHidden = (val: string) => {
+  const onChange = (val: string) => {
     setValue(val)
 
     if (!placeholderRef.current) return
 
     if (val.length !== 0) {
       placeholderRef.current.style.display = 'none'
+      placeholderRef.current.style.animation = 'none'
     } else {
       placeholderRef.current.style.display = 'inline-block'
+    }
+  }
+
+  const onBlur = () => {
+    if (!placeholderRef.current) return
+    if (value.length === 0) {
+      placeholderRef.current.style.display = 'inline-block'
+    } else if (value.length !== 0) {
+      placeholderRef.current.style.display = 'none'
+      placeholderRef.current.style.animation = 'none'
     }
   }
 
@@ -88,15 +91,8 @@ const SearchBox = () => {
         <input
           ref={inputRef}
           value={value}
-          onChange={(e) => placeholderHidden(e.target.value)}
-          onBlur={() => {
-            if (!placeholderRef.current) return
-            if (value.length === 0) {
-              placeholderRef.current.style.display = 'inline-block'
-            } else if (value.length !== 0) {
-              placeholderRef.current.style.display = 'none'
-            }
-          }}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={() => onBlur()}
           placeholder="Search"
           className="h-full w-full border-none bg-inherit px-3 py-3 text-slate-900 outline-none placeholder:text-slate-600 focus:outline-none"
         />
@@ -105,7 +101,7 @@ const SearchBox = () => {
           ref={placeholderRef}
           className="pointer-events-none absolute left-[68px] top-[10px] animate-placeHolderFade text-slate-600"
         >
-          <span className="transition-all">{placeholders[index]}</span>
+          <span>{placeholders[index]}</span>
         </div>
       </div>
     </div>
