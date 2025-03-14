@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       'images.unsplash.com',
       'drive.google.com',
       'lh3.googleusercontent.com',
+      'avatars.githubusercontent.com',
     ],
   },
 }
