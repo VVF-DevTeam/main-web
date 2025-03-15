@@ -25,7 +25,8 @@ model EventCategory {
 
 model Event {
   id          String    @id @default(cuid())
-  title       String
+  title       String    @unique
+  keyName     String    @unique 
   eventType   EventType
   description String?
   imgUrl      String?
@@ -146,8 +147,8 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  postLikes    PostLikes[]
-  postVisits   PostVisits[]
+  postLikes  PostLikes[]
+  postVisits PostVisits[]
   categories EventCategory[]
 
   // relation
