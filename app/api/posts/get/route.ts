@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export const GET = async (
-  { params }: { params: Promise<{ postId: string }> }
+  request: NextRequest,
 ) => {
   try {
-    const postId = (await params)?.postId
-
+    const postId = request?.nextUrl?.searchParams.get('postId')
+    
+    console.log(postId)
+    
     let post = null
     // Check if post exists
     if (!postId) {
