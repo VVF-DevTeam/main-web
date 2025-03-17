@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 
 export const GET = async (request: NextRequest) => {
   const eventId = request?.nextUrl?.searchParams.get('eventId')
+  const searchTitle = request?.nextUrl?.searchParams.get('title') || ' '
   const pageNum = Number(request?.nextUrl?.searchParams.get('pageNum')) || 0
   const pageSize = Number(request?.nextUrl?.searchParams.get('pageSize')) || 4
 
@@ -12,6 +13,7 @@ export const GET = async (request: NextRequest) => {
   try {
     if (!eventId) {
       // Get all published events
+
       const [events, total] = await Promise.all([
         prisma.event.findMany({
           select: {
@@ -28,13 +30,26 @@ export const GET = async (request: NextRequest) => {
             ticketsSold: true,
             days: true,
           },
+          where: {
+            title: {
+              contains: searchTitle,
+              mode: 'insensitive',
+            },
+          },
           orderBy: {
             updatedAt: 'desc',
           },
           skip: pageNum * pageSize,
           take: pageSize,
         }),
-        prisma.event.count(),
+        prisma.event.count({
+          where: {
+            title: {
+              contains: searchTitle,
+              mode: 'insensitive',
+            },
+          },
+        }),
       ])
       event = events
       totalEvent = total
@@ -79,6 +94,7 @@ export const GET = async (request: NextRequest) => {
       { status: 200 }
     )
   } catch (error) {
+    console.log('[Update EVENT ERROR]', error)
     return NextResponse.json({ message: 'Internal Error' }, { status: 500 })
   }
 }

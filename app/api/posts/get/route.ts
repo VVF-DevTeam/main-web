@@ -4,7 +4,8 @@ import { prisma } from '@/lib/db'
 export const GET = async (request: NextRequest) => {
   try {
     const postId = request?.nextUrl?.searchParams.get('postId')
-    const pageNum = Number(request?.nextUrl?.searchParams.get('pageNum'))
+    const searchText = request?.nextUrl?.searchParams.get('searchText') || ' '
+    const pageNum = Number(request?.nextUrl?.searchParams.get('pageNum')) || 0
     const pageSize = Number(request?.nextUrl?.searchParams.get('pageSize')) || 2
 
     console.log(postId)
@@ -29,7 +30,10 @@ export const GET = async (request: NextRequest) => {
             },
           },
           where: {
-            isPublished: true,
+            content: {
+              contains: searchText,
+              mode: 'insensitive',
+            },
           },
           orderBy: {
             updatedAt: 'desc',
@@ -39,7 +43,10 @@ export const GET = async (request: NextRequest) => {
         }),
         prisma.post.count({
           where: {
-            isPublished: true,
+            content: {
+              contains: searchText,
+              mode: 'insensitive',
+            },
           },
         }),
       ])
