@@ -1,17 +1,16 @@
 import Link from 'next/link'
-import { Suspense } from 'react'
 
 import { auth } from '@/auth'
 import { getPublishedPostsByTitle } from '@/lib/dbQueries/Post'
 import { prisma } from '@/lib/db'
 import { PlusCircle, ArrowRight } from 'lucide-react'
-
-import PostList from '@/app/[locale]/(Home)/posts/_components/PostList'
 import SearchBox from '../../components/SearchBox'
 import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
+import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
 import initTranslations from '@/app/i18n'
+import PublishedPosts from './_components/PublishedPosts'
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
@@ -76,17 +75,8 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/* Posts */}
-        <Suspense fallback={<PostsSkeleton />}>
-          {publishedPosts !== null && publishedPosts.length > 0 ? (
-            <PostList
-              posts={publishedPosts}
-              userId={session?.user?.id || null}
-            />
-          ) : (
-            <p className="flex-center header-font-black mx-auto my-auto text-2xl text-muted-foreground">
-              {t('noPost')}
-            </p>
-          )}
+        <Suspense key={title} fallback={<PostsSkeleton />}>
+          <PublishedPosts title={title} locale={locale} />
         </Suspense>
 
         {/* Admin Buttons */}

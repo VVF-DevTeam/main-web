@@ -12,6 +12,7 @@ interface PostListProps {
   } & {
     postLikes: PostLikes[]
   } & { postVisits: PostVisits[] })[]
+
   userId: string | null
 }
 

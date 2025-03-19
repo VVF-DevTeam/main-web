@@ -28,7 +28,6 @@ export const signinAction = async (data: {
     })
 
     if (!userExists || !userExists.password) {
-      console.log("User doesn't exist")
       return {
         message: "User doesn't exist",
         success: false,
@@ -36,7 +35,6 @@ export const signinAction = async (data: {
     }
 
     if (!userExists.emailVerified) {
-      console.log('email not verified')
       const newToken = await createToken(email)
       sendEmail({
         firstName: userExists.name!,
@@ -49,14 +47,14 @@ export const signinAction = async (data: {
         success: true,
       }
     }
-    console.log('pre signin')
+ 
     // Sign in the user
     await signIn('credentials', {
       email: email,
       password: password,
       redirect: false,
     })
-    console.log('post signin')
+
     return {
       message: 'Signed in successfully',
       success: true,
