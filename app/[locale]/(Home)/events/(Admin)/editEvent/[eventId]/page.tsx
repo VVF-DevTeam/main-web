@@ -28,7 +28,7 @@ const EditEventPage = async ({
 }: {
   params: Promise<{ eventId: string }>
 }) => {
-  // check if the current user is an admin to allow access to the post control page
+  // check if the current user is an admin or host to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
     !(await roleCheck({ role: 'HOST' }))
@@ -37,6 +37,7 @@ const EditEventPage = async ({
   }
 
   const { eventId } = await params
+  
   // Fetch the Event data
   const event = await prisma.event.findUnique({
     where: {

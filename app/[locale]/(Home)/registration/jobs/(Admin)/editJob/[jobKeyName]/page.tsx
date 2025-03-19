@@ -1,0 +1,152 @@
+// Libraries
+import { roleCheck } from '@/lib/dbQueries/roleCheck'
+import React from 'react'
+import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
+
+// Components
+import PublishButton from '@/app/[locale]/components/PublishButton'
+import BackButton from '@/components/ui/back-button'
+import JobTitle from '../../../../_components/_jobs/_editJob/JobTitle'
+import JobType from '../../../../_components/_jobs/_editJob/JobType'
+import JobStartDate from '../../../../_components/_jobs/_editJob/JobStartDate'
+import JobEndDate from '../../../../_components/_jobs/_editJob/JobEndDate'
+import JobDescription from '../../../../_components/_jobs/_editJob/JobDescription'
+import JobSummary from '../../../../_components/_jobs/_editJob/JobSummary'
+import JobLocation from '../../../../_components/_jobs/_editJob/JobLocation'
+
+const EditJobPage = async ({
+  params,
+}: {
+  params: Promise<{ jobKeyName: string }>
+}) => {
+  // check if the current user is an admin to allow access to the post control page
+  if (!(await roleCheck({ role: 'ADMIN' }))) {
+    return redirect('/jobs')
+  }
+
+  // Get the jobKeyName from the URL
+  const { jobKeyName } = await params
+
+  // Fetch the Job data
+  const job = await prisma.job.findUnique({
+    where: {
+      keyName: jobKeyName,
+    },
+  })
+
+  // TODO: If the job is not found, show a 404 page.
+  if (!job) {
+    redirect('/registration/jobs')
+  }  
+
+  // useState to check if field is filled
+  const jobFields = [
+    !!job.title,
+    !!job.jobType,
+    !!job.summary,
+    !!job.description,
+    !!job.startDate,
+    !!job.endDate,
+  ]
+
+  // check completed fields
+  const completedFields = jobFields.filter(Boolean).length
+  const completionText = `(${completedFields} / ${jobFields.length})`
+  const canPublish = completedFields === jobFields.length
+
+  return (
+    <div className="my-12 p-6 lg:my-20">
+      {/* Back Button To Parent Page */}
+      <BackButton />
+
+      <div className="mx-auto my-20 max-w-7xl">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-y-3">
+            <h1 className="text-2xl font-bold tracking-wide md:text-3xl xl:text-5xl">
+              Edit Job
+            </h1>
+            <span className="text-sm text-muted-foreground">
+              Fill all the fields to publish your job.
+            </span>
+            <span className="mt-1 text-sm text-muted-foreground">
+              Steps completed: {completionText}
+            </span>
+          </div>
+
+          {/* Publish Button */}
+          <PublishButton
+            id={job.id}
+            type={'job'}
+            canPublish={canPublish}
+            isPublished={job.isPublished}
+            domain={'jobs'}
+          />
+        </div>
+
+        {/* Job Body */}
+        <div className="mt-20 grid grid-cols-1 gap-x-4 gap-y-12 md:grid-cols-2 lg:gap-x-8">
+          {/* Title */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step I :</span> Title
+            </h2>
+            <JobTitle job={job} />
+          </div>
+
+          {/* Type */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step II :</span> Type
+            </h2>
+            <JobType job={job} />
+          </div>
+
+          {/* Description */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step III :</span> Description
+            </h2>
+            <JobDescription job={job} />
+          </div>
+
+          {/* Summary */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step IV :</span> Summary
+            </h2>
+            <JobSummary job={job} />
+          </div>
+          
+          {/* Location */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step V :</span> Location
+            </h2>
+            <JobLocation job={job} />
+          </div>
+
+          {/* Start Date */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step VI :</span> Start Date
+            </h2>
+            <JobStartDate job={job} />
+          </div>
+
+          {/* End date */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step VII :</span> End Date
+            </h2>
+            <JobEndDate job={job} />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default EditJobPage

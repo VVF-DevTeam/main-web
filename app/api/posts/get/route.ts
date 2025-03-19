@@ -6,9 +6,7 @@ export const GET = async (
 ) => {
   try {
     const postId = request?.nextUrl?.searchParams.get('postId')
-    
-    console.log(postId)
-    
+        
     let post = null
     // Check if post exists
     if (!postId) {

@@ -28,6 +28,10 @@ const BackButton = async () => {
     // For Event Class Page, class page is is just a bridge page so we will skip it
     parentPath = parentPath.replace('/class', '')
   }
+  else if (parentPath.includes('job')) {
+    // For Event Class Page, class page is is just a bridge page so we will skip it
+    parentPath = parentPath.replace('editJob', 'allJobs')
+  }
 
   return (
     <Link href={parentPath as string} className="absolute left-3 top-[170px]">

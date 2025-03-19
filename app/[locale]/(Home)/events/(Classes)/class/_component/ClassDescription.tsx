@@ -45,10 +45,10 @@ const ClassDescription = async ({
       <div className="grid w-full justify-between gap-x-4 gap-y-4 md:flex">
         <div className="flex flex-col gap-y-2">
           <h1 className="mb-2 text-xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerInfo-guitar')}
+            {t('headerInfo')}
           </h1>
           <p>
-            {t('dateHeader-guitar')}:{' '}
+            {t('dateHeader')}:{' '}
             {startDate.toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
@@ -61,7 +61,7 @@ const ClassDescription = async ({
             ,
           </p>
           <p>
-            {t('timeHeader-guitar')}:{' '}
+            {t('timeHeader')}:{' '}
             {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
             {t('everyWeek')}, {startTime} - {endTime}
           </p>
@@ -73,7 +73,7 @@ const ClassDescription = async ({
         <div>
           <iframe
             src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
-            title="VVF Beginner Guitar Lesson"
+            title="Class Location"
             width="300"
             height="250"
             allowFullScreen
@@ -84,7 +84,7 @@ const ClassDescription = async ({
       {/* Event Description */}
       <div>
         <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
-          {t('headerAbout-guitar')}
+          {t('headerAbout')}
         </h1>
         <div className="mt-4 w-full text-pretty">
           <TextPreview value={description} />
@@ -98,9 +98,9 @@ const ClassDescription = async ({
       {/* Schedule */}
       <div className="min-w-full">
         <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
-          {t('headerSchedule-guitar')}
+          {t('headerSchedule')}
         </h1>
-        <h3 className="mb-2 italic">({t('subHeaderSchedule-guitar')})</h3>
+        <h3 className="mb-2 italic">({t('subHeaderSchedule')})</h3>
         <div className="flex flex-col gap-y-4">
           {schedules.map((schedule) => (
             <ScheduleItem

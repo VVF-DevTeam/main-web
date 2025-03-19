@@ -130,6 +130,7 @@ model User {
 
   purchases    Purchase[]
   posts        Post[]
+  jobs         Job[]
   likedPosts   PostLikes[]
   visitedPosts PostVisits[]
   EventHost    Event[]
@@ -155,6 +156,33 @@ model Post {
 
   @@unique([id, userId])
   // TODO: Add Category
+  @@index([id])
+}
+
+// Jobs made by admins
+model Job {
+  id          String   @id @default(cuid())
+  title       String   @unique
+  keyName     String   @unique
+
+  // Metadata
+  description     String?
+  jobType     JobType
+  summary     String?
+  startDate   DateTime? @default(now())
+  endDate     DateTime? @default(now())
+  location    String?
+
+  // States
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // relation
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([id, userId])
   @@index([id])
 }
 
@@ -226,6 +254,14 @@ enum Role {
 enum EventType {
   CLASS
   CONCERT
+}
+
+enum JobType {
+  Media
+  Operations
+  Event
+  HR
+  Tech
 }
 
 enum CategoryType {

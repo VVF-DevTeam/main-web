@@ -21,7 +21,7 @@ const foundingStory = [
   {
     id: 3,
     description:
-      "Lead by Trong Nguyen - a dedicated doctor and guitarist, with the support of Josh Nguyen - the key singer, Eattle Nguyen - the drummer and Khue Le - another the key singer, they started to brainstorm and plan the organization's mission, vision and goals.",
+      "Lead by Trong Nguyen - a dedicated doctor and guitarist, with the support of Josh Tran - the key singer, Eattle Nguyen - the drummer and Khue Le - another the key singer, they started to brainstorm and plan the organization's mission, vision and goals.",
     imageUrl:
       'https://drive.google.com/thumbnail?id=1IcCi98pC_IQ9IrE-J6tay3dAzKSXZshb&sz=w1000',
   },

@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { classId } = await params
 
-  // TODO:Simplify code to only query once to get data
+  // TODO: Simplify code to only query once to get data
   const publishedClass = await prisma.event.findUnique({
     where: {
       keyName: classId,

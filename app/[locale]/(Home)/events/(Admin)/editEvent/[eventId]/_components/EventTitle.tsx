@@ -54,7 +54,6 @@ const EventTitle = ({ event }: EventTitleProps) => {
       setIsEditing(false)
       router.refresh()
     } catch (error: unknown) {
-      console.log(error)
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
           toast({

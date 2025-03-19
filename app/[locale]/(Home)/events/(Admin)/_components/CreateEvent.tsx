@@ -42,7 +42,7 @@ interface CreateEventFormProps {
 const createEventSchema = z.object({
   title: z
     .string({ required_error: 'Title is required' })
-    .min(1, { message: 'Title is required' })
+    .min(1, { message: 'Title must be at least 2 characters long' })
     .max(20, { message: 'Title must be at most 20 characters long' }),
   eventType: z.string().min(1, { message: 'Event type is required' }),
 })
@@ -70,7 +70,6 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
     // Format title to keyName, which is used for pathname
     const keyName = title.replace(/\s+/g, '-').toLowerCase()
-    console.log(keyName)
 
     try {
       const eventData = {
@@ -89,12 +88,9 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
       form.reset()
       router.refresh()
-      router.push(`/events/editEvent/${response.data.id}`)
-    } catch (error) {
-      // TODO: Format error message for all events and posts
-      console.log(error)
+      router.push(`/events/editEvent/${response.data.keyName}`)
+    } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        console.log(error.response?.status)
         if (error.response?.status === 409) {
           toast({
             variant: 'destructive',
@@ -105,14 +101,23 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
           toast({
             variant: 'destructive',
             title: 'Error making request to database',
-            description: 'Something went wrong. Please contact the admin',
+            description:
+              error.response?.data ||
+              'Something went wrong. Please contact the admin',
           })
         }
+      } else if (error instanceof Error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description:
+            error?.message || 'Something went wrong. Please contact the admin.',
+        })
       } else {
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: 'Something went wrong. Please contact the admin',
+          description: 'Something went wrong. Please contact the admin.',
         })
       }
     }
