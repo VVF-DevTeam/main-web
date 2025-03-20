@@ -35,11 +35,17 @@ const JobDescription = async ({
           </h1>
           <p>
             {t('location')}: {location}
-            {t('startDate')}: {startDate.toLocaleDateString('en-GB', {
+          </p>
+          <p>
+            {t('startDate')}:{' '}
+            {startDate.toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
             })}
-            {t('endDate')}: {endDate.toLocaleDateString('en-GB', {
+          </p>
+          <p>
+            {t('endDate')}:{' '}
+            {endDate.toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
             })}

@@ -5,7 +5,7 @@ import { AuthError } from 'next-auth'
 import { isRedirectError } from 'next/dist/client/components/redirect'
 import { prisma } from '../db'
 import { sendEmail } from '../utilFunctions/sendEmail'
-import { createToken } from '../dbQueries/token'
+import { createToken } from '../dbQueries/tokenFunctions'
 
 export const signinAction = async (data: {
   email: string

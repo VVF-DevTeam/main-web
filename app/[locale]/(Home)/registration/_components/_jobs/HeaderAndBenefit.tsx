@@ -42,7 +42,7 @@ const HeaderAndBenefit = () => {
               <li>Access to all Google Workspace features</li>
               <li>
                 Access to Microsoft 365 Basics feature (Words, Excel,
-                PowerPoint, OneDrive, Teams, etc.)
+                PowerPoint, OneDrive, Teams, etc.) or discount on premium features such as Power BI (up to 70% off)
               </li>
               <li>Access to Canvas Pros</li>
               <li>Access to Github Team</li>
