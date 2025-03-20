@@ -10,8 +10,11 @@ import { columns } from './_components/columns'
 
 // Main Component
 const AllEvents = async () => {
-  // check if the current user is an admin to allow access to the event control page
-  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+  // check if the current user is an admin to allow access to the post control page
+  if (
+    !(await roleCheck({ role: 'ADMIN' })) &&
+    !(await roleCheck({ role: 'HOST' }))
+  ) {
     return redirect('/events')
   }
 
@@ -21,11 +24,10 @@ const AllEvents = async () => {
       updatedAt: 'desc',
     },
   })
-  
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}
-      <BackButton />
+      <BackButton style="-mt-10 mb-10" />
 
       {/* Events Table */}
       <h1 className="header-sub">All Events</h1>

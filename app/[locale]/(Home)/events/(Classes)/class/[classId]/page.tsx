@@ -69,18 +69,19 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   return (
     <div>
-      <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
-        <BackButton />
-
-        <ClassImage
-          imageUrl={publishedClass.imgUrl!}
-          location={publishedClass.location!}
-          startDate={publishedClass.startDate!}
-          hosts={publishedClass.hosts}
-          title={publishedClass.title}
-          formLink={publishedClass.formLink!}
-          locale={locale}
-        />
+      <div className="flex flex-col p-6 md:gap-y-10 lg:gap-y-0">
+        <div className="width-max-default mx-auto">
+          <BackButton style="mt-6" />
+          <ClassImage
+            imageUrl={publishedClass.imgUrl!}
+            location={publishedClass.location!}
+            startDate={publishedClass.startDate!}
+            hosts={publishedClass.hosts}
+            title={publishedClass.title}
+            formLink={publishedClass.formLink!}
+            locale={locale}
+          />
+        </div>
         <ClassDescription
           description={publishedClass.description!}
           startDate={publishedClass.startDate!}

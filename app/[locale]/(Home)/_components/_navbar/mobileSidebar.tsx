@@ -4,7 +4,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTrigger,
@@ -25,9 +24,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
         <SheetHeader>
           <SheetTitle className="text-textColor-white">Menu</SheetTitle>
 
-          <SheetDescription>
-            <NavLinks mode="mobile" locale={locale} />
-          </SheetDescription>
+          <NavLinks mode="mobile" locale={locale} />
         </SheetHeader>
 
         <SheetFooter className="mt-20">
