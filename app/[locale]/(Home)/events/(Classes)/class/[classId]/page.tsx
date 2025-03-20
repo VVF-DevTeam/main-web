@@ -71,7 +71,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
     <div>
       <div className="flex flex-col p-6 md:gap-y-10 lg:gap-y-0">
         <div className="width-max-default mx-auto">
-          <BackButton style="mt-6" />
+          <BackButton variant={'responsive'} />
           <ClassImage
             imageUrl={publishedClass.imgUrl!}
             location={publishedClass.location!}

@@ -27,7 +27,7 @@ const AllEvents = async () => {
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}
-      <BackButton style="-mt-10 mb-10" />
+      <BackButton />
 
       {/* Events Table */}
       <h1 className="header-sub">All Events</h1>

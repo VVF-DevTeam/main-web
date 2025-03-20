@@ -93,7 +93,7 @@ const EditEventPage = async ({
   return (
     <div className="my-12 p-6 lg:my-20">
       {/* Back Button To Parent Page */}
-      <BackButton style='my-6'/>
+      <BackButton />
 
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
