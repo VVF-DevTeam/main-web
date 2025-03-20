@@ -1,6 +1,6 @@
 /* Below are some utility functions for hover effects */
 .hover-focus-zoomIn {
-  @apply transition-all duration-300 ease-in-out hover:scale-105;
+  @apply transition-all duration-300 ease-in-out hover:scale-[102%];
 }
 
 .hover-opacity-blur {

@@ -8,10 +8,10 @@ interface EditorProps {
   value: string
 }
 const Editor = ({ onChange, value }: EditorProps) => {
-  const ReactQuill = useMemo(
-    () => dynamic(() => import('react-quill-new'), { ssr: false }),
-    []
-  )
+  const ReactQuill = useMemo(() => {
+    return dynamic(() => import('react-quill-new'), { ssr: false })
+  }, [])
+
   return (
     <ReactQuill
       className="h-fit w-full"
@@ -20,7 +20,9 @@ const Editor = ({ onChange, value }: EditorProps) => {
         toolbar: {
           container: [
             [{ header: '1' }, { header: '2' }, { header: '3' }, { font: [] }],
+            [{ color: [] }, { background: [] }],
             [{ size: [] }],
+            [{ align: 'justify' }],
             ['bold', 'italic', 'underline', 'strike', 'blockquote'],
             [
               { list: 'ordered' },
@@ -39,18 +41,22 @@ const Editor = ({ onChange, value }: EditorProps) => {
       }}
       formats={[
         'header',
+        'align',
         'font',
         'size',
         'bold',
         'italic',
         'underline',
         'strike',
+        'color',
+        'background',
         'blockquote',
         'list',
         'indent',
         'link',
         'image',
         'video',
+        'direction',
         'code-block',
       ]}
       value={value}

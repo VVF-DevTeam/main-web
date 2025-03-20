@@ -23,7 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased ${taipro.variable} ${roboto.variable}`}>
+      <body
+        className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
+      >
         <main>{children}</main>
         <Toaster />
       </body>

@@ -11,7 +11,10 @@ import { columns } from './_components/columns'
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+  if (
+    !(await roleCheck({ role: 'ADMIN' })) &&
+    !(await roleCheck({ role: 'HOST' }))
+  ) {
     return redirect('/events')
   }
 
@@ -21,11 +24,10 @@ const AllPosts = async () => {
       updatedAt: 'desc',
     },
   })
-  
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}
-      <BackButton />
+      <BackButton style="-mt-10 mb-10" />
 
       {/* Posts Table */}
       <h1 className="header-sub">All Events</h1>
@@ -35,7 +37,7 @@ const AllPosts = async () => {
           {' '}
           &quot;Edit&quot;
         </span>{' '}
-        button to edit a post.
+        button to edit a event.
       </p>
       <DataTable columns={columns} data={allEvents} />
     </div>

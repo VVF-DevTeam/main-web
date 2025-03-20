@@ -60,7 +60,6 @@ const EditEventPage = async ({
   })
   // Fetch event categories
   const categories = await prisma.eventCategory.findMany()
-
   // TODO: If the event is not found, show a 404 page.
   if (!event) {
     redirect('/events')
@@ -93,7 +92,7 @@ const EditEventPage = async ({
   return (
     <div className="my-12 p-6 lg:my-20">
       {/* Back Button To Parent Page */}
-      <BackButton />
+      <BackButton style='my-6'/>
 
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}

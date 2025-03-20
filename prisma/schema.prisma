@@ -20,12 +20,13 @@ model EventCategory {
   type      CategoryType
   eventId   String?
   event     Event[]
+  post      Post[]
 }
 
 model Event {
   id          String    @id @default(cuid())
   title       String    @unique
-  keyName     String    @unique
+  keyName     String    @unique 
   eventType   EventType
   description String?
   imgUrl      String?
@@ -148,13 +149,13 @@ model Post {
 
   postLikes  PostLikes[]
   postVisits PostVisits[]
+  categories EventCategory[]
 
   // relation
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([id, userId])
-  // TODO: Add Category
   @@index([id])
 }
 
