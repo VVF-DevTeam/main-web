@@ -1,11 +1,14 @@
 'use client'
+// Libraries
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { z } from 'zod'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+
+// Components
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 import {
   Form,
@@ -31,6 +34,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
 
+// Interfaces
 interface CreateEventFormProps {
   author: string
 }
@@ -38,11 +42,12 @@ interface CreateEventFormProps {
 const createEventSchema = z.object({
   title: z
     .string({ required_error: 'Title is required' })
-    .min(1, { message: 'Title is required' })
+    .min(1, { message: 'Title must be at least 2 characters long' })
     .max(20, { message: 'Title must be at most 20 characters long' }),
   eventType: z.string().min(1, { message: 'Event type is required' }),
 })
 
+// Main Component
 const CreateEventForm = ({ author }: CreateEventFormProps) => {
   console.log(author)
   const { toast } = useToast()
@@ -59,10 +64,18 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     console.log(data)
+
+    //Format title to trims whitespaces
+    const title = data.title.replace(/\s+/g, ' ').trim()
+
+    // Format title to keyName, which is used for pathname
+    const keyName = title.replace(/\s+/g, '-').toLowerCase()
+
     try {
       const eventData = {
-        title: data.title,
+        title: title,
         eventType: data.eventType,
+        keyName: keyName,
       }
       const response = await axios.post('/api/events/create', eventData)
       if (response.status === 200) {
@@ -75,14 +88,38 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
       form.reset()
       router.refresh()
-      router.push(`/events/editEvent/${response.data.id}`)
-    } catch (error) {
-      console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      router.push(`/events/editEvent/${response.data.keyName}`)
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast({
+            variant: 'destructive',
+            title: 'Duplicate Event Title',
+            description: 'There is already an event with this title',
+          })
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error making request to database',
+            description:
+              error.response?.data ||
+              'Something went wrong. Please contact the admin',
+          })
+        }
+      } else if (error instanceof Error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description:
+            error?.message || 'Something went wrong. Please contact the admin.',
+        })
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Something went wrong. Please contact the admin.',
+        })
+      }
     }
   }
 
@@ -108,11 +145,13 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#C54B3E]">Event Title</FormLabel>
+                <FormLabel className="text-textColor-brand">
+                  Event Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
-                    className="w-80 text-[#1B171A] xl:max-w-[400px]"
+                    className="w-80 text-textColor xl:max-w-[400px]"
                     {...field}
                   />
                 </FormControl>
@@ -126,7 +165,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             name="eventType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="mr-2 text-[#C54B3E]">
+                <FormLabel className="mr-2 text-textColor-brand">
                   Event Type:
                 </FormLabel>
                 <FormControl>
@@ -162,7 +201,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-[#C54B3E] font-bold text-white hover:bg-[#C54B3E]/90 hover:text-white/90"
+              className="text-md max-w-fit bg-bgColor-brand font-bold text-textColor-white hover:bg-bgColor-brand/90 hover:text-textColor-white/90"
               type="submit"
             >
               Create Event

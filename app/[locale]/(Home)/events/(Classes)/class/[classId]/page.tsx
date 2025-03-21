@@ -1,27 +1,42 @@
 // Components
 import ClassImage from '../_component/ClassImage'
 import ClassDescription from '../_component/ClassDescription'
+import BackButton from '@/components/ui/back-button'
 
 // Libraries
 import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 
-// Metadata
-export const metadata: Metadata = {
-  title: 'Beginner Guitar Lessons',
-  description: 'Beginner Guitar Lessons from Viet Vibe Foundation',
-  openGraph: {
-    title: 'Beginner Guitar Lessons',
-    description: 'Beginner Guitar Lessons from Viet Vibe Foundation',
-    images: [
-      {
-        url: 'https://opengraph.b-cdn.net/production/images/11bc2377-17ca-4649-b552-4bd9243ac6e7.jpg?token=b3iCUGitQyvlmapA7oEKdwIGX78HqOKvJHILBkc6j2o&height=800&width=1200&expires=33274743245', // Update with the correct path
-        width: 1200,
-        height: 630,
-        alt: 'Someone is playing a guitar',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ classId: string }>
+}): Promise<Metadata> {
+  const { classId } = await params
+
+  // TODO: Simplify code to only query once to get data
+  const publishedClass = await prisma.event.findUnique({
+    where: {
+      keyName: classId,
+    },
+    select: {
+      title: true,
+      imgUrl: true,
+    },
+  })
+
+  return {
+    title: publishedClass?.title,
+    description: publishedClass?.title + ' from Viet Vibe Foundation',
+    openGraph: {
+      title: publishedClass?.title,
+      description: publishedClass?.title + ' from Viet Vibe Foundation',
+      images: {
+        url: publishedClass?.imgUrl!,
+        alt: publishedClass?.title,
       },
-    ],
-  },
+    },
+  }
 }
 
 // Interfaces
@@ -35,7 +50,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   const publishedClass = await prisma.event.findUnique({
     where: {
-      id: classId,
+      keyName: classId,
     },
     include: {
       schedules: true,
@@ -54,15 +69,19 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   return (
     <div>
-      <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
-        <ClassImage
-          imageUrl={publishedClass.imgUrl!}
-          location={publishedClass.location!}
-          startDate={publishedClass.startDate!}
-          hosts={publishedClass.hosts}
-          title={publishedClass.title}
-          locale={locale}
-        />
+      <div className="flex flex-col p-6 md:gap-y-10 lg:gap-y-0">
+        <div className="width-max-default mx-auto">
+          <BackButton variant={'responsive'} />
+          <ClassImage
+            imageUrl={publishedClass.imgUrl!}
+            location={publishedClass.location!}
+            startDate={publishedClass.startDate!}
+            hosts={publishedClass.hosts}
+            title={publishedClass.title}
+            formLink={publishedClass.formLink!}
+            locale={locale}
+          />
+        </div>
         <ClassDescription
           description={publishedClass.description!}
           startDate={publishedClass.startDate!}
@@ -74,6 +93,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           hosts={publishedClass.hosts}
           schedules={publishedClass.schedules}
           days={publishedClass.days!}
+          formLink={publishedClass.formLink!}
           locale={locale}
         />
       </div>

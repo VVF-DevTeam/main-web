@@ -43,7 +43,6 @@ const EventTimings = ({ event }: EventTimingsProps) => {
   })
 
   const onSubmit = async (data: z.infer<typeof EventTimingsSchema>) => {
-    console.log(data)
     try {
       const response = await axios.put(`/api/events/edit/${event.id}`, data)
       toast({

@@ -45,7 +45,6 @@ const ScheduleItem = ({
   isEditable = true,
   eventId,
   scheduleItemId,
-  position,
 }: ScheduleItemProps) => {
   const router = useRouter()
   const { toast } = useToast()
@@ -83,7 +82,6 @@ const ScheduleItem = ({
   }
 
   const addScheduleItem = async (scheduleItemId: string | null) => {
-    console.log(scheduleItemId, position)
     const data = {
       scheduleItemId: scheduleItemId,
     }
@@ -110,7 +108,6 @@ const ScheduleItem = ({
     }
   }
   const onSubmit = async (data: z.infer<typeof scheduleItemSchema>) => {
-    console.log(data)
     let response
     try {
       if (scheduleItemId === null) {

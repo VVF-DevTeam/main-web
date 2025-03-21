@@ -7,6 +7,7 @@ export const PUT = async (
   try {
     const { isPublished, ...values } = await request.json()
     const { eventId } = await params
+    
     console.log(isPublished)
     // Check if the event exists
     const eventExists = await prisma.event.findUnique({
@@ -18,7 +19,10 @@ export const PUT = async (
     if (!eventExists) {
       return new NextResponse('Event not found', { status: 404 })
     }
+    
+    // TODO: Do we need to assign to eventExists.days?
     const eventDays = eventExists.days = values.days
+
     // Update the event
     let updatedEvent
     if (values.days) {

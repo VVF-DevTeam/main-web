@@ -5,6 +5,7 @@ import initTranslation from '@/app/i18n'
 import ScheduleItem from './ScheduleItem'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import TextPreview from '@/app/[locale]/components/TextPreview'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
@@ -19,6 +20,7 @@ interface ClassDescriptionProps {
   hosts: { name: string | null }[]
   locale: string
   days: string[]
+  formLink: string
   schedules: EventSchedule[]
 }
 
@@ -33,6 +35,7 @@ const ClassDescription = async ({
   endDate,
   locale,
   days,
+  formLink,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -42,10 +45,10 @@ const ClassDescription = async ({
       <div className="grid w-full justify-between gap-x-4 gap-y-4 md:flex">
         <div className="flex flex-col gap-y-2">
           <h1 className="mb-2 text-xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerInfo-guitar')}
+            {t('headerInfo')}
           </h1>
           <p>
-            {t('dateHeader-guitar')}:{' '}
+            {t('dateHeader')}:{' '}
             {startDate.toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
@@ -58,18 +61,19 @@ const ClassDescription = async ({
             ,
           </p>
           <p>
-            {t('timeHeader-guitar')}:{' '}
-            {days.map((day) => t(day).toLowerCase()).join(', ')}{' '}
+            {t('timeHeader')}:{' '}
+            {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
             {t('everyWeek')}, {startTime} - {endTime}
           </p>
           <p>
-            {location} ({t('TBD')})
+            {t('location')}: {location}
           </p>
         </div>
+
         <div>
           <iframe
-            src="https://www.google.com/maps/d/u/5/embed?mid=1pqdfvsCcNlRJQx5ZQfFsx7TFghOn44o&ehbc=2E312F"
-            title="VVF Beginner Guitar Lesson"
+            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
+            title="Class Location"
             width="300"
             height="250"
             allowFullScreen
@@ -79,10 +83,12 @@ const ClassDescription = async ({
 
       {/* Event Description */}
       <div>
-        <h1 className="mb-4 text-xl font-extrabold md:text-3xl lg:text-4xl">
-          {t('headerAbout-guitar')}
+        <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+          {t('headerAbout')}
         </h1>
-      <p>{t(description)}</p>
+        <div className="mt-4 w-full text-pretty">
+          <TextPreview value={description} />
+        </div>
         {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
           the reserve button below)
@@ -91,10 +97,10 @@ const ClassDescription = async ({
 
       {/* Schedule */}
       <div className="min-w-full">
-        <h1 className="mb-4 text-xl font-extrabold md:text-3xl lg:text-4xl">
-          {t('headerSchedule-guitar')}
+        <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+          {t('headerSchedule')}
         </h1>
-        <h3 className="mb-2 italic">({t('subHeaderSchedule-guitar')})</h3>
+        <h3 className="mb-2 italic">({t('subHeaderSchedule')})</h3>
         <div className="flex flex-col gap-y-4">
           {schedules.map((schedule) => (
             <ScheduleItem
@@ -110,7 +116,7 @@ const ClassDescription = async ({
 
       {/* Buy Button */}
       <Link
-        href="https://docs.google.com/forms/d/1u6MqzvwTdQhEwiwBNa1mf_IIEpWiKpK9dDWk-85Vv0E/viewform?edit_requested=true"
+        href={formLink}
         target="_blank"
         rel="noopener noreferrer"
       >

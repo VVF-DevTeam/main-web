@@ -16,12 +16,26 @@
   @apply flex items-center justify-center;
 }
 
-.flex-end {
-  @apply flex items-center justify-end;
+.flex-center-md {
+  @apply md:flex md:items-center md:justify-center;
 }
 
 .flex-col-center {
   @apply flex flex-col items-center justify-center;
+}
+
+
+/* flex end */
+.flex-end {
+  @apply flex items-center justify-end;
+}
+
+.flex-col-end {
+  @apply flex flex-col items-center justify-end;
+}
+
+.flex-end-md {
+  @apply md:flex md:items-center md:justify-end;
 }
 
 /* flex between */

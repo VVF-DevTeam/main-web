@@ -18,19 +18,45 @@ const ScheduleItem = async ({
 }: ScheduleItemProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
-  const duration = '0.5 hours'
+  const calcDuration = (startTime: string, endTime: string) => {
+    const splitStart = startTime.split(':')
+    const splitEnd = endTime.split(':')
 
-  // TODO: Add a duration calculator function
-  // const calcDuration = (startTime: string, endTime: string) => {}
+    let hours = 0
+    let minutes = 0
+
+    //  Calculate the minutes
+    if (parseInt(splitEnd[1]) - parseInt(splitStart[1]) < 0) {
+      minutes = 60 - parseInt(splitStart[1]) + parseInt(splitEnd[1])
+      hours = hours - 1
+    } else {
+      minutes = parseInt(splitEnd[1]) - parseInt(splitStart[1])
+    }
+
+    // Calculate the hours
+    if (parseInt(splitEnd[0]) - parseInt(splitStart[0]) < 0) {
+      hours += 24 + parseInt(splitStart[0]) - parseInt(splitEnd[0])
+    } else {
+      hours += parseInt(splitEnd[0]) - parseInt(splitStart[0])
+    }
+
+    return `${hours===0? '':''+hours+'h'} ${minutes}m`
+  }
 
   return (
     <div className="flex min-w-full gap-x-24 border-b-2 border-gray-500 py-6">
       {/* Time */}
+<<<<<<< HEAD
       <div className="flex-col-default">
+=======
+      <div className="flex flex-col text-nowrap">
+>>>>>>> f5b91ba757f87f5f1282dd6b2a5a65609c989bbb
         <span>
           {startTime} - {endTime}
         </span>
-        <span className="text-muted-foreground">{duration}</span>
+        <span className="text-muted-foreground">
+          {calcDuration(startTime, endTime)}
+        </span>
       </div>
 
       {/* Action */}

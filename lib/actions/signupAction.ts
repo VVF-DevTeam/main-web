@@ -1,6 +1,6 @@
 'use server'
 import { signUpSchema } from '../zodSchema/signupSchema'
-import { createToken } from '../dbQueries/token'
+import { createToken } from '../dbQueries/tokenFunctions'
 import { prisma } from '../db'
 
 import bcrypt from 'bcryptjs'

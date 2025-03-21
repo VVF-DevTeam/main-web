@@ -1,7 +1,13 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 
-export async function adminCheck() {
+type role = 'ADMIN' | 'HOST'
+
+interface StatusCheckProps {
+  role: role
+}
+
+export async function roleCheck({ role }: StatusCheckProps) {
   const session = await auth()
   const userEmail = session?.user?.email
 
@@ -12,7 +18,7 @@ export async function adminCheck() {
   })
 
   let isAdmin = false
-  if (user?.role === 'ADMIN') {
+  if (user?.role === role) {
     isAdmin = true
   }
 

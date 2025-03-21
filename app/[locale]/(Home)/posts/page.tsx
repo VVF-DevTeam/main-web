@@ -1,32 +1,32 @@
-import PostList from '@/app/[locale]/(Home)/posts/_components/PostList'
-import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { PlusCircle, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+
 import { auth } from '@/auth'
+import { getPublishedPostsByTitle } from '@/lib/dbQueries/Post'
+import { prisma } from '@/lib/db'
+import { PlusCircle, ArrowRight } from 'lucide-react'
+import SearchBox from '../../components/SearchBox'
+import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
+import { Suspense } from 'react'
+
+import { Button } from '@/components/ui/button'
 import initTranslations from '@/app/i18n'
+import PublishedPosts from './_components/PublishedPosts'
 interface PostsProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    title: string
+  }>
 }
 
-const Posts = async ({ params }: PostsProps) => {
+const Posts = async ({ params, searchParams }: PostsProps) => {
   const { locale } = await params
+  const { title } = await searchParams
   const { t } = await initTranslations(locale, ['post', 'common'])
 
   // TODO: Abstract this code to a db function.
   const session = await auth()
-  const publishedPosts = await prisma.post.findMany({
-    where: {
-      isPublished: true,
-    },
-    include: {
-      postLikes: true,
-      postVisits: true,
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  const publishedPosts = await getPublishedPostsByTitle(title || '')
+
   const userEmail = session?.user?.email
 
   const user = await prisma.user.findUnique({
@@ -48,23 +48,40 @@ const Posts = async ({ params }: PostsProps) => {
           <h1 className="header-font-black header-sub lg:text-5xl">
             {t('header')}
           </h1>
-          <p className="header-font-black text-sm text-textColor">
+          <p className="header-font-black md:text-md text-sm text-muted-foreground">
             {t('description-header')}
           </p>
         </div>
 
-        {/* Posts */}
-        {publishedPosts.length > 0 ? (
-          <PostList posts={publishedPosts} userId={session?.user?.id || null} />
-        ) : (
-          <p className="flex-center header-font-black header-sub">
-            {t('noPost')}
+        {/* Seearch box */}
+
+        <div className="mt-6 md:mt-10 lg:mt-12">
+          <SearchBox />
+          <p className="mt-2 pl-4 text-sm text-muted-foreground">
+            {publishedPosts !== null && publishedPosts.length > 0 ? (
+              <>
+                Showing {publishedPosts.length} posts{' '}
+                {title && (
+                  <>
+                    with title{' '}
+                    <span className="font-semibold">&quot;{title}&quot;</span>
+                  </>
+                )}
+              </>
+            ) : (
+              'No results found'
+            )}
           </p>
-        )}
+        </div>
+
+        {/* Posts */}
+        <Suspense key={title} fallback={<PostsSkeleton />}>
+          <PublishedPosts title={title} locale={locale} />
+        </Suspense>
 
         {/* Admin Buttons */}
         {isAdmin && (
-          <div className="flex-end mt-6 w-full gap-x-4 px-6">
+          <div className="flex-end mt-6 w-full flex-wrap gap-x-4 pl-4 sm:px-6">
             <Link href="/posts/allPosts" className="group mb-2 py-6">
               <Button
                 variant={'ghost'}

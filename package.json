@@ -47,7 +47,11 @@
     "next-i18n-router": "^5.5.1",
     "pg": "^8.13.1",
     "prisma": "^6.2.1",
+<<<<<<< HEAD
     "quill": "^2.0.3",
+=======
+    "query-string": "^9.1.1",
+>>>>>>> f5b91ba757f87f5f1282dd6b2a5a65609c989bbb
     "react": "18.2.0",
     "react-color-palette": "^7.3.0",
     "react-day-picker": "^9.5.1",
@@ -60,6 +64,7 @@
     "react-spinners": "^0.15.0",
     "resend": "^4.0.1",
     "shadcn": "^2.1.6",
+    "suneditor-react": "^3.6.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "use-ssr": "^1.0.25",

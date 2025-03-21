@@ -87,7 +87,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
   const { t } = await initTranslation(locale, ['about', 'common'])
 
   return (
-    <div className="flex-col-center py-32">
+    <div className="flex-col-center py-20">
 
       {/* Header */}
       <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">

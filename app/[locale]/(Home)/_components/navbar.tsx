@@ -16,7 +16,8 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="sticky z-10 h-[90px] w-full bg-[#d2d0d0]/50 px-6 shadow-sm backdrop-blur-sm">
+    <nav className="sticky z-10 h-[80px] w-full bg-[#d2d0d0]/60 px-6 shadow-md backdrop-blur-sm">
+
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
       {/* <div className="white-overlay"></div>
       <Image
@@ -28,19 +29,20 @@ const Navbar = async ({ locale }: { locale: string }) => {
       /> */}
 
       {/* Nav Links */}
-      <div className="flex-between">
+
+      <div className="flex-between h-[90px]">
         <div className="flex h-full w-full items-center gap-x-4">
           {/* Company Logo with Slogan*/}
-          <Link href="/" className="flex-col-center -mt-5">
+          <Link href="/">
+
             <CompanyLogo />
-            <p className="-mt-7 text-[9px] header-font-black"> Grow together, Shine together</p>
           </Link>
 
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="flex-center -ml-10 md:-ml-5 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand"
-              href=""
+              className="flex-center -ml-10 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-7"
+              href={`/profile/${session?.user?.name}`}
               aria-label="Go to user profile"
             >
               <User2 className="h-5 w-5" />

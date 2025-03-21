@@ -16,7 +16,7 @@ export const PATCH = async (
       return new NextResponse('Event not found', { status: 404 })
     }
 
-    const unpublishedEvent = await prisma.event.update({
+    const publishedEvent = await prisma.event.update({
       where: {
         id: eventId,
       },
@@ -24,9 +24,9 @@ export const PATCH = async (
         isPublished: true,
       },
     })
-    return NextResponse.json(unpublishedEvent)
+    return NextResponse.json(publishedEvent)
   } catch (error) {
-    console.log('[UNPUBLISH ERROR]', error)
+    console.log('[PUBLISH ERROR]', error)
     return new NextResponse('internal error', { status: 500 })
   }
 }

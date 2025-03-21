@@ -7,7 +7,12 @@ import PostCard from './PostCard'
 
 // Interfaces
 interface PostListProps {
-  posts: (Post & { postLikes: PostLikes[] } & { postVisits: PostVisits[] })[]
+  posts: (Pick<Post, 'id' | 'title' | 'createdAt' | 'imgUrl' | 'summary'> & {
+    _count: { postLikes: number; postVisits: number }
+  } & {
+    postLikes: PostLikes[]
+  } & { postVisits: PostVisits[] })[]
+
   userId: string | null
 }
 
@@ -18,12 +23,12 @@ const PostList = ({ posts, userId }: PostListProps) => {
       {posts &&
         posts.map((post) => (
           <PostCard
+            key={post.id}
             userId={userId}
-            postLikes={post.postLikes.length}
-            postViews={post.postVisits.length}
+            postLikes={post._count.postLikes}
+            postViews={post._count.postVisits}
             hasLiked={!!post.postLikes.some((like) => like.userId === userId)}
             hasViewed={!!post.postVisits.some((view) => view.userId === userId)}
-            key={post.id}
             id={post.id}
             title={post.title}
             summary={post.summary!}

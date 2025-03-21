@@ -58,6 +58,7 @@ const EventDays = ({ event }: EventEndDays) => {
     const day2 = b.toLowerCase()
     return sorter[day1] - sorter[day2]
   })
+  
   const onSubmit = async (data: z.infer<typeof EventDaysSchema>) => {
     try {
       const response = await axios.put(`/api/events/edit/${event.id}`, data)

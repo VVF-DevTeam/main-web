@@ -54,7 +54,7 @@ const SignInForm = () => {
 
   useEffect(() => {
     // Redirect to home page if the user is already logged in
-    if (shouldRedirect === false) {
+    if (!shouldRedirect) {
       return
     }
     redirect('/')
@@ -72,7 +72,7 @@ const SignInForm = () => {
     try {
       const response: ServerActionResponse = await signinAction(data)
 
-      if (response.success === true) {
+      if (response.success) {
         toast({
           variant: 'default',
           title: 'Success',
@@ -155,7 +155,7 @@ const SignInForm = () => {
                     {t('password')}
                   </FormLabel>
                   <FormControl>
-                    <div className="relative max-w-[360px]">
+                    <div className="relative lg:max-w-[360px]">
                       <Input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter password"

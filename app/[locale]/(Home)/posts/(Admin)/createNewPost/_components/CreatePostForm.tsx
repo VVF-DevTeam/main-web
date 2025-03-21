@@ -1,12 +1,15 @@
 'use client'
+// Libraries
 import { createPostSchema } from '@/lib/zodSchema/createPostSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { z } from 'zod'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+
+// Components
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 import {
   Form,
@@ -21,9 +24,12 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
 
+// Interfaces
 interface CreatePostFormProps {
   author: string
 }
+
+// Main Component
 const CreatePostForm = ({ author }: CreatePostFormProps) => {
   const { toast } = useToast()
   const router = useRouter()
@@ -53,13 +59,30 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
 
       form.reset()
       router.refresh()
+      router.push(`/posts/editPost/${response.data.id}`)
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast({
+            variant: 'destructive',
+            title: 'Duplicate Post',
+            description: 'There is already a post with this title',
+          })
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error making request to database',
+            description: 'Something went wrong. Please contact the admin',
+          })
+        }
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Something went wrong. Please contact the admin',
+        })
+      }
     }
   }
 
@@ -102,10 +125,10 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
           />
           <div className="flex gap-x-6">
             <Button
-              variant={'outline'}
+              variant={'default'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-bgColor-brand font-bold text-textColor-white hover:bg-bgColor-brand/90 hover:text-textColor-white/90"
+              className="text-md max-w-fit"
               type="submit"
             >
               Create Post

@@ -11,6 +11,81 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        placeHolderFade: {
+          '0%': {
+            opacity: '0',
+            fontsize: '0px',
+            transform: 'translateY(-30px)',
+          },
+          '3%': {
+            opcacity: '0',
+            fontsize: '0px',
+            transform: 'translateY(-30px)',
+          },
+          '20%': {
+            opacity: '1',
+            fontsize: 'inherit',
+            transform: 'translateY(0)',
+          },
+          '97%': {
+            opacity: '1',
+            fontsize: 'inherit',
+            transform: 'translateY(0)',
+          },
+          '100%': {
+            opacity: '0',
+            fontsize: '0px',
+            transform: 'translateY(30px)',
+          },
+        },
+        roll: {
+          '0%': {
+            opacity: '0',
+            fontsize: '0px',
+            marginleft: '-30px',
+            margintop: '0px',
+            transform: 'rotate(-25deg)',
+          },
+          '3%': {
+            opacity: '1',
+            transform: 'rotate(0deg)',
+          },
+          '5%': {
+            fontsize: 'inherit',
+            opacity: '1',
+            marginleft: '0px',
+            margintop: '0px',
+          },
+
+          '70%': {
+            fontsize: 'inherit',
+            opacity: '1',
+            marginleft: '0px',
+            margintop: '0px',
+            transform: 'rotate(0deg)',
+          },
+
+          '77%': {
+            fontsize: '0px',
+            opacity: '0',
+            marginleft: '-50px',
+            margintop: '-50px',
+          },
+          '100%': {
+            fontsize: '0px',
+            opacity: '0',
+            marginleft: '-30px',
+            margintop: '0px',
+            transform: 'rotate(15deg)',
+          },
+        },
+      },
+      animation: {
+        placeHolderFade: 'placeHolderFade 3s ease-in infinite',
+        roll: 'roll 3s linear infinite 0.2s',
+      },
+
       colors: {
         bgColor: {
           DEFAULT: 'hsl(var(--background-white))',
@@ -22,6 +97,9 @@ export default {
           brandDark: 'hsl(var(--brand-color-dark))',
           gray: 'hsl(var(--background-gray))',
           grayLight: 'hsl(var(--background-gray-light))',
+          blue: 'hsl(var(--background-blue))',
+          green: 'hsl(var(--background-green))',
+          yellow: 'hsl(var(--background-yellow))',
           destructive: 'hsl(var(--destructive))',
         },
         textColor: {
@@ -31,6 +109,9 @@ export default {
           brandDark: 'hsl(var(--brand-color-dark))',
           white: 'hsl(var(--text-white))',
           gray: 'hsl(var(--text-gray))',
+          blue: 'hsl(var(--text-blue))',
+          green: 'hsl(var(--text-green))',
+          yellow: 'hsl(var(--text-yellow))',
           destructive: 'hsl(var(--destructive))',
         },
         foreground: 'hsl(var(--foreground))',

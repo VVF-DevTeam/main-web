@@ -59,8 +59,6 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   }
   const saveTags = async (data: EventCategory[]) => {
     setLoading(true)
-    const dataWithId = data.map((item) => ({ ...item, eventId: event.id }))
-    console.log(dataWithId)
 
     try {
       const response = await axios.post(
@@ -90,7 +88,6 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   }
 
   const removeTag = async (tagId: string) => {
-    console.log(tagId)
     setLoading(true)
     try {
       const response = await axios.delete(

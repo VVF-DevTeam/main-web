@@ -41,7 +41,6 @@ const EventPrice = ({ event }: EventPriceProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventPriceSchema>) => {
-    console.log(values)
     try {
       await axios.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)

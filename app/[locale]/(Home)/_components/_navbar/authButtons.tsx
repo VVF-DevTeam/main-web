@@ -57,13 +57,23 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
     <button
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
       className={cn(
+        'flex items-center justify-center transition-all font-semibold whitespace-nowrap',
         mode === 'desktop'
-          ? `flex items-center justify-center gap-x-2 whitespace-nowrap text-sm font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-[#212121] hover:text-[#C54B3E] hover:underline'}`
-          : `mt-2 flex h-full w-full items-center justify-center gap-x-4 whitespace-nowrap rounded-md p-4 text-xl font-semibold transition-all ${isActive ? 'text-[#C54B3E]' : 'text-slate-200 hover:bg-[#C54B3E]/40'}`
+          ? 'gap-x-2 text-sm'
+          : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl',
+        isActive
+          ? 'text-textColor-brand'
+          : mode === 'desktop'
+          ? 'text-textColor hover:text-textColor-brand hover:underline'
+          : 'text-slate-200 hover:bg-bgColor-brand'
       )}
     >
       <LogIn className="h-5 w-5" />
-      <span>{userExists ? t('logout-nav', { ns: 'homePage' }) : t('login-nav', { ns: 'homePage' })}</span>
+      <span>
+        {userExists
+          ? t('logout-nav', { ns: 'homePage' })
+          : t('login-nav', { ns: 'homePage' })}
+      </span>
     </button>
   )
 }

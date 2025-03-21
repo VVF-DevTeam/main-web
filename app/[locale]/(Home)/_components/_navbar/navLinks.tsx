@@ -9,6 +9,8 @@ import { auth } from '@/auth'
 import NavLink from './navLink'
 import AuthButtons from './authButtons'
 import NavAbout from './navAbout'
+import NavRegistration from './navRegistration'
+
 
 // Interfaces
 type screenSize = 'mobile' | 'desktop'
@@ -27,7 +29,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
     <div
       className={cn(
         mode === 'desktop'
-          ? 'flex-center h-full w-full gap-x-3 lg:gap-x-6'
+          ? 'flex-center h-full w-full gap-x-3 lg:gap-x-5'
           : 'flex-col-center h-full w-full gap-y-4'
       )}
     >
@@ -41,11 +43,14 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
         />
       ))}
 
+      <NavRegistration mode={mode} />
+
       {/* TODO: Fix CSS for them */}
       <NavAbout
         title={t('about-navLink')}
         vision={t('vision-navLink')}
         directors={t('directors-navLink')}
+        founders={t('founders-navLink')}
         mode={mode}
       />
       <AuthButtons userExists={!!session?.user} mode={mode} />
