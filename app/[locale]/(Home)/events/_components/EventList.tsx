@@ -10,7 +10,7 @@ interface EventListProps {
 // Main Component
 const EventList = async ({ events }: EventListProps) => {
   return (
-    <div className="flex w-full flex-col items-center gap-y-6 xl:gap-y-12 my-10 xl:mt-20">
+    <div className="flex w-full flex-center gap-y-6 xl:gap-y-12 my-10 xl:mt-20">
       <h2 className="header-main">
         Upcoming Events
       </h2>

@@ -34,8 +34,8 @@ const HostsSearchBox = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-6">
-      <div className="flex flex-wrap items-center gap-x-2">
+    <div className="flex flex-col-default">
+      <div className="flex-wrap-dafault items-center">
         {/* Display all the selected users with an x button */}
         {eventHosts.length > 0 ? (
           eventHosts.map((host: Host) => (

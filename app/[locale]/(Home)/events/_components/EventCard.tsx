@@ -44,7 +44,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
         {/* Price and availability */}
         <div className="flex-between">
-          <span className="flex items-center gap-x-2">
+          <span className="flex-center gap-x-2">
             <Tag className="h-5 w-5"></Tag>${event.price}
             {event.priceMember ? '/$' + event.priceMember : null}
           </span>
@@ -59,7 +59,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
         {/* Location */}
         <div className="flex-between">
-          <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
+          <span className="flex-center gap-x-2 text-xl text-muted-foreground">
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}
           </span>
@@ -68,7 +68,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
         {/* Timings */}
         <div className="flex-between rounded-lg bg-bgColor-brand/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand/30">
-          <span className="flex items-center gap-x-2 text-sm md:text-lg">
+          <span className="flex-center gap-x-2 text-sm md:text-lg">
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5"></CalendarDays>
             {event.startDate.toLocaleDateString('en-GB', {})}
           </span>

@@ -1,0 +1,5 @@
+/*Below are some default setting for loading skeleton*/
+/* For all size screens */
+.post_card {
+    @apply h-[45vh] w-full animate-pulse rounded-md bg-gray-300 md:h-[19vh];
+}

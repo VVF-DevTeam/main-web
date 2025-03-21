@@ -17,7 +17,7 @@ const PreviewBadge = ({
   helperText,
 }: PreviewBadgeProps) => {
   return (
-    <div className="flex flex-col items-center place-self-center">
+    <div className="flex-col-center place-self-center">
      {helperText && <h3 className="mb-6 font-bold text-gray-800 md:text-xl">
         {helperText}
       </h3>}

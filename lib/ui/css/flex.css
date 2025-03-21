@@ -33,3 +33,11 @@
 .default-gap {
   @apply gap-x-8 gap-y-6;
 }
+
+.flex-col-default-gap-y{
+  @apply flex flex-col gap-y-6;
+}
+
+.flex-wrap-dafault{
+  @apply flex flex-wrap gap-x-2;
+}

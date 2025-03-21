@@ -116,7 +116,7 @@ const EventDays = ({ event }: EventEndDays) => {
                       <ToggleGroup
                         type="multiple"
                         variant={'outline'}
-                        className="flex flex-wrap gap-x-2 gap-y-2"
+                        className="flex-wrap-dafault gap-y-2"
                         {...field}
                         value={field.value}
                         onValueChange={field.onChange}

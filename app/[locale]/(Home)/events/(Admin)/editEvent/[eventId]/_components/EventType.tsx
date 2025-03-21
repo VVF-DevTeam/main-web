@@ -73,7 +73,7 @@ const EventType = ({ event }: EventTypeProps) => {
 
   return (
     <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Event Type</h1>
         <button
           onClick={() => setEditing(!editing)}
@@ -85,7 +85,7 @@ const EventType = ({ event }: EventTypeProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Type <Pencil className="h-4 w-4" />
             </span>
           )}
@@ -101,7 +101,7 @@ const EventType = ({ event }: EventTypeProps) => {
               control={form.control}
               name="eventType"
               render={({ field }) => (
-                <FormItem className='flex items-center justify-center'>
+                <FormItem className='flex-center'>
                   <FormControl>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

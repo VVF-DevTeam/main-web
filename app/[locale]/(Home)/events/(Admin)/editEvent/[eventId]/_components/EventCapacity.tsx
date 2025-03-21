@@ -63,7 +63,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <div className="flex w-full flex-col-default rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Capacity</h1>
         <button
@@ -76,7 +76,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Price <Pencil className="h-4 w-4" />
             </span>
           )}

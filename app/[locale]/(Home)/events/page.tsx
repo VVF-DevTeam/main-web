@@ -31,7 +31,7 @@ const EventsPage = async ({
   }
 
   return (
-    <div className="flex flex-col gap-y-6">
+    <div className="flex-col-default-gap-y">
       <EventHeroImage locale={locale} />
       <Suspense
         fallback={

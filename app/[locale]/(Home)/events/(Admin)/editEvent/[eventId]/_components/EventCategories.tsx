@@ -120,7 +120,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h3 className="text-lg font-bold">Event Categories</h3>
         <Button
           variant={null}
@@ -290,7 +290,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
             Add event event categories.
           </p>
         ) : (
-          <div className="flex flex-wrap gap-x-2">
+          <div className="flex-wrap-dafault">
             {event.categories.map((category) => (
               <Badge
                 key={category.id}
