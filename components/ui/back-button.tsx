@@ -80,5 +80,7 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
     )
   }
 )
+BackButton.displayName = 'BackButton'
+
 
 export default BackButton

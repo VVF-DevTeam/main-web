@@ -6,8 +6,9 @@ const nextConfig: NextConfig = {
     domains: [
       'images.unsplash.com',
       'drive.google.com',
-      'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com',
+      'lh3.googleusercontent.com', // for google avatars and images
+      'avatars.githubusercontent.com', // for github avatars
+      'platform-lookaside.fbsbx.com', // for facebook avatars
     ],
   },
 }
