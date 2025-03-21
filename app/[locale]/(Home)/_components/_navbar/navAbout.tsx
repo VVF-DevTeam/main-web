@@ -52,10 +52,10 @@ const NavAbout: React.FC<NavAboutProps> = ({
   }
 
   return (
-    <div ref={dropdownRef} className="relative w-full">
+    <div ref={dropdownRef} className="relative w-full -mr-1">
       <button
         className={classNames(
-          'flex items-center justify-center gap-x-[5px] font-semibold transition-all pr-1',
+          'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
           mode === 'desktop'
             ? `whitespace-nowrap text-sm ${
                 isActive
@@ -73,7 +73,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Ribbon className="h-5 w-5" />
         <span>{title}</span>
         <ChevronDown
-          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 

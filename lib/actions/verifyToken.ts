@@ -1,5 +1,5 @@
 'use server'
-import { getTokenByToken } from '../dbQueries/token'
+import { getTokenByToken } from '../dbQueries/tokenFunctions'
 import { prisma } from '@/lib/db'
 
 export const verifyToken = async (token: string) => {

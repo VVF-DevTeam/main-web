@@ -28,7 +28,7 @@ const EditEventPage = async ({
 }: {
   params: Promise<{ eventId: string }>
 }) => {
-  // check if the current user is an admin to allow access to the post control page
+  // check if the current user is an admin or host to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
     !(await roleCheck({ role: 'HOST' }))
@@ -37,6 +37,7 @@ const EditEventPage = async ({
   }
 
   const { eventId } = await params
+  
   // Fetch the Event data
   const event = await prisma.event.findUnique({
     where: {
@@ -92,7 +93,7 @@ const EditEventPage = async ({
   return (
     <div className="my-12 p-6 lg:my-20">
       {/* Back Button To Parent Page */}
-      <BackButton style='my-6'/>
+      <BackButton />
 
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}

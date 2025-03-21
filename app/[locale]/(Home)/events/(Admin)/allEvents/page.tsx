@@ -9,7 +9,7 @@ import { DataTable } from './_components/data-table'
 import { columns } from './_components/columns'
 
 // Main Component
-const AllPosts = async () => {
+const AllEvents = async () => {
   // check if the current user is an admin to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
@@ -18,7 +18,7 @@ const AllPosts = async () => {
     return redirect('/events')
   }
 
-  // Get all published and unpublished posts
+  // Get all published and unpublished events
   const allEvents = await prisma.event.findMany({
     orderBy: {
       updatedAt: 'desc',
@@ -27,9 +27,9 @@ const AllPosts = async () => {
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}
-      <BackButton style="-mt-10 mb-10" />
+      <BackButton />
 
-      {/* Posts Table */}
+      {/* Events Table */}
       <h1 className="header-sub">All Events</h1>
       <p className="mb-12 text-sm text-muted-foreground">
         All published and unpublished events appear here. Click on the
@@ -44,4 +44,4 @@ const AllPosts = async () => {
   )
 }
 
-export default AllPosts
+export default AllEvents

@@ -20,7 +20,7 @@ export const columns: ColumnDef<Event>[] = [
           {title ? (
             <span>{title}</span>
           ) : (
-            <span className="italic text-muted-foreground">No image</span>
+            <span className="italic text-muted-foreground">No title</span>
           )}
         </div>
       )

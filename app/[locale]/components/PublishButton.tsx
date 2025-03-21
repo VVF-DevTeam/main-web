@@ -8,8 +8,8 @@ interface PublishButtonProps {
   id: string
   canPublish: boolean
   isPublished: boolean
-  type: 'post' | 'event' | 'class'
-  domain: 'posts' | 'events' | 'classes'
+  type: 'post' | 'event' | 'class' | 'job'
+  domain: 'posts' | 'events' | 'classes' | 'jobs'
 }
 // TODO: Add the types to a different file.
 const PublishButton = ({
