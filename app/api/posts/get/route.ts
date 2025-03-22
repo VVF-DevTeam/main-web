@@ -4,16 +4,24 @@ import { prisma } from '@/lib/db'
 export const GET = async (request: NextRequest) => {
   try {
     const postId = request?.nextUrl?.searchParams.get('postId')
-    const searchText = request?.nextUrl?.searchParams.get('searchText') || ' '
+    const searchText =
+      request?.nextUrl?.searchParams.get('searchText') || undefined
     const pageNum = Number(request?.nextUrl?.searchParams.get('pageNum')) || 0
     const pageSize = Number(request?.nextUrl?.searchParams.get('pageSize')) || 2
+
+    const isPublishedParam = request?.nextUrl.searchParams.get('isPublished')
+    const isPublished =
+      isPublishedParam === 'true'
+        ? true
+        : isPublishedParam === 'false'
+          ? false
+          : undefined
 
     console.log(postId)
     let totalPost = 0
     let post = null
-    // Check if post exists
+
     if (!postId) {
-      // Get all published posts
       const [posts, count] = await Promise.all([
         prisma.post.findMany({
           select: {
@@ -34,6 +42,9 @@ export const GET = async (request: NextRequest) => {
               contains: searchText,
               mode: 'insensitive',
             },
+            ...(isPublished !== undefined && {
+              isPublished: isPublished,
+            }),
           },
           orderBy: {
             updatedAt: 'desc',
@@ -47,6 +58,9 @@ export const GET = async (request: NextRequest) => {
               contains: searchText,
               mode: 'insensitive',
             },
+            ...(isPublished !== undefined && {
+              isPublished: isPublished,
+            }),
           },
         }),
       ])
