@@ -92,6 +92,15 @@ export default {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
 
+      if (path.includes('/api')) {
+        const secretHeader = request.headers.get('secret')
+        if (secretHeader) {
+          if (secretHeader === process.env.SECRET_TRUST_CLIENT)
+            return NextResponse.next()
+        }
+        return new NextResponse('Fobidden', { status: 403 })
+      }
+
       // extract the locale from the path
       path = '/' + path.split('/')[2]
 
