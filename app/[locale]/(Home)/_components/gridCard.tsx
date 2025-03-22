@@ -15,7 +15,7 @@ interface GridCardProps {
 // Main Component
 const GridCard = ({ name, desc, logo: Logo }: GridCardProps) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-y-2 p-2 md:p-4 md:gap-y-4">
+    <div className="flex-col-center justify-center gap-y-2 p-2 md:p-4 md:gap-y-4">
       {Logo && <Logo className="h-12 w-12 text-textColor-brandDark/70" />}
       <h2
         className={cn(

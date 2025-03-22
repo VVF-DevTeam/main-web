@@ -73,7 +73,7 @@ const PostSummary = ({ post }: PostSummaryProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Summary <Pencil className="h-4 w-4" />
             </span>
           )}

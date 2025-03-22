@@ -62,13 +62,9 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
         </div>
 
         {/* Location */}
-<<<<<<< HEAD
+
         <div className="flex-between">
           <span className="flex-center gap-x-2 text-xl text-muted-foreground">
-=======
-        <div className="flex-between gap-x-2">
-          <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
->>>>>>> f5b91ba757f87f5f1282dd6b2a5a65609c989bbb
             <MapPin className="h-5 w-5"></MapPin>
             {event.location}
           </span>

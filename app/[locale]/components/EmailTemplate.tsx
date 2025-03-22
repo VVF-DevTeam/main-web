@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> f5b91ba757f87f5f1282dd6b2a5a65609c989bbb
 import React from 'react'
 interface EmailTemplateProps {
   firstName: string

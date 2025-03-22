@@ -32,14 +32,14 @@ const MyProfile = async ({
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex-between">
           <h1 className="text-3xl font-bold">{t('my-profile')}</h1>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Profile Section */}
           <div className="bg-bgColor-white col-span-1 flex flex-col rounded-lg p-6 shadow-lg">
-            <div className="mb-6 flex flex-col items-center">
+            <div className="mb-6 flex-col-center">
               <div className="relative">
                 <div className="h-32 w-32 overflow-hidden rounded-full bg-bgColor-gray/20">
                 
@@ -190,7 +190,7 @@ const MyProfile = async ({
                   height={140}
                   className="h-48 w-full object-cover"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="absolute inset-0 flex-center bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
                   <div className="p-4 text-center text-textColor-white">
                     <Link
                       href={`/events/class/${item.id}`}

@@ -47,7 +47,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
     <div ref={dropdownRef} className="relative w-full -mr-1">
       <button
         className={classNames(
-          'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
+          'flex-center gap-x-[5px] font-semibold transition-all',
           mode === 'desktop'
             ? `whitespace-nowrap text-sm ${
                 isActive
@@ -79,7 +79,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/registration/jobs"
           className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -90,7 +90,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/about/directors"
           className={classNames(
-            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}

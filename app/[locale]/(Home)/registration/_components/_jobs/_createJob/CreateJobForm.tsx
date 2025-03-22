@@ -124,8 +124,8 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-y-8">
-      <div className="flex flex-col items-center gap-y-2">
+    <div className="flex-col-center gap-y-8">
+      <div className="flex-col-center gap-y-2">
         <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
           Give a title to your job posting
         </h1>

@@ -67,7 +67,7 @@ const JobType = ({ job }: JobTypeProps) => {
 
   return (
     <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Job Type</h1>
         <button
           onClick={() => setEditing(!editing)}
@@ -79,7 +79,7 @@ const JobType = ({ job }: JobTypeProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Type <Pencil className="h-4 w-4" />
             </span>
           )}
@@ -95,7 +95,7 @@ const JobType = ({ job }: JobTypeProps) => {
               control={form.control}
               name="jobType"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-center">
+                <FormItem className="flex-center">
                   <FormControl>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

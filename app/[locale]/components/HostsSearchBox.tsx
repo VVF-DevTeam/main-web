@@ -41,7 +41,7 @@ const HostsSearchBox = ({
           eventHosts.map((host: Host) => (
             <div
               key={host.id}
-              className="flex items-center justify-center gap-x-2 rounded-2xl border-2 border-slate-400 bg-slate-200 p-2"
+              className="flex-center gap-x-2 rounded-2xl border-2 border-slate-400 bg-slate-200 p-2"
               onClick={() => {
                 deleteHost(host.id)
               }}
@@ -56,7 +56,7 @@ const HostsSearchBox = ({
           </p>
         )}
       </div>
-      <div className="flex flex-col items-center gap-y-2">
+      <div className="flex-col-center gap-y-2">
         {/* Display all the available users with a search box */}
         <Input
           type="text"

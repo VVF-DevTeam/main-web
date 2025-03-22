@@ -55,7 +55,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
     <div ref={dropdownRef} className="relative w-full -mr-1">
       <button
         className={classNames(
-          'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
+          'flex-center gap-x-[5px] font-semibold transition-all',
           mode === 'desktop'
             ? `whitespace-nowrap text-sm ${
                 isActive
@@ -87,7 +87,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/vision"
           className={classNames(
-            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-textColor hover:text-textColor-brand',
+            'flex-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-textColor hover:text-textColor-brand',
             mode === 'desktop'
               ? 'whitespace-nowrap text-sm '
               : 'text-xl'
@@ -100,7 +100,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/directors"
           className={classNames(
-            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
+            'flex-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
             mode === 'desktop'
               ? 'whitespace-nowrap text-sm '
               : 'text-xl'

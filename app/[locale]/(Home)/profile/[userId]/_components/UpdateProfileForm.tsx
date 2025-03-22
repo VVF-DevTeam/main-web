@@ -92,10 +92,10 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
           className="grid gap-y-6 pt-2 md:grid-cols-2 md:gap-x-8"
         >
           {/* Profile Image Upload */}
-          <div className="col-span-2 flex flex-col items-center">
+          <div className="col-span-2 flex-col-center">
             <label className="relative h-48 w-48 cursor-pointer rounded-lg border-2 border-dashed border-bgColor-black p-4 hover:bg-bgColor-gray/10">
               {imagePreview ? (
-                <div className="flex items-center justify-center">
+                <div className="flex-center">
                   <Image
                     src={imagePreview}
                     alt="Profile"
@@ -114,7 +114,7 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
                   </label>
                 </div>
               ) : (
-                <div className="flex flex-col items-center space-y-2 text-center">
+                <div className="flex-col-center space-y-2 text-center">
                   <User className="h-10 w-10" />
                   <p className="text-lg font-bold uppercase text-textColor-blue">
                     {t('profile-photo-add')}

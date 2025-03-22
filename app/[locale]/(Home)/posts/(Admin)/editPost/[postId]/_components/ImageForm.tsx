@@ -76,7 +76,7 @@ const PostImage = ({ post }: PostImageProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Image <Pencil className="h-4 w-4" />
             </span>
           )}

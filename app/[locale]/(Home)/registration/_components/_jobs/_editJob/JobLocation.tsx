@@ -63,7 +63,7 @@ const JobLocation = ({ job }: JobLocationProps) => {
 
   return (
     <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Job Location</h1>
         <button
           onClick={() => setEditing(!editing)}
@@ -75,7 +75,7 @@ const JobLocation = ({ job }: JobLocationProps) => {
           {editing ? (
             <span>Cancel</span>
           ) : (
-            <span className="flex items-center justify-center gap-x-2">
+            <span className="flex-center gap-x-2">
               Edit Location <Pencil className="h-4 w-4" />
             </span>
           )}

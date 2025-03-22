@@ -64,7 +64,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
 
   return (
     <div className="flex w-full flex-col-default rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Event Capacity</h1>
         <button
           onClick={() => setEditing(!editing)}

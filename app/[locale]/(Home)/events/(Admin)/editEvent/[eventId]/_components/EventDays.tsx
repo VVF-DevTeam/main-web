@@ -82,7 +82,7 @@ const EventDays = ({ event }: EventEndDays) => {
 
   return (
     <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h3 className="text-lg font-bold">Event Days</h3>
         <Button
           variant={null}
@@ -196,7 +196,7 @@ const EventDays = ({ event }: EventEndDays) => {
           <div className="grid grid-cols-3 gap-3 text-muted-foreground">
             {eventDays.map((day, index) => (
               <div
-                className="flex items-center justify-center rounded-2xl border-2 border-slate-400 bg-slate-200 p-1 font-semibold"
+                className="flex-center rounded-2xl border-2 border-slate-400 bg-slate-200 p-1 font-semibold"
                 key={index}
               >
                 {day.substring(0, 3)}

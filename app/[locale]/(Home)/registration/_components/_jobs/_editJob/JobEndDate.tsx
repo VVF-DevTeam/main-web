@@ -82,7 +82,7 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h3 className="text-lg font-bold">Job End Date</h3>
         <Button
           variant={null}

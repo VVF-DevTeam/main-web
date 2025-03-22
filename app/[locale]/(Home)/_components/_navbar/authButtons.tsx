@@ -57,7 +57,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
     <button
       onClick={() => handleAuth(userExists ? 'logout' : 'login')}
       className={cn(
-        'flex items-center justify-center transition-all font-semibold whitespace-nowrap',
+        'flex-center transition-all font-semibold whitespace-nowrap',
         mode === 'desktop'
           ? 'gap-x-2 text-sm'
           : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl',

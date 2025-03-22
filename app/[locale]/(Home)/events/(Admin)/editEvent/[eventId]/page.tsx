@@ -97,7 +97,7 @@ const EditEventPage = async ({
 
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex-between">
           <div className="flex flex-col gap-y-3">
             <h1 className="text-2xl font-bold tracking-wide md:text-3xl xl:text-5xl">
               Edit Event

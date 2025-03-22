@@ -67,7 +67,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
 
   return (
     <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex-between">
         <h1 className="text-xl font-semibold">Event Description</h1>
         <button
           onClick={() => setEditing(!editing)}
