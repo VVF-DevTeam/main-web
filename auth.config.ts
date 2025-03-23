@@ -93,7 +93,7 @@ export default {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
 
-      if (path.includes('/api')) {
+      if (path.includes('/api') && !path.includes('/auth')) {
         const secretHeader = request.headers.get('secret')
         if (secretHeader && validateSecretToken(secretHeader)) {
           return NextResponse.next()
