@@ -6,7 +6,6 @@ import TimePicker from './TimePicker'
 import { useToast } from '@/hooks/use-toast'
 import { CheckIcon, XIcon, PlusIcon } from 'lucide-react'
 
-import axios from 'axios'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface ScheduleItemProps {
   eventId: string
@@ -61,7 +61,7 @@ const ScheduleItem = ({
   const deleteScheduleItem = async (itemId: string | null) => {
     if (!itemId) return
     try {
-      const response = await axios.delete(
+      const response = await axiosInstance.delete(
         `/api/events/schedule/scheduleItem/delete/${itemId}`
       )
       console.log(response)
@@ -87,7 +87,7 @@ const ScheduleItem = ({
     }
     // Make API request to add new item to the db.
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `/api/events/schedule/scheduleItem/add`,
         data
       )
@@ -111,13 +111,16 @@ const ScheduleItem = ({
     let response
     try {
       if (scheduleItemId === null) {
-        response = await axios.post(`/api/events/schedule/scheduleItem/add`, {
-          ...data,
-          eventId: eventId,
-          scheduleItemId: null,
-        })
+        response = await axiosInstance.post(
+          `/api/events/schedule/scheduleItem/add`,
+          {
+            ...data,
+            eventId: eventId,
+            scheduleItemId: null,
+          }
+        )
       } else {
-        response = await axios.put(
+        response = await axiosInstance.put(
           `/api/events/schedule/scheduleItem/edit/${scheduleItemId}`,
           data
         )

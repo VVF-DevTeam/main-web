@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -19,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface PostSummaryProps {
   post: Post
@@ -41,7 +41,7 @@ const PostSummary = ({ post }: PostSummaryProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof PostSummarySchema>) => {
     try {
-      await axios.put(`/api/posts/edit/${post.id}`, values)
+      await axiosInstance.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -60,7 +60,7 @@ const PostSummary = ({ post }: PostSummaryProps) => {
   }
 
   return (
-    <div className="mt-4 w-full flex-col-default rounded-md bg-bgColor-gray/10 px-4 py-6">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray/10 px-4 py-6">
       <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Summary</h1>
         <button

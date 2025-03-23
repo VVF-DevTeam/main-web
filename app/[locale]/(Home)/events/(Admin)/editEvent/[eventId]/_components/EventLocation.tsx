@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,13 +18,14 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventLocationProps {
   event: Event
 }
 
 const EventLocationSchema = z.object({
-  location: z.string().min(10, {message: "Location is required"}),
+  location: z.string().min(10, { message: 'Location is required' }),
 })
 
 const EventLocation = ({ event }: EventLocationProps) => {
@@ -36,14 +36,14 @@ const EventLocation = ({ event }: EventLocationProps) => {
   const form = useForm<z.infer<typeof EventLocationSchema>>({
     resolver: zodResolver(EventLocationSchema),
     defaultValues: {
-      location: event?.location || "",
+      location: event?.location || '',
     },
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventLocationSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/events/edit/${event.id}`, values)
+      await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',

@@ -4,7 +4,7 @@ import { createPostSchema } from '@/lib/zodSchema/createPostSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 
 // Components
@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
+import { axiosInstance } from '@/lib/axios'
 
 // Interfaces
 interface CreatePostFormProps {
@@ -48,7 +49,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
         title: data.title,
         userId: author,
       }
-      const response = await axios.post('/api/posts/create', postData)
+      const response = await axiosInstance.post('/api/posts/create', postData)
       if (response.status === 200) {
         toast({
           variant: 'default',

@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -21,6 +20,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventDescriptionProps {
   event: Event
@@ -47,7 +47,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
   const onSubmit = async (values: z.infer<typeof EventDescriptionSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/events/edit/${event.id}`, values)
+      await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',

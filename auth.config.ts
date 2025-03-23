@@ -12,6 +12,7 @@ import { AUTH_PATHS } from './lib/appRoutes'
 
 import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
+import { validateSecretToken } from './lib/utilFunctions/secretToken'
 
 export default {
   providers: [
@@ -94,9 +95,8 @@ export default {
 
       if (path.includes('/api')) {
         const secretHeader = request.headers.get('secret')
-        if (secretHeader) {
-          if (secretHeader === process.env.SECRET_TRUST_CLIENT)
-            return NextResponse.next()
+        if (secretHeader && validateSecretToken(secretHeader)) {
+          return NextResponse.next()
         }
         return new NextResponse('Fobidden', { status: 403 })
       }

@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import HostsSearchBox from '@/app/[locale]/components/HostsSearchBox'
 import useDebounce from '@/hooks/useDebounce'
 import getUsers from '@/lib/actions/getUsersAction'
 import { Host } from '@/lib/types/HostType'
+import { axiosInstance } from '@/lib/axios'
 interface EventHostsProps {
   event: Event & { hosts: Host[] }
 }
@@ -50,7 +50,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
     if (hostIds.length === 0) return
     setLoading(true)
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `/api/events/edit/${event.id}/hosts/edit`,
         {
           hostIds: hostIds,
@@ -73,7 +73,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
   const deleteHost = async (hostId: string) => {
     setLoading(true)
     try {
-      const response = await axios.delete(
+      const response = await axiosInstance.delete(
         `/api/events/edit/${event.id}/hosts/edit`,
         {
           data: { hostId: hostId },

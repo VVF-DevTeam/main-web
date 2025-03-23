@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -19,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventEndDateProps {
   event: Event
@@ -43,7 +43,6 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
   const { isValid, isSubmitting } = form.formState
 
   const onSubmit = async (data: z.infer<typeof EventEndDateSchema>) => {
-    
     // Check if the end Date is after the start date
     const endDate = new Date(data.endDate).getTime()
     const startDate = event.startDate
@@ -61,7 +60,10 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
 
     // Save the end date
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
+      const response = await axiosInstance.put(
+        `/api/events/edit/${event.id}`,
+        data
+      )
       console.log(response)
       toast({
         variant: 'default',

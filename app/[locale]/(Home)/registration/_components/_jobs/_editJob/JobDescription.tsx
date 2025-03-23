@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -21,6 +20,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface JobDescriptionProps {
   job: Job
@@ -45,9 +45,8 @@ const JobDescription = ({ job }: JobDescriptionProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof JobDescriptionSchema>) => {
-
     try {
-      await axios.put(`/api/jobs/edit/${job.id}`, values)
+      await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',

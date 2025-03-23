@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,15 +18,14 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventFormLinkProps {
   event: Event
 }
 
 const EventFormLinkSchema = z.object({
-  formLink: z
-    .string()
-    .url({ message: 'Invalid URL format' }),
+  formLink: z.string().url({ message: 'Invalid URL format' }),
 })
 
 const EventTitle = ({ event }: EventFormLinkProps) => {
@@ -38,13 +36,16 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
   const form = useForm<z.infer<typeof EventFormLinkSchema>>({
     resolver: zodResolver(EventFormLinkSchema),
     defaultValues: {
-        formLink: event.formLink || '',
+      formLink: event.formLink || '',
     },
   })
 
   const onSubmit = async (data: z.infer<typeof EventFormLinkSchema>) => {
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
+      const response = await axiosInstance.put(
+        `/api/events/edit/${event.id}`,
+        data
+      )
       toast({
         variant: 'default',
         title: 'Success',

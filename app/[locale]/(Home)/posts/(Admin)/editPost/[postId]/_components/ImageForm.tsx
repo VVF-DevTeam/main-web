@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -20,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import Image from 'next/image'
+import { axiosInstance } from '@/lib/axios'
 
 interface PostImageProps {
   post: Post
@@ -44,7 +44,7 @@ const PostImage = ({ post }: PostImageProps) => {
   const onSubmit = async (values: z.infer<typeof PostImageSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/posts/edit/${post.id}`, values)
+      await axiosInstance.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -63,7 +63,7 @@ const PostImage = ({ post }: PostImageProps) => {
   }
 
   return (
-    <div className="mt-4 w-full flex-col-default rounded-md bg-bgColor-gray/10 px-4 py-6">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray/10 px-4 py-6">
       <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Image</h1>
         <button
@@ -94,7 +94,7 @@ const PostImage = ({ post }: PostImageProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Input placeholder='Enter Image URL' {...field} />
+                    <Input placeholder="Enter Image URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

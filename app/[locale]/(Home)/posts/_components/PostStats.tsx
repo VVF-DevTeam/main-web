@@ -2,13 +2,13 @@
 
 // Libraries
 import React from 'react'
-import axios from 'axios'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 
 // Components
 import { ThumbsUp, ChartNoAxesColumn } from 'lucide-react'
+import { axiosInstance } from '@/lib/axios'
 
 // Interfaces
 interface PostStatsProps {
@@ -43,7 +43,7 @@ const PostStats = ({
     }
 
     try {
-      await axios.patch(`/api/posts/likes/${postId}`, {
+      await axiosInstance.patch(`/api/posts/likes/${postId}`, {
         userId: userId,
         action: action,
       })

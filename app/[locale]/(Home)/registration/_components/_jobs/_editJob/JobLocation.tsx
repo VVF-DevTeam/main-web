@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,13 +18,14 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface JobLocationProps {
   job: Job
 }
 
 const JobLocationSchema = z.object({
-  location: z.string().min(10, {message: "Location is required"}),
+  location: z.string().min(10, { message: 'Location is required' }),
 })
 
 const JobLocation = ({ job }: JobLocationProps) => {
@@ -36,14 +36,14 @@ const JobLocation = ({ job }: JobLocationProps) => {
   const form = useForm<z.infer<typeof JobLocationSchema>>({
     resolver: zodResolver(JobLocationSchema),
     defaultValues: {
-      location: job?.location || "",
+      location: job?.location || '',
     },
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof JobLocationSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/jobs/edit/${job.id}`, values)
+      await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
