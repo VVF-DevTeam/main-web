@@ -11,7 +11,7 @@ import { Search } from 'lucide-react'
 
 // Interfaces & Types
 interface SearchBoxProps {
-  placeholders?: String[]
+  placeholders?: string[]
 }
 
 const SearchBox = ({ placeholders }: SearchBoxProps) => {

@@ -4,7 +4,6 @@ import initTranslations from '@/app/i18n'
 import { prisma } from '@/lib/db'
 
 // Components
-import { Search } from 'lucide-react'
 import JobCard from './JobCard'
 import SearchBox from '@/app/[locale]/components/SearchBox'
 
