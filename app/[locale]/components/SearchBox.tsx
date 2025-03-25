@@ -1,14 +1,25 @@
 'use client'
+
+// Libraries
 import React, { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Search } from 'lucide-react'
 import useDebounce from '@/hooks/useDebounce'
 import queryString from 'query-string'
 
-const placeholders = ['Friday Chill', 'Guitar class', 'Tennis']
-const SearchBox = () => {
+// Components
+import { Search } from 'lucide-react'
+
+// Interfaces & Types
+interface SearchBoxProps {
+  placeholders?: String[]
+}
+
+const SearchBox = ({ placeholders }: SearchBoxProps) => {
   const [value, setValue] = useState('')
   const [index, setIndex] = useState(0)
+
+  // check if placeholders is null
+  placeholders = placeholders || []
 
   const currentPath = usePathname()
   const router = useRouter()
@@ -21,7 +32,7 @@ const SearchBox = () => {
   const placeholderRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  // UseEffect for debouncing to set the url seach query
+  // UseEffect for debouncing to set the url search query
   useEffect(() => {
     const url = queryString.stringifyUrl(
       {
@@ -101,7 +112,7 @@ const SearchBox = () => {
           ref={placeholderRef}
           className="pointer-events-none absolute left-[68px] top-[9px] animate-placeHolderFade text-slate-600"
         >
-          <span>{placeholders[index]}</span>
+          <span>{placeholders[index] ? placeholders[index] : ''}</span>
         </div>
       </div>
     </div>

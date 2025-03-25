@@ -64,7 +64,7 @@ const ImageCarousel = ({
     <div>
       {/* Title & Separator */}
       <div className="flex-col-center default-gap lg:mt-6">
-        <span className="header-font-black header-sub mb-7 py-6 italic">
+        <span className="header-font-black header-sub py-6">
           {t('header-achievement')}
         </span>
       </div>

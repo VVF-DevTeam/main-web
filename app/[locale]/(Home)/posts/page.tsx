@@ -53,10 +53,10 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
           </p>
         </div>
 
-        {/* Seearch box */}
+        {/* Search box */}
 
         <div className="mt-6 md:mt-10 lg:mt-12">
-          <SearchBox />
+          <SearchBox placeholders={['Friday Chill', 'Guitar class', 'Tennis']} />
           <p className="mt-2 pl-4 text-sm text-muted-foreground">
             {publishedPosts !== null && publishedPosts.length > 0 ? (
               <>

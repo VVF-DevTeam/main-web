@@ -1,7 +1,5 @@
 // Libraries
 import { roleCheck } from '@/lib/actions/user/roleCheck'
-import { prisma } from '@/lib/db'
-import initTranslations from '@/app/i18n'
 
 // Components
 import HeaderAndBenefit from '../_components/_jobs/HeaderAndBenefit'
@@ -10,30 +8,20 @@ import JobList from '../_components/_jobs/JobList'
 
 const JobsAndVolunteers = async ({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    title: string
+  }>
 }) => {
   const { locale } = await params
-  const { t } = await initTranslations(locale, ['job', 'common'])
-
-  // Get all jobs
-  const allJobs = await prisma.job.findMany({
-    where: {
-      isPublished: true,
-    },
-  })
-  if (allJobs.length === 0) {
-    return (
-      <p className="text-center text-xl text-muted-foreground">
-        {t('noJobsOrVolunteersPosition')}
-      </p>
-    )
-  }
+  const { title } = await searchParams
 
   return (
-    <div className='flex flex-col gap-y-6 p-4 text-base md:text-lg'>
-      <HeaderAndBenefit />
-      <JobList jobs = {allJobs} />
+    <div className="flex flex-col gap-y-6 p-4 text-base md:text-lg">
+      <HeaderAndBenefit locale={locale} />
+      <JobList title={title} locale={locale} />
       {(await roleCheck({ role: 'ADMIN' })) ? <JobAdminButtons /> : null}
     </div>
   )

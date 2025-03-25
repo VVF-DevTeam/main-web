@@ -28,7 +28,7 @@ const JobCard = async ({ job }: JobCardProps) => {
   const tagColorClass = jobTypeColors[job.jobType] || 'bg-gray-600 hover:bg-gray-500/80'
 
   return (
-    <div className="group flex w-[calc(100%-3px)] min-w-[350px] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
+    <div className="group flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
       {/* Header */}
       <div className="relative bg-bgColor-brandLighter pt-10">
         {/* Tags */}

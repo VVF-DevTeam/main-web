@@ -2,6 +2,7 @@ import ImageCarousel from '@/app/[locale]/(Home)/_components/imageCarousel'
 import Introduction from '@/app/[locale]/(Home)/_components/_introduction/Introduction'
 import Directors from './_components/directors'
 import Contact from './_components/contact'
+import JoinUs from './_components/joinUs'
 
 export default async function Home({
   params,
@@ -21,6 +22,7 @@ export default async function Home({
       <Introduction locale={locale} />
       {/* Intro cards */}
       <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
+      <JoinUs locale={locale} />
       <Directors locale={locale} />
       <Contact locale={locale} />
     </div>
