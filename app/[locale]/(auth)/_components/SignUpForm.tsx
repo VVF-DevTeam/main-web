@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
-import { signupAction } from '@/lib/actions/signupAction'
+import { signupAction } from '@/lib/actions/auth/signupAction'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('signIn-signUp')
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const form = useForm<z.infer<typeof signUpSchema>>({

@@ -1,5 +1,7 @@
 // Libraries
 import type { Metadata } from 'next'
+import TranslationsProvider from '@/components/translator/TranslationsProvider'
+import initTranslation from '@/app/i18n'
 
 // Components
 import { Toaster } from '@/components/ui/toaster'
@@ -15,20 +17,34 @@ export const metadata: Metadata = {
   description: 'Viet Vibe Foundation',
 }
 
+// namespaces for translations
+const i18nNamespaces = ['homePage', 'common', 'event', 'job', 'profile', 'signIn-signUp']
+
 // Main Component
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }>) {
+  const { locale } = await params
+  const { resources } = await initTranslation(locale, i18nNamespaces)
+  
   return (
-    <html lang="en">
-      <body
-        className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
-      >
-        <main>{children}</main>
-        <Toaster />
-      </body>
-    </html>
+    <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
+      namespaces={i18nNamespaces}
+      locale={locale}
+      resources={resources}
+    >
+      <html lang="en">
+        <body
+          className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
+        >
+          <main>{children}</main>
+          <Toaster />
+        </body>
+      </html>
+    </TranslationsProvider>
   )
 }

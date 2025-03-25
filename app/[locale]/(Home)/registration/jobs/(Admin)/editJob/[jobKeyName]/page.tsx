@@ -1,5 +1,5 @@
 // Libraries
-import { roleCheck } from '@/lib/dbQueries/roleCheck'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
@@ -47,7 +47,6 @@ const EditJobPage = async ({
     !!job.summary,
     !!job.description,
     !!job.startDate,
-    !!job.endDate,
   ]
 
   // check completed fields

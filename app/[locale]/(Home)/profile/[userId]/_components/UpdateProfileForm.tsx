@@ -7,7 +7,7 @@ import { z } from 'zod'
 import Image from 'next/image'
 import { User } from 'lucide-react'
 
-import { updateAction } from '@/lib/actions/updateAction'
+import { updateUser } from '@/lib/actions/user/updateUser'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import {
@@ -35,7 +35,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 
 const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('profile')
   const { toast } = useToast()
   const [imagePreview, setImagePreview] = useState(user.image || '')
 
@@ -58,7 +58,7 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      const response = await updateAction(data)
+      const response = await updateUser(data)
       if (response.success) {
         toast({
           title: 'Success',

@@ -29,7 +29,7 @@ const ImageCarousel = ({
   duration = 7000,
 }: ImageCarouselProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('homePage')
   const [imageIndex, setImageIndex] = useState(0)
   const changeImage = (direction: Direction) => {
     let newIndex = 0

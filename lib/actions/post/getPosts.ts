@@ -1,4 +1,4 @@
-import { prisma } from '../db'
+import { prisma } from '../../db'
 
 // Find Published Posts by title
 export const getPublishedPostsByTitle = async (title: string) => {

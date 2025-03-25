@@ -1,12 +1,15 @@
 'use server'
+// Libraries
+import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
+import { prisma } from '@/lib/db'
 
-import { getUserInfo } from '@/lib/utilFunctions/getUserInfo'
+// Components
 import MyProfile from './_components/MyProfile'
 import UpdateProfileForm from './_components/UpdateProfileForm'
 import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
-import { prisma } from '@/lib/db'
 
+// Main Component
 export default async function ProfilePage({
   params,
   searchParams,
@@ -14,7 +17,7 @@ export default async function ProfilePage({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ section?: string }>
 }) {
-  const user = await getUserInfo()
+  const user = await getCurrentUserInfo()
   // Get all events
   const eventList = await prisma.event.findMany({
     where: {

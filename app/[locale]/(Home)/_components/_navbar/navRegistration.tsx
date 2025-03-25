@@ -18,7 +18,7 @@ interface NavRegistrationProps {
 // Main Component
 const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('homePage')
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 

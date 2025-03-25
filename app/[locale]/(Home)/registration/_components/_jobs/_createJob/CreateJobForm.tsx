@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
 
 // Components
 import Link from 'next/link'
@@ -32,7 +33,6 @@ import {
 
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
-import { useToast } from '@/hooks/use-toast'
 
 // Interfaces
 interface CreateJobFormProps {

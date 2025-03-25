@@ -6,8 +6,9 @@ import React from 'react'
 interface DatePickerProps {
   value: Date | undefined
   onChange: (date: Date) => void
+  disabled?: boolean
 }
-const DatePicker = ({ value, onChange }: DatePickerProps) => {
+const DatePicker = ({ value, onChange, disabled }: DatePickerProps) => {
   return (
     <div className='h-full w-full flex justify-center items-center'>
     <DayPicker
@@ -23,6 +24,7 @@ const DatePicker = ({ value, onChange }: DatePickerProps) => {
       selected={value}
       onSelect={onChange}
       className="rounded-lg bg-gray-200 p-4 shadow-md w-full max-w-[470px]"
+      disabled={disabled}
     />
     </div>
   )

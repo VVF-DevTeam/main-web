@@ -1,19 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+
 export const POST = async (request: Request) => {
   try {
     const { title, userId } = await request.json()
-    
-    // Check if the post with this title already exists
-    const existingPost = await prisma.post.findUnique({
-      where: {
-        title: title,
-      },
-    })
-
-    if (existingPost) {
-      return new NextResponse('Post already exists', { status: 409 })
-    }
 
     // Create the post
     const post = await prisma.post.create({
@@ -25,7 +16,18 @@ export const POST = async (request: Request) => {
 
     return NextResponse.json(post)
   } catch (error) {
-    console.log('[SIGNIN ERROR]', error)
-    return new NextResponse('Internal Error', { status: 500 })
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        // Duplicate entry
+        return new NextResponse('There is already a post with this title.', { status: 409 })
+      }
+    }        
+    if (error instanceof Error) {
+      console.log('Edit Job Error: ', error.stack)
+    } else {
+      console.log('Error: ', error)
+    }
+
+    return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

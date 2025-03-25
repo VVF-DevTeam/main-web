@@ -3,7 +3,7 @@
 // Libraries
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { verifyToken } from '@/lib/actions/verifyToken'
+import { verifyToken } from '@/lib/actions/token/verifyToken'
 
 // Components
 import ClipLoader from 'react-spinners/ClipLoader'

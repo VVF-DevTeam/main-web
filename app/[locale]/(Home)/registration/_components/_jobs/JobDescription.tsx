@@ -1,29 +1,42 @@
 // Libraries
 import React from 'react'
 import initTranslation from '@/app/i18n'
-import Link from 'next/link'
 
 // Components
 import TextPreview from '@/app/[locale]/components/TextPreview'
-import { Button } from '@/components/ui/button'
+import JobApplyModal from './_applyJob/JobApplyModal'
+import { auth } from '@/auth'
 
-// INterfaces & Types
+// Interfaces & Types
+import { JobType } from '@prisma/client'
 interface JobDescriptionProps {
+  title: string
   description: string
   startDate: Date
   endDate: Date
   location: string
   locale: string
+  id: string
+  keyName: string
+  jobType: JobType
 }
 
 const JobDescription = async ({
+  title,
   description,
   startDate,
   endDate,
   location,
   locale,
+  id,
+  keyName,
+  jobType,
 }: JobDescriptionProps) => {
   const { t } = await initTranslation(locale, ['job', 'common'])
+  
+  // Get the current user's id 
+  const session = await auth()
+  const author = session?.user?.id!
 
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
@@ -43,13 +56,15 @@ const JobDescription = async ({
               month: 'short',
             })}
           </p>
-          <p>
-            {t('endDate')}:{' '}
-            {endDate.toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-            })}
-          </p>
+          { endDate && (
+            <p>
+              {t('endDate')}:{' '}
+              {endDate.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+              })}
+            </p>
+          )}
         </div>
 
         {/* <div>
@@ -78,10 +93,7 @@ const JobDescription = async ({
         </p> */}
       </div>
 
-      {/* Apply Button */}
-      <Link href="/" target="_blank" rel="noopener noreferrer">
-        <Button>{t('apply-button')}</Button>
-      </Link>
+      <JobApplyModal id={id} author={author} title={title} keyName={keyName} jobType={jobType} />
     </div>
   )
 }

@@ -14,7 +14,18 @@ interface JobCardProps {
   job: Job
 }
 
+// Color mapping for job types
+const jobTypeColors: Record<string, string> = {
+  Media: 'bg-purple-600 hover:bg-purple-500/80',
+  Operations: 'bg-green-600 hover:bg-green-500/80',
+  Event: 'bg-blue-600 hover:bg-blue-500/80',
+  HR: 'bg-yellow-600 hover:bg-yellow-500/80',
+  Tech: 'bg-pink-800 hover:bg-pink-800/80',
+}
+
+// Main Component
 const JobCard = async ({ job }: JobCardProps) => {
+  const tagColorClass = jobTypeColors[job.jobType] || 'bg-gray-600 hover:bg-gray-500/80'
 
   return (
     <div className="group flex w-[calc(100%-3px)] min-w-[350px] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
@@ -24,9 +35,7 @@ const JobCard = async ({ job }: JobCardProps) => {
         <div
           className={cn(
             'absolute left-3 top-2 mx-auto max-w-[30%] rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
-            job.jobType === 'CLASS'
-              ? 'bg-blue-950 hover:bg-blue-700/80'
-              : 'bg-yellow-500 hover:bg-yellow-400/80'
+            tagColorClass
           )}
         >
           {job.jobType}

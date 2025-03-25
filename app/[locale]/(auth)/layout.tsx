@@ -1,11 +1,7 @@
 import React from 'react'
 import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
-import TranslationsProvider from '@/components/translator/TranslationsProvider'
-import initTranslation from '@/app/i18n'
 import Footer from '@/app/[locale]/(Home)/_components/footer'
-
-const i18nNamespaces = ['signIn-signUp', 'common', 'homePage']
 
 const Layout = async ({
   children,
@@ -15,23 +11,16 @@ const Layout = async ({
   params: Promise<{ locale: string }>
 }) => {
   const { locale } = await params
-  const { resources } = await initTranslation(locale, i18nNamespaces)
 
   return (
-    <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
-      namespaces={i18nNamespaces}
-      locale={locale}
-      resources={resources}
-    >
-      <div className="relative h-full min-h-fit w-full min-w-full bg-cover bg-center bg-no-repeat bg-bgColor-brandLighter">
-        <Header />
-        <Navbar locale={locale} />
-        <div className="min-h-screen">{children}</div>
-        <div className="mt-auto">
-          <Footer locale={locale} />
-        </div>
+    <div className="relative h-full min-h-fit w-full min-w-full bg-bgColor-brandLighter bg-cover bg-center bg-no-repeat">
+      <Header />
+      <Navbar locale={locale} />
+      <div className="min-h-screen">{children}</div>
+      <div className="mt-auto">
+        <Footer locale={locale} />
       </div>
-    </TranslationsProvider>
+    </div>
   )
 }
 

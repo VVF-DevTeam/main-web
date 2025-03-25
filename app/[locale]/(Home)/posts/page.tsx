@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { auth } from '@/auth'
-import { getPublishedPostsByTitle } from '@/lib/dbQueries/Post'
+import { getPublishedPostsByTitle } from '@/lib/actions/post/getPosts'
 import { prisma } from '@/lib/db'
 import { PlusCircle, ArrowRight } from 'lucide-react'
 import SearchBox from '../../components/SearchBox'

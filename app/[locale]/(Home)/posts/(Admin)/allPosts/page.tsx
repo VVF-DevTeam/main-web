@@ -1,7 +1,7 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import { roleCheck } from '@/lib/dbQueries/roleCheck'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 // Components
 import BackButton from '@/components/ui/back-button'

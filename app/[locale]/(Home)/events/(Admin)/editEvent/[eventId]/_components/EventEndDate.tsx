@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import DatePicker from '@/app/[locale]/components/datePicker'
+import DatePicker from '@/app/[locale]/components/DatePicker'
 import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
