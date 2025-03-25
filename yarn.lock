@@ -6267,10 +6267,19 @@ react-color-palette@^7.3.0:
   resolved "https://registry.yarnpkg.com/react-color-palette/-/react-color-palette-7.3.0.tgz#2229230b0513ea0bb303c74319f1840c6f0608e0"
   integrity sha512-GCgz+XEcbyFkq5wVvrPiXp8mUnOI3oObtmOtsZBCpDXgzHcDCJdssW8lTtVXbUqodo6pOw6pwYQRlXpi/ekkzQ==
 
-react-day-picker@*, react-day-picker@^9.5.1:
+react-day-picker@*:
   version "9.5.1"
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.5.1.tgz#ec40acdcc3ffbf7c0b9bfea8b6f97924249ea974"
   integrity sha512-PxuK8inYLlYgM2zZUVBPsaBM5jI40suPeG+naKyx7kpyF032RRlEAUEjkpW9/poTASh/vyWAOVqjGuGw+47isw==
+  dependencies:
+    "@date-fns/tz" "^1.2.0"
+    date-fns "^4.1.0"
+    date-fns-jalali "^4.1.0-0"
+
+react-day-picker@^9.6.3:
+  version "9.6.3"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.3.tgz#df9b84c1c224e8f342fffcc725dcdda4dd9a42c0"
+  integrity sha512-rDqCSKAl5MLX0z1fLkYcBenQK4ANlYaAhUR0ruVSVAhAa7/ZmKQqgDpXPoS7bYEkgBRH06LO1qNFP1Ki8uiZpw==
   dependencies:
     "@date-fns/tz" "^1.2.0"
     date-fns "^4.1.0"
