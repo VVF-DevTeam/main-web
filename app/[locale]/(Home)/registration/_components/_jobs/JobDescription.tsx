@@ -37,7 +37,7 @@ const JobDescription = async ({
   // Get the current user's id 
   const session = await auth()
   const author = session?.user?.id!
-
+  
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
       {/* Time and Location */}
