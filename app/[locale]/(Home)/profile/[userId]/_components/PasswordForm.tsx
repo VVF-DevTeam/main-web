@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useState } from 'react'
-import { changePassword } from '@/lib/actions/changePassword'
+import { changePassword } from '@/lib/actions/auth/changePassword'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,7 @@ const PasswordForm = ({
   user: { email: string; password: string | null }
 }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('profile')
   const { toast } = useToast()
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,

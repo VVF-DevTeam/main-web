@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import DatePicker from '@/app/[locale]/components/datePicker'
+import DatePicker from '@/components/ui/DatePicker'
 import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
@@ -24,33 +24,36 @@ interface JobEndDateProps {
   job: Job
 }
 
+// Allow endDate to be null
 const JobEndDateSchema = z.object({
-  endDate: z.date(),
+  endDate: z.date().nullable(),
 })
 
 const JobEndDate = ({ job }: JobEndDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
+  const [noEndDate, setNoEndDate] = useState(false) // NEW STATE
   const router = useRouter()
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof JobEndDateSchema>>({
     resolver: zodResolver(JobEndDateSchema),
     defaultValues: {
-      endDate: job.endDate || undefined,
+      endDate: job.endDate || null,
     },
   })
 
   const { isValid, isSubmitting } = form.formState
 
   const onSubmit = async (data: z.infer<typeof JobEndDateSchema>) => {
-    
-    // Check if the end Date is after the start date
-    const endDate = new Date(data.endDate).getTime()
+    // If 'noEndDate' is active, overwrite with null
+													
+    const endDate = noEndDate ? null : data.endDate
+
     const startDate = job.startDate
       ? new Date(job.startDate).getTime()
       : null
 
-    if (startDate !== null && endDate < startDate) {
+    if (startDate !== null && endDate && new Date(endDate).getTime() < startDate) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -59,9 +62,11 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
       return
     }
 
-    // Save the end date
+						
     try {
-      const response = await axios.put(`/api/jobs/edit/${job.id}`, data)
+      const response = await axios.put(`/api/jobs/edit/${job.id}`, {
+        endDate,
+      })
       console.log(response)
       toast({
         variant: 'default',
@@ -116,17 +121,37 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
                     <FormItem>
                       <FormControl>
                         <DatePicker
-                          value={field.value}
+                          value={field.value ?? undefined}
                           onChange={field.onChange}
+                          disabled={noEndDate}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <div className="mt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setNoEndDate(!noEndDate)
+                      if (!noEndDate) {
+                        form.setValue('endDate', null)
+                      }
+                    }}
+                  >
+                    {noEndDate ? 'Have End Date' : 'No End Date'}
+                  </Button>
+                </div>
+
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Use the calender above to pick your desired end date.
+                  {noEndDate
+                    ? 'End Date will be removed.'
+                    : 'Use the calendar above to pick your desired end date.'}
                 </p>
+
                 <Button
                   variant={'default'}
                   className="mt-6"
@@ -139,11 +164,11 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
           </>
         ) : !job.endDate ? (
           <p className="italic text-muted-foreground text-slate-500">
-            Add an End Date for this job.
+            No End Date set for this job.
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {job.endDate.toLocaleDateString('en-US')}
+            {new Date(job.endDate).toLocaleDateString('en-US')}
           </p>
         )}
       </div>

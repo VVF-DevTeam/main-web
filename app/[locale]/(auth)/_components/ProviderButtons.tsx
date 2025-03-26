@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { authAction } from '@/lib/actions/authAction'
+import { authAction } from '@/lib/actions/auth/authAction'
 import { authType } from '@/lib/types/authTpes'
 import { FaGithub, FaFacebook } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'

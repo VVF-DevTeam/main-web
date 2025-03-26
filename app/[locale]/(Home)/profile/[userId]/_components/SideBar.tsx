@@ -13,7 +13,7 @@ export default function Sidebar({
   userId: string
 }) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
-  const { t } = useTranslation()
+  const { t } = useTranslation('profile')
   const searchParams = useSearchParams()
   const currentSection = searchParams.get('section') || 'my-profile'
 

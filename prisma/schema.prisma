@@ -54,6 +54,7 @@ model Event {
   tickets    EventTicket[]
   schedules  EventSchedule[]
 
+  @@unique([title, eventType])
   @@index([id])
 }
 
@@ -131,10 +132,11 @@ model User {
 
   purchases    Purchase[]
   posts        Post[]
-  jobs         Job[]
   likedPosts   PostLikes[]
   visitedPosts PostVisits[]
   EventHost    Event[]
+  jobs         Job[]
+  applications Application[]
 }
 
 // Posts made by admins
@@ -182,8 +184,36 @@ model Job {
   // relation
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  applications Application[]
+  
   @@unique([id, userId])
+  @@index([id])
+}
+
+model Application {
+  id       String   @id @default(uuid())
+
+  // Metadata
+  firstName     String
+  lastName     String
+  address  String
+  city     String
+  country  String
+  postCode String
+  email    String
+  phoneNumber String
+  resume   Bytes
+
+  // States
+  appliedAt DateTime @default(now())
+
+  // Relations
+  jobId    String
+  job      Job      @relation(fields: [jobId], references: [id])
+  userId   String
+  user     User     @relation(fields: [userId], references: [id]) 
+
+  @@unique([jobId, userId])
   @@index([id])
 }
 

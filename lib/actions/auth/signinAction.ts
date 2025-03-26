@@ -1,11 +1,11 @@
 'use server'
 import { signIn } from '@/auth'
-import { signInSchema } from '../zodSchema/signinSchema'
+import { signInSchema } from '@/lib/zodSchema/signinSchema'
 import { AuthError } from 'next-auth'
-import { isRedirectError } from 'next/dist/client/components/redirect'
-import { prisma } from '../db'
-import { sendEmail } from '../utilFunctions/sendEmail'
-import { createToken } from '../dbQueries/tokenFunctions'
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { prisma } from '@/lib/db'
+import { sendVerificationEmail } from '../email/sendVerificationEmail'
+import { createToken } from '../token/tokenFunctions'
 
 export const signinAction = async (data: {
   email: string
@@ -36,7 +36,7 @@ export const signinAction = async (data: {
 
     if (!userExists.emailVerified) {
       const newToken = await createToken(email)
-      sendEmail({
+      sendVerificationEmail({
         firstName: userExists.name!,
         to: userExists.email,
         token: newToken?.id!,

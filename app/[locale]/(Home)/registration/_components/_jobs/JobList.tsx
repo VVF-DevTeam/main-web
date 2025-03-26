@@ -1,19 +1,33 @@
 // Libraries
 import React from 'react'
+import initTranslations from '@/app/i18n'
+import { prisma } from '@/lib/db'
 
 // Components
-import { Search } from 'lucide-react'
 import JobCard from './JobCard'
+import SearchBox from '@/app/[locale]/components/SearchBox'
 
 // Interfaces & Types
-import { Job } from '@prisma/client'
-
 interface JobListProps {
-  jobs: Job[]
+  title: string
+  locale: string
 }
 
 // Main Component
-const JobList = ({ jobs }: JobListProps) => {
+const JobList = async ({ title, locale }: JobListProps) => {
+  const { t } = await initTranslations(locale, ['job', 'common'])
+
+  // Get all jobs
+  const allJobs = await prisma.job.findMany({
+    where: {
+      isPublished: true,
+      title: {
+        contains: title,
+        mode: 'insensitive',
+      },
+    },
+  })
+
   return (
     <div>
       {/* Job Posts */}
@@ -21,22 +35,26 @@ const JobList = ({ jobs }: JobListProps) => {
         {/* Header */}
         <div className="flex-col-center">
           <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
-            Job Posts
+          {t('headerJob')}
           </h1>
 
           {/* Search Bar */}
-          <div className="flex">
-            <Search className="h-6 w-6 text-textColor-brandDark" />
-            <input className="border-2" />
-          </div>
+          <SearchBox />
         </div>
 
         {/* Job Posts */}
-        <div className="flex-col-default grid-all-cols-3 mx-auto mb-5 p-6 md:gap-y-12">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
+
+        {allJobs.length === 0 ? (
+          <p className="text-center text-xl text-muted-foreground pt-5">
+            {t('noJobsOrVolunteersPosition')}
+          </p>
+        ) : (
+          <div className="flex-col-default grid-all-cols-3 mx-auto mb-5 p-6 md:gap-y-12">
+            {allJobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

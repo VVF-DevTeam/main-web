@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export const POST = async (req: Request) => {
   try {
@@ -7,18 +8,6 @@ export const POST = async (req: Request) => {
 
     // Destructure the request body
     const { title, eventType, keyName } = await req.json()
-
-    // Check if an event with ths title and type already exists
-    const existingEvent = await prisma.event.findFirst({
-      where: {
-        title: title,
-        eventType: eventType,
-      },
-    })
-
-    if (existingEvent) {
-      return new NextResponse('Event already exists', { status: 409 })
-    }
 
     // Create the event
     const event = await prisma.event.create({
@@ -32,7 +21,19 @@ export const POST = async (req: Request) => {
     return NextResponse.json(event)
     
   } catch (error) {
-    console.log('[CREATE EVENT ERROR]', error)
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        // Duplicate entry
+        return new NextResponse('You have already applied for this job.', { status: 409 })
+      }
+    }    
+
+    if (error instanceof Error) {
+      console.log('Edit Job Error: ', error.stack)
+    } else {
+      console.log('Error: ', error)
+    }
+
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

@@ -1,6 +1,6 @@
 // Libraries
 import { prisma } from '@/lib/db'
-import { roleCheck } from '@/lib/dbQueries/roleCheck'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { redirect } from 'next/navigation'
 
 // Components

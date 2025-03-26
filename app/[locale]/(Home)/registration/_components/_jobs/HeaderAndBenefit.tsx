@@ -1,17 +1,25 @@
 // Libraries
 import React from 'react'
+import initTranslations from '@/app/i18n'
 
 // Components
 import { Separator } from '@/components/ui/separator'
 
+// Interface & Type
+interface HeaderAndBenefitProps {
+  locale: string
+}
+
 // Main Component
-const HeaderAndBenefit = () => {
+const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
+  const { t } = await initTranslations(locale, ['job', 'common'])
+
   return (
-    <div className="flex-col-center width-max-default gap-y-10 px-5 py-20 lg:gap-y-20">
+    <div className="flex-col-center gap-y-10 px-5 py-20 lg:gap-y-20">
     {/* Header */}
     <div className="flex-col-center">
       <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
-        Volunteers
+        {t('header-benefits')}
       </h1>
       <Separator className="w-[170%] bg-bgColor-brandDark" />
     </div>
@@ -19,39 +27,34 @@ const HeaderAndBenefit = () => {
     {/* Benefits */}
     <div className="flex-col-default">
       <p>
-        We are looking for people who are willing to join our team as an
-        officer or volunteer to help us in our mission to connect Vietnamese
-        people in Vancouver through arts and cultures.
+        {t('benefits-description1')}
       </p>
-      <p> When joining VVF, you will have the opportunity to:</p>
+      <p> {t('benefits-description2')}</p>
       <div className="ml-4">
         <ol className="list-decimal">
           <li>
-            Gain experience in one of more fields of expertise that you are
-            interested in
+          {t('benefits-item1')}
+
           </li>
-          <li>Get recognized by receiving a certification from VVF</li>
+          <li>{t('benefits-item2')}</li>
           <li>
-            Get access to multiple essential and modern technologies and
-            applications for free such as:
+            {t('benefits-item3')}
             <ul className="list-inside list-disc">
               <li>
-                A work Google account with our domain in it (ex:
-                joe.smith@vietvibe.org)
+                {t('benefits-subitem1')}
               </li>
-              <li>Access to all Google Workspace features</li>
+              <li>{t('benefits-subitem2')}</li>
               <li>
-                Access to Microsoft 365 Basics feature (Words, Excel,
-                PowerPoint, OneDrive, Teams, etc.) or discount on premium features such as Power BI (up to 70% off)
+                {t('benefits-subitem3')}
               </li>
-              <li>Access to Canvas Pros</li>
-              <li>Access to Github Team</li>
-              <li>15% discount from Lululemon</li>
+              <li>{t('benefits-subitem4')}</li>
+              <li>{t('benefits-subitem5')}</li>
+              <li>{t('benefits-subitem6')}</li>
               <li>
-                Staff discount when join in any courses or events from VVF
+              {t('benefits-subitem7')}
               </li>
-              <li>Access to ChatGPT Plus</li>
-              <li>Participate in exciting events such as hiking, camping, board night game and more with us</li>
+              <li>{t('benefits-subitem8')}</li>
+              <li>{t('benefits-subitem9')}</li>
             </ul>
           </li>
         </ol>

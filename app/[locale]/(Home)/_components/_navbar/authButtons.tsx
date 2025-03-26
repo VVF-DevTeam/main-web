@@ -7,7 +7,7 @@ import { ServerActionResponse } from '@/lib/types/serverAction'
 import { LogIn } from 'lucide-react'
 
 // Libraries
-import { signOutAction } from '@/lib/actions/signoutAction'
+import { signOutAction } from '@/lib/actions/auth/signoutAction'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -24,7 +24,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
   const pathname = usePathname()
   const isActive = pathname.includes('signIn')
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('homePage')
 
   const handleAuth = (type: 'login' | 'logout') => {
     if (type === 'login') {
