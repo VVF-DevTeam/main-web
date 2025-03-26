@@ -11,10 +11,10 @@ export default async function Home({
 }) {
   const { locale } = await params
   const imageUrls = [
-    { id: '1', url: 'https://drive.google.com/thumbnail?id=1IcCi98pC_IQ9IrE-J6tay3dAzKSXZshb&sz=w2000' },
-    { id: '2', url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000' },
-    { id: '3', url: 'https://drive.google.com/thumbnail?id=1HsFliVn1V3lBc3yMhFlOPG629zOj83Lg&sz=w2000' },
-    { id: '4', url: 'https://drive.google.com/thumbnail?id=1M9hHWRlNCc6fFvlRfphq-uWwh2J12KFf&sz=w2000' },
+    { id: '1', url: 'https://drive.google.com/thumbnail?id=1AqJvPcGUzuZM5pTnLWI_TPR0iZhIu27M&sz=w2000' },
+    { id: '2', url: 'https://drive.google.com/thumbnail?id=1LzN0Kouxwfy1R07qkX0NfxWByIHMtyGJ&sz=w3000' },
+    { id: '3', url: 'https://drive.google.com/thumbnail?id=1QWFZ4Uhijftf5YT-7_KFU9jVJhPHT7PN&sz=w2000' },
+    { id: '4', url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000' },
   ]
 
   return (
