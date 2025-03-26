@@ -33,7 +33,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
 
   return (
     <div>
-      <div className="flex-col-center header-font-white default-gap relative h-[80vh] text-center lg:h-[85vh]">
+      <div className="flex-col-center header-font-white default-gap relative h-[60vh] text-center lg:h-[70vh]">
         {/* NextJS Image and Dark Overlay */}
         <div className="dark-overlay"></div>
         <Image
@@ -48,7 +48,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
         <h1 className="text-2xl tracking-wide md:text-3xl">
           Viet Vibe Foundation
         </h1>
-        <h2 className="header-sub my-2 max-w-[90vw] xl:my-4 xl:text-5xl">
+        <h2 className="header-sub my-2 max-w-[90vw] xl:my-4 xl:text-5xl xl:leading-normal">
           {t('title-small-introduction')}
         </h2>
         <p className="header-text">{t('title-big-introduction')}</p>

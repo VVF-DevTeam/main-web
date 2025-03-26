@@ -26,7 +26,7 @@ const Header = () => {
   }
 
   return (
-    <div className="flex-between text-textColor-white bg-bgColor-blackLight h-[60px] w-full px-8">
+    <div className="flex-between text-textColor-white bg-bgColor-blackLight h-[50px] w-full px-8">
       <div className="flex gap-x-2">
         {/* <TooltipProvider>
           <Tooltip> */}
