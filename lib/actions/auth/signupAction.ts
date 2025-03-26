@@ -1,10 +1,12 @@
 'use server'
-import { signUpSchema } from '../zodSchema/signupSchema'
-import { createToken } from '../dbQueries/tokenFunctions'
-import { prisma } from '../db'
+
+import { prisma } from '@/lib/db'
+import { createToken } from '../token/tokenFunctions'
 
 import bcrypt from 'bcryptjs'
-import { sendEmail } from '../utilFunctions/sendEmail'
+import { sendVerificationEmail } from '../email/sendVerificationEmail'
+import { signUpSchema } from '@/lib/zodSchema/signupSchema'
+
 interface signupActionProps {
   firstName: string
   lastName: string
@@ -88,14 +90,11 @@ export const signupAction = async (formData: signupActionProps) => {
     // Send Verification Email
     const verificationToken = await createToken(user.email)
     if (verificationToken && user) {
-      console.log('before sending email')
-      await sendEmail({
+      await sendVerificationEmail({
         firstName: user.name!,
         to: user.email,
         token: verificationToken.token,
       })
-
-      console.log('After sending email')
     }
 
     return {

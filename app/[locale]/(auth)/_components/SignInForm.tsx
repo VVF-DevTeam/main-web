@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-import { signinAction } from '@/lib/actions/signinAction'
+import { signinAction } from '@/lib/actions/auth/signinAction'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next'
 
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('signIn-signUp')
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
 

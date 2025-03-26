@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
-import { deleteUser } from '@/lib/actions/deleteUser'
+import { deleteUser } from '@/lib/actions/user/deleteUser'
 import { useRouter } from 'next/navigation'
 
 const deleteAccountSchema = z.object({
@@ -38,7 +38,7 @@ const DeleteForm = ({
   user: { email: string; password: string | null }
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
-  const { t } = useTranslation()
+  const { t } = useTranslation('profile')
   const { toast } = useToast()
   const router = useRouter()
   const form = useForm<DeleteAccountFormValues>({

@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '../db'
+import { prisma } from '../../db'
 
-export const updateAction = async (data: {
+export const updateUser = async (data: {
   name?: string | null
   email: string
   phone?: string | null 

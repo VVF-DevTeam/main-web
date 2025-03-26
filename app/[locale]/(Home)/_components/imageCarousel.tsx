@@ -29,7 +29,7 @@ const ImageCarousel = ({
   duration = 7000,
 }: ImageCarouselProps) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation()
+  const { t } = useTranslation('homePage')
   const [imageIndex, setImageIndex] = useState(0)
   const changeImage = (direction: Direction) => {
     let newIndex = 0
@@ -64,7 +64,7 @@ const ImageCarousel = ({
     <div>
       {/* Title & Separator */}
       <div className="flex-col-center default-gap lg:mt-6">
-        <span className="header-font-black header-sub mb-7 py-6 italic">
+        <span className="header-font-black header-sub py-6">
           {t('header-achievement')}
         </span>
       </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import PostList from './PostList'
 import { auth } from '@/auth'
 import initTranslations from '@/app/i18n'
-import { getPublishedPostsByTitle } from '@/lib/dbQueries/Post'
+import { getPublishedPostsByTitle } from '@/lib/actions/post/getPosts'
 
 interface Postsprops {
   locale: string

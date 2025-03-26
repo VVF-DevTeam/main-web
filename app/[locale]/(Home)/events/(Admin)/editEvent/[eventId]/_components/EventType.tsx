@@ -22,6 +22,7 @@ import {
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 
+// Interfaces and Types
 interface EventTypeProps {
   event: Event
 }
@@ -32,6 +33,7 @@ const EventTypeSchema = z.object({
   eventType: zEnum,
 })
 
+// Main Component
 const EventType = ({ event }: EventTypeProps) => {
   const { toast } = useToast()
 

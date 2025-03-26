@@ -6,7 +6,7 @@ import initTranslation from '@/app/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Event } from '@prisma/client'
-import { getEventStatus } from '@/lib/utilFunctions/getEventStatus'
+import { getEventStatus } from '@/lib/actions/event/getEventStatus'
 interface UserInfoProps {
   name: string
   email: string

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import HostsSearchBox from '@/app/[locale]/components/HostsSearchBox'
 import useDebounce from '@/hooks/useDebounce'
-import getUsers from '@/lib/actions/getUsersAction'
+import getUsersWithRole from '@/lib/actions/user/getUsersWithRole'
 import { Host } from '@/lib/types/HostType'
 import { axiosInstance } from '@/lib/axios'
 interface EventHostsProps {
@@ -31,7 +31,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
   const searchHosts = async (debouncedValue: string) => {
     setLoading(true)
     try {
-      const response: Host[] = await getUsers(debouncedValue, 'HOST')
+      const response: Host[] = await getUsersWithRole(debouncedValue, 'HOST')
       setHostData(response)
       router.refresh()
     } catch (error) {

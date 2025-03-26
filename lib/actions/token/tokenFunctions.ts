@@ -1,5 +1,6 @@
-import { prisma } from '../db'
+import { prisma } from '../../db'
 import {v4 as uuid} from "uuid";
+
 // create verification token
 export const createToken = async (email: string) => {
   try {

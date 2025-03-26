@@ -1,9 +1,9 @@
 'use server'
-import { Host } from '../types/HostType'
-import { prisma } from '../db'
+import { Host } from '../../types/HostType'
+import { prisma } from '../../db'
 import { Role as PrismaRole } from '@prisma/client'
 
-const getUsers = async (
+const getUsersWithRole = async (
   searchString: string,
   role: keyof typeof PrismaRole
 ): Promise<Host[]> => {
@@ -30,4 +30,4 @@ const getUsers = async (
   }
 }
 
-export default getUsers
+export default getUsersWithRole

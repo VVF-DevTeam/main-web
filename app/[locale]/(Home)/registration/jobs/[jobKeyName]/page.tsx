@@ -64,11 +64,15 @@ const JobPage = async ({ params }: JobPageProps) => {
           summary={publishedJob.summary!}
         />
         <JobDescription
+          title={publishedJob.title}
           description={publishedJob.description!}
           startDate={publishedJob.startDate!}
           endDate={publishedJob.endDate!}
           location={publishedJob.location!}
           locale={locale}
+          id={publishedJob.id}
+          keyName={publishedJob.keyName}
+          jobType={publishedJob.jobType}
         />
       </div>
     </div>

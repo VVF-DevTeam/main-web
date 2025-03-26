@@ -17,13 +17,13 @@ const Directors = async ({ locale }: DirectorsProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-8 md:p-12 lg:gap-y-12 lg:pb-28 lg:pt-14">
-      <span className="header-font-black header-sub pb-4 italic md:pb-8">
+    <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-3 md:p-10 lg:gap-y-12 lg:pb-28 lg:pt-5">
+      <span className="header-font-black header-sub pb-4 md:pb-8">
         {t('header-director')}
       </span>
       <div className="flex-col-default grid-all-cols-2 gap-x-0 pb-5">
         {/* First Director */}
-        <div className="flex-col-center w-full gap-y-3 md:flex-row md:justify-end md:gap-x-5 md:border-r-[1px] md:border-[#3d3a3a] md:pr-2">
+        <div className="flex-col-center w-full gap-y-3 md:flex-row md:justify-end md:gap-x-5 md:pr-2">
           <Image
             src="https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u&sz=w1000"
             alt="Trong Nguyen"

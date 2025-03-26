@@ -15,7 +15,7 @@ export default function MobileSidebar({
   sections: { [key: string]: string }
 }) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
-  const { t } = useTranslation()
+  const { t } = useTranslation('profile')
 
   const [isOpen, setIsOpen] = useState(false)
 
