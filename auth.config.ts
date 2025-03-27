@@ -92,14 +92,19 @@ export default {
     authorized: ({ request, auth }) => {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
+      
+      // exclude all auth path
+      if (path.includes('/api/auth')) {
+        return NextResponse.next()
+      }
 
-      if (path.includes('/api') && !path.includes('/auth')) {
+      if (path.includes('/api')) {
         if (request.method !== 'GET') return NextResponse.next()
         const secretHeader = request.headers.get('secret')
         if (secretHeader && validateSecretToken(secretHeader)) {
           return NextResponse.next()
         }
-        return new NextResponse('Fobidden', { status: 403 })
+        return new NextResponse('Forbidden', { status: 403 })
       }
 
       // extract the locale from the path
@@ -117,7 +122,7 @@ export default {
 
       // Check if user is trying to access an auth path
       if (AUTH_PATHS.includes(path) && isLoggedIn) {
-        return Response.redirect(new URL('/', request.nextUrl.origin))
+        return NextResponse.redirect(new URL('/', request.nextUrl.origin))
       }
 
       // Wrap with the i18n response for internationalization and translations
