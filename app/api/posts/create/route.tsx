@@ -1,9 +1,25 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 export const POST = async (request: Request) => {
   try {
+    // Check for user role, allow ADMIN to create/edit posts
+    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
+
+    if (!isMobile) {
+      // Check role for web app
+      const isAdmin = await roleCheck({ role: 'ADMIN' })
+
+      if (!isAdmin) {
+        return new NextResponse('Forbidden', { status: 403 })
+      }
+    } else {
+      //TODO: Check role for mobile app
+    }
+
+    // Extract the title and userId from the request body
     const { title, userId } = await request.json()
 
     // Create the post

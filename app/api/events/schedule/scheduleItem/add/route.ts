@@ -1,9 +1,25 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 export const POST = async (request: Request) => {
   try {
-    // Check if user is admin
+    // Check for user role, allow ADMIN and HOST to create/edit events
+    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
+  
+    if (!isMobile) {
+      // Check role for web app
+      const isAdmin = await roleCheck({ role: 'ADMIN' })
+      const isHost = await roleCheck({ role: 'HOST' })
+      
+      if (!isAdmin && !isHost) {
+        return new NextResponse('Forbidden', { status: 403 })
+      }
+    } else {
+      //TODO: Check role for mobile app
+    }
+
+    // Extract the data from the request
     const { scheduleItemId, ...data } = await request.json()
     // Check if the schedule item is null, if yes, then create a new item and return
     if (scheduleItemId === null) {
@@ -29,7 +45,7 @@ export const POST = async (request: Request) => {
       )
     }
 
-    // Shiftt the position of all items by one
+    // Shift the position of all items by one
     await prisma.eventSchedule.updateMany({
       where: {
         position: {

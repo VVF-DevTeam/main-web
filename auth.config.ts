@@ -12,7 +12,7 @@ import { AUTH_PATHS } from './lib/appRoutes'
 
 import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
-import { validateSecretToken } from './lib/utilFunctions/secretToken'
+import { validateSecretToken } from './lib/actions/token/secretToken'
 
 export default {
   providers: [
@@ -72,6 +72,7 @@ export default {
         token.id = user.id as string
         token.email = user.email as string
         token.name = user.name as string
+        token.role = user.role as string
       }
       return token
     },
@@ -79,6 +80,7 @@ export default {
       session.user.id = token.id as string
       session.user.email = token.email as string
       session.user.name = token.name as string
+      session.user.role = token.role as string
       return session
     },
     async signIn({ account }) {

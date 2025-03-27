@@ -1,9 +1,24 @@
 import { prisma } from '@/lib/db'
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
-export const POST = async (request: Request) => {
+export const POST = async (request: NextRequest) => {
   try {
-    // TODO: Check if user is admin
+    // Check for user role, only allow ADMIN to create category
+    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
+
+    if (!isMobile) {
+      // Check role for web app
+      const isAdmin = await roleCheck({ role: 'ADMIN' })
+      
+      if (!isAdmin) {
+        return new NextResponse('Forbidden', { status: 403 })
+      }
+    } else {
+      //TODO: For mobile app
+    }
+
+    // Extract data from request
     const data = await request.json()
 
     // Create new category

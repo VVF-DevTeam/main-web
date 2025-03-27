@@ -1,4 +1,4 @@
-import { decodeSecretToken } from '../cryptoUtil'
+import { decodeSecretToken } from '../../cryptoUtil'
 
 export const validateSecretToken = (secretToken: string) => {
   try {

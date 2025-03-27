@@ -3,12 +3,26 @@ import { prisma } from '@/lib/db'
 import { sendApplication } from '@/lib/actions/email/sendApplication'
 import { JobType } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { auth } from '@/auth'
 
 export const POST = async (
   request: Request,
   { params }: { params: Promise<{ jobId: string }> }
 ) => {
   try {
+    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
+
+    if (!isMobile) {
+      // Check login status, only logged in user can apply
+      const session = await auth()
+      if (!session?.user) {
+        return new NextResponse('Forbidden', { status: 403 })
+      }
+    } else {
+      //TODO: Check role for mobile app
+    }
+
+    // Extract form data
     const formData = await request.formData()
 
     const { jobId } = await params
@@ -41,20 +55,32 @@ export const POST = async (
 
     // Apply for the job
     const appliedJob = await prisma.application.create({
-      data: { ...jobData, jobId: jobId, userId: formData.get('userId') as string, resume: resumeBuffer },
+      data: {
+        ...jobData,
+        jobId: jobId,
+        userId: formData.get('userId') as string,
+        resume: resumeBuffer,
+      },
     })
 
     // Send Application Email
-    await sendApplication({...jobData, keyName: formData.get('keyName') as string, jobType: formData.get('jobType') as JobType, resume: resumeFile})
+    await sendApplication({
+      ...jobData,
+      keyName: formData.get('keyName') as string,
+      jobType: formData.get('jobType') as JobType,
+      resume: resumeFile,
+    })
 
     return NextResponse.json(appliedJob)
   } catch (error: unknown) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         // Duplicate entry
-        return new NextResponse('You have already applied for this job.', { status: 409 })
+        return new NextResponse('You have already applied for this job.', {
+          status: 409,
+        })
       }
-    }    
+    }
     if (error instanceof Error) {
       console.log('Edit Job Error: ', error.stack)
     } else {
