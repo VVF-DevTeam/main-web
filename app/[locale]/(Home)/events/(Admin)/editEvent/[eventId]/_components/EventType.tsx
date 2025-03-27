@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -20,12 +19,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 // Interfaces and Types
 interface EventTypeProps {
@@ -54,7 +49,7 @@ const EventType = ({ event }: EventTypeProps) => {
   const onSubmit = async (values: z.infer<typeof EventTypeSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/events/edit/${event.id}`, values)
+      await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -102,7 +97,7 @@ const EventType = ({ event }: EventTypeProps) => {
               control={form.control}
               name="eventType"
               render={({ field }) => (
-                <FormItem className='flex items-center justify-center'>
+                <FormItem className="flex items-center justify-center">
                   <FormControl>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

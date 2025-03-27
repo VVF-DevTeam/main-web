@@ -12,6 +12,7 @@ import { AUTH_PATHS } from './lib/appRoutes'
 
 import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
+import { validateSecretToken } from './lib/utilFunctions/secretToken'
 
 export default {
   providers: [
@@ -91,6 +92,15 @@ export default {
     authorized: ({ request, auth }) => {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
+
+      if (path.includes('/api') && !path.includes('/auth')) {
+        if (request.method !== 'GET') return NextResponse.next()
+        const secretHeader = request.headers.get('secret')
+        if (secretHeader && validateSecretToken(secretHeader)) {
+          return NextResponse.next()
+        }
+        return new NextResponse('Fobidden', { status: 403 })
+      }
 
       // extract the locale from the path
       path = '/' + path.split('/')[2]

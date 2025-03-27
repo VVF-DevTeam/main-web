@@ -9,9 +9,9 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventEndDays {
   event: Event
@@ -58,10 +58,13 @@ const EventDays = ({ event }: EventEndDays) => {
     const day2 = b.toLowerCase()
     return sorter[day1] - sorter[day2]
   })
-  
+
   const onSubmit = async (data: z.infer<typeof EventDaysSchema>) => {
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
+      const response = await axiosInstance.put(
+        `/api/events/edit/${event.id}`,
+        data
+      )
       console.log(response)
       toast({
         variant: 'default',

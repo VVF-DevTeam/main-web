@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -21,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface JobTypeProps {
   job: Job
@@ -47,7 +47,7 @@ const JobType = ({ job }: JobTypeProps) => {
   const onSubmit = async (values: z.infer<typeof JobTypeSchema>) => {
     console.log(values)
     try {
-      await axios.put(`/api/jobs/edit/${job.id}`, values)
+      await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',

@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -20,6 +19,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventStartDateProps {
   event: Event
@@ -43,7 +43,10 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventStartDateSchema>) => {
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
+      const response = await axiosInstance.put(
+        `/api/events/edit/${event.id}`,
+        data
+      )
       toast({
         variant: 'default',
         title: 'Success',

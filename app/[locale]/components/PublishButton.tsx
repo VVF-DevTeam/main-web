@@ -2,8 +2,8 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { axiosInstance } from '@/lib/axios'
 interface PublishButtonProps {
   id: string
   canPublish: boolean
@@ -25,7 +25,7 @@ const PublishButton = ({
 
   const publishOrUnpublish = async (action: 'Unpublish' | 'Publish') => {
     try {
-      await axios.patch(`/api/${domain}/${action.toLowerCase()}/${id}`)
+      await axiosInstance.patch(`/api/${domain}/${action.toLowerCase()}/${id}`)
       toast({
         variant: 'default',
         title: 'Success',

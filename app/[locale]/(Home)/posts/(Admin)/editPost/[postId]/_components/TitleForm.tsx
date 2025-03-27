@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface PostTitleProps {
   post: Post
@@ -43,7 +43,7 @@ const PostTitle = ({ post }: PostTitleProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof PostTitleSchema>) => {
     try {
-      await axios.put(`/api/posts/edit/${post.id}`, values)
+      await axiosInstance.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -100,9 +100,7 @@ const PostTitle = ({ post }: PostTitleProps) => {
           </form>
         </Form>
       ) : !post?.title ? (
-        <p className="italic text-textColor-gray">
-          Add a title for this post.
-        </p>
+        <p className="italic text-textColor-gray">Add a title for this post.</p>
       ) : (
         <div>
           <p className="text-textColor-black/50">{post?.title}</p>

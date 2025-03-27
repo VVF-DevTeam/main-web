@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast'
 import { Pencil, XIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -17,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { axiosInstance } from '@/lib/axios'
 
 const MAX_PRIMARY_TAGS = 2
 const MAX_SECONDARY_TAGS = 3
@@ -61,7 +61,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
     setLoading(true)
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `/api/events/edit/${event.id}/categories/edit`,
         data
       )
@@ -90,7 +90,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   const removeTag = async (tagId: string) => {
     setLoading(true)
     try {
-      const response = await axios.delete(
+      const response = await axiosInstance.delete(
         `/api/events/edit/${event.id}/categories/edit/`,
         { data: { categoryId: tagId } }
       )
@@ -124,7 +124,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
           onClick={() => setIsEditing(!isEditing)}
           className={cn(
             isEditing
-              ? 'text-gray-700 transition-all font-semibold duration-75 hover:text-red-700'
+              ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
               : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
           )}
         >

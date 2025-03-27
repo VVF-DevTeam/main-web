@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -19,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface JobEndDateProps {
   job: Job
@@ -45,10 +45,9 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
   const { isValid, isSubmitting } = form.formState
 
   const onSubmit = async (data: z.infer<typeof JobEndDateSchema>) => {
-    // If 'noEndDate' is active, overwrite with null
-													
-    const endDate = noEndDate ? null : data.endDate
 
+    // If 'noEndDate' is active, overwrite with null													
+    const endDate = noEndDate ? null : data.endDate
     const startDate = job.startDate
       ? new Date(job.startDate).getTime()
       : null
@@ -64,7 +63,7 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
 
 						
     try {
-      const response = await axios.put(`/api/jobs/edit/${job.id}`, {
+      const response = await axiosInstance.put(`/api/jobs/edit/${job.id}`, {
         endDate,
       })
       console.log(response)

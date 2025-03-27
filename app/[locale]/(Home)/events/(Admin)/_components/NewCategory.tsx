@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
 import { useToast } from '@/hooks/use-toast'
 import { ColorPicker, useColor } from 'react-color-palette'
 import { Input } from '@/components/ui/input'
@@ -19,6 +18,7 @@ import {
 import PreviewBadge from './PreviewBadge'
 
 import 'react-color-palette/css'
+import { axiosInstance } from '@/lib/axios'
 const NewCategory = () => {
   const [title, setTitle] = useState('')
   const [categoryType, setCategoryType] = useState('')
@@ -44,7 +44,7 @@ const NewCategory = () => {
     }
 
     try {
-      const response = await axios.post(`/api/categories/create`, data)
+      const response = await axiosInstance.post(`/api/categories/create`, data)
       if (response.status === 200) {
         toast({
           variant: 'default',

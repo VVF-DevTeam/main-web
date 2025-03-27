@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 
 // Components
@@ -33,6 +33,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useToast } from '@/hooks/use-toast'
+import { axiosInstance } from '@/lib/axios'
 
 // Interfaces
 interface CreateEventFormProps {
@@ -77,7 +78,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
         eventType: data.eventType,
         keyName: keyName,
       }
-      const response = await axios.post('/api/events/create', eventData)
+      const response = await axiosInstance.post('/api/events/create', eventData)
       if (response.status === 200) {
         toast({
           variant: 'default',

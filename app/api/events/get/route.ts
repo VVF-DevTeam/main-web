@@ -3,17 +3,23 @@ import { prisma } from '@/lib/db'
 
 export const GET = async (request: NextRequest) => {
   const eventId = request?.nextUrl?.searchParams.get('eventId')
-  const searchTitle = request?.nextUrl?.searchParams.get('title') || ' '
+  const searchTitle = request?.nextUrl?.searchParams.get('title') || undefined
   const pageNum = Number(request?.nextUrl?.searchParams.get('pageNum')) || 0
   const pageSize = Number(request?.nextUrl?.searchParams.get('pageSize')) || 4
+
+  const isPublishedParam = request?.nextUrl.searchParams.get('isPublished')
+  const isPublished =
+    isPublishedParam === 'true'
+      ? true
+      : isPublishedParam === 'false'
+        ? false
+        : undefined
 
   let event = null
   let totalEvent = 0
 
   try {
     if (!eventId) {
-      // Get all published events
-
       const [events, total] = await Promise.all([
         prisma.event.findMany({
           select: {
@@ -35,6 +41,9 @@ export const GET = async (request: NextRequest) => {
               contains: searchTitle,
               mode: 'insensitive',
             },
+            ...(isPublished !== undefined && {
+              isPublished: isPublished,
+            }),
           },
           orderBy: {
             updatedAt: 'desc',
@@ -48,10 +57,16 @@ export const GET = async (request: NextRequest) => {
               contains: searchTitle,
               mode: 'insensitive',
             },
+            ...(isPublished !== undefined && {
+              isPublished: isPublished,
+            }),
           },
         }),
       ])
-      event = events
+      event = events.map((item) => ({
+        ...item,
+        remainingTicket: (item.capacity || 0) - (item.ticketsSold || 0),
+      }))
       totalEvent = total
     } else {
       event = await prisma.event.findUnique({

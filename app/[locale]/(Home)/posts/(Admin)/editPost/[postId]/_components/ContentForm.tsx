@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -21,6 +20,7 @@ import {
 } from '@/components/ui/form'
 import Editor from '../../../../../../components/Editor'
 import TextPreview from '../../../../../../components/TextPreview'
+import { axiosInstance } from '@/lib/axios'
 
 interface PostContentProps {
   post: Post
@@ -45,7 +45,7 @@ const PostContent = ({ post }: PostContentProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof PostContentSchema>) => {
     try {
-      await axios.put(`/api/posts/edit/${post.id}`, values)
+      await axiosInstance.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
       toast({
         variant: 'default',
@@ -64,7 +64,7 @@ const PostContent = ({ post }: PostContentProps) => {
   }
 
   return (
-    <div className="mt-4 w-full flex-col-default rounded-md bg-bgColor-gray/10 px-4 py-6">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray/10 px-4 py-6">
       <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Content</h1>
         <button
@@ -109,7 +109,7 @@ const PostContent = ({ post }: PostContentProps) => {
           Add content for this post.
         </p>
       ) : (
-        <div className="h-fit text-textColor-black/50">
+        <div className="text-textColor-black/50 h-fit">
           <TextPreview value={post?.content} />
         </div>
       )}

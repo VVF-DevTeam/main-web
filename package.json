@@ -36,6 +36,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "core-js": "^3.39.0",
+    "crypto-js": "^4.2.0",
     "i18next": "22.4.12",
     "i18next-resources-to-backend": "^1.2.1",
     "input": "^1.0.1",
@@ -68,6 +69,7 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/google.maps": "^3.58.1",
     "@types/node": "^20",
     "@types/react": "^18",

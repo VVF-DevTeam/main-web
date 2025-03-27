@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,6 +19,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
 
 interface EventTitleProps {
   event: Event
@@ -44,7 +45,10 @@ const EventTitle = ({ event }: EventTitleProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventTitleSchema>) => {
     try {
-      const response = await axios.put(`/api/events/edit/${event.id}`, data)
+      const response = await axiosInstance.put(
+        `/api/events/edit/${event.id}`,
+        data
+      )
       toast({
         variant: 'default',
         title: 'Success',
