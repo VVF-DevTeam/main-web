@@ -59,6 +59,7 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
           </li>
         </ol>
       </div>
+      <p className='text-xs italic'>{t('job-note')}</p>
     </div>
   </div>
   )
