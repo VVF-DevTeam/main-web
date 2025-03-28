@@ -19,14 +19,17 @@ export default {
     Github({
       clientId: process.env.GITHUB_TEST_CLIENT,
       clientSecret: process.env.GITHUB_TEST_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       credentials: {
@@ -92,7 +95,7 @@ export default {
     authorized: ({ request, auth }) => {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
-      
+
       // exclude all auth path
       if (path.includes('/api/auth')) {
         return NextResponse.next()
