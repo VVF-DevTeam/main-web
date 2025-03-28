@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+
 export const PUT = async (
   request: Request,
   { params }: { params: Promise<{ eventId: string }> }
@@ -65,9 +66,9 @@ export const DELETE = async (
       },
       data: {
         hosts: {
-            disconnect: {
-                id: hostId,
-              },
+          disconnect: {
+            id: hostId,
+          },
         },
       },
     })

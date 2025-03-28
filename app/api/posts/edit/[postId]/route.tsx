@@ -6,10 +6,11 @@ export const PUT = async (
   { params }: { params: Promise<{ postId: string }> }
 ) => {
   try {
+    // Extract the postId from the URL
     const { postId } = await params
-    const {isPublished, ...body} = await request.json()
+    const { isPublished, ...body } = await request.json()
     console.log(isPublished)
-    // TODO: Check if user is admin
+
     // Check if post exists
     const post = await prisma.post.findUnique({
       where: {

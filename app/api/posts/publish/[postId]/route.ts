@@ -6,7 +6,9 @@ export const PATCH = async (
   { params }: { params: Promise<{ postId: string }> }
 ) => {
   try {
+    // Extract data
     const { postId } = await params
+
     // Find if post to be unpublished exists
     const post = await prisma.post.findUnique({
       where: {

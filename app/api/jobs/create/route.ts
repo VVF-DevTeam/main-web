@@ -1,12 +1,10 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/db'
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (request: NextRequest) => {
   try {
-    // TODO: Check if user is admin
-
     // Destructure the request body
-    const { title, jobType, keyName, userId } = await req.json()
+    const { title, jobType, keyName, userId } = await request.json()
 
     console.log(userId)
 

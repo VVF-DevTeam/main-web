@@ -1,26 +1,23 @@
 import { auth } from '@/auth'
-import { prisma } from '@/lib/db'
-
-type role = 'ADMIN' | 'HOST'
+import { Role } from '@prisma/client'
+type role = Role
 
 interface StatusCheckProps {
-  role: role
+  role?: role
 }
 
 export async function roleCheck({ role }: StatusCheckProps) {
   const session = await auth()
-  const userEmail = session?.user?.email
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email: userEmail || '',
-    },
-  })
+  if (role) {
+    let matchRole = false
+    if (session?.user?.role === role) {
+      matchRole = true
+    }
 
-  let isAdmin = false
-  if (user?.role === role) {
-    isAdmin = true
+    return matchRole
   }
 
-  return isAdmin
+  // return role if param is not provided
+  return session?.user?.role
 }

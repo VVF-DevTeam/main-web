@@ -6,7 +6,6 @@ export const POST = async (
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
-    // Check if user is admin
     const { eventId } = await params
     const categories = await request.json()
     const updatedCategories = await prisma.event.update({
@@ -39,7 +38,7 @@ export const DELETE = async (
   try {
     // Check if user is admin
     const { eventId } = await params
-    const {categoryId} = await request.json()
+    const { categoryId } = await request.json()
     console.log(categoryId)
     // delete the category from the eventID
     const updatedCategories = await prisma.event.update({

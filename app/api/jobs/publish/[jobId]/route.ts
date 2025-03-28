@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+
 export const PATCH = async (
   request: Request,
   { params }: { params: Promise<{ jobId: string }> }
 ) => {
-  try {
+  try { 
+    // Extract the jobId from the URL
     const { jobId } = await params
+
+    // Check if the job exists
     const jobExists = await prisma.job.findUnique({
       where: {
         id: jobId,

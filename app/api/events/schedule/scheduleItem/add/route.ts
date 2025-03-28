@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 export const POST = async (request: Request) => {
   try {
-    // Check if user is admin
+    // Extract the data from the request
     const { scheduleItemId, ...data } = await request.json()
     // Check if the schedule item is null, if yes, then create a new item and return
     if (scheduleItemId === null) {
@@ -29,7 +29,7 @@ export const POST = async (request: Request) => {
       )
     }
 
-    // Shiftt the position of all items by one
+    // Shift the position of all items by one
     await prisma.eventSchedule.updateMany({
       where: {
         position: {

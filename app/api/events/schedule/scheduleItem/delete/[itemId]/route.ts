@@ -6,7 +6,6 @@ export const DELETE = async (
   { params }: { params: Promise<{ itemId: string }> }
 ) => {
   try {
-
     // Check if user is admin
     const { itemId } = await params
 

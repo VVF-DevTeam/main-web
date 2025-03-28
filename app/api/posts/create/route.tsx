@@ -4,6 +4,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export const POST = async (request: Request) => {
   try {
+    // Extract the title and userId from the request body
     const { title, userId } = await request.json()
 
     // Create the post

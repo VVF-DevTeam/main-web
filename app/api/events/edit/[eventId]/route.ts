@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+
 export const PUT = async (
   request: Request,
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
+    // Extract the data from the request
     const { isPublished, ...values } = await request.json()
     const { eventId } = await params
     
@@ -19,9 +21,9 @@ export const PUT = async (
     if (!eventExists) {
       return new NextResponse('Event not found', { status: 404 })
     }
-    
+
     // TODO: Do we need to assign to eventExists.days?
-    const eventDays = eventExists.days = values.days
+    const eventDays = (eventExists.days = values.days)
 
     // Update the event
     let updatedEvent

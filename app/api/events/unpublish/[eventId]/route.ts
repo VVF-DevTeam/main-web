@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+
 export const PATCH = async (
   request: Request,
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
+    // extract id from params
     const { eventId } = await params
+
+    // check if event exists
     const eventExists = await prisma.event.findUnique({
       where: {
         id: eventId,

@@ -1,0 +1,21 @@
+// This roleCheck is for middleware.js to avoid useLayoutEffect mismatch error
+import { getToken } from 'next-auth/jwt'
+import { Role } from '@prisma/client'
+import { NextRequest } from 'next/server'
+
+interface StatusCheckProps {
+  role?: Role
+  req: NextRequest
+}
+
+export async function roleCheckToken({ role, req }: StatusCheckProps) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+
+  if (!token) return false
+
+  if (role) {
+    return token.role === role
+  }
+
+  return token.role
+}

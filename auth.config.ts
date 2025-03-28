@@ -5,6 +5,7 @@ import Github from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
 import Facebook from 'next-auth/providers/facebook'
 import { NextResponse } from 'next/server'
+import { roleCheckToken } from './lib/actions/user/roleCheckToken'
 
 import { prisma } from './lib/db'
 import { PRIVATE_PATHS } from './lib/appRoutes'
@@ -12,7 +13,7 @@ import { AUTH_PATHS } from './lib/appRoutes'
 
 import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
-import { validateSecretToken } from './lib/utilFunctions/secretToken'
+import { validateSecretToken } from './lib/actions/token/secretToken'
 
 export default {
   providers: [
@@ -75,6 +76,7 @@ export default {
         token.id = user.id as string
         token.email = user.email as string
         token.name = user.name as string
+        token.role = user.role as string
       }
       return token
     },
@@ -82,6 +84,7 @@ export default {
       session.user.id = token.id as string
       session.user.email = token.email as string
       session.user.name = token.name as string
+      session.user.role = token.role as string
       return session
     },
     async signIn({ account }) {
@@ -92,7 +95,7 @@ export default {
 
       return true
     },
-    authorized: ({ request, auth }) => {
+    authorized: async ({ request, auth }) => {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
 
@@ -102,12 +105,59 @@ export default {
       }
 
       if (path.includes('/api')) {
-        if (request.method !== 'GET') return NextResponse.next()
-        const secretHeader = request.headers.get('secret')
-        if (secretHeader && validateSecretToken(secretHeader)) {
-          return NextResponse.next()
+        const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
+
+        if (request.method !== 'GET') {
+          if (!isMobile) {
+            // Check role for web app (cannot use roleCheck or use auth() because it will return useLayoutEffect, which leads to a mismatch between the initial   )
+            const isAdmin = await roleCheckToken({
+              role: 'ADMIN',
+              req: request,
+            })
+            const isHost = await roleCheckToken({ role: 'HOST', req: request })
+
+            if (path.includes('categories') && !isAdmin) {
+              //For categories, only allow ADMIN
+              return new NextResponse('Forbidden', { status: 403 })
+            } else if (path.includes('events') && !isAdmin && !isHost) {
+              // For events API, only allow Admin and Host
+              return new NextResponse('Forbidden', { status: 403 })
+            } else if (path.includes('jobs')) {
+              // Only logged in user can apply
+              if (path.includes('apply')) {
+                if (!(await roleCheckToken({ req: request }))) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              } else {
+                // For job API, only allow Admin
+                if (!isAdmin) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              }
+            } else if (path.includes('posts') && !isAdmin) {
+              // For Post like API, Only logged in user can like post
+              if (path.includes('likes')) {
+                if (!(await roleCheckToken({ req: request }))) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              } else {
+                // For posts API, only allow Admin
+                if (!isAdmin) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              }
+            }
+            return NextResponse.next()
+          } else {
+            //TODO: Check role for mobile app
+          }
+        } else {
+          const secretHeader = request.headers.get('secret')
+          if (secretHeader && validateSecretToken(secretHeader)) {
+            return NextResponse.next()
+          }
+          return new NextResponse('Forbidden', { status: 403 })
         }
-        return new NextResponse('Forbidden', { status: 403 })
       }
 
       // extract the locale from the path

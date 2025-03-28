@@ -2,12 +2,10 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
-export const POST = async (req: Request) => {
+export const POST = async (request: Request) => {
   try {
-    // TODO: Check if user is admin
-
     // Destructure the request body
-    const { title, eventType, keyName } = await req.json()
+    const { title, eventType, keyName } = await request.json()
 
     // Create the event
     const event = await prisma.event.create({
@@ -19,14 +17,15 @@ export const POST = async (req: Request) => {
     })
 
     return NextResponse.json(event)
-    
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         // Duplicate entry
-        return new NextResponse('You have already applied for this job.', { status: 409 })
+        return new NextResponse('You have already applied for this job.', {
+          status: 409,
+        })
       }
-    }    
+    }
 
     if (error instanceof Error) {
       console.log('Edit Job Error: ', error.stack)

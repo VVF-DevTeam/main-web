@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/db'
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 
-export const POST = async (request: Request) => {
+export const POST = async (request: NextRequest) => {
   try {
-    // TODO: Check if user is admin
+    // Extract data from request
     const data = await request.json()
 
     // Create new category

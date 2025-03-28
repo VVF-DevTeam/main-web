@@ -6,6 +6,7 @@ export const PUT = async (
   { params }: { params: Promise<{ jobId: string }> }
 ) => {
   try {
+    // Extract data
     const { isPublished, ...values } = await request.json()
     const { jobId } = await params
 
