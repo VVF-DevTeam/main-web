@@ -125,16 +125,12 @@ export default {
                 if (!(await roleCheckToken({ req: request }))) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
-              }
-              else {
+              } else {
                 // For job API, only allow Admin
                 if (!isAdmin) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }
-            } else if (path.includes('events') && !isAdmin && !isHost) {
-              // For events API, only allow Admin and Host
-              return new NextResponse('Forbidden', { status: 403 })
             } else if (path.includes('posts') && !isAdmin) {
               // For Post like API, Only logged in user can like post
               if (path.includes('likes')) {
