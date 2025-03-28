@@ -12,7 +12,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 
 2. Development:
 
-   a. Add all the environment variables from this [document] to the '.env' file before starting local development (https://docs.google.com/spreadsheets/d/1HWzT14xOBQg8zwtJ3RfTpdCH8ENshvoSRAO7LeGP1IM/edit?usp=sharing) (only accessible to officers who have VVF gmail account)
+   a. Add all the environment variables from this [document](https://docs.google.com/spreadsheets/d/1HWzT14xOBQg8zwtJ3RfTpdCH8ENshvoSRAO7LeGP1IM/edit?usp=sharing) to the '.env' file before starting local development (only accessible to officers who have VVF gmail account)
    
    b. Open http://localhost:3000 in your browser to see the template home page. Then navigate to the page mentioned in your tasks and start editing. The website is auto-updated as you edit the file and make new changes.
    
