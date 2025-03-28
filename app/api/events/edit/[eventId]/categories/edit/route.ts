@@ -1,27 +1,11 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 export const POST = async (
   request: Request,
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
-    // Check for user role, allow ADMIN and HOST to create/edit events
-    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
-
-    if (!isMobile) {
-      // Check role for web app
-      const isAdmin = await roleCheck({ role: 'ADMIN' })
-      const isHost = await roleCheck({ role: 'HOST' })
-      
-      if (!isAdmin && !isHost) {
-        return new NextResponse('Forbidden', { status: 403 })
-      }
-    } else {
-      //TODO: Check role for mobile app
-    }
-
     const { eventId } = await params
     const categories = await request.json()
     const updatedCategories = await prisma.event.update({

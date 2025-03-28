@@ -1,26 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { auth } from '@/auth'
 
 export const PATCH = async (
   request: Request,
   { params }: { params: Promise<{ postId: string }> }
 ) => {
   try {
-    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
-
-    if (!isMobile) {
-      // Check login status, only logged in user can like
-      const session = await auth()
-      if (!session?.user) {
-        return new NextResponse('Forbidden', { status: 403 })
-      }
-    } else {
-      //TODO: Check role for mobile app
-    }
-
+    // Extract data
     const { postId } = await params
     const { userId, action } = await request.json()
+    
     // Find if post to be unpublished exists
     const post = await prisma.post.findUnique({
       where: {

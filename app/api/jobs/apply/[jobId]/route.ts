@@ -3,28 +3,14 @@ import { prisma } from '@/lib/db'
 import { sendApplication } from '@/lib/actions/email/sendApplication'
 import { JobType } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { auth } from '@/auth'
 
 export const POST = async (
   request: Request,
   { params }: { params: Promise<{ jobId: string }> }
 ) => {
   try {
-    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
-
-    if (!isMobile) {
-      // Check login status, only logged in user can apply
-      const session = await auth()
-      if (!session?.user) {
-        return new NextResponse('Forbidden', { status: 403 })
-      }
-    } else {
-      //TODO: Check role for mobile app
-    }
-
-    // Extract form data
+    // Extract data
     const formData = await request.formData()
-
     const { jobId } = await params
     // Check if the job exists
     const jobExists = await prisma.job.findUnique({

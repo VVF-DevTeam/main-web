@@ -1,26 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 export const PATCH = async (
   request: Request,
   { params }: { params: Promise<{ jobId: string }> }
 ) => {
   try {
-    // Check for user role, allow ADMIN to create/edit jobs
-    const isMobile = request.headers.get('X-App-Client')?.includes('mobile')
-
-    if (!isMobile) {
-      // Check role for web app
-      const isAdmin = await roleCheck({ role: 'ADMIN' })
-      
-      if (!isAdmin) {
-        return new NextResponse('Forbidden', { status: 403 })
-      }
-    } else {
-      //TODO: Check role for mobile app
-    }
-
     // Extract the jobId from the URL
     const { jobId } = await params
 
