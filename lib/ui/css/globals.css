@@ -26,6 +26,8 @@ body {
     --text-blue: 219 100% 57%; /* #2563EB */
     --text-yellow: 45 100% 50%; /* #FFB800 */
     --text-green: 152 76% 40%; /* #12805D */
+    --text-red: 0 80% 50%;     /* #E60000 */
+    --text-pink: 340 80% 55%; /* #E63980 */
     --destructive: 0 84% 60%; /* #EF4444 */
     --foreground: 240 10% 3.9%; /* #09090B */
     --card: 0 0% 100%; /* #FFFFFF */

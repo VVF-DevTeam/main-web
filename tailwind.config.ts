@@ -112,6 +112,8 @@ export default {
           blue: 'hsl(var(--text-blue))',
           green: 'hsl(var(--text-green))',
           yellow: 'hsl(var(--text-yellow))',
+          pink: 'hsl(var(--text-pink))',
+          red: 'hsl(var(--text-red))',
           destructive: 'hsl(var(--destructive))',
         },
         foreground: 'hsl(var(--foreground))',
