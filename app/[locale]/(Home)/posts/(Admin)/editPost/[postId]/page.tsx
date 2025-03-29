@@ -12,6 +12,8 @@ import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_
 import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/components/PublishButton'
 import BackButton from '@/components/ui/back-button'
+import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
+import EditorInstructions from '@/components/instruction/EditorInstructions'
 
 // Interfaces
 interface EditPostProps {
@@ -118,6 +120,7 @@ const EditPost = async ({ params }: EditPostProps) => {
                 Image
               </h1>
             </div>
+            <ImageAddInstruction />
             <PostImage post={post} />
           </div>
 
@@ -130,6 +133,7 @@ const EditPost = async ({ params }: EditPostProps) => {
                 Content
               </h1>
             </div>
+            <EditorInstructions />
             <PostContent post={post} />
           </div>
         </div>

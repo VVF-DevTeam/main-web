@@ -1,14 +1,21 @@
+// Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 import { auth } from '@/auth'
 
+// Components
+import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import BackButton from '@/components/ui/back-button'
+
+// Interfaces
 interface PostPageProps {
   params: Promise<{ postId: string }>
 }
+
+// Main Component
 const PostPage = async ({ params }: PostPageProps) => {
   const { postId } = await params
   const session = await auth()
@@ -59,16 +66,8 @@ const PostPage = async ({ params }: PostPageProps) => {
 
   //   todo create a not found page
   return (
-    <div className="mx-auto my-20 flex max-w-7xl flex-col">
-      <Link href="/posts" className="p-6">
-        <Button
-          variant={'ghost'}
-          className="-my-14 flex items-center gap-x-2 bg-bgColor-brand text-textColor-white transition-all hover:bg-bgColor-brand/70 hover:text-slate-200"
-        >
-          <ArrowLeft className="h-6 w-6" />
-          Go back
-        </Button>
-      </Link>
+    <div className="mx-auto my-20 flex max-w-7xl flex-col gap-y-7">
+      <BackButton variant={'responsive'} />
       <PostBody
         title={post.title}
         createdAt={post.createdAt}

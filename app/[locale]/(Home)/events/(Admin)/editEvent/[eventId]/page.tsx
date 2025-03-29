@@ -21,6 +21,8 @@ import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
 import EventFormLink from './_components/EventFormLink'
 import BackButton from '@/components/ui/back-button'
+import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
+import EditorInstructions from '@/components/instruction/EditorInstructions'
 
 // Main Component
 const EditEventPage = async ({
@@ -37,7 +39,7 @@ const EditEventPage = async ({
   }
 
   const { eventId } = await params
-  
+
   // Fetch the Event data
   const event = await prisma.event.findUnique({
     where: {
@@ -143,6 +145,7 @@ const EditEventPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step III :</span> Description
             </h2>
+            <EditorInstructions />
             <EventDescription event={event} />
           </div>
 
@@ -175,6 +178,7 @@ const EditEventPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step VII :</span> Image
             </h2>
+            <ImageAddInstruction />
             <EventImage event={event} />
           </div>
 
@@ -237,7 +241,8 @@ const EditEventPage = async ({
           {/* Event Registration Form Link */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XV :</span> Event Registration Form
+              <span className="text-gray-500">Step XV :</span> Event
+              Registration Form
             </h2>
             <EventFormLink event={event} />
           </div>
