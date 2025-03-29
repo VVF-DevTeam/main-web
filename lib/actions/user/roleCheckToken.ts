@@ -10,12 +10,13 @@ interface StatusCheckProps {
 
 export async function roleCheckToken({ role, req }: StatusCheckProps) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+  console.log(token)
   console.log(process.env.AUTH_SECRET)
   if (!token) return false
 
   if (role) {
     return token.role === role
   }
-  
+
   return token.role
 }
