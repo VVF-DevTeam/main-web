@@ -9,6 +9,7 @@ import Link from 'next/link'
 import MobileSidebar from './_navbar/mobileSidebar'
 import NavLinks from './_navbar/navLinks'
 import CompanyLogo from '@/app/[locale]/components/CustomIcon'
+import Image from 'next/image'
 
 // Main Component
 const Navbar = async ({ locale }: { locale: string }) => {
@@ -16,32 +17,31 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="sticky z-10 h-[80px] w-full bg-[#d2d0d0]/60 px-6 shadow-md backdrop-blur-sm">
+    <nav className="relative sticky z-10 top-0 w-full px-6 shadow-md">
 
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
-      {/* <div className="white-overlay"></div>
+      <div className="white-overlay"></div>
       <Image
-        src="https://drive.google.com/thumbnail?id=1b17wtI8m9C1isfbJC7w-vbG_B5oe8wW9&sz=w1000"
+        src="https://drive.google.com/thumbnail?id=18KrAvZmI1kaoe16AjXSp_6cKC3GZXl4v&sz=w1000"
         alt="Intro"
         className="next-background object-top"
         fill
         priority
-      /> */}
+      />
 
       {/* Nav Links */}
 
-      <div className="flex-between h-[90px]">
-        <div className="flex h-full w-full items-center gap-x-4">
+      <div className="flex-between items-center">
+        <div className="flex h-[70px] w-full items-center gap-x-4">
           {/* Company Logo with Slogan*/}
-          <Link href="/">
-
+          <Link href="/" className='-ml-10 md:-ml-2'>
             <CompanyLogo />
           </Link>
 
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="flex-center -ml-10 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-7"
+              className="flex-center -ml-12 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-10"
               href={`/profile/${session?.user?.name}`}
               aria-label="Go to user profile"
             >

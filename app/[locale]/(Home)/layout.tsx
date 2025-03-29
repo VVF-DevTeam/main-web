@@ -14,10 +14,9 @@ const Layout = async ({
 
   return (
     <div className="relative h-full min-h-screen w-full">
-      <div>
-        <Header />
-        <Navbar locale={locale} />
-      </div>
+      <Header />
+      <Navbar locale={locale} />
+
       <div className="min-h-screen">{children}</div>
       <div className="mt-auto">
         <Footer locale={locale} />
