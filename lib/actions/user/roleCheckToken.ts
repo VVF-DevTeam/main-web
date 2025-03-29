@@ -13,11 +13,9 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
     req,
     secret: process.env.AUTH_SECRET,
     cookieName: process.env.NODE_ENV === 'production'
-      ? '__Secure-next-auth.session-token'
+      ? '__Secure-authjs.session-token'
       : 'next-auth.session-token',
   })
-
-  console.log('Cookies:', req.cookies.getAll())
 
   console.log(token)
   console.log(process.env.AUTH_SECRET)
