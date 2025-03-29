@@ -9,7 +9,16 @@ interface StatusCheckProps {
 }
 
 export async function roleCheckToken({ role, req }: StatusCheckProps) {
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    cookieName: process.env.NODE_ENV === 'production'
+      ? '__Secure-next-auth.session-token'
+      : 'next-auth.session-token',
+  })
+
+  console.log('Cookies:', req.cookies.getAll())
+
   console.log(token)
   console.log(process.env.AUTH_SECRET)
   if (!token) return false
