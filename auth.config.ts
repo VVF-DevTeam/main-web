@@ -115,10 +115,7 @@ export default {
               req: request,
             })
             const isHost = await roleCheckToken({ role: 'HOST', req: request })
-            
-            console.log(isAdmin)
-            console.log(isHost)
-            
+
             if (path.includes('categories') && !isAdmin) {
               //For categories, only allow ADMIN
               return new NextResponse('Forbidden', { status: 403 })

@@ -14,11 +14,11 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
     secret: process.env.AUTH_SECRET,
     cookieName: process.env.NODE_ENV === 'production'
       ? '__Secure-authjs.session-token'
-      : 'next-auth.session-token',
+      : 'authjs.session-token',
   })
 
-  console.log(token)
-  console.log(process.env.AUTH_SECRET)
+  // console.log('Cookies:', req.cookies.getAll())
+
   if (!token) return false
 
   if (role) {
