@@ -1,13 +1,10 @@
 // Libraries
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { auth } from '@/auth'
 
 // Components
 import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 import BackButton from '@/components/ui/back-button'
 
 // Interfaces
