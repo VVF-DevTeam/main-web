@@ -49,7 +49,7 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
         {/* Price and availability */}
         <div className="flex-between">
           <span className="flex items-center gap-x-2">
-            <Tag className="h-5 w-5"></Tag>${event.price}
+            <Tag className="h-5 w-5"></Tag>${event.price?.toString()}
             {event.priceMember ? '/$' + event.priceMember : null}
           </span>
           <span className="flex-center gap-x-2">

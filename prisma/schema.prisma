@@ -34,7 +34,7 @@ model Event {
 
   // Metadata
   location    String?
-  price       Int?      @default(0)
+  price       Decimal?      @default(0)
   startDate   DateTime? @default(now())
   endDate     DateTime  @default(now())
   days        String[]
