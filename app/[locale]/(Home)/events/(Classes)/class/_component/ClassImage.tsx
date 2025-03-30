@@ -29,7 +29,7 @@ const ClassImage = async ({
 
   return (
     <div className="grid-all-cols-2 mx-auto flex w-full flex-col p-6 pt-20 md:grid">
-      <div className="relative aspect-video h-[30vh] w-full basis-1/2 md:h-[40vh] lg:h-[50vh]">
+      <div className="relative aspect-video w-full basis-1/2 md:h-[35vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
           className="rounded-t-sm object-cover md:rounded-l-sm"
