@@ -36,7 +36,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
   const form = useForm<z.infer<typeof EventPriceSchema>>({
     resolver: zodResolver(EventPriceSchema),
     defaultValues: {
-      price: event?.price || 0,
+      price: event?.price ? Number(event.price) : 0,
     },
   })
   const { isSubmitting, isValid } = form.formState
@@ -106,7 +106,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
           Add a price for this event.
         </p>
       ) : (
-        <div className="text-muted-foreground">${event.price}</div>
+        <div className="text-muted-foreground">${Number(event.price).toFixed(2)}</div>
       )}
     </div>
   )
