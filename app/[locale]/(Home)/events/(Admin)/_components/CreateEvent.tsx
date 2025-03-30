@@ -50,6 +50,8 @@ const createEventSchema = z.object({
 
 // Main Component
 const CreateEventForm = ({ author }: CreateEventFormProps) => {
+
+  // TODO: Add author field for event
   console.log(author)
   const { toast } = useToast()
   const router = useRouter()

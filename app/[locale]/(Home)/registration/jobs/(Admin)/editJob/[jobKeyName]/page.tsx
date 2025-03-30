@@ -14,6 +14,7 @@ import JobEndDate from '../../../../_components/_jobs/_editJob/JobEndDate'
 import JobDescription from '../../../../_components/_jobs/_editJob/JobDescription'
 import JobSummary from '../../../../_components/_jobs/_editJob/JobSummary'
 import JobLocation from '../../../../_components/_jobs/_editJob/JobLocation'
+import EditorInstructions from '@/components/instruction/EditorInstructions'
 
 const EditJobPage = async ({
   params,
@@ -107,6 +108,7 @@ const EditJobPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step III :</span> Description
             </h2>
+            <EditorInstructions />
             <JobDescription job={job} />
           </div>
 

@@ -69,34 +69,32 @@ const ClassPage = async ({ params }: ClassPageProps) => {
 
   return (
     <div>
-      <div className="flex flex-col p-6 md:gap-y-10 lg:gap-y-0">
-        <div className="width-max-default mx-auto">
-          <BackButton variant={'responsive'} />
-          <ClassImage
-            imageUrl={publishedClass.imgUrl!}
-            location={publishedClass.location!}
-            startDate={publishedClass.startDate!}
-            hosts={publishedClass.hosts}
-            title={publishedClass.title}
-            formLink={publishedClass.formLink!}
-            locale={locale}
-          />
-        </div>
-        <ClassDescription
-          description={publishedClass.description!}
-          startDate={publishedClass.startDate!}
-          endDate={publishedClass.endDate}
-          startTime={publishedClass.startTime!}
-          endTime={publishedClass.endTime!}
-          capacity={publishedClass.capacity!}
+      <div className="width-max-default mx-auto">
+        <BackButton variant={'responsive'} />
+        <ClassImage
+          imageUrl={publishedClass.imgUrl!}
           location={publishedClass.location!}
+          startDate={publishedClass.startDate!}
           hosts={publishedClass.hosts}
-          schedules={publishedClass.schedules}
-          days={publishedClass.days!}
+          title={publishedClass.title}
           formLink={publishedClass.formLink!}
           locale={locale}
         />
       </div>
+      <ClassDescription
+        description={publishedClass.description!}
+        startDate={publishedClass.startDate!}
+        endDate={publishedClass.endDate}
+        startTime={publishedClass.startTime!}
+        endTime={publishedClass.endTime!}
+        capacity={publishedClass.capacity!}
+        location={publishedClass.location!}
+        hosts={publishedClass.hosts}
+        schedules={publishedClass.schedules}
+        days={publishedClass.days!}
+        formLink={publishedClass.formLink!}
+        locale={locale}
+      />
     </div>
   )
 }
