@@ -12,6 +12,7 @@ import EventButton from './EventButton'
 
 // Interfaces & Types
 import { Event } from '@prisma/client'
+
 interface EventCardProps {
   event: Event
   locale: string
@@ -20,8 +21,15 @@ interface EventCardProps {
 const EventCard = async ({ event, locale }: EventCardProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
+  const now = new Date()
+  const hasStartedAndNotEnded =
+    event.startDate &&
+    event.endDate &&
+    new Date(event.startDate) <= now &&
+    new Date(event.endDate) >= now
+
   return (
-    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
+    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100 xl:min-w-[400px]">
       <Image
         src={event.imgUrl!}
         alt="event thumbnail"
@@ -44,16 +52,18 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
         </div>
 
         {/* Title */}
-        <h2 className="mb-4 text-center text-2xl font-bold">{event.title}</h2>
+        <h2 className="mb-4 text-center text-2xl font-bold">
+          {event.title} {hasStartedAndNotEnded && <span>(Started)</span>}
+        </h2>
 
         {/* Price and availability */}
         <div className="flex-between">
           <span className="flex items-center gap-x-2">
-            <Tag className="h-5 w-5"></Tag>${event.price?.toString()}
+            <Tag className="h-5 w-5" />${event.price?.toString()}
             {event.priceMember ? '/$' + event.priceMember : null}
           </span>
           <span className="flex-center gap-x-2">
-            <Ticket className="h-5 w-5 rotate-45"></Ticket>
+            <Ticket className="h-5 w-5 rotate-45" />
             {event.capacity! - event.ticketsSold! === 0
               ? 'Sold Out'
               : event.capacity! - event.ticketsSold!}{' '}
@@ -64,17 +74,23 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
         {/* Location */}
         <div className="flex-between gap-x-2">
           <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
-            <MapPin className="h-5 w-5"></MapPin>
+            <MapPin className="h-5 w-5" />
             {event.location}
           </span>
-          <EventButton eventKeyName={event.keyName} eventType={event.eventType} />
+          <EventButton
+            eventKeyName={event.keyName}
+            eventType={event.eventType}
+          />
         </div>
 
         {/* Timings */}
         <div className="flex-between rounded-lg bg-bgColor-brand/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand/30">
           <span className="flex items-center gap-x-2 text-sm md:text-lg">
-            <CalendarDays className="h-4 w-4 md:h-5 md:w-5"></CalendarDays>
-            {event.startDate.toLocaleDateString('en-GB', {})}
+            <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
+            <div>
+              <p>{event.startDate.toLocaleDateString('en-GB')}</p>
+              <p>{event.endDate.toLocaleDateString('en-GB')}</p>
+            </div>
           </span>
 
           <div className="flex flex-col text-right text-sm md:text-base xl:text-lg">

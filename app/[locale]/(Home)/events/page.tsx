@@ -35,12 +35,24 @@ const EventsPage = async ({
     )
   }
 
+  // Filter upcoming and finished events
+  const now = new Date()
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.endDate) >= now
+  )
+  const finishedEvents = allEvents.filter(
+    (event) => new Date(event.endDate) < now
+  )
+
   return (
     <div className="flex flex-col gap-y-6">
       <EventHeroImage locale={locale} />
-      <EventList events={allEvents} locale={locale} />
+      <EventList events={upcomingEvents} locale={locale} />
       {(isAdmin || isHost) && <EventAdminButtons />}
       <EventInstruction locale={locale} />
+      {finishedEvents.length > 0 && (
+        <EventList events={finishedEvents} locale={locale} finished={true} />
+      )}
     </div>
   )
 }
