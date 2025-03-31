@@ -22,7 +22,7 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
   if (!token) return false
 
   if (role) {
-    return token.role === role
+    return token.role?.includes(role)
   }
 
   return token.role

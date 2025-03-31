@@ -121,7 +121,7 @@ model User {
   image         String?
   accounts      Account[]
 
-  role     Role    @default(USER)
+  role     Role[]
   age      String?
   phone    String? @unique
   address  String?

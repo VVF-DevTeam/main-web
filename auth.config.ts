@@ -14,6 +14,7 @@ import { AUTH_PATHS } from './lib/appRoutes'
 import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
 import { validateSecretToken } from './lib/actions/token/secretToken'
+import { Role } from '@prisma/client'
 
 export default {
   providers: [
@@ -66,7 +67,10 @@ export default {
 
         // Return user
         const { password, ...userWithoutPassword } = user
-        return userWithoutPassword
+        return {
+          ...userWithoutPassword,
+          role: user.role, // include roles separately to avoid conflict with NextAuth types
+        }
       },
     }),
   ],
@@ -76,7 +80,7 @@ export default {
         token.id = user.id as string
         token.email = user.email as string
         token.name = user.name as string
-        token.role = user.role as string
+        token.role = user.role as Role[]
       }
       return token
     },
@@ -84,7 +88,7 @@ export default {
       session.user.id = token.id as string
       session.user.email = token.email as string
       session.user.name = token.name as string
-      session.user.role = token.role as string
+      session.user.role = token.role as Role[]
       return session
     },
     async signIn({ account }) {

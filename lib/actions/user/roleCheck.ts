@@ -11,7 +11,7 @@ export async function roleCheck({ role }: StatusCheckProps) {
 
   if (role) {
     let matchRole = false
-    if (session?.user?.role === role) {
+    if (session?.user?.role?.includes(role) ) {
       matchRole = true
     }
 

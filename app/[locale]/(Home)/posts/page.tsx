@@ -36,7 +36,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   })
 
   let isAdmin = false
-  if (user?.role === 'ADMIN') {
+  if (user?.role.includes('ADMIN')) {
     isAdmin = true
   }
 

@@ -14,7 +14,9 @@ const getUsersWithRole = async (
           contains: searchString,
           mode: 'insensitive',
         },
-        role: PrismaRole[role],
+        role: {
+          has: PrismaRole[role]
+        }
       },
       select: {
         id: true,
