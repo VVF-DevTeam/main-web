@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { createToken } from '@/lib/actions/token/tokenFunctions'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
-import { error } from 'console'
 
 interface SignupActionProps {
   firstName: string
@@ -87,6 +86,7 @@ export const POST = async (request: NextRequest) => {
       { status: 201 }
     )
   } catch (error) {
-    throw error
+    console.log(error)
+    return new NextResponse('Internal Error', { status: 500 })
   }
 }

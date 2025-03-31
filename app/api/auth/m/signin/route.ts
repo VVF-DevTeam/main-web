@@ -84,6 +84,7 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     )
   } catch (error) {
-    throw error
+    console.log(error)
+    return new NextResponse('Internal Error', { status: 500 })
   }
 }
