@@ -15,6 +15,7 @@ import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
 import { validateSecretToken } from './lib/actions/token/secretToken'
 import { Role } from '@prisma/client'
+import * as jose from 'jose'
 
 export default {
   providers: [
@@ -154,11 +155,129 @@ export default {
             return NextResponse.next()
           } else {
             //TODO: Check role for mobile app
+            const jwtHeader = request.headers.get('Authorization')
+            const response = NextResponse.next()
+            if (!jwtHeader)
+              return NextResponse.json(
+                { message: 'Un-authorized' },
+                { status: 401 }
+              )
+            try {
+              const parts = jwtHeader.split(' ')
+              if (parts.length !== 2 || parts[0] !== 'Bearer') {
+                return NextResponse.json(
+                  { message: 'Unauthorized: Invalid token format' },
+                  { status: 401 }
+                )
+              }
+              const token = parts[1]
+              const secretKey = new TextEncoder().encode(
+                process.env.AUTH_SECRET as string
+              )
+
+              const isJwtVerified = await jose.jwtVerify(token, secretKey)
+
+              if (!isJwtVerified)
+                return NextResponse.json(
+                  { message: 'Un-authorized' },
+                  { status: 401 }
+                )
+
+              const jwtDecoded = (await jose.decodeJwt(token)) as {
+                email: string
+                id: string
+                role: string[]
+              }
+
+              const { role, id } = jwtDecoded
+              response.headers.set('userId', id)
+
+              if (path.includes('categories') && !role.includes('ADMIN')) {
+                //For categories, only allow ADMIN
+                return new NextResponse('Forbidden', { status: 403 })
+              }
+              if (
+                path.includes('events') &&
+                !role.includes('ADMIN') &&
+                !role.includes('HOST')
+              ) {
+                // For events API, only allow Admin and Host
+                return new NextResponse('Forbidden', { status: 403 })
+              }
+
+              if (path.includes('jobs')) {
+                // Only logged in user can apply
+                if (path.includes('apply') && !token) {
+                  return new NextResponse('Forbidden', {
+                    status: 403,
+                  })
+                }
+                if (!path.includes('apply') && !role.includes('ADMIN')) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              }
+              if (path.includes('posts')) {
+                if (path.includes('likes')) {
+                  if (!token) {
+                    return new NextResponse('Forbidden', { status: 403 })
+                  }
+                } else if (!role.includes('ADMIN')) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              }
+              return response
+            } catch (error) {
+              console.log(error)
+              return NextResponse.json(
+                { message: 'Token expired' },
+                { status: 401 }
+              )
+            }
           }
         } else {
           const secretHeader = request.headers.get('secret')
+          const response = NextResponse.next()
           if (secretHeader && validateSecretToken(secretHeader)) {
-            return NextResponse.next()
+            const jwtHeader = request.headers.get('Authorization')
+            if (jwtHeader) {
+              try {
+                const parts = jwtHeader.split(' ')
+                if (parts.length !== 2 || parts[0] !== 'Bearer') {
+                  return NextResponse.json(
+                    { message: 'Unauthorized: Invalid token format' },
+                    { status: 401 }
+                  )
+                }
+                const token = parts[1]
+                const secretKey = new TextEncoder().encode(
+                  process.env.AUTH_SECRET as string
+                )
+
+                const isJwtVerified = await jose.jwtVerify(parts[1], secretKey)
+
+                if (!isJwtVerified)
+                  return NextResponse.json(
+                    { message: 'Un-authorized' },
+                    { status: 401 }
+                  )
+
+                const jwtDecoded = (await jose.decodeJwt(token)) as {
+                  email: string
+                  id: string
+                  role: Role[]
+                }
+
+                const { id } = jwtDecoded
+                response.headers.set('userId', id)
+              } catch (error) {
+                console.log(error)
+                return NextResponse.json(
+                  { message: 'Token expired' },
+                  { status: 401 }
+                )
+              }
+            }
+            return response
           }
           return new NextResponse('Forbidden', { status: 403 })
         }
