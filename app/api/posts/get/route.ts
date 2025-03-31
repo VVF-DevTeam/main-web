@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 
 export const GET = async (request: NextRequest) => {
   try {
+    const userId = request.headers.get('userId') || undefined
     const postId = request?.nextUrl?.searchParams.get('postId')
     const searchText =
       request?.nextUrl?.searchParams.get('searchText') || undefined
@@ -17,7 +18,6 @@ export const GET = async (request: NextRequest) => {
           ? false
           : undefined
 
-    console.log(postId)
     let totalPost = 0
     let post = null
 
@@ -33,6 +33,16 @@ export const GET = async (request: NextRequest) => {
             imgUrl: true,
             isPublished: true,
             summary: true,
+            ...(userId && {
+              postLikes: {
+                select: {
+                  id: true,
+                },
+                where: {
+                  userId: userId,
+                },
+              },
+            }),
             _count: {
               select: { postLikes: true, postVisits: true },
             },
@@ -64,7 +74,12 @@ export const GET = async (request: NextRequest) => {
           },
         }),
       ])
-      post = posts
+      post = posts.map((item) => ({
+        ...item,
+        ...(userId && {
+          liked: (item?.postLikes && item?.postLikes?.length > 0) || null,
+        }),
+      }))
       totalPost = count
     } else {
       const result = await prisma.post.findUnique({
@@ -79,6 +94,14 @@ export const GET = async (request: NextRequest) => {
               name: true,
             },
           },
+          postLikes: {
+            select: {
+              id: true,
+            },
+            where: {
+              userId: userId,
+            },
+          },
         },
         where: {
           id: postId,
@@ -91,6 +114,9 @@ export const GET = async (request: NextRequest) => {
         updateAt: result?.updatedAt,
         createAt: result?.createdAt,
         authorName: result?.user.name,
+        ...(userId && {
+          liked: (result?.postLikes && result?.postLikes?.length > 0) || null,
+        }),
       }
       if (!post) {
         return NextResponse.json({ message: 'Post not found' }, { status: 404 })
