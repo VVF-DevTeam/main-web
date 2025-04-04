@@ -4,20 +4,40 @@ import React, { useState } from 'react'
 import { format, addDays, subDays } from 'date-fns'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react'
+
+import { useTranslation } from 'react-i18next'
+
 import { Event } from '@prisma/client'
 
 interface EventCalendarProps {
   events: Event[]
   times: string[]
+  days: string[]
+  locale: string
 }
 
-const EventCalendarDay = ({ events, times }: EventCalendarProps) => {
+const EventCalendarDay = ({
+  events,
+  times,
+  days,
+  locale,
+}: EventCalendarProps) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('event')
+
   const [currentDate, setCurrentDate] = useState(new Date())
   const dayText = format(currentDate, 'EEEE')
+  const day = days[currentDate.getDay()]
   const SLOT_HEIGHT_REM = 6
 
   const handlePrev = () => setCurrentDate(subDays(currentDate, 1))
   const handleNext = () => setCurrentDate(addDays(currentDate, 1))
+
+  const formattedDate = new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(currentDate)
 
   return (
     <div className="overflow-x-auto">
@@ -28,13 +48,13 @@ const EventCalendarDay = ({ events, times }: EventCalendarProps) => {
         <button aria-label="next-month" onClick={handleNext}>
           <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
         </button>
-        <span className="ml-2">{format(currentDate, 'MMMM d, yyyy')}</span>
+        <span className="ml-2"> {formattedDate}</span>
       </div>
 
       <div className="bg-bgColor-white relative grid min-w-full grid-cols-[100px_1fr]">
-        <div className="border-r py-3 text-center font-bold">Time</div>
+        <div className="border-r py-3 text-center font-bold">{t('time')}</div>
         <div className="py-3 text-center font-bold">
-          {dayText} <br /> {format(currentDate, 'd')}
+          {t(day)} <br /> {format(currentDate, 'd')}
         </div>
 
         {times.map((time, rowIdx) => (

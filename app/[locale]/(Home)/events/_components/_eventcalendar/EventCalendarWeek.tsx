@@ -4,15 +4,26 @@ import React, { useState } from 'react'
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react'
+
+import { useTranslation } from 'react-i18next'
+
 import { Event } from '@prisma/client'
 
 interface EventCalendarWeekProps {
   events: Event[]
   times: string[]
   days: string[]
+  locale: string
 }
 
-const EventCalendarWeek = ({ events, days, times }: EventCalendarWeekProps) => {
+const EventCalendarWeek = ({
+  events,
+  days,
+  times,
+  locale,
+}: EventCalendarWeekProps) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('event')
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const handlePrev = () => setCurrentDate(subWeeks(currentDate, 1))
@@ -21,6 +32,25 @@ const EventCalendarWeek = ({ events, days, times }: EventCalendarWeekProps) => {
   const SLOT_HEIGHT_REM = 6
 
   const weekStart = startOfWeek(currentDate)
+
+  const startMonth = new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+    weekStart
+  )
+  const endMonth = new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+    addDays(weekStart, 6)
+  )
+  const startYear = format(weekStart, 'yyyy')
+  const endYear = format(addDays(weekStart, 6), 'yyyy')
+
+  let weekDisplay = ''
+  if (startYear === endYear) {
+    weekDisplay =
+      startMonth === endMonth
+        ? `${startMonth} ${startYear}`
+        : `${startMonth} – ${endMonth}, ${startYear}`
+  } else {
+    weekDisplay = `${startMonth} ${startYear} – ${endMonth} ${endYear}`
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -32,23 +62,19 @@ const EventCalendarWeek = ({ events, days, times }: EventCalendarWeekProps) => {
         <button aria-label="next-month" onClick={handleNext}>
           <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
         </button>
-        <span className="ml-2">
-          {format(weekStart, 'MMM') === format(addDays(weekStart, 6), 'MMM')
-            ? format(weekStart, 'MMMM yyyy')
-            : `${format(weekStart, 'MMM')} - ${format(addDays(weekStart, 6), 'MMM, yyyy')}`}
-        </span>
+        <span className="ml-2">{weekDisplay}</span>
       </div>
-      <div className="bg-bgColor-white relative grid min-w-[1000px] grid-cols-[100px_repeat(7,_1fr)]">
+      <div className="bg-bgColor-white relative grid min-w-[700px] grid-cols-[100px_repeat(7,_1fr)]">
         {/* Header Row */}
         <div className="bg-bgColor-white border-r py-3 text-center font-bold">
-          Time
+          {t('time')}
         </div>
         {days.map((day, idx) => (
           <div
             key={day}
             className="bg-bgColor-white border-l py-3 text-center font-bold"
           >
-            {day} <br /> {format(addDays(weekStart, idx), 'd')}
+            {t(day)} <br /> {format(addDays(weekStart, idx), 'd')}
           </div>
         ))}
 
@@ -72,17 +98,18 @@ const EventCalendarWeek = ({ events, days, times }: EventCalendarWeekProps) => {
 
         {/* Event layer */}
         <div className="absolute bottom-0 left-[100px] right-0 top-[4.5rem] grid grid-cols-7">
-          {days.map((day) => (
+          {days.map((day, idx) => (
             <div key={day} className="relative">
               {events.map((event) => {
                 const start = event.startDate ? new Date(event.startDate) : null
                 const end = event.endDate ? new Date(event.endDate) : null
+                const dayText = format(addDays(weekStart, idx), 'EEEE')
                 if (
                   !start ||
                   !end ||
                   currentDate < start ||
                   currentDate > end ||
-                  !event.days?.includes(day.toUpperCase()) ||
+                  !event.days?.includes(dayText.toUpperCase()) ||
                   !event.startTime ||
                   !event.endTime
                 )

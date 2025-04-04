@@ -13,14 +13,26 @@ import {
   isSameDay,
 } from 'date-fns'
 import Link from 'next/link'
-import { Event } from '@prisma/client'
 import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react'
+
+import { useTranslation } from 'react-i18next'
+
+import { Event } from '@prisma/client'
+
 interface EventCalendarMonthProps {
   events: Event[]
   days: string[]
+  locale: string
 }
 
-const EventCalendarMonth = ({ events, days }: EventCalendarMonthProps) => {
+const EventCalendarMonth = ({
+  events,
+  days,
+  locale,
+}: EventCalendarMonthProps) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('event')
+
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const handlePrev = () => setCurrentDate(subMonths(currentDate, 1))
@@ -30,6 +42,11 @@ const EventCalendarMonth = ({ events, days }: EventCalendarMonthProps) => {
   const end = endOfWeek(endOfMonth(currentDate))
   const daysInMonthGrid = eachDayOfInterval({ start, end })
   const today = new Date()
+
+  const formattedMonth = new Intl.DateTimeFormat(locale, {
+    month: 'long',
+  }).format(currentDate)
+
   return (
     <div className="overflow-x-auto">
       {/* Header Navigation */}
@@ -40,16 +57,15 @@ const EventCalendarMonth = ({ events, days }: EventCalendarMonthProps) => {
         <button aria-label="next-month" onClick={handleNext}>
           <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
         </button>
-        <span className="ml-2">{format(currentDate, 'MMMM yyyy')}</span>
+        <span className="ml-2">
+          {formattedMonth + format(currentDate, ' yyyy')}
+        </span>
       </div>
 
-      <div className="bg-bgColor-white grid grid-cols-7 border border-bgColor-black">
+      <div className="bg-bgColor-white grid min-w-[700px] grid-cols-7 border">
         {days.map((day) => (
-          <div
-            key={day}
-            className="border border-bgColor-black py-2 text-center font-semibold"
-          >
-            {day}
+          <div key={day} className="border py-2 text-center font-semibold">
+            {t(day)}
           </div>
         ))}
 
@@ -73,7 +89,7 @@ const EventCalendarMonth = ({ events, days }: EventCalendarMonthProps) => {
           return (
             <div
               key={idx}
-              className={`min-h-[120px] border border-bgColor-black p-2 text-sm ${
+              className={`min-h-[120px] border p-2 text-sm ${
                 isCurrentMonth
                   ? 'bg-bgColor-white'
                   : 'text-textColor-grayLight bg-bgColor-grayLight'
