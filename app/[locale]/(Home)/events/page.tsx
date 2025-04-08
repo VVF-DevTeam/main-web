@@ -21,6 +21,7 @@ const EventsPage = async ({
   const isAdmin = await roleCheck({ role: 'ADMIN' })
   const isHost = await roleCheck({ role: 'HOST' })
 
+  // TODO: Fix: Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
   // Get all events
   const allEvents = await prisma.event.findMany({
     where: {

@@ -47,7 +47,7 @@ export const signinAction = async (data: {
         success: true,
       }
     }
- 
+
     // Sign in the user
     await signIn('credentials', {
       email: email,

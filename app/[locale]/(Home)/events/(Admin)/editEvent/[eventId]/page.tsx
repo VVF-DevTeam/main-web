@@ -114,7 +114,7 @@ const EditEventPage = async ({
 
           {/* Publish Button */}
           <PublishButton
-            id={event.keyName}
+            id={event.id}
             type={'event'}
             canPublish={canPublish}
             isPublished={event.isPublished}
