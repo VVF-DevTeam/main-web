@@ -5,14 +5,14 @@ import { Readable } from 'stream'
 
 const FOLDER_ID = '1S2Y8zt25b47LeIsGVLhFojLMQwa2UDM6' // replace with actual ID
 
-const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
-  scopes: ['https://www.googleapis.com/auth/drive'],
-})
-
-const drive = google.drive({ version: 'v3', auth })
-
 export async function listAvatars() {
+  const auth = new google.auth.GoogleAuth({
+    credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
+    scopes: ['https://www.googleapis.com/auth/drive'],
+  })
+  
+  const drive = google.drive({ version: 'v3', auth })
+  
   const res = await drive.files.list({
     q: `'${FOLDER_ID}' in parents and trashed = false`,
     fields: 'files(id, name)',
@@ -35,6 +35,13 @@ export async function uploadAvatar(
   filename: string,
   mimetype: string
 ) {
+  const auth = new google.auth.GoogleAuth({
+    credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
+    scopes: ['https://www.googleapis.com/auth/drive'],
+  })
+  
+  const drive = google.drive({ version: 'v3', auth })
+    
   // Working code
   // await drive.files.create({
   //     requestBody: {
