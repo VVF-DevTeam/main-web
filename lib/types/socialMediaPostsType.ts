@@ -5,6 +5,7 @@ export interface SocialMediaPost {
     image: string;
     likes: number;
     comments: number;
+    url: string;
     timestamp: string;
     platform: string;
   }

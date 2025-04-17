@@ -1,10 +1,4 @@
-import {
-  FaFacebook,
-  FaInstagram,
-  FaHeart,
-  FaComment,
-  FaExpand,
-} from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaHeart, FaComment } from 'react-icons/fa'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -22,7 +16,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       ? `${post.content.substring(0, MAX_CONTENT_LENGTH)}...`
       : post.content
 
-  const link = 'https://www.facebook.com/profile.php?id=61570910920072'
+  // const link = 'https://www.facebook.com/profile.php?id=61570910920072'
 
   return (
     <div className="bg-bgColor-white rounded-xl p-4 shadow-lg transition-all duration-300 hover:shadow-xl">
@@ -44,9 +38,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       {/* Post content with 'Read more' link always visible */}
       <p className="text-textColor-black mb-4">
         {truncatedContent}{' '}
-        {link && (
+        {post.url && (
           <Link
-            href={link}
+            href={post.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-textColor-link hover:text-textColor-linkHover underline"
