@@ -7,6 +7,7 @@ import EventList from './_components/EventList'
 import EventAdminButtons from './_components/EventAdminButtons'
 import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
+import EventCalendar from './_components/EventCalendar'
 
 // import { Suspense } from 'react'
 
@@ -54,6 +55,7 @@ const EventsPage = async ({
       {finishedEvents.length > 0 && (
         <EventList events={finishedEvents} locale={locale} finished={true} />
       )}
+      <EventCalendar events={allEvents} locale={locale} />
     </div>
   )
 }
