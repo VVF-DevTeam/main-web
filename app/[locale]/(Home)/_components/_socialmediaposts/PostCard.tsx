@@ -50,13 +50,17 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         )}
       </p>
 
-      <Image
-        src={post.image}
-        alt="Post content"
-        className="mb-4 h-48 w-full rounded-lg object-cover"
-        width={128}
-        height={128}
-      />
+      {post.url && (
+        <Link href={post.url} target="_blank" rel="noopener noreferrer">
+          <Image
+            src={post.image}
+            alt="Post content"
+            className="mb-4 h-48 w-full rounded-lg object-cover"
+            width={128}
+            height={128}
+          />
+        </Link>
+      )}
 
       <div className="flex items-center justify-between text-textColor-gray">
         <div className="flex items-center space-x-2">

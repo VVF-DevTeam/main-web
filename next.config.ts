@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
       'lh3.googleusercontent.com',          // for google avatars and images
       'avatars.githubusercontent.com',      // for github avatars
       'platform-lookaside.fbsbx.com',       // for facebook avatars
-      'scontent.xx.fbcdn.net',              // general fbcdn fallback
       'scontent-sea1-1.xx.fbcdn.net',       // faceboook region-specific CDN for posts image
+      'scontent-sea1-1.cdninstagram.com'    // instagram region-specific CDN for posts image
     ],
   },
 }

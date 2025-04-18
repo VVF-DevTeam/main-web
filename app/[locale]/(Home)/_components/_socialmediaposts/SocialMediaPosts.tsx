@@ -4,7 +4,7 @@ import initTranslation from '@/app/i18n'
 // Components
 import PostCard from './PostCard'
 import { Separator } from '@/components/ui/separator'
-import { getFacebookPosts } from '@/lib/actions/post/getSocialPost'
+import { getSocialMediaPosts } from '@/lib/actions/post/getSocialPost'
 interface SocialMediaProps {
   locale: string
 }
@@ -12,7 +12,7 @@ interface SocialMediaProps {
 // Main Component
 const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
-  const posts = await getFacebookPosts()
+  const posts = await getSocialMediaPosts(locale as 'en' | 'vi' | 'fr')
   return (
     <div>
       {/* Title & Separator */}
