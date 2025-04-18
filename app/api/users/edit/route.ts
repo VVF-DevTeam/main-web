@@ -20,7 +20,7 @@ export const PUT = async (request: NextRequest) => {
         image: image ?? savedUser.image,
       },
     })
-    console.log(updatedUser)
+    // console.log(updatedUser)
     return NextResponse.json({ data: updatedUser }, { status: 200 })
   } catch (error) {
     console.log(error)

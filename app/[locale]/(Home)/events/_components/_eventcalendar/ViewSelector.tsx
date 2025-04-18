@@ -43,10 +43,10 @@ interface ViewSelectorProps {
 const ViewSelector = ({ events, locale }: ViewSelectorProps) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
-  const [view, setView] = useState<'Day' | 'Week' | 'Month'>('Week')
+  const [view, setView] = useState<'Day' | 'Week' | 'Month'>('Month')
   const viewList = ['Day', 'Week', 'Month']
   return (
-    <div>
+    <div className='w-full'>
       <div className="mb-6 flex justify-end">
         <div className="inline-flex items-center overflow-hidden rounded border text-sm">
           {viewList.map((v) => (

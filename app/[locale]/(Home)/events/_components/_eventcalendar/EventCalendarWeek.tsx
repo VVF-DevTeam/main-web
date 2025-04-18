@@ -130,7 +130,7 @@ const EventCalendarWeek = ({
                   <Link
                     key={event.id}
                     href={eventUrl}
-                    className="absolute left-1 right-1 z-10 cursor-pointer rounded bg-bgColor-brand p-2 text-xs text-textColor-white shadow-md hover:bg-bgColor-brandLight"
+                    className="absolute left-1 right-1 z-10 cursor-pointer rounded bg-bgColor-brand p-2 text-xs text-textColor-white shadow-md hover:bg-bgColor-brandLight overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400"
                     style={{ top: `${top}rem`, height: `${height}rem` }}
                   >
                     <strong>{event.title}</strong>

@@ -18,10 +18,10 @@ const EventCalendar = async ({ events, locale }: EventCalendarProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="relative p-4">
-      <h1 className="mb-4 text-3xl font-bold text-textColor-brand">
+    <div className="my-10 flex w-full flex-col items-center gap-y-6 xl:mt-20 xl:gap-y-12">
+      <h2 className="header-main text-center">
         {t('event-calendar')}
-      </h1>
+      </h2>
       <ViewSelector
         events={JSON.parse(JSON.stringify(events))}
         locale={locale}

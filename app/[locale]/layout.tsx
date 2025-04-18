@@ -2,6 +2,8 @@
 import type { Metadata } from 'next'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react"
 
 // Components
 import { Toaster } from '@/components/ui/toaster'
@@ -43,6 +45,8 @@ export default async function RootLayout({
         >
           <main>{children}</main>
           <Toaster />
+          <Analytics/>
+          <SpeedInsights />
         </body>
       </html>
     </TranslationsProvider>

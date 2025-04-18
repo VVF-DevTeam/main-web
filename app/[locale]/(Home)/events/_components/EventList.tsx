@@ -19,7 +19,7 @@ const EventList = async ({ events, locale, finished }: EventListProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="my-10 flex w-full flex-col items-center gap-y-6 xl:mt-20 xl:gap-y-12">
+    <div className={`py-10 flex w-full flex-col items-center gap-y-6 xl:pt-20 xl:gap-y-12 ${finished ? 'bg-gray-100' : ''}`}>
       {finished ?
         <h2 className="header-main text-center">{t('header-finishedEvent')}</h2>: <h2 className="header-main text-center">{t('header-upcomingEvent')}</h2>
       }

@@ -52,10 +52,10 @@ const EventsPage = async ({
       <EventList events={upcomingEvents} locale={locale} />
       {(isAdmin || isHost) && <EventAdminButtons />}
       <EventInstruction locale={locale} />
+      <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
         <EventList events={finishedEvents} locale={locale} finished={true} />
       )}
-      <EventCalendar events={allEvents} locale={locale} />
     </div>
   )
 }
