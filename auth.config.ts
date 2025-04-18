@@ -151,6 +151,11 @@ export default {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }
+            } else if (path.includes('users')) {
+              // For users API,  Only logged in user can upload avatar
+              if (!(await roleCheckToken({ req: request }))) {
+                return new NextResponse('Forbidden', { status: 403 })
+              }
             }
             return NextResponse.next()
           } else {
@@ -222,6 +227,12 @@ export default {
                     return new NextResponse('Forbidden', { status: 403 })
                   }
                 } else if (!role.includes('ADMIN')) {
+                  return new NextResponse('Forbidden', { status: 403 })
+                }
+              }
+              if (path.includes('users')) {
+                // For users API,  Only logged in user can access
+                if (!token) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }

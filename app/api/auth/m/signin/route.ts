@@ -72,6 +72,8 @@ export const POST = async (req: NextRequest) => {
     const jwtToken = await new jose.SignJWT({
       id: userExists.id,
       email: userExists.email,
+      name: userExists.name,
+      image: userExists.image,
       role: userExists.role,
     })
       .setProtectedHeader({ alg: 'HS256' })

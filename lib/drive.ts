@@ -10,9 +10,9 @@ export async function listAvatars() {
     credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
     scopes: ['https://www.googleapis.com/auth/drive'],
   })
-  
+
   const drive = google.drive({ version: 'v3', auth })
-  
+
   const res = await drive.files.list({
     q: `'${FOLDER_ID}' in parents and trashed = false`,
     fields: 'files(id, name)',
@@ -24,7 +24,6 @@ export async function listAvatars() {
     res.data.files?.map((file) => ({
       id: file.id,
       name: file.name,
-      
       url: `https://drive.google.com/thumbnail?id=${file.id}&sz=w500`, // change width here if needed
     })) || []
   )
@@ -39,23 +38,8 @@ export async function uploadAvatar(
     credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
     scopes: ['https://www.googleapis.com/auth/drive'],
   })
-  
-  const drive = google.drive({ version: 'v3', auth })
-    
-  // Working code
-  // await drive.files.create({
-  //     requestBody: {
-  //       name: 'test-avatar.jpg',
-  //       parents: [FOLDER_ID],
-  //     },
-  //     media: {
-  //       mimeType: 'image/jpeg',
-  //       body: 'Asdasd',
-  //     },
-  //     supportsAllDrives: true,
-  //   })
 
-  // Need testing code
+  const drive = google.drive({ version: 'v3', auth })
   const stream = Readable.from(fileBuffer)
 
   const fileRes = await drive.files.create({
@@ -68,6 +52,7 @@ export async function uploadAvatar(
       body: stream,
     },
     fields: 'id, name',
+    supportsAllDrives: true,
   })
 
   return {
