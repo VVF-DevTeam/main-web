@@ -48,7 +48,8 @@ const formatDate = (rawDate: string, locale: 'en' | 'vi' | 'fr') =>
   }).format(new Date(rawDate))
 
 export const getSocialMediaPosts = async (
-  locale: 'en' | 'vi' | 'fr' = 'en'
+  locale: 'en' | 'vi' | 'fr' = 'en',
+  numposts: number
 ): Promise<SocialMediaPost[]> => {
   try {
     // 1. Fetch Facebook Posts
@@ -99,7 +100,7 @@ export const getSocialMediaPosts = async (
       (a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )
-    .slice(0, 8)
+    .slice(0, numposts)
     .map((post) => ({
       ...post,
       timestamp: formatDate(post.timestamp, locale),

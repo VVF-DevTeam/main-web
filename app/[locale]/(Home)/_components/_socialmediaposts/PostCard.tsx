@@ -8,7 +8,7 @@ interface PostCardProps {
   post: SocialMediaPost
 }
 
-const MAX_CONTENT_LENGTH = 50
+const MAX_CONTENT_LENGTH = 150 // show more text before truncation
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const truncatedContent =
@@ -16,10 +16,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       ? `${post.content.substring(0, MAX_CONTENT_LENGTH)}...`
       : post.content
 
-  // const link = 'https://www.facebook.com/profile.php?id=61570910920072'
-
   return (
-    <div className="bg-bgColor-white rounded-xl p-4 shadow-lg transition-all duration-300 hover:shadow-xl">
+    <div className="bg-bgColor-white flex min-h-[28rem] flex-col justify-between rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
+      {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center">
           <h3 className="text-textColor-black font-semibold">
@@ -31,12 +30,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         {post.platform === 'facebook' ? (
           <FaFacebook className="text-xl text-textColor-blue" />
         ) : (
-          <FaInstagram className="text-textColor-pink text-xl" />
+          <FaInstagram className="text-xl text-textColor-pink" />
         )}
       </div>
 
-      {/* Post content with 'Read more' link always visible */}
-      <p className="text-textColor-black mb-4">
+      {/* Content */}
+      <p className="text-textColor-black mb-4 text-base leading-relaxed">
         {truncatedContent}{' '}
         {post.url && (
           <Link
@@ -50,19 +49,21 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         )}
       </p>
 
+      {/* Image */}
       {post.url && (
         <Link href={post.url} target="_blank" rel="noopener noreferrer">
           <Image
             src={post.image}
             alt="Post content"
-            className="mb-4 h-48 w-full rounded-lg object-cover"
-            width={128}
-            height={128}
+            className="mb-4 h-64 w-full rounded-lg object-cover"
+            width={640}
+            height={320}
           />
         </Link>
       )}
 
-      <div className="flex items-center justify-between text-textColor-gray">
+      {/* Footer: Likes & Comments */}
+      <div className="mt-auto flex items-center justify-between text-textColor-gray">
         <div className="flex items-center space-x-2">
           <FaHeart className="text-textColor-red" />
           <span>{post.likes.toLocaleString()}</span>

@@ -5,11 +5,19 @@ const nextConfig: NextConfig = {
     domains: [
       'images.unsplash.com',
       'drive.google.com',
-      'lh3.googleusercontent.com',          // for google avatars and images
-      'avatars.githubusercontent.com',      // for github avatars
-      'platform-lookaside.fbsbx.com',       // for facebook avatars
-      'scontent-sea1-1.xx.fbcdn.net',       // faceboook region-specific CDN for posts image
-      'scontent-sea1-1.cdninstagram.com'    // instagram region-specific CDN for posts image
+      'lh3.googleusercontent.com',          // Google avatars/images
+      'avatars.githubusercontent.com',      // GitHub avatars
+      'platform-lookaside.fbsbx.com',       // Facebook avatars
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.fbcdn.net',           // Facebook CDN (posts, stories, etc.)
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cdninstagram.com',    // Instagram CDN (posts, reels, etc.)
+      },
     ],
   },
 }

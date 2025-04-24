@@ -12,17 +12,17 @@ interface SocialMediaProps {
 // Main Component
 const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
-  const posts = await getSocialMediaPosts(locale as 'en' | 'vi' | 'fr')
+  const posts = await getSocialMediaPosts(locale as 'en' | 'vi' | 'fr', 3)
   return (
     <div>
       {/* Title & Separator */}
       <div className="flex-col-center default-gap lg:mt-6">
-        <span className="header-font-black header-sub mb-7 py-6 italic">
+        <span className="header-font-black header-sub pb-4 md:pb-8">
           {t('socialPostHeader')}
         </span>
       </div>
       <div className="width-max-default mx-auto flex flex-col gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 xl:grid-cols-3">
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
