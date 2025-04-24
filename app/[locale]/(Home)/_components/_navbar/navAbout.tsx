@@ -52,7 +52,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
   }
 
   return (
-    <div ref={dropdownRef} className="relative w-full -mr-1">
+    <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
           'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
@@ -87,10 +87,8 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/vision"
           className={classNames(
-            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-textColor hover:text-textColor-brand',
-            mode === 'desktop'
-              ? 'whitespace-nowrap text-sm '
-              : 'text-xl'
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -100,10 +98,8 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/directors"
           className={classNames(
-            'flex items-center justify-center p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
-            mode === 'desktop'
-              ? 'whitespace-nowrap text-sm '
-              : 'text-xl'
+            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -114,10 +110,8 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/founders"
           className={classNames(
-            'flex p-2 transition-all hover:rounded-md hover:bg-gray-100 text-center text-textColor hover:text-textColor-brand',
-            mode === 'desktop'
-              ? 'whitespace-nowrap text-sm'
-              : 'text-xl'
+            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
         >

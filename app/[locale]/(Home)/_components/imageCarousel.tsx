@@ -135,13 +135,13 @@ const ImageCarousel = ({
           <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] md:max-w-[75vw] max-w-[90vw] px-4">
             <button aria-label="prev-image">
               <ArrowLeft
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight opacity-75"
                 onClick={() => changeImage('left')}
               />
             </button>
             <button aria-label="next-image">
               <ArrowRight
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight opacity-75"
                 onClick={() => changeImage('right')}
               />
             </button>
