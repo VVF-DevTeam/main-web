@@ -30,7 +30,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
         <SheetFooter className="mt-20">
           <SheetClose asChild>
             <button aria-label="Close mobile menu">
-              <X className="text-textColor-brand-light h-12 w-12 rounded-md p-1 hover:border-2 hover:border-bgColor-brand" />
+              <X className="text-textColor-white h-12 w-12 rounded-md p-1 hover:border-2 hover:border-bgColor-brandLight" />
             </button>
           </SheetClose>
         </SheetFooter>

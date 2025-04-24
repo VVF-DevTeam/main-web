@@ -55,7 +55,7 @@ const Header = () => {
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="flex-center gap-x-2 rounded-md p-1 hover:text-textColor-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="flex-center gap-x-2 rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
                 onClick={() => handleClick('media@vietvibe.org')}
                 aria-label="Copy email address to clipboard"
                 aria-live="polite"
@@ -64,7 +64,7 @@ const Header = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent className="bg-bgColor-black">
-              <p className="flex gap-x-2 text-sm text-textColor-brand-light">
+              <p className="flex gap-x-2 text-sm text-textColor-brandLight">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
