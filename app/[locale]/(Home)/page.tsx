@@ -10,18 +10,12 @@ export default async function Home({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const imageUrls = [
-    { id: '1', url: 'https://drive.google.com/thumbnail?id=1AqJvPcGUzuZM5pTnLWI_TPR0iZhIu27M&sz=w2000' },
-    { id: '2', url: 'https://drive.google.com/thumbnail?id=1LzN0Kouxwfy1R07qkX0NfxWByIHMtyGJ&sz=w3000' },
-    { id: '3', url: 'https://drive.google.com/thumbnail?id=1QWFZ4Uhijftf5YT-7_KFU9jVJhPHT7PN&sz=w2000' },
-    { id: '4', url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000' },
-  ]
 
   return (
-    <div className="overflow-hidden flex flex-col gap-y-12">
+    <div className="flex flex-col gap-y-12 overflow-hidden">
       <Introduction locale={locale} />
       {/* Intro cards */}
-      <ImageCarousel imageUrls={imageUrls} autoSlide={true} />
+      <ImageCarousel autoSlide={true} locale={locale} />
       <JoinUs locale={locale} />
       <Directors locale={locale} />
       <Contact locale={locale} />

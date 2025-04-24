@@ -59,7 +59,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}
       </div>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brandDark md:w-1/2" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
     </div>
   )
 }

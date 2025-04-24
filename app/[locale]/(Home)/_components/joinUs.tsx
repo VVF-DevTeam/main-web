@@ -16,7 +16,7 @@ const JoinUs = async ({ locale }: HeaderAndBenefitPreviewProps) => {
   const { t } = await initTranslations(locale, ['job', 'common'])
 
   return (
-    <div className="flex-col-center gap-y-8 px-5 py-3 lg:py-5 text-center">
+    <div className="flex flex-col items-center justify-center gap-y-8 px-5 py-3 lg:py-5 text-center">
       {/* Header */}
       <div>
         <h2 className="header-font-black header-sub">
@@ -39,7 +39,7 @@ const JoinUs = async ({ locale }: HeaderAndBenefitPreviewProps) => {
           {t('learn-more')}
         </Button>
       </Link>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2 h-[1px]" />
     </div>
   )
 }
