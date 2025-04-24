@@ -3,6 +3,7 @@ import Introduction from '@/app/[locale]/(Home)/_components/_introduction/Introd
 import Directors from './_components/directors'
 import Contact from './_components/contact'
 import JoinUs from './_components/joinUs'
+import SocialMediaPosts from './_components/_socialmediaposts/SocialMediaPosts'
 
 export default async function Home({
   params,
@@ -18,6 +19,7 @@ export default async function Home({
       <ImageCarousel autoSlide={true} locale={locale} />
       <JoinUs locale={locale} />
       <Directors locale={locale} />
+      <SocialMediaPosts locale={locale} />
       <Contact locale={locale} />
     </div>
   )
