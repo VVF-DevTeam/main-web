@@ -82,8 +82,6 @@ const ImageCarousel = ({
     }
   }, [autoSlide, duration, imageIndex])
 
-  const totalwidth = `${imageUrls.length * 75}vw`
-
   return (
     <div>
       {/* Title & Separator */}
@@ -94,24 +92,23 @@ const ImageCarousel = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="ml-[12.5vw] w-[75vw] overflow-hidden rounded-sm">
-        <div className="relative h-[50vh] w-[300vw] md:h-[60vh] xl:h-[70vh]">
+      <div className="md:ml-[12.5vw] md:w-[75vw] overflow-hidden rounded-sm w-[90vw] ml-[5vw]">
+        <div className="relative h-[50vh] md:w-[300vw] w-[360vw] md:h-[60vh] xl:h-[70vh]">
           <div className="flex h-full w-full items-center">
             {imageUrls.map((img) => (
               <div
                 key={img.id}
                 style={{
-                  width: totalwidth,
                   transform: `translateX(-${imageIndex * 100}%)`,
                 }}
-                className="relative h-full transition-transform duration-500 ease-out"
+                className={`relative h-full transition-transform duration-500 ease-out md:w-[${imageUrls.length * 75}vw] w-[${imageUrls.length * 90}vw]`}
               >
                 <div className="relative h-full w-full">
                   <Image
                     src={img.url}
                     alt={`Image ${img.id}`}
                     fill
-                    sizes="75vw"
+                    sizes="md:75vw 90vw"
                     className="z-0 rounded-sm object-cover"
                   />
 
@@ -124,7 +121,7 @@ const ImageCarousel = ({
                       className="group z-30 flex items-center whitespace-nowrap font-semibold hover:underline"
                     >
                       {img.description}
-                      <span className="pl-1 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1">
+                      <span className="pl-1 transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1">
                         <ArrowUpRight className="h-4 w-4" />
                       </span>
                     </Link>
@@ -135,7 +132,7 @@ const ImageCarousel = ({
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] max-w-[75vw] px-4">
+          <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] md:max-w-[75vw] max-w-[90vw] px-4">
             <button aria-label="prev-image">
               <ArrowLeft
                 className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight"
