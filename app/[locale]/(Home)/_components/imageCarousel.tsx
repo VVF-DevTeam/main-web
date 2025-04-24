@@ -152,7 +152,7 @@ const ImageCarousel = ({
         </div>
       </div>
 
-      <Separator className="mx-auto mt-12 h-[0.5px] w-2/3 bg-bgColor-brand md:w-1/2" />
+      <Separator className="mx-auto mt-12 h-[1px] w-2/3 bg-bgColor-brand md:w-1/2" />
     </div>
   )
 }
