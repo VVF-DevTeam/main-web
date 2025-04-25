@@ -17,7 +17,7 @@ const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
     <div>
       {/* Title & Separator */}
       <div className="flex-col-center default-gap lg:mt-6">
-        <span className="header-font-black header-sub pb-4 md:pb-8">
+        <span className="header-font-black header-sub pb-2 md:pb-4">
           {t('socialPostHeader')}
         </span>
       </div>
@@ -28,7 +28,7 @@ const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
           ))}
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brandDark md:w-1/2" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
     </div>
   )
 }

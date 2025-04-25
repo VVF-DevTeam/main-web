@@ -50,7 +50,7 @@ const createEventCategoryPage = async () => {
         )}
       </div>
 
-      <Separator className="mx-auto mb-[5vh] mt-[5vh] h-[2px] w-[70%] bg-red-700" />
+      <Separator className="mx-auto mb-[5vh] mt-[5vh] w-[70%] bg-red-700" />
 
       {/* Section 2 */}
       <div className="flex flex-col gap-y-20 rounded-xl bg-slate-200 p-6">

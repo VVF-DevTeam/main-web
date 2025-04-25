@@ -11,6 +11,7 @@ import { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import initTranslations from '@/app/i18n'
 import PublishedPosts from './_components/PublishedPosts'
+
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{

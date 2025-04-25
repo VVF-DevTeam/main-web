@@ -17,9 +17,9 @@ export default async function Home({
       <Introduction locale={locale} />
       {/* Intro cards */}
       <ImageCarousel autoSlide={true} locale={locale} />
+      <SocialMediaPosts locale={locale} />
       <JoinUs locale={locale} />
       <Directors locale={locale} />
-      <SocialMediaPosts locale={locale} />
       <Contact locale={locale} />
     </div>
   )

@@ -39,7 +39,7 @@ const JoinUs = async ({ locale }: HeaderAndBenefitPreviewProps) => {
           {t('learn-more')}
         </Button>
       </Link>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2 h-[1px]" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
     </div>
   )
 }
