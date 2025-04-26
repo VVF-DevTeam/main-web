@@ -19,24 +19,6 @@ const directors = [
   },
   {
     id: 2,
-    description: 'description-EricNguyen',
-    bio: 'bio-EricNguyen',
-    imageUrl:
-      'https://drive.google.com/thumbnail?id=16dN0NDi0FsfBWoBRyK4rjm_yrLRY71ZG&sz=w1000',
-    name: 'Eric Nguyen',
-    title: 'Co-Founder/COO',
-  },
-  {
-    id: 3,
-    description: 'description-KhueLe',
-    bio: 'bio-KhueLe',
-    imageUrl:
-      'https://drive.google.com/thumbnail?id=15m1KsV9oU99fQ6GDpiGYclvbd46R4VAR&sz=w1000',
-    name: 'Khue Le',
-    title: 'Co-Founder/CHRO',
-  },
-  {
-    id: 4,
     description: 'description-EattleNguyen',
     bio: 'bio-EattleNguyen',
     imageUrl:
@@ -45,7 +27,7 @@ const directors = [
     title: 'Co-Founder/CMO',
   },
   {
-    id: 5,
+    id: 3,
     description: 'description-DaoNguyen',
     bio: 'bio-DaoNguyen',
     imageUrl:
@@ -54,13 +36,22 @@ const directors = [
     title: 'CPO',
   },
   {
-    id: 6,
+    id: 4,
     description: 'description-KhaiHung',
     bio: 'bio-KhaiHung',
     imageUrl:
       'https://drive.google.com/thumbnail?id=1mmoqu-ALmc7mJ1ZmY9_Srfcb1AZD-0eh&sz=w1000',
     name: 'Khai Hung',
     title: 'CTO',
+  },
+  {
+    id: 5,
+    description: 'description-LunarNguyen',
+    bio: 'bio-LunarNguyen',
+    imageUrl:
+      'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn&sz=w1000',
+    name: 'Lunar Nguyen',
+    title: 'CHO',
   },
 ]
 
@@ -88,7 +79,6 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
   return (
     <div className="flex-col-center py-20">
-
       {/* Header */}
       <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
         {t('header-directors-aboutUs')}
@@ -111,8 +101,28 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
       </div>
       <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
         {honoraryMembers.map((honoraryMember) => (
-          <OrgMemberCard key={honoraryMember.id} locale={locale} {...honoraryMember} />
+          <OrgMemberCard
+            key={honoraryMember.id}
+            locale={locale}
+            {...honoraryMember}
+          />
         ))}
+      </div>
+
+      {/* All other members */}
+      <div className="flex-col-center px-6 py-14 md:w-2/3">
+        <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark">
+          And all of our other members, whether active or not, will always be a
+          precious part of our VVF family:
+        </p>
+
+        <p>
+          Minh Tue Nguyen (Co-founder), Khue Le (Co-founder), Jayant Puri, Elena
+          Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi Dat, Tran Quyet Tien,
+          Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan, Phu Loc, Thanh Hang
+          Nguyen, Thao Pham, Le Duc Hieu, Duc Anh Do, Thi Phuong Thao Nguyen,
+          Pham Bao Tran, Nguyen Ngoc Thuy Nguyen.
+        </p>
       </div>
     </div>
   )
