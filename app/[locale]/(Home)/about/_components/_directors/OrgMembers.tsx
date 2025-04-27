@@ -46,11 +46,11 @@ const directors = [
   },
   {
     id: 5,
-    description: 'description-LunarNguyen',
-    bio: 'bio-LunarNguyen',
+    description: 'description-LunaNguyen',
+    bio: 'bio-LunaNguyen',
     imageUrl:
       'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn&sz=w1000',
-    name: 'Lunar Nguyen',
+    name: 'Luna Nguyen',
     title: 'CHO',
   },
 ]
@@ -112,8 +112,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
       {/* All other members */}
       <div className="flex-col-center px-6 py-14 md:w-2/3">
         <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark">
-          And all of our other members, whether active or not, will always be a
-          precious part of our VVF family:
+          {t('header-allmembers')}
         </p>
 
         <p>
@@ -121,7 +120,9 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
           Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi Dat, Tran Quyet Tien,
           Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan, Phu Loc, Thanh Hang
           Nguyen, Thao Pham, Le Duc Hieu, Duc Anh Do, Thi Phuong Thao Nguyen,
-          Pham Bao Tran, Nguyen Ngoc Thuy Nguyen.
+          Pham Bao Tran, Nguyen Ngoc Thuy Nguyen, Pham Gia Tri, Dao Gia An, Van
+          Le, Tang Phuong Minh, Luong Quoc Trung, Doan Thu Tra, Vinh Bao Phu,
+          Bui Gia Khanh.
         </p>
       </div>
     </div>
