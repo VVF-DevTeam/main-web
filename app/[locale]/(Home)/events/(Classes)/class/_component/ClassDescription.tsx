@@ -1,11 +1,11 @@
 // Libraries
 import initTranslation from '@/app/i18n'
+import { auth } from '@/auth'
 
 // Components
 import ScheduleItem from './ScheduleItem'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import TextPreview from '@/app/[locale]/components/TextPreview'
+import PaymentOptions from './_stripepayment/PaymentOptions'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
@@ -21,11 +21,17 @@ interface ClassDescriptionProps {
   locale: string
   days: string[]
   formLink: string
+  stripePriceId: string
   schedules: EventSchedule[]
+  keyName: string
+  classId: string
+  price: number
+  title: string
 }
 
 // Main Code
 const ClassDescription = async ({
+  title,
   description,
   startDate,
   startTime,
@@ -36,8 +42,16 @@ const ClassDescription = async ({
   locale,
   days,
   formLink,
+  stripePriceId,
+  keyName,
+  classId,
+  price,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+
+  // Get the current user's id 
+  const session = await auth()
+  const author = session?.user?.id!
 
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
@@ -114,14 +128,15 @@ const ClassDescription = async ({
         </div>
       </div>
 
-      {/* Buy Button */}
-      <Link
-        href={formLink}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button>{t('reserve-button')}</Button>
-      </Link>
+      {/* Payment Options */}
+      {author ? <PaymentOptions
+        stripePriceId={stripePriceId}
+        formLink={formLink}
+        classKeyName={keyName}
+        price={price}
+        classId={classId}
+        title={title}
+      /> : <p className='italic'>Please log in to make payment.</p>}
     </div>
   )
 }

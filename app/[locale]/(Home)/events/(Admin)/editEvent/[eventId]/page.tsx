@@ -19,7 +19,6 @@ import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
-import EventFormLink from './_components/EventFormLink'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
@@ -80,7 +79,7 @@ const EditEventPage = async ({
     !!event.startDate,
     !!event.endDate,
     !!event.startTime,
-    !!event.formLink,
+    // !!event.formLink,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
     event.schedules.length === 0 ? false : true,
@@ -239,13 +238,13 @@ const EditEventPage = async ({
           </div>
 
           {/* Event Registration Form Link */}
-          <div className="flex flex-col gap-y-8">
+          {/* <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step XV :</span> Event
               Registration Form
             </h2>
             <EventFormLink event={event} />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

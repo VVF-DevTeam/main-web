@@ -17,12 +17,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       : post.content
 
   return (
-    <Link
-      href={post.url || '#'}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block min-h-[28rem] transform cursor-pointer rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl"
-    >
+    <div className="block min-h-[28rem] transform cursor-pointer rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl">
       <div className="flex h-full flex-col justify-between">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
@@ -42,7 +37,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
         {/* Content */}
         <p className="text-textColor-black mb-4 text-base leading-relaxed">
-          {truncatedContent}{' '}
+          {truncatedContent}
           {post.url && (
             <Link
               href={post.url}
@@ -80,7 +75,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 

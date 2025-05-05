@@ -159,6 +159,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
                   />
                 </FormControl>
                 <FormDescription>What is your event about?</FormDescription>
+                <FormDescription className='text-[11px]'>(This will be the keyname in URL path. To change, please create a new one or ask dev team to update)</FormDescription>    
                 <FormMessage />
               </FormItem>
             )}

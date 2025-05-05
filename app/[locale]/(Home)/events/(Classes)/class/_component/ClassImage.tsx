@@ -1,6 +1,5 @@
 // Components
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
 
 // Libraries
 import initTranslation from '@/app/i18n'
@@ -12,7 +11,6 @@ interface ClassImageProps {
   endDate?: Date
   hosts: { name: string | null }[]
   title: string
-  formLink: string
   locale: string
 }
 
@@ -23,7 +21,6 @@ const ClassImage = async ({
   hosts,
   title,
   locale,
-  formLink,
 }: ClassImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -32,13 +29,13 @@ const ClassImage = async ({
       <div className="relative aspect-video w-full basis-1/2 md:h-[35vh] lg:h-[50vh]">
         <Image
           src={imageUrl}
-          className="rounded-t-sm object-cover md:rounded-l-sm"
+          className="rounded-t-sm object-cover md:rounded-tr-none md:rounded-l-sm"
           fill
           alt="Event Image"
           sizes="(min-width: 1800px) 37.58vw, (min-width: 1380px) calc(10.5vw + 481px), (min-width: 780px) 44.83vw, calc(100vw - 48px)"
         />
       </div>
-      <div className="flex-col-center gap-y-4 rounded-b-sm bg-bgColor-black px-4 py-10 text-left text-textColor-white md:h-[40vh] md:gap-y-6 md:rounded-r-sm lg:h-[50vh] lg:pl-8 lg:pt-2">
+      <div className="flex-col-center gap-y-4 rounded-b-sm bg-bgColor-black px-4 py-10 text-left text-textColor-white md:h-[35vh] md:gap-y-6 md:rounded-bl-none md:rounded-r-sm lg:h-[50vh] lg:pl-8 lg:pt-2">
         <span className="text-sm text-muted">
           {startDate.toLocaleDateString()} | {location}
         </span>
@@ -51,11 +48,6 @@ const ClassImage = async ({
             {hosts.map((h) => h.name).join(', ')}
           </span>
         </span>
-        <a href={formLink} target="_blank" rel="noopener noreferrer">
-          <Button className="w-fit bg-bgColor-brand hover:bg-bgColor-brand/80">
-            {t('reserve-button')}
-          </Button>
-        </a>
       </div>
     </div>
   )

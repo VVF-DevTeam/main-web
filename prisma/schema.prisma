@@ -31,7 +31,8 @@ model Event {
   description String?
   imgUrl      String?
   formLink    String?
-
+  stripeProductId String?
+  stripePriceId String?
   // Metadata
   location    String?
   price       Decimal?      @default(0)

@@ -24,8 +24,21 @@ interface EventPriceProps {
   event: Event
 }
 
+interface StripeDataCreate {
+  success: boolean
+  productId: string
+  priceId: string
+}
+
+interface StripeDataEdit {
+  success: boolean
+  newPriceId: string
+}
+
 const EventPriceSchema = z.object({
   price: z.coerce.number(),
+  stripeProductId: z.string().optional(),
+  stripePriceId: z.string().optional(),
 })
 
 const EventPrice = ({ event }: EventPriceProps) => {
@@ -42,6 +55,34 @@ const EventPrice = ({ event }: EventPriceProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventPriceSchema>) => {
     try {
+      // create or update price product in stripe
+      if (!event.stripeProductId) {
+        const { data } = await axiosInstance.post<StripeDataCreate>(
+          '/api/payment/events',
+          {
+            eventId: event.id,
+            eventUrl: `https://www.vietvibe.org/en/events/class/${event.keyName}`,
+            price: values.price,
+            title: event.title,
+          }
+        )
+        values.stripeProductId = data.productId
+        values.stripePriceId = data.priceId
+      } else {
+        const { data } = await axiosInstance.put<StripeDataEdit>(
+          '/api/payment/events',
+          {
+            eventUrl: `https://www.vietvibe.org/en/events/class/${event.keyName}`,
+            eventId: event.id,
+            price: values.price,
+            stripeProductId: event.stripeProductId,
+            stripePriceId: event.stripePriceId,
+          }
+        )
+
+        values.stripePriceId = data.newPriceId
+      }
+
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast({
@@ -106,7 +147,9 @@ const EventPrice = ({ event }: EventPriceProps) => {
           Add a price for this event.
         </p>
       ) : (
-        <div className="text-muted-foreground">${Number(event.price).toFixed(2)}</div>
+        <div className="text-muted-foreground">
+          ${Number(event.price).toFixed(2)}
+        </div>
       )}
     </div>
   )
