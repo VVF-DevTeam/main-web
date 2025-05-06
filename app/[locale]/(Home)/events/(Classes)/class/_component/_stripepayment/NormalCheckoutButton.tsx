@@ -22,8 +22,8 @@ interface NormalCheckoutButtonProps {
 export default function NormalCheckoutButton({
   stripePriceId,
   classKeyName,
-  userId,
-  classId,
+  // userId,
+  // classId,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
