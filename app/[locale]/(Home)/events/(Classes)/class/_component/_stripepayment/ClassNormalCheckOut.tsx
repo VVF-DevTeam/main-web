@@ -10,12 +10,16 @@ interface ClassNormalCheckOutProps {
   stripePriceId?: string
   formLink?: string // form link is a legacy property from the old version of the website for payment
   classKeyName: string
+  userId: string
+  classId: string
 }
 
 export default function ClassNormalCheckOut({
   stripePriceId,
   formLink,
   classKeyName,
+  userId,
+  classId,
 }: ClassNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -27,6 +31,8 @@ export default function ClassNormalCheckOut({
         <NormalCheckoutButton
           stripePriceId={stripePriceId}
           classKeyName={classKeyName}
+          userId={userId}
+          classId={classId}
         />
       ) : (
         // Link to google form payment (for old courses)

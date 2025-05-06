@@ -15,11 +15,15 @@ const stripePromise = loadStripe(
 interface NormalCheckoutButtonProps {
   stripePriceId: string
   classKeyName: string
+  userId: string
+  classId: string
 }
 
 export default function NormalCheckoutButton({
   stripePriceId,
   classKeyName,
+  userId,
+  classId,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -35,7 +39,7 @@ export default function NormalCheckoutButton({
           classKeyName,
         }
       )
-
+      console.log(data)
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
 
       if (result.error) {
@@ -50,7 +54,7 @@ export default function NormalCheckoutButton({
       } else if (error instanceof Error) {
         toast.error(error.message || 'Unexpected error occurred.')
       } else {
-        toast.error('Unexpected error occurred. Please contact support.')
+        toast.error('Unexpected error occurred. Please contact our developer team for support.')
       }
     }
   }

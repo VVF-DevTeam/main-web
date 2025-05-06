@@ -14,6 +14,7 @@ interface PaymentOptionsProps {
   price: number
   classId: string
   title: string
+  userId: string
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -25,6 +26,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   price,
   classId,
   title,
+  userId,
 }) => {
   const [selected, setSelected] = useState<OptionType>('checkout')
   const [showOptions, setShowOptions] = useState(false)
@@ -79,6 +81,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   stripePriceId={stripePriceId}
                   formLink={formLink}
                   classKeyName={classKeyName}
+                  userId={userId}
+                  classId={classId}
                 />
               </div>
             )}

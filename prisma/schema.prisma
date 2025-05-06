@@ -54,6 +54,7 @@ model Event {
   categories EventCategory[]
   tickets    EventTicket[]
   schedules  EventSchedule[]
+  payments   Payment[]
 
   @@unique([title, eventType])
   @@index([id])
@@ -138,6 +139,7 @@ model User {
   EventHost    Event[]
   jobs         Job[]
   applications Application[]
+  payments     Payment[]
 }
 
 // Posts made by admins
@@ -216,6 +218,26 @@ model Application {
 
   @@unique([jobId, userId])
   @@index([id])
+}
+
+model Payment {
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // These fields below are changeable by host and admin, so we save them as the snapshot instead of joining them through Event table
+  stripeProductId String   // Immutable snapshot of what was sold
+  stripePriceId   String   // Immutable snapshot of price paid
+  pricePaid       Decimal  // Actual amount charged, always saved
+
+  @@unique([userId, eventId]) // Only if one payment per user per event is guaranteed
 }
 
 model PostLikes {

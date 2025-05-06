@@ -32,9 +32,24 @@ const EventDescriptionSchema = z.object({
     .min(100, { message: 'Description must be at least 100 characters long' }),
 })
 
+function htmlToVisibleText(html: string): string {
+  if (typeof window !== 'undefined') {
+    const div = document.createElement('div')
+    div.innerHTML = html
+    return div.innerText.trim()
+  }
+
+  // For server environments (Node.js), you can fall back to a lightweight HTML-to-text library
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{2,}/g, '\n')
+    .trim()
+}
+
 const EventDescription = ({ event }: EventDescriptionProps) => {
   const { toast } = useToast()
-
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const form = useForm<z.infer<typeof EventDescriptionSchema>>({
@@ -44,10 +59,25 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
     },
   })
   const { isSubmitting, isValid } = form.formState
+
   const onSubmit = async (values: z.infer<typeof EventDescriptionSchema>) => {
-    console.log(values)
     try {
+      // update the event description
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
+
+      // update product description
+      console.log(values.description)
+      const processedText = htmlToVisibleText(values.description)
+      console.log(processedText)
+
+      if (event.stripeProductId) {
+        await axiosInstance.put(`/api/payment/events`, {
+          stripeProductId: event.stripeProductId,
+          description: processedText,
+        })
+      }
+
+      // send a success message
       setEditing(false)
       toast({
         variant: 'default',

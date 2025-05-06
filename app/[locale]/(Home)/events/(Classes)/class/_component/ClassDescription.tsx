@@ -136,6 +136,7 @@ const ClassDescription = async ({
         price={price}
         classId={classId}
         title={title}
+        userId={author}
       /> : <p className='italic'>Please log in to make payment.</p>}
     </div>
   )

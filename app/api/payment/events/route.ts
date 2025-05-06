@@ -42,19 +42,20 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { eventId, eventUrl, title, price, stripeProductId, stripePriceId } =
-      await req.json()
-
-    if (!price) {
-      return NextResponse.json({ message: 'Missing price' }, { status: 400 })
-    }
+    const {
+      eventId,
+      eventUrl,
+      title,
+      description,
+      price,
+      stripeProductId,
+      stripePriceId, // sent to disable the old price
+    } = await req.json()
 
     // since the price is immutable (unchangeable), we need to create a new price
+    // in this API, we will update both product and price, so only send the variables you want to update
 
-    // disable the old price
-    await stripe.prices.update(stripePriceId, { active: false })
-
-    // update the product title
+    // update the product title if have value
     if (title) {
       await stripe.products.update(stripeProductId, {
         name: title,
@@ -62,16 +63,41 @@ export async function PUT(req: NextRequest) {
       })
     }
 
-    // create a new price and link it to the product
-    const newPrice = await stripe.prices.create({
-      unit_amount: Math.round(price * 100),
-      currency: 'cad',
-      product: stripeProductId,
-    })
+    // update the product description if have value
+    if (description) {
+      await stripe.products.update(stripeProductId, {
+        description: description,
+      })
+    }
+
+    // update the price if have stripePriceId and price
+    if (stripePriceId || price) {
+      // Ensure both price and stripePriceId are provided
+      if (!stripePriceId || !price) {
+        return NextResponse.json(
+          { message: 'Missing price or stripePriceId' },
+          { status: 400 }
+        )
+      }
+
+      // disable the old price
+      await stripe.prices.update(stripePriceId, { active: false })
+
+      // create a new price and link it to the product, return new price id
+      const newPrice = await stripe.prices.create({
+        unit_amount: Math.round(price * 100),
+        currency: 'cad',
+        product: stripeProductId,
+      })
+
+      return NextResponse.json({
+        success: true,
+        newPriceId: newPrice.id,
+      })
+    }
 
     return NextResponse.json({
       success: true,
-      newPriceId: newPrice.id,
     })
   } catch (error: unknown) {
     console.error('[STRIPE_EDIT_ERROR]', error)

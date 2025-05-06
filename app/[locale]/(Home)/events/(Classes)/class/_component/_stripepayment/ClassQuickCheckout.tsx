@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axios'
 import { useToast } from '@/hooks/use-toast'
+import { useRouter, usePathname } from 'next/navigation'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -21,6 +22,8 @@ function CheckoutForm({ price, eventId }: { price: number; eventId: string }) {
   const elements = useElements()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,11 +50,7 @@ function CheckoutForm({ price, eventId }: { price: number; eventId: string }) {
           description: result.error.message,
         })
       } else if (result.paymentIntent?.status === 'succeeded') {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: 'Payment complete!',
-        })
+        router.push(`${pathname}/payment/success`)
       }
     } catch (error: unknown) {
       const message =
