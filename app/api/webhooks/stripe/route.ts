@@ -53,11 +53,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session
-    const metadata = session.metadata
+  // handle successful payment
+  const successType = ['checkout.session.completed', 'payment_intent.succeeded']
 
-    console.log('Webhook received!', metadata)
+  if (successType.includes(event.type)) {
+    let paymentData: Stripe.PaymentIntent | Stripe.Checkout.Session
+    let chargedAmount: number
+
+    if (event.type === 'payment_intent.succeeded') {
+      paymentData = event.data.object as Stripe.PaymentIntent
+      chargedAmount = paymentData.amount
+    } else {
+      paymentData = event.data.object as Stripe.Checkout.Session
+      chargedAmount = paymentData.amount_total!
+    }
+
+    const metadata = paymentData.metadata
 
     if (!metadata?.userId || !metadata?.eventId) {
       return NextResponse.json(
@@ -68,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     try {
       const lineItems = await stripe.checkout.sessions.listLineItems(
-        session.id,
+        paymentData.id,
         {
           limit: 1,
           expand: ['data.price.product'],
@@ -86,7 +97,7 @@ export async function POST(req: NextRequest) {
               ? lineItem.price.product
               : lineItem.price?.product?.id!,
           stripePriceId: lineItem.price?.id!,
-          pricePaid: (session.amount_total ?? 0) / 100,
+          pricePaid: (chargedAmount ?? 0) / 100,
         },
       })
     } catch (error: unknown) {
@@ -97,6 +108,8 @@ export async function POST(req: NextRequest) {
           : 'Failed to create payment record'
       return NextResponse.json({ error: message }, { status: 500 })
     }
+  } else {
+    console.log('Not supported event type', event)
   }
 
   return NextResponse.json({ received: true }, { status: 200 })
