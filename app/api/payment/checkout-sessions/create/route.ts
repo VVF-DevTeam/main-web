@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const origin = req.headers.get('origin') || 'http://localhost:3000'
-    const { stripePriceId, classKeyName } = await req.json()
+    const { stripePriceId, classKeyName, userId, classId } = await req.json()
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -21,6 +21,10 @@ export async function POST(req: Request) {
       mode: 'payment',
       success_url: `${origin}/events/class/${classKeyName}/payment/success`,
       cancel_url: `${origin}/events/class/${classKeyName}`,
+      metadata: {
+        userId: userId, // <-- REPLACE with actual userId from request
+        eventId: classId, // or another field like classId if that's what you want
+      },
     })
 
     return NextResponse.json({ id: session.id })
