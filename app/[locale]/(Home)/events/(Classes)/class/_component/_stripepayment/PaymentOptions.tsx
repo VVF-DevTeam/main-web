@@ -88,24 +88,33 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             )}
             {selected === 'quick' && (
               <div className="w-fit">
-                <ClassQuickCheckout price={price} eventId={classId} />
+                <ClassQuickCheckout
+                  price={price}
+                  classId={classId}
+                  userId={userId}
+                />
               </div>
             )}
             {selected === 'etransfer' && (
-              <div className="rounded border bg-white p-4 dark:bg-gray-800 text-sm leading-relaxed">
-                <p className="mb-2 font-semibold">To complete your payment via e-transfer:</p>
+              <div className="rounded border bg-white p-4 text-sm leading-relaxed dark:bg-gray-800">
+                <p className="mb-2 font-semibold">
+                  To complete your payment via e-transfer:
+                </p>
                 <ul className="ml-5 list-disc space-y-1">
                   <li>
                     Send your payment to: <strong>payment@vietvibe.org</strong>
                   </li>
                   <li>
-                    Use the security question: <em>Class Name</em>, answer: <em>{classKeyName}</em>
+                    Use the security question: <em>Class Name</em>, answer:
+                    <em>{classKeyName}</em>
                   </li>
                   <li>
-                    Include your full name and class title <strong>{title}</strong> in the message
+                    Include your full name and class title
+                    <strong>{title}</strong> in the message
                   </li>
                   <li>
-                    Send us a message on our Facebook/Instagram page for confirmation.
+                    Send us a message on our Facebook/Instagram page for
+                    confirmation.
                   </li>
                 </ul>
               </div>

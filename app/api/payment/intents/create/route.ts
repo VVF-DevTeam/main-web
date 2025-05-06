@@ -7,11 +7,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    const { amount, eventId } = await req.json()
+    const { amount, classId, userId } = await req.json()
 
-    if (!amount || !eventId) {
+    if (!amount || !classId) {
       return NextResponse.json(
-        { message: 'Missing amount or eventId' },
+        { message: 'Missing amount or classId' },
         { status: 400 }
       )
     }
@@ -19,13 +19,17 @@ export async function POST(req: NextRequest) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: 'cad',
-      metadata: { eventId },
+      metadata: {
+        userId: userId,
+        eventId: classId,
+      },
     })
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret })
   } catch (error: unknown) {
     console.error('[PAYMENT_INTENT_CREATE_ERROR]', error)
-    const message = error instanceof Error ? error.message : 'Unknown server error'
+    const message =
+      error instanceof Error ? error.message : 'Unknown server error'
     return NextResponse.json({ message }, { status: 500 })
   }
 }

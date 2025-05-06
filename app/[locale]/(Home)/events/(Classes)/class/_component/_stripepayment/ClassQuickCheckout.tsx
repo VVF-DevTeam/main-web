@@ -17,7 +17,15 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-function CheckoutForm({ price, eventId }: { price: number; eventId: string }) {
+function CheckoutForm({
+  price,
+  classId,
+  userId,
+}: {
+  price: number
+  classId: string
+  userId: string
+}) {
   const stripe = useStripe()
   const elements = useElements()
   const { toast } = useToast()
@@ -34,7 +42,8 @@ function CheckoutForm({ price, eventId }: { price: number; eventId: string }) {
     try {
       const { data } = await axiosInstance.post('/api/payment/intents/create', {
         amount: Math.round(price * 100),
-        eventId,
+        classId,
+        userId,
       })
 
       const result = await stripe.confirmCardPayment(data.clientSecret, {
@@ -95,10 +104,12 @@ function CheckoutForm({ price, eventId }: { price: number; eventId: string }) {
 
 export default function ClassQuickCheckout({
   price,
-  eventId,
+  classId,
+  userId,
 }: {
   price: number
-  eventId: string
+  classId: string
+  userId: string
 }) {
   return (
     <Elements stripe={stripePromise}>
@@ -106,7 +117,7 @@ export default function ClassQuickCheckout({
         Debit and Credit Card only. For other payment methods or paying for full
         course, please use normal checkout if this doesn&apos;t work.
       </p>
-      <CheckoutForm price={price} eventId={eventId} />
+      <CheckoutForm price={price} classId={classId} userId={userId} />
     </Elements>
   )
 }
