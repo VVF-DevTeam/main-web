@@ -6,7 +6,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
 })
 
-async function getRawBody(readable: ReadableStream<Uint8Array>): Promise<Buffer> {
+async function getRawBody(
+  readable: ReadableStream<Uint8Array>
+): Promise<Buffer> {
   const reader = readable.getReader()
   const chunks: Uint8Array[] = []
 
@@ -30,7 +32,8 @@ export async function POST(req: NextRequest) {
     bodyBuffer = await getRawBody(req.body as ReadableStream<Uint8Array>)
   } catch (error: unknown) {
     console.error('[RAW_BODY_ERROR]', error)
-    const message = error instanceof Error ? error.message : 'Failed to read raw body'
+    const message =
+      error instanceof Error ? error.message : 'Failed to read raw body'
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
@@ -43,7 +46,10 @@ export async function POST(req: NextRequest) {
     )
   } catch (error: unknown) {
     console.error('[STRIPE_SIGNATURE_ERROR]', error)
-    const message = error instanceof Error ? error.message : 'Invalid Stripe webhook signature'
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Invalid Stripe webhook signature'
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
@@ -61,10 +67,13 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-        limit: 1,
-        expand: ['data.price.product'],
-      })
+      const lineItems = await stripe.checkout.sessions.listLineItems(
+        session.id,
+        {
+          limit: 1,
+          expand: ['data.price.product'],
+        }
+      )
 
       const lineItem = lineItems.data[0]
 
@@ -72,14 +81,20 @@ export async function POST(req: NextRequest) {
         data: {
           userId: metadata.userId,
           eventId: metadata.eventId,
-          stripeProductId: lineItem.price?.product?.toString()!,
+          stripeProductId:
+            typeof lineItem.price?.product === 'string'
+              ? lineItem.price.product
+              : lineItem.price?.product?.id!,
           stripePriceId: lineItem.price?.id!,
           pricePaid: (session.amount_total ?? 0) / 100,
         },
       })
     } catch (error: unknown) {
       console.error('[STRIPE_CREATE_PAYMENT_ERROR]', error)
-      const message = error instanceof Error ? error.message : 'Failed to create payment record'
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create payment record'
       return NextResponse.json({ error: message }, { status: 500 })
     }
   }

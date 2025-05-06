@@ -22,8 +22,8 @@ export async function POST(req: Request) {
       success_url: `${origin}/events/class/${classKeyName}/payment/success`,
       cancel_url: `${origin}/events/class/${classKeyName}`,
       metadata: {
-        userId: userId, // <-- REPLACE with actual userId from request
-        eventId: classId, // or another field like classId if that's what you want
+        userId: userId,
+        eventId: classId,
       },
     })
 
