@@ -93,6 +93,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         days={publishedClass.days!}
         formLink={publishedClass.formLink!}
         stripePriceId={publishedClass.stripePriceId!}
+        stripeProductId={publishedClass.stripeProductId!}
         locale={locale}
         keyName={publishedClass.keyName}
         classId={publishedClass.id}

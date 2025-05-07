@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 interface PaymentOptionsProps {
   stripePriceId: string
+  stripeProductId: string
   formLink: string
   classKeyName: string
   price: number
@@ -21,6 +22,7 @@ type OptionType = 'checkout' | 'quick' | 'etransfer'
 
 const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   stripePriceId,
+  stripeProductId,
   formLink,
   classKeyName,
   price,
@@ -79,6 +81,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               <div className="w-fit">
                 <ClassNormalCheckOut
                   stripePriceId={stripePriceId}
+                  stripeProductId={stripeProductId}
                   formLink={formLink}
                   classKeyName={classKeyName}
                   userId={userId}
@@ -92,6 +95,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   price={price}
                   classId={classId}
                   userId={userId}
+                  stripePriceId={stripePriceId}
+                  stripeProductId={stripeProductId}
                 />
               </div>
             )}

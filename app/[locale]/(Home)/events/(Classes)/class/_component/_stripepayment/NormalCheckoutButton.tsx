@@ -14,6 +14,7 @@ const stripePromise = loadStripe(
 
 interface NormalCheckoutButtonProps {
   stripePriceId: string
+  stripeProductId: string
   classKeyName: string
   userId: string
   classId: string
@@ -21,6 +22,7 @@ interface NormalCheckoutButtonProps {
 
 export default function NormalCheckoutButton({
   stripePriceId,
+  stripeProductId,
   classKeyName,
   userId,
   classId,
@@ -36,6 +38,7 @@ export default function NormalCheckoutButton({
         '/api/payment/checkout-sessions/create',
         {
           stripePriceId,
+          stripeProductId,
           classKeyName,
           userId,
           classId,

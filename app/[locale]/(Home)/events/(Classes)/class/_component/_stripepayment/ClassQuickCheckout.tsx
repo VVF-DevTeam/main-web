@@ -13,19 +13,25 @@ import { axiosInstance } from '@/lib/axios'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter, usePathname } from 'next/navigation'
 
+interface CheckoutFormProps {
+  price: number
+  classId: string
+  userId: string
+  stripePriceId: string
+  stripeProductId: string
+}
+
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-function CheckoutForm({
+function QuickCheckoutForm({
   price,
   classId,
   userId,
-}: {
-  price: number
-  classId: string
-  userId: string
-}) {
+  stripePriceId,
+  stripeProductId,
+}: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const { toast } = useToast()
@@ -44,6 +50,8 @@ function CheckoutForm({
         amount: Math.round(price * 100),
         classId,
         userId,
+        stripePriceId,
+        stripeProductId,
       })
 
       const result = await stripe.confirmCardPayment(data.clientSecret, {
@@ -106,18 +114,22 @@ export default function ClassQuickCheckout({
   price,
   classId,
   userId,
-}: {
-  price: number
-  classId: string
-  userId: string
-}) {
+  stripePriceId,
+  stripeProductId,
+}: CheckoutFormProps) {
   return (
     <Elements stripe={stripePromise}>
       <p className="pb-2">
         Debit and Credit Card only. For other payment methods or paying for full
         course, please use normal checkout if this doesn&apos;t work.
       </p>
-      <CheckoutForm price={price} classId={classId} userId={userId} />
+      <QuickCheckoutForm
+        price={price}
+        classId={classId}
+        userId={userId}
+        stripePriceId={stripePriceId}
+        stripeProductId={stripeProductId}
+      />
     </Elements>
   )
 }

@@ -8,6 +8,7 @@ import { ArrowRight } from 'lucide-react'
 
 interface ClassNormalCheckOutProps {
   stripePriceId?: string
+  stripeProductId?: string
   formLink?: string // form link is a legacy property from the old version of the website for payment
   classKeyName: string
   userId: string
@@ -16,6 +17,7 @@ interface ClassNormalCheckOutProps {
 
 export default function ClassNormalCheckOut({
   stripePriceId,
+  stripeProductId,
   formLink,
   classKeyName,
   userId,
@@ -30,6 +32,7 @@ export default function ClassNormalCheckOut({
       {stripePriceId ? (
         <NormalCheckoutButton
           stripePriceId={stripePriceId}
+          stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
           classKeyName={classKeyName}
           userId={userId}
           classId={classId}

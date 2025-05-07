@@ -22,6 +22,7 @@ interface ClassDescriptionProps {
   days: string[]
   formLink: string
   stripePriceId: string
+  stripeProductId: string
   schedules: EventSchedule[]
   keyName: string
   classId: string
@@ -43,6 +44,7 @@ const ClassDescription = async ({
   days,
   formLink,
   stripePriceId,
+  stripeProductId,
   keyName,
   classId,
   price,
@@ -131,6 +133,7 @@ const ClassDescription = async ({
       {/* Payment Options */}
       {author ? <PaymentOptions
         stripePriceId={stripePriceId}
+        stripeProductId={stripeProductId}
         formLink={formLink}
         classKeyName={keyName}
         price={price}

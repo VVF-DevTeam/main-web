@@ -78,34 +78,21 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const lineItems = await stripe.checkout.sessions.listLineItems(
-        paymentData.id,
-        {
-          limit: 1,
-          expand: ['data.price.product'],
-        }
-      )
-
-      const lineItem = lineItems.data[0]
-
       await prisma.payment.create({
         data: {
           userId: metadata.userId,
           eventId: metadata.eventId,
-          stripeProductId:
-            typeof lineItem.price?.product === 'string'
-              ? lineItem.price.product
-              : lineItem.price?.product?.id!,
-          stripePriceId: lineItem.price?.id!,
+          stripeProductId: metadata.stripeProductId,
+          stripePriceId: metadata.stripePriceId,
           pricePaid: (chargedAmount ?? 0) / 100,
         },
       })
     } catch (error: unknown) {
-      console.error('[STRIPE_CREATE_PAYMENT_ERROR]', error)
+      console.error('[PRISMA_CREATE_PAYMENT_ERROR]', error)
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to create payment record'
+          : 'Failed to save payment record to database using prisma'
       return NextResponse.json({ error: message }, { status: 500 })
     }
   } else {
