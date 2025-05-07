@@ -86,6 +86,17 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         >
           {t('job-navRegistration')}
         </Link>
+
+        <Link
+          href="/registration/membership"
+          className={classNames(
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
+          )}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {t('job-navMembership')}
+        </Link>
         {/* <div className="border-b border-gray-200" />
         <Link
           href="/about/directors"

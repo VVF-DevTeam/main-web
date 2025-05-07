@@ -5,7 +5,7 @@ import { RiCalendarEventFill } from 'react-icons/ri'
 import initTranslation from '@/app/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Event } from '@prisma/client'
+import { Event, PaymentType } from '@prisma/client'
 import { getEventStatus } from '@/lib/actions/event/getEventStatus'
 import { Decimal } from '@prisma/client/runtime/library'
 interface UserInfoProps {
@@ -18,18 +18,20 @@ interface UserInfoProps {
 }
 
 interface PaymentHistoryItem {
-  id: string;
-  pricePaid: Decimal;
-  createdAt: Date;
+  id: string
+  pricePaid: Decimal
+  createdAt: Date
+  type: PaymentType
+  expiresAt?: Date | null
   event: {
-    id: string;
-    title: string;
-    keyName: string;
-    imgUrl: string | null;
-    startDate: Date | null;
-    endDate: Date;
-    location: string | null;
-  };
+    id: string
+    title: string
+    keyName: string
+    imgUrl: string | null
+    startDate: Date | null
+    endDate: Date
+    location: string | null
+  } | null
 }
 
 const MyProfile = async ({
@@ -127,50 +129,74 @@ const MyProfile = async ({
                   </thead>
                   <tbody className="divide-y">
                     {paymentHistory.length > 0 ? (
-                      paymentHistory.map((payment: PaymentHistoryItem, index: number) => {
-                        const event = payment.event
-                        const startDate = new Date(
-                          event.startDate || event.endDate
-                        )
-                        const status = getEventStatus(startDate, event.endDate)
-                        return (
-                          <tr
-                            key={index}
-                            className="bg-bgColor-white cursor-pointer border-b"
-                          >
-                            <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
-                              <Link href={`/events/class/${event.keyName}`}>
-                                {event.title}
-                              </Link>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {new Date(event.startDate || "").toLocaleDateString()}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {new Date(event.endDate).toLocaleDateString()}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {event.location}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              ${payment.pricePaid.toFixed(2)}
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span
-                                className={`rounded-full px-2 py-1 text-sm ${
-                                  status === 'Upcoming'
-                                    ? 'bg-bgColor-blue/20 text-textColor-blue'
-                                    : status === 'Ongoing'
-                                      ? 'bg-bgColor-green/20 text-textColor-green'
-                                      : 'bg-bgColor-yellow/20 text-textColor-yellow'
-                                }`}
-                              >
-                                {status}
-                              </span>
-                            </td>
-                          </tr>
-                        )
-                      })
+                      paymentHistory.map(
+                        (payment: PaymentHistoryItem, index: number) => {
+                          // payment details
+                          const event = payment.event
+                          const startDate = new Date(
+                            payment.type === 'Membership'
+                              ? payment.createdAt
+                              : event!.startDate!
+                          )
+                          const endDate = new Date(
+                            payment.type === 'Membership'
+                              ? payment!.expiresAt!
+                              : event!.endDate
+                          )
+                          const status =
+                            payment.type === 'Membership'
+                              ? getEventStatus(startDate, endDate)
+                              : getEventStatus(
+                                  payment.createdAt,
+                                  payment!.expiresAt!
+                                )
+                          return (
+                            <tr
+                              key={index}
+                              className="bg-bgColor-white cursor-pointer border-b"
+                            >
+                              <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
+                                {payment.type === 'Membership' ? (
+                                  'Membership'
+                                ) : (
+                                  <Link
+                                    href={`/events/class/${event!.keyName}`}
+                                  >
+                                    {event!.title}
+                                  </Link>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {startDate.toLocaleDateString()}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {endDate.toLocaleDateString()}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {payment.type === 'Membership'
+                                  ? '-'
+                                  : event!.location!}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                ${payment.pricePaid.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span
+                                  className={`rounded-full px-2 py-1 text-sm ${
+                                    status === 'Upcoming'
+                                      ? 'bg-bgColor-blue/20 text-textColor-blue'
+                                      : status === 'Ongoing'
+                                        ? 'bg-bgColor-green/20 text-textColor-green'
+                                        : 'bg-bgColor-yellow/20 text-textColor-yellow'
+                                  }`}
+                                >
+                                  {status}
+                                </span>
+                              </td>
+                            </tr>
+                          )
+                        }
+                      )
                     ) : (
                       <tr>
                         <td

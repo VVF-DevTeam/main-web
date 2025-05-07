@@ -225,7 +225,8 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type PaymentType
-  
+  expiresAt   DateTime? // for subscription payment
+
   // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
