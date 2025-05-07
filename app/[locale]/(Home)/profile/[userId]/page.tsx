@@ -72,7 +72,7 @@ export default async function ProfilePage({
         <MyProfile
           user={user}
           locale={locale}
-          events={eventList}
+          // events={eventList}
           upcoming_events={eventList}
           paymentHistory={paymentHistory}
         />

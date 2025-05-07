@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Event } from '@prisma/client'
 import { getEventStatus } from '@/lib/actions/event/getEventStatus'
+import { Decimal } from '@prisma/client/runtime/library'
 interface UserInfoProps {
   name: string
   email: string
@@ -15,18 +16,34 @@ interface UserInfoProps {
   age?: string
   image?: string
 }
+
+interface PaymentHistoryItem {
+  id: string;
+  pricePaid: Decimal;
+  createdAt: Date;
+  event: {
+    id: string;
+    title: string;
+    keyName: string;
+    imgUrl: string | null;
+    startDate: Date | null;
+    endDate: Date;
+    location: string | null;
+  };
+}
+
 const MyProfile = async ({
   user,
   locale,
-  events,
+  // events,
   upcoming_events,
   paymentHistory,
 }: {
   user: UserInfoProps
   locale: string
-  events: Event[]
+  // events: Event[]
   upcoming_events: Event[]
-  paymentHistory: object[]
+  paymentHistory: PaymentHistoryItem[]
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
 
@@ -110,7 +127,7 @@ const MyProfile = async ({
                   </thead>
                   <tbody className="divide-y">
                     {paymentHistory.length > 0 ? (
-                      paymentHistory.map((payment: any, index: number) => {
+                      paymentHistory.map((payment: PaymentHistoryItem, index: number) => {
                         const event = payment.event
                         const startDate = new Date(
                           event.startDate || event.endDate
@@ -127,7 +144,7 @@ const MyProfile = async ({
                               </Link>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              {new Date(event.startDate).toLocaleDateString()}
+                              {new Date(event.startDate || "").toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3 text-center">
                               {new Date(event.endDate).toLocaleDateString()}
