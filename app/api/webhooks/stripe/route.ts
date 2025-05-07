@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
+import { PaymentType } from '@prisma/client'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
           stripeProductId: metadata.stripeProductId,
           stripePriceId: metadata.stripePriceId,
           pricePaid: (chargedAmount ?? 0) / 100,
+          type: metadata.type as PaymentType,
         },
       })
     } catch (error: unknown) {

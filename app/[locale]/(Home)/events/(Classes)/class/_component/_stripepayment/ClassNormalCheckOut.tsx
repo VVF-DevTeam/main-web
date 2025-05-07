@@ -1,6 +1,6 @@
 'use client'
 
-import NormalCheckoutButton from '@/app/[locale]/(Home)/events/(Classes)/class/_component/_stripepayment/NormalCheckoutButton'
+import NormalCheckoutButton from '@/components/payment/NormalCheckoutButton'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
@@ -29,21 +29,22 @@ export default function ClassNormalCheckOut({
   return (
     // Edit classname if needed
     <>
-      {stripePriceId ? (
-        <NormalCheckoutButton
-          stripePriceId={stripePriceId}
-          stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
-          classKeyName={classKeyName}
-          userId={userId}
-          classId={classId}
-        />
-      ) : (
+      {formLink ? (
         // Link to google form payment (for old courses)
         <Link href={formLink!} target="_blank" rel="noopener noreferrer">
           <Button variant={'gray'}>
             {t('reserve-button')} <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
+      ) : (
+        <NormalCheckoutButton
+          stripePriceId={stripePriceId!}
+          stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
+          classKeyName={classKeyName}
+          userId={userId}
+          eventId={classId}
+          buttonText='reserve-button'
+        />
       )}
     </>
   )

@@ -15,9 +15,10 @@ const stripePromise = loadStripe(
 interface NormalCheckoutButtonProps {
   stripePriceId: string
   stripeProductId: string
-  classKeyName: string
+  classKeyName?: string
   userId: string
-  classId: string
+  eventId?: string
+  buttonText: string
 }
 
 export default function NormalCheckoutButton({
@@ -25,7 +26,8 @@ export default function NormalCheckoutButton({
   stripeProductId,
   classKeyName,
   userId,
-  classId,
+  eventId,
+  buttonText,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -37,11 +39,12 @@ export default function NormalCheckoutButton({
       const { data } = await axiosInstance.post(
         '/api/payment/checkout-sessions/create',
         {
-          stripePriceId,
-          stripeProductId,
-          classKeyName,
-          userId,
-          classId,
+          stripePriceId: stripePriceId,
+          stripeProductId: stripeProductId,
+          classKeyName: classKeyName,
+          userId: userId,
+          eventId: eventId,
+          type: 'Class',
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
@@ -65,7 +68,7 @@ export default function NormalCheckoutButton({
 
   return (
     <Button onClick={handleCheckout} variant="gray">
-      {t('reserve-button')}
+      {t(buttonText)}
       <ArrowRight className="h-4 w-4" />
     </Button>
   )
