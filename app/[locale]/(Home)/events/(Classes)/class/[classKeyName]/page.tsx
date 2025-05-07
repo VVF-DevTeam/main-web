@@ -10,14 +10,14 @@ import { prisma } from '@/lib/db'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ classId: string }>
+  params: Promise<{ classKeyName: string }>
 }): Promise<Metadata> {
-  const { classId } = await params
+  const { classKeyName } = await params
 
   // TODO: Simplify code to only query once to get data
   const publishedClass = await prisma.event.findUnique({
     where: {
-      keyName: classId,
+      keyName: classKeyName,
     },
     select: {
       title: true,
@@ -41,16 +41,16 @@ export async function generateMetadata({
 
 // Interfaces
 interface ClassPageProps {
-  params: Promise<{ locale: string; classId: string }>
+  params: Promise<{ locale: string; classKeyName: string }>
 }
 
 // Main Component
 const ClassPage = async ({ params }: ClassPageProps) => {
-  const { locale, classId } = await params
+  const { locale, classKeyName } = await params
 
   const publishedClass = await prisma.event.findUnique({
     where: {
-      keyName: classId,
+      keyName: classKeyName,
     },
     include: {
       schedules: true,
@@ -77,7 +77,6 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           startDate={publishedClass.startDate!}
           hosts={publishedClass.hosts}
           title={publishedClass.title}
-          formLink={publishedClass.formLink!}
           locale={locale}
         />
       </div>
@@ -93,7 +92,13 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         schedules={publishedClass.schedules}
         days={publishedClass.days!}
         formLink={publishedClass.formLink!}
+        stripePriceId={publishedClass.stripePriceId!}
+        stripeProductId={publishedClass.stripeProductId!}
         locale={locale}
+        keyName={publishedClass.keyName}
+        classId={publishedClass.id}
+        price={publishedClass.price?.toNumber()!}
+        title={publishedClass.title}
       />
     </div>
   )

@@ -24,11 +24,40 @@ export default async function ProfilePage({
       isPublished: true,
     },
   })
+
   const { section } = await searchParams
   const { locale } = await params
+
+  // return if user is not logged in
   if (!user) {
     return <p className="mt-10 text-center">No user data available.</p>
   }
+  console.log(user.id)
+  // get payment history
+  const paymentHistory = await prisma.payment.findMany({
+    where: {
+      userId: user.id,
+    },
+    select: {
+      id: true,
+      pricePaid: true,
+      createdAt: true,
+      event: {
+        select: {
+          id: true,
+          title: true,
+          keyName: true,
+          imgUrl: true,
+          startDate: true,
+          endDate: true,
+          location: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
 
   // ✅ Switch component based on searchParams
   switch (section) {
@@ -43,8 +72,9 @@ export default async function ProfilePage({
         <MyProfile
           user={user}
           locale={locale}
-          events={eventList}
+          // events={eventList}
           upcoming_events={eventList}
+          paymentHistory={paymentHistory}
         />
       )
   }

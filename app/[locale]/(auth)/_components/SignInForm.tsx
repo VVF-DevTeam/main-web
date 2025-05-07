@@ -29,6 +29,8 @@ import { useSearchParams } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
 
+// TODO: Fix bug that if email and password are prefilled, even if users click on other method to login like Github, it will login with email and password
+
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
@@ -99,7 +101,6 @@ const SignInForm = () => {
 
   return (
     <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
-
       {/* Form Header */}
       <div className="flex-center header-font-black mb-24 gap-x-4 lg:mb-36">
         <CustomIcon height={100} width={100} />
@@ -118,7 +119,7 @@ const SignInForm = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-4 flex flex-col default-gap pb-6"
+            className="default-gap mt-4 flex flex-col pb-6"
           >
             {/* Email */}
             <FormField
@@ -180,7 +181,7 @@ const SignInForm = () => {
             />
 
             {/* Submit & Other Actions */}
-            <div className="mt-6 flex-center flex-col gap-y-4 self-stretch">
+            <div className="flex-center mt-6 flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
                 className="w-full bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"
@@ -194,7 +195,7 @@ const SignInForm = () => {
                 {t('noAccount')}{' '}
                 <Link
                   href="/signUp"
-                  className="text-textColor-brand decoration-2 transition-all hover:underline hover:text-textColor-brand/70"
+                  className="text-textColor-brand decoration-2 transition-all hover:text-textColor-brand/70 hover:underline"
                 >
                   {t('signUp')}
                 </Link>

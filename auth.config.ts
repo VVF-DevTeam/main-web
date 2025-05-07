@@ -103,7 +103,6 @@ export default {
     authorized: async ({ request, auth }) => {
       // Check what path the user is trying to access
       let path = request.nextUrl.pathname
-
       // exclude all auth path
       if (path.includes('/api/auth')) {
         return NextResponse.next()
@@ -120,7 +119,6 @@ export default {
               req: request,
             })
             const isHost = await roleCheckToken({ role: 'HOST', req: request })
-
             if (path.includes('categories') && !isAdmin) {
               //For categories, only allow ADMIN
               return new NextResponse('Forbidden', { status: 403 })
@@ -131,7 +129,7 @@ export default {
               // Only logged in user can apply
               if (path.includes('apply')) {
                 if (!(await roleCheckToken({ req: request }))) {
-                  return new NextResponse('Forbidden', { status: 403 })
+                  return new NextResponse('Please log in to apply.', { status: 403 })
                 }
               } else {
                 // For job API, only allow Admin
@@ -152,9 +150,14 @@ export default {
                 }
               }
             } else if (path.includes('users')) {
-              // For users API,  Only logged in user can upload avatar
+              // For users API, only logged in user can upload avatar
               if (!(await roleCheckToken({ req: request }))) {
-                return new NextResponse('Forbidden', { status: 403 })
+                return new NextResponse('Please log in to upload avatar.', { status: 403 })
+              }
+            } else if (path.includes('payment')) {
+              // For users API, only logged in user can make payment
+              if (!(await roleCheckToken({ req: request }))) {
+                return new NextResponse('Please log in to make payment.', { status: 403 })
               }
             }
             return NextResponse.next()

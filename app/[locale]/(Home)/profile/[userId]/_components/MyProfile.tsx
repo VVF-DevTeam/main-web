@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Event } from '@prisma/client'
 import { getEventStatus } from '@/lib/actions/event/getEventStatus'
+import { Decimal } from '@prisma/client/runtime/library'
 interface UserInfoProps {
   name: string
   email: string
@@ -15,20 +16,37 @@ interface UserInfoProps {
   age?: string
   image?: string
 }
+
+interface PaymentHistoryItem {
+  id: string;
+  pricePaid: Decimal;
+  createdAt: Date;
+  event: {
+    id: string;
+    title: string;
+    keyName: string;
+    imgUrl: string | null;
+    startDate: Date | null;
+    endDate: Date;
+    location: string | null;
+  };
+}
+
 const MyProfile = async ({
   user,
   locale,
-  events,
+  // events,
   upcoming_events,
+  paymentHistory,
 }: {
   user: UserInfoProps
   locale: string
-  events: Event[]
+  // events: Event[]
   upcoming_events: Event[]
+  paymentHistory: PaymentHistoryItem[]
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
 
-  console.log(user?.image)
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -36,13 +54,13 @@ const MyProfile = async ({
           <h1 className="text-3xl font-bold">{t('my-profile')}</h1>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:pb-5 lg:grid-cols-4">
           {/* Profile Section */}
-          <div className="bg-bgColor-white col-span-1 flex flex-col rounded-lg p-6 shadow-lg">
+          <div className="bg-bgColor-white relative col-span-1 flex flex-col rounded-lg p-6 shadow-lg">
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
                 <div className="h-32 w-32 overflow-hidden rounded-full bg-bgColor-gray/20">
-                
                   {user?.image ? (
                     <Image
                       src={user.image}
@@ -84,11 +102,12 @@ const MyProfile = async ({
             </div>
           </div>
 
-          {/* Event History Section */}
-          <div className="bg-bgColor-white col-span-3 flex h-full flex-col rounded-lg p-6 shadow-lg">
+          {/* Order History Section */}
+          <div className="bg-bgColor-white relative col-span-3 flex h-full flex-col rounded-lg p-6 shadow-lg">
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
-              {t('event-history')}
+              {t('order-history')}
             </h3>
 
             <div className="flex max-h-64 flex-grow flex-col overflow-hidden rounded-md border">
@@ -101,44 +120,42 @@ const MyProfile = async ({
                         {t('start-date')}
                       </th>
                       <th className="px-4 py-3 text-center">{t('end-date')}</th>
-                      <th className="px-4 py-3 text-center">{t('dates')}</th>
-                      <th className="px-4 py-3 text-center">{t('price')}</th>
                       <th className="px-4 py-3 text-center">{t('location')}</th>
+                      <th className="px-4 py-3 text-center">{t('price')}</th>
                       <th className="px-4 py-3 text-center">{t('status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {events.length > 0 ? (
-                      events.map((event, index) => {
-                        const startDate = event.startDate || event.endDate
+                    {paymentHistory.length > 0 ? (
+                      paymentHistory.map((payment: PaymentHistoryItem, index: number) => {
+                        const event = payment.event
+                        const startDate = new Date(
+                          event.startDate || event.endDate
+                        )
                         const status = getEventStatus(startDate, event.endDate)
                         return (
                           <tr
                             key={index}
                             className="bg-bgColor-white cursor-pointer border-b"
                           >
-                            <td className="px-4 py-3">
-                              <Link
-                                href={`/events/class/${event.id}`}
-                                className="text-textColor-blue hover:underline"
-                              >
+                            <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
+                              <Link href={`/events/class/${event.keyName}`}>
                                 {event.title}
                               </Link>
                             </td>
-                            <td className="px-4 py-3">
-                              {new Date(startDate).toLocaleDateString()}
+                            <td className="px-4 py-3 text-center">
+                              {new Date(event.startDate || "").toLocaleDateString()}
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3 text-center">
                               {new Date(event.endDate).toLocaleDateString()}
                             </td>
-                            <td className="px-4 py-3">
-                              {event.days.join(', ')}
+                            <td className="px-4 py-3 text-center">
+                              {event.location}
                             </td>
-                            <td className="px-4 py-3">
-                              ${event.price?.toFixed(2)}
+                            <td className="px-4 py-3 text-center">
+                              ${payment.pricePaid.toFixed(2)}
                             </td>
-                            <td className="px-4 py-3">{event.location}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3 text-center">
                               <span
                                 className={`rounded-full px-2 py-1 text-sm ${
                                   status === 'Upcoming'
@@ -157,7 +174,7 @@ const MyProfile = async ({
                     ) : (
                       <tr>
                         <td
-                          colSpan={8}
+                          colSpan={6}
                           className="px-4 py-3 text-center text-textColor-gray/50"
                         >
                           {t('no-event')}
@@ -172,7 +189,8 @@ const MyProfile = async ({
         </div>
 
         {/* Wishlist Section */}
-        <div className="bg-bgColor-white mb-8 rounded-lg p-6 shadow-lg">
+        <div className="bg-bgColor-white relative mb-8 rounded-lg p-6 shadow-lg">
+          <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
             <FiHeart />
             {t('upcoming-event')}

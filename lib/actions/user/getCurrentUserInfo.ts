@@ -15,6 +15,7 @@ export async function getCurrentUserInfo() {
 
   // Ensure all properties match expected `userProps` type
   return {
+    id: user.id,
     name: user.name ?? '',
     email: user.email, 
     phone: user.phone ?? '',

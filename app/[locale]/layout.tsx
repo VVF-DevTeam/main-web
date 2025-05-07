@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/react"
 
 // Components
 import { Toaster } from '@/components/ui/toaster'
+import { Toaster as SonnerToaster } from 'sonner'
 
 // CSS and CSS Modules
 import '@/lib/ui/css/globals.css'
@@ -45,6 +46,7 @@ export default async function RootLayout({
         >
           <main>{children}</main>
           <Toaster />
+          <SonnerToaster />
           <Analytics/>
           <SpeedInsights />
         </body>
