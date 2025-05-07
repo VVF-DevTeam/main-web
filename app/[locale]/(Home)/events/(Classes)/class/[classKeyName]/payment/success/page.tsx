@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/db'
 import initTranslations from '@/app/i18n'
 import '@/lib/ui/css/lineAnimation.css'
+import Link from 'next/link'
+import { auth } from '@/auth'
 
 // Interfaces
 interface ClassPaymentCancelPageProps {
@@ -14,6 +16,11 @@ const ClassPaymentCancelPage = async ({
   const { locale, classKeyName } = await params
   const { t } = await initTranslations(locale, ['event', 'common'])
 
+  // get current user name
+  const session = await auth()
+  const userName = session?.user?.name!
+
+  //
   const publishedClass = await prisma.event.findUnique({
     where: { keyName: classKeyName },
     select: { title: true },
@@ -22,10 +29,10 @@ const ClassPaymentCancelPage = async ({
   if (!publishedClass) return null
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-white dark:bg-neutral-900 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center dark:bg-neutral-900">
       {/* Checkmark SVG */}
       <svg
-        className="w-20 h-20 text-green-500 mb-6"
+        className="mb-6 h-20 w-20 text-green-500"
         viewBox="0 0 52 52"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -51,11 +58,18 @@ const ClassPaymentCancelPage = async ({
       </svg>
 
       {/* Message */}
-      <h1 className="text-2xl font-bold text-green-600 mb-2">
+      <h1 className="mb-2 text-2xl font-bold text-green-600">
         {t('paymentSuccess-header')}
       </h1>
-      <p className="text-lg text-neutral-700 dark:text-neutral-300 max-w-xl">
-         {t('paymentSuccess-text')} <strong>{publishedClass.title}</strong>
+      <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
+        {t('paymentSuccess-text')} <strong>{publishedClass.title}</strong>
+      </p>
+      <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
+        Please check the payment details at{' '}
+        <Link href={`/profile/${userName}`} className="text-blue-600 underline">
+          your profile
+        </Link>
+        .
       </p>
     </div>
   )
