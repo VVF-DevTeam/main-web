@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { ArrowRight } from 'lucide-react'
+import { PaymentType } from '@prisma/client'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -15,19 +16,21 @@ const stripePromise = loadStripe(
 interface NormalCheckoutButtonProps {
   stripePriceId: string
   stripeProductId: string
-  classKeyName?: string
+  eventKeyName?: string
   userId: string
   eventId?: string
   buttonText: string
+  type: PaymentType
 }
 
 export default function NormalCheckoutButton({
   stripePriceId,
   stripeProductId,
-  classKeyName,
+  eventKeyName,
   userId,
   eventId,
   buttonText,
+  type,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -41,10 +44,10 @@ export default function NormalCheckoutButton({
         {
           stripePriceId: stripePriceId,
           stripeProductId: stripeProductId,
-          classKeyName: classKeyName,
+          eventKeyName: eventKeyName,
           userId: userId,
           eventId: eventId,
-          type: 'Class',
+          type: type,
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })

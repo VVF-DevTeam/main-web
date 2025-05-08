@@ -56,7 +56,7 @@ const MyProfile = async ({
           <h1 className="text-3xl font-bold">{t('my-profile')}</h1>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:pb-5 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 pb-8 md:pb-5 lg:grid-cols-4">
           {/* Profile Section */}
           <div className="bg-bgColor-white relative col-span-1 flex flex-col rounded-lg p-6 shadow-lg">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
@@ -145,11 +145,11 @@ const MyProfile = async ({
                           )
                           const status =
                             payment.type === 'Membership'
-                              ? getEventStatus(startDate, endDate)
-                              : getEventStatus(
+                              ? getEventStatus(
                                   payment.createdAt,
                                   payment!.expiresAt!
                                 )
+                              : getEventStatus(startDate, endDate)
                           return (
                             <tr
                               key={index}

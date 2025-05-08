@@ -40,10 +40,11 @@ export default function ClassNormalCheckOut({
         <NormalCheckoutButton
           stripePriceId={stripePriceId!}
           stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
-          classKeyName={classKeyName}
+          eventKeyName={classKeyName}
           userId={userId}
           eventId={classId}
           buttonText='reserve-button'
+          type='Class'
         />
       )}
     </>

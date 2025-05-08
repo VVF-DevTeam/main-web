@@ -8,7 +8,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const origin = req.headers.get('origin') || 'http://localhost:3000'
-    const { stripePriceId, stripeProductId, classKeyName, userId, eventId, type } = await req.json()
+    const {
+      stripePriceId,
+      stripeProductId,
+      eventKeyName,
+      userId,
+      eventId,
+      type,
+    } = await req.json()
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -18,9 +25,15 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      success_url: `${origin}/events/class/${classKeyName}/payment/success`,
-      cancel_url: `${origin}/events/class/${classKeyName}`,
+      mode: type === 'Membership' ? 'subscription' : 'payment',
+      success_url:
+        type === 'Membership'
+          ? `${origin}/registration/membership/payment/success`
+          : `${origin}/events/class/${eventKeyName}/payment/success`,
+      cancel_url:
+        type === 'Membership'
+          ? `${origin}/registration/membership`
+          : `${origin}/events/class/${eventKeyName}`,
       metadata: {
         userId: userId,
         eventId: eventId,

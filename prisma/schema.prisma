@@ -305,6 +305,7 @@ enum Role {
   USER
   ADMIN
   HOST
+  MEMBER
 }
 
 enum EventType {

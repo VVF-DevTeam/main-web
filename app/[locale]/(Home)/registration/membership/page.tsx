@@ -26,10 +26,11 @@ const MembershipPage = async ({
       {userId ? (
         <div className="mt-8 flex justify-center">
           <NormalCheckoutButton
-            stripePriceId="price_1RMFpi06wc04MarVvcc6OXj0"
+            stripePriceId="price_1RMH3r06wc04MarV0wWvGuq9"
             stripeProductId="prod_SGnQhahDiUFrsq"
             userId={userId}
             buttonText="become-member"
+            type="Membership"
           />
         </div>
       ) : (

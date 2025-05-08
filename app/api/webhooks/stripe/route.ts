@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
-import { PaymentType } from '@prisma/client'
+import { PaymentType, Role } from '@prisma/client'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      // create payment record
       await prisma.payment.create({
         data: {
           userId: metadata.userId,
@@ -89,6 +90,16 @@ export async function POST(req: NextRequest) {
           type: metadata.type as PaymentType,
         },
       })
+
+      // add role member to user
+      if (metadata.type === 'Membership') {
+        await prisma.user.update({
+          where: { id: metadata.userId },
+          data: {
+            role: ['MEMBER' as Role],
+          },
+        })
+      }
     } catch (error: unknown) {
       console.error('[PRISMA_CREATE_PAYMENT_ERROR]', error)
       const message =
