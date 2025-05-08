@@ -88,6 +88,12 @@ export async function POST(req: NextRequest) {
           stripePriceId: metadata.stripePriceId,
           pricePaid: (chargedAmount ?? 0) / 100,
           type: metadata.type as PaymentType,
+          expiresAt:
+            metadata.type === 'Membership'
+              ? metadata.stripePriceId === 'price_1RMFpi06wc04MarVvcc6OXj0' // priceId for monthly membership
+                ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 1 year from now
+                : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 month from now
+              : null,
         },
       })
 
@@ -96,7 +102,9 @@ export async function POST(req: NextRequest) {
         await prisma.user.update({
           where: { id: metadata.userId },
           data: {
-            role: ['MEMBER' as Role],
+            role: {
+              push: 'MEMBER' as Role,
+            },
           },
         })
       }
