@@ -71,9 +71,9 @@ export async function POST(req: NextRequest) {
 
     const metadata = paymentData.metadata
 
-    if (!metadata?.userId || !metadata?.eventId) {
+    if (!metadata?.userId) {
       return NextResponse.json(
-        { error: 'Missing userId or eventId in metadata' },
+        { error: 'Missing userId in metadata' },
         { status: 400 }
       )
     }
