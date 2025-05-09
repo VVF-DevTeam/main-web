@@ -27,7 +27,7 @@ async function getSubscriptionDetails(subscriptionId: string) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId)
     // get subscription start and end date
     const { current_period_start, current_period_end } = subscription.items.data[0]
-    
+
     // get subscription price id
     const { id } = subscription.items.data[0].price
     return { current_period_start, current_period_end, stripePriceId: id }
@@ -75,7 +75,6 @@ export async function POST(req: NextRequest) {
   if (successType.includes(event.type)) {
     let paymentData: Stripe.PaymentIntent | Stripe.Checkout.Session
     let chargedAmount: number
-    let subscriptionStart = null
     let subscriptionEnd = null
     let stripePriceId = null
 
@@ -89,7 +88,6 @@ export async function POST(req: NextRequest) {
       if (paymentData.subscription) {
         const subscriptionDetails = await getSubscriptionDetails(paymentData.subscription as string)
         if (subscriptionDetails) {
-          subscriptionStart = subscriptionDetails.current_period_start
           subscriptionEnd = subscriptionDetails.current_period_end
           stripePriceId = subscriptionDetails.stripePriceId
         }
