@@ -20,25 +20,15 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
-        type === 'Membership'
-          ? {
-              price: 'price_1RMH3r06wc04MarV0wWvGuq9',
-              quantity: 1,
-              adjustable_quantity: {
-                enabled: true,
-                minimum: 1,
-                maximum: 10,
-              },
-            }
-          : {
-              price: stripePriceId,
-              quantity: 1,
-              adjustable_quantity: {
-                enabled: true,
-                minimum: 1,
-                maximum: 10,
-              },
-            },
+        {
+          price: stripePriceId,
+          quantity: 1,
+          adjustable_quantity: {
+            enabled: true,
+            minimum: 1,
+            maximum: 10,
+          },
+        },
       ],
       mode: type === 'Membership' ? 'subscription' : 'payment',
       success_url:

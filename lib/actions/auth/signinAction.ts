@@ -43,8 +43,8 @@ export const signinAction = async (data: {
       })
 
       return {
-        message: 'A verification link has been sent to your email',
-        success: true,
+        message: 'Please verify your account first. A new verification link has been sent to your email',
+        success: false,
       }
     }
 

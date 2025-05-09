@@ -45,7 +45,6 @@ const JobType = ({ job }: JobTypeProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof JobTypeSchema>) => {
-    console.log(values)
     try {
       await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)

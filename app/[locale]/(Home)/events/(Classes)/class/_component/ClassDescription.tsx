@@ -29,6 +29,7 @@ interface ClassDescriptionProps {
   classId: string
   price: number
   title: string
+  stripeSubscribedPriceId: string
 }
 
 // Main Code
@@ -46,6 +47,7 @@ const ClassDescription = async ({
   formLink,
   stripePriceId,
   stripeProductId,
+  stripeSubscribedPriceId,
   keyName,
   classId,
   price,
@@ -154,6 +156,7 @@ const ClassDescription = async ({
           <PaymentOptions
             stripePriceId={stripePriceId}
             stripeProductId={stripeProductId}
+            stripeSubscribedPriceId={stripeSubscribedPriceId}
             formLink={formLink}
             classKeyName={keyName}
             price={price}

@@ -33,6 +33,7 @@ model Event {
   formLink    String?
   stripeProductId String?
   stripePriceId String?
+  subscribedPriceId String?
   // Metadata
   location    String?
   price       Decimal?      @default(0)
@@ -131,6 +132,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  subscribedAt DateTime?
+  subscribeExpires DateTime?
 
   purchases    Purchase[]
   posts        Post[]
@@ -305,7 +308,6 @@ enum Role {
   USER
   ADMIN
   HOST
-  MEMBER
 }
 
 enum EventType {

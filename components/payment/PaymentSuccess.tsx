@@ -16,7 +16,6 @@ const PaymentSuccess = async ({
   locale,
   translationWorkspaces,
 }: PaymentSuccessProps) => {
-  console.log(translationWorkspaces)
   const { t } = await initTranslations(locale, translationWorkspaces)
 
   return (

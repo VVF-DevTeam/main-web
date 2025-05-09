@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 interface PaymentOptionsProps {
   stripePriceId: string
   stripeProductId: string
+  stripeSubscribedPriceId: string
   formLink: string
   classKeyName: string
   price: number
@@ -23,6 +24,7 @@ type OptionType = 'checkout' | 'quick' | 'etransfer'
 const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   stripePriceId,
   stripeProductId,
+  stripeSubscribedPriceId,
   formLink,
   classKeyName,
   price,
@@ -82,6 +84,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 <ClassNormalCheckOut
                   stripePriceId={stripePriceId}
                   stripeProductId={stripeProductId}
+                  stripeSubscribedPriceId={stripeSubscribedPriceId}
                   formLink={formLink}
                   classKeyName={classKeyName}
                   userId={userId}
@@ -110,12 +113,13 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     Send your payment to: <strong>payment@vietvibe.org</strong>
                   </li>
                   <li>
-                    Use the security question: <em>Class Name</em>, answer:
+                    Use the security question: <em>Class Name</em>, answer:{' '}
                     <em>{classKeyName}</em>
                   </li>
                   <li>
-                    Include your full name and class title
-                    <strong>{title}</strong> in the message
+                    Include your full name and class title{' '}
+                    <strong>{title}</strong> in the message, and payment type
+                    (full course or drop-in)
                   </li>
                   <li>
                     Send us a message on our Facebook/Instagram page for
