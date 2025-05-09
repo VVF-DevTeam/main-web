@@ -27,10 +27,17 @@ export async function POST(req: NextRequest) {
       product: product.id,
     })
 
+    const subscribedStripePrice = await stripe.prices.create({
+      unit_amount: Math.round(price * 0.8 * 100),
+      currency: 'cad',
+      product: product.id,
+    })
+
     return NextResponse.json({
       success: true,
       productId: product.id,
       priceId: stripePrice.id,
+      subscribedPriceId: subscribedStripePrice.id,
     })
   } catch (error: unknown) {
     console.error('[STRIPE_CREATE_ERROR]', error)
@@ -50,6 +57,7 @@ export async function PUT(req: NextRequest) {
       price,
       stripeProductId,
       stripePriceId, // sent to disable the old price
+      subscribedPriceId,
     } = await req.json()
 
     // since the price is immutable (unchangeable), we need to create a new price
@@ -71,21 +79,28 @@ export async function PUT(req: NextRequest) {
     }
 
     // update the price if have stripePriceId and price
-    if (stripePriceId || price) {
+    if (stripePriceId || price || subscribedPriceId) {
       // Ensure both price and stripePriceId are provided
-      if (!stripePriceId || !price) {
+      if (!stripePriceId || !price || !subscribedPriceId) {
         return NextResponse.json(
-          { message: 'Missing price or stripePriceId' },
+          { message: 'Missing price or stripePriceId or subscribedPriceId' },
           { status: 400 }
         )
       }
 
-      // disable the old price
+      // disable the old prices
       await stripe.prices.update(stripePriceId, { active: false })
+      await stripe.prices.update(subscribedPriceId, { active: false })
 
-      // create a new price and link it to the product, return new price id
+      // create new prices and link it to the product, return new price id
       const newPrice = await stripe.prices.create({
         unit_amount: Math.round(price * 100),
+        currency: 'cad',
+        product: stripeProductId,
+      })
+
+      const newSubscribedPrice = await stripe.prices.create({
+        unit_amount: Math.round(price * 0.8 * 100),
         currency: 'cad',
         product: stripeProductId,
       })
@@ -93,6 +108,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({
         success: true,
         newPriceId: newPrice.id,
+        newSubscribedPriceId: newSubscribedPrice.id,
       })
     }
 

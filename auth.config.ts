@@ -310,7 +310,7 @@ export default {
         )
       }
 
-      // Check if user is trying to access an auth path
+      // Check if user is trying to access an auth path after logged in
       if (AUTH_PATHS.includes(path) && isLoggedIn) {
         return NextResponse.redirect(new URL('/', request.nextUrl.origin))
       }
@@ -334,6 +334,16 @@ export default {
         },
       })
 
+      return
+    },
+    createUser: async ({ user }) => {
+      // Set USER role for new accounts created through OAuth
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          role: ['USER'],
+        },
+      })
       return
     },
   },

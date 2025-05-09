@@ -28,17 +28,20 @@ interface StripeDataCreate {
   success: boolean
   productId: string
   priceId: string
+  subscribedPriceId: string
 }
 
 interface StripeDataEdit {
   success: boolean
   newPriceId: string
+  newSubscribedPriceId: string
 }
 
 const EventPriceSchema = z.object({
   price: z.coerce.number(),
   stripeProductId: z.string().optional(),
   stripePriceId: z.string().optional(),
+  subscribedPriceId: z.string().optional(),
 })
 
 const EventPrice = ({ event }: EventPriceProps) => {
@@ -68,6 +71,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
         )
         values.stripeProductId = data.productId
         values.stripePriceId = data.priceId
+        values.subscribedPriceId = data.subscribedPriceId
       } else {
         const { data } = await axiosInstance.put<StripeDataEdit>(
           '/api/payment/events',
@@ -77,12 +81,15 @@ const EventPrice = ({ event }: EventPriceProps) => {
             price: values.price,
             stripeProductId: event.stripeProductId,
             stripePriceId: event.stripePriceId,
+            subscribedPriceId: event.subscribedPriceId,
           }
         )
 
         values.stripePriceId = data.newPriceId
+        values.subscribedPriceId = data.newSubscribedPriceId
       }
 
+      // update event with new price in database and stripeData
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast({

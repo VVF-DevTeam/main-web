@@ -25,5 +25,5 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
     return token.role?.includes(role)
   }
 
-  return token.role
+  return token.role && token.role?.length > 0
 }

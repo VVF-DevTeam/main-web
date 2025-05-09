@@ -12,7 +12,6 @@ interface Postsprops {
 const PublishedPosts = async ({ locale, title }: Postsprops) => {
   const { t } = await initTranslations(locale, ['post', 'common'])
   const session = await auth()
-
   const publishedPosts = await getPublishedPostsByTitle(title || '')
 
   return (

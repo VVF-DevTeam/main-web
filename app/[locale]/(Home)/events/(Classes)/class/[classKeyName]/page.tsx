@@ -94,6 +94,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         formLink={publishedClass.formLink!}
         stripePriceId={publishedClass.stripePriceId!}
         stripeProductId={publishedClass.stripeProductId!}
+        stripeSubscribedPriceId={publishedClass.subscribedPriceId!}
         locale={locale}
         keyName={publishedClass.keyName}
         classId={publishedClass.id}

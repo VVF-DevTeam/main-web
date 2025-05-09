@@ -82,6 +82,7 @@ export const signupAction = async (formData: signupActionProps) => {
         phone: String(phoneNumber),
         address: address,
         password: hashedPassword,
+        role: ['USER'],
       },
     })
 

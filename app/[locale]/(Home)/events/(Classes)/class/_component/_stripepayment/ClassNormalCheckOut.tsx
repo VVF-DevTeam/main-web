@@ -13,6 +13,7 @@ interface ClassNormalCheckOutProps {
   classKeyName: string
   userId: string
   classId: string
+  stripeSubscribedPriceId?: string
 }
 
 export default function ClassNormalCheckOut({
@@ -22,6 +23,7 @@ export default function ClassNormalCheckOut({
   classKeyName,
   userId,
   classId,
+  stripeSubscribedPriceId,
 }: ClassNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -40,6 +42,7 @@ export default function ClassNormalCheckOut({
         <NormalCheckoutButton
           stripePriceId={stripePriceId!}
           stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
+          stripeSubscribedPriceId={stripeSubscribedPriceId!}
           eventKeyName={classKeyName}
           userId={userId}
           eventId={classId}

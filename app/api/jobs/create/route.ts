@@ -6,8 +6,6 @@ export const POST = async (request: NextRequest) => {
     // Destructure the request body
     const { title, jobType, keyName, userId } = await request.json()
 
-    console.log(userId)
-
     // Create the event
     const event = await prisma.job.create({
       data: {
