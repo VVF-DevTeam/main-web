@@ -22,6 +22,21 @@ async function getRawBody(
   return Buffer.concat(chunks)
 }
 
+async function getSubscriptionDetails(subscriptionId: string) {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+    // get subscription start and end date
+    const { current_period_start, current_period_end } = subscription.items.data[0]
+
+    // get subscription price id
+    const { id } = subscription.items.data[0].price
+    return { current_period_start, current_period_end, stripePriceId: id }
+  } catch (error) { 
+    console.error('[SUBSCRIPTION_RETRIEVE_ERROR]', error)
+    return null
+  }
+}
+
 export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature')
   if (!signature) {
@@ -60,6 +75,8 @@ export async function POST(req: NextRequest) {
   if (successType.includes(event.type)) {
     let paymentData: Stripe.PaymentIntent | Stripe.Checkout.Session
     let chargedAmount: number
+    let subscriptionEnd = null
+    let stripePriceId = null
 
     if (event.type === 'payment_intent.succeeded') {
       paymentData = event.data.object as Stripe.PaymentIntent
@@ -67,6 +84,14 @@ export async function POST(req: NextRequest) {
     } else {
       paymentData = event.data.object as Stripe.Checkout.Session
       chargedAmount = paymentData.amount_total!
+
+      if (paymentData.subscription) {
+        const subscriptionDetails = await getSubscriptionDetails(paymentData.subscription as string)
+        if (subscriptionDetails) {
+          subscriptionEnd = subscriptionDetails.current_period_end
+          stripePriceId = subscriptionDetails.stripePriceId
+        }
+      }
     }
 
     const metadata = paymentData.metadata
@@ -79,19 +104,16 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const expiresAt = metadata.type === 'Membership'
-      ? metadata.stripePriceId === 'price_1RMFpi06wc04MarVvcc6OXj0' // priceId for monthly membership
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 1 year from now
-        : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 month from now
-      : null
+      const expiresAt = metadata.type === 'Membership' && subscriptionEnd 
+        ? new Date(subscriptionEnd * 1000)  // Convert Unix timestamp to milliseconds
+        : null
 
-      // create payment record
       await prisma.payment.create({
         data: {
           userId: metadata.userId,
           eventId: metadata.eventId,
           stripeProductId: metadata.stripeProductId,
-          stripePriceId: metadata.stripePriceId,
+          stripePriceId: stripePriceId || metadata.stripePriceId,
           pricePaid: (chargedAmount ?? 0) / 100,
           type: metadata.type as PaymentType,
           expiresAt: expiresAt,
