@@ -2,26 +2,41 @@
 
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { Decimal } from '@prisma/client/runtime/library'
+import { PaymentType } from '@prisma/client'
 
-interface SubscriptionInfoProps {
-  user: {
+interface PaymentHistoryItem {
+  id: string
+  pricePaid: Decimal
+  createdAt: Date
+  type: PaymentType
+  expiresAt?: Date | null
+  event: {
     id: string
-    name: string
-    email: string
-  }
-  paymentHistory: any[]
+    title: string
+    keyName: string
+    imgUrl: string | null
+    startDate: Date | null
+    endDate: Date
+    location: string | null
+  } | null
 }
 
 export default function SubscriptionInfo({
-  user,
   paymentHistory,
-}: SubscriptionInfoProps) {
+}: {
+  paymentHistory: PaymentHistoryItem[]
+}) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
 
-  console.log(paymentHistory)
+  const getSubscriptionType = (createdAt: Date, expiresAt: Date) => {
+    const months = (expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30)
+    return months <= 1 ? 'Monthly' : 'Annual'
+  }
+
   const activeSubscription = paymentHistory.find(
-    (payment) => payment.expiresAt > new Date()
+    (payment) => payment.expiresAt && payment.expiresAt > new Date()
   )
 
   return (
@@ -48,12 +63,17 @@ export default function SubscriptionInfo({
               <div className="flex items-center justify-between border-b pb-4">
                 <span className="text-textColor-gray">{t('expires-at')}</span>
                 <span className="font-medium">
-                  {format(new Date(activeSubscription.expiresAt), 'PPP')}
+                  {format(new Date(activeSubscription.expiresAt as Date), 'PPP')}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b pb-4">
                 <span className="text-textColor-gray">{t('plan-type')}</span>
-                <span className="font-medium">{activeSubscription.type}</span>
+                <span className="font-medium">
+                  {activeSubscription && getSubscriptionType(
+                    new Date(activeSubscription.createdAt),
+                    new Date(activeSubscription.expiresAt as Date)
+                  )}
+                </span>
               </div>
             </>
           )}
@@ -76,11 +96,11 @@ export default function SubscriptionInfo({
                     {format(new Date(payment.createdAt), 'PPP')}
                   </p>
                   <p className="text-sm text-textColor-gray">
-                    - {format(new Date(payment.expiresAt), 'PPP')}
+                    - {format(new Date(payment.expiresAt as Date), 'PPP')}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">${payment.pricePaid}</p>
+                  <p className="font-medium">${payment.pricePaid.toString()}</p>
                   <p className="text-sm text-textColor-gray">{payment.type}</p>
                 </div>
               </div>

@@ -33,7 +33,7 @@ export default async function ProfilePage({
   if (!user) {
     return <p className="mt-10 text-center">No user data available.</p>
   }
-  console.log(user.id)
+
   // get payment history
   const paymentHistory = await prisma.payment.findMany({
     where: {
@@ -71,7 +71,7 @@ export default async function ProfilePage({
     case 'delete-account':
       return <DeleteForm user={user} />
     case 'subscription':
-      return <SubscriptionInfo user={user} paymentHistory={paymentHistory} />
+      return <SubscriptionInfo paymentHistory={paymentHistory} />
     default:
       return (
         <MyProfile
