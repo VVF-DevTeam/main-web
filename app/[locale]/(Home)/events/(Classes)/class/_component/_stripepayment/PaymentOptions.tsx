@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import Link from 'next/link'
 interface PaymentOptionsProps {
   stripePriceId: string
   stripeProductId: string
@@ -113,18 +114,37 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 </p>
                 <ul className="ml-5 list-disc space-y-1">
                   <li>
-                    {t('etransfer-description-1')} <strong>payment@vietvibe.org</strong>
+                    {t('etransfer-description-1')}{' '}
+                    <strong>payment@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>{classKeyName}</em>
+                    {t('etransfer-description-2')} <em>Class Name</em>, {t('etransfer-description-6')}:{' '}
                     <em>{classKeyName}</em>
                   </li>
                   <li>
-                    {t('etransfer-description-3')}
+                    {t('etransfer-description-3')}:{' '}
                     <strong>{title}</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-4')}
+                    {t('etransfer-description-4')}{' '}
+                    <Link
+                      href="https://www.facebook.com/people/VIET-VIBE/61570910920072/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-600"
+                    >
+                      Facebook
+                    </Link>
+                    /
+                    <Link
+                      href="https://www.instagram.com/vietvibe.foundation/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-600"
+                    >
+                      Instagram
+                    </Link>{' '}
+                    {t('etransfer-description-5')}
                   </li>
                 </ul>
               </div>
