@@ -6,7 +6,7 @@ import ClassQuickCheckout from './ClassQuickCheckout'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-
+import { useTranslation } from 'react-i18next'
 interface PaymentOptionsProps {
   stripePriceId: string
   stripeProductId: string
@@ -32,12 +32,15 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   title,
   userId,
 }) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('event')
+
   const [selected, setSelected] = useState<OptionType>('checkout')
   const [showOptions, setShowOptions] = useState(false)
 
   const options: { id: OptionType; label: string }[] = [
-    { id: 'checkout', label: 'Normal Checkout' },
-    { id: 'quick', label: 'Quick Checkout' },
+    { id: 'checkout', label: 'normal-checkout' },
+    { id: 'quick', label: 'quick-checkout' },
     { id: 'etransfer', label: 'E-transfer' },
   ]
 
@@ -48,7 +51,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         onClick={() => setShowOptions((prev) => !prev)}
         className="mb-4 font-semibold"
       >
-        Reserve Here
+        {t('reserve-here')}
         <ChevronRight
           className={`ml-2 h-5 w-5 transition-transform duration-300 ${showOptions ? 'rotate-90' : 'rotate-0'}`}
         />
@@ -74,7 +77,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                       : 'border-gray-300 bg-white hover:bg-gray-100'
                   }`}
                 >
-                  {option.label}
+                  {t(option.label)}
                 </button>
               ))}
             </div>
@@ -106,24 +109,22 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             {selected === 'etransfer' && (
               <div className="rounded border bg-white p-4 text-sm leading-relaxed dark:bg-gray-800">
                 <p className="mb-2 font-semibold">
-                  To complete your payment via e-transfer:
+                  {t('etransfer-description')}
                 </p>
                 <ul className="ml-5 list-disc space-y-1">
                   <li>
-                    Send your payment to: <strong>payment@vietvibe.org</strong>
+                    {t('etransfer-description-1')} <strong>payment@vietvibe.org</strong>
                   </li>
                   <li>
-                    Use the security question: <em>Class Name</em>, answer:{' '}
+                    {t('etransfer-description-2')} <em>{classKeyName}</em>
                     <em>{classKeyName}</em>
                   </li>
                   <li>
-                    Include your full name and class title{' '}
-                    <strong>{title}</strong> in the message, and payment type
-                    (full course or drop-in)
+                    {t('etransfer-description-3')}
+                    <strong>{title}</strong>
                   </li>
                   <li>
-                    Send us a message on our Facebook/Instagram page for
-                    confirmation.
+                    {t('etransfer-description-4')}
                   </li>
                 </ul>
               </div>
