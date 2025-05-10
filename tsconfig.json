@@ -24,7 +24,7 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts",
-    "app/[locale]/(Home)/_components/navLink.jsx"
+    "app/[locale]/(Home)/_components/navLink.jsx", "lib/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
