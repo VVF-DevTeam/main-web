@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
       | Stripe.Checkout.Session
       | Stripe.Invoice
     let chargedAmount: number = 0
+    let subscriptionId: string | null = null
     let subscriptionEnd: number | null = null
     let stripePriceId: string | null = null
 
@@ -125,7 +126,8 @@ export async function POST(req: NextRequest) {
 
       // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
-        const subscriptionDetails = await getSubscriptionDetails(paymentData.subscription as string)
+        subscriptionId = paymentData.subscription as string
+        const subscriptionDetails = await getSubscriptionDetails(subscriptionId)
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
           stripePriceId = subscriptionDetails.stripePriceId
@@ -140,7 +142,7 @@ export async function POST(req: NextRequest) {
 
     const metadata = paymentData.metadata as Record<string, string>
 
-    // filter out the event 
+    // filter out the event
     if (!metadata?.userId) {
       return NextResponse.json(
         { error: 'Missing userId in metadata' },
@@ -176,8 +178,8 @@ export async function POST(req: NextRequest) {
           },
         })
 
-        if (metadata.subscriptionId) {
-          await updateSubscriptionMetadata(metadata.subscriptionId, metadata)
+        if (subscriptionId) {
+          await updateSubscriptionMetadata(subscriptionId, metadata)
         }
       }
     } catch (error) {
