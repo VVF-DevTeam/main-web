@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
@@ -13,8 +13,18 @@ import { axiosInstance } from '@/lib/axios'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-
+import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
+import { PaymentType } from '@prisma/client'
 interface CheckoutFormProps {
+  price: number
+  classId: string
+  userId: string
+  stripePriceId: string
+  stripeProductId: string
+  type: PaymentType
+}
+
+interface QuickCheckoutFormProps {
   price: number
   classId: string
   userId: string
@@ -32,6 +42,7 @@ function QuickCheckoutForm({
   userId,
   stripePriceId,
   stripeProductId,
+  type,
 }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
@@ -39,6 +50,23 @@ function QuickCheckoutForm({
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+  const [isSubscribed, setIsSubscribed] = useState(false)
+
+  // Check if the user is subscribed to the class and get remaining sessions
+  useEffect(() => {
+    const checkSubAndSessions = async () => {
+      try {
+        const [subResult] = await Promise.all([
+          checkSubscription(userId),
+        ])
+        setIsSubscribed(subResult)
+        // Calculate full course price with 50% discount, and additional 20% if subscribed
+      } catch (error) {
+        console.error('Error checking subscription or sessions:', error)
+      }
+    }
+    checkSubAndSessions()
+  }, [userId, classId, price])  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,11 +76,12 @@ function QuickCheckoutForm({
 
     try {
       const { data } = await axiosInstance.post('/api/payment/intents/create', {
-        amount: Math.round(price * 100),
+        amount: isSubscribed ? price * 0.8 * 100 : price * 100,
         classId,
         userId,
         stripePriceId,
         stripeProductId,
+        type: type,
       })
 
       const result = await stripe.confirmCardPayment(data.clientSecret, {
@@ -105,7 +134,7 @@ function QuickCheckoutForm({
         />
       </div>
       <Button type="submit" disabled={!stripe || loading}>
-        Pay ${price}
+        Pay ${isSubscribed ? price * 0.8 : price}
       </Button>
     </form>
   )
@@ -117,7 +146,7 @@ export default function ClassQuickCheckout({
   userId,
   stripePriceId,
   stripeProductId,
-}: CheckoutFormProps) {
+}: QuickCheckoutFormProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
 
@@ -130,6 +159,7 @@ export default function ClassQuickCheckout({
         userId={userId}
         stripePriceId={stripePriceId}
         stripeProductId={stripeProductId}
+        type="Class"
       />
     </Elements>
   )
