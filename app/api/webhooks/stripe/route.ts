@@ -105,6 +105,8 @@ export async function POST(req: NextRequest) {
       chargedAmount = paymentData.amount
     } else if (event.type === 'invoice.paid') {
       // invoice.paid is triggered when a subscription is created or renewed
+      // for this check, we only catch event when subscription is renewed, then it will have metadata.userId
+      // otherwise, it will be handled in the checkout.session.completed event
       paymentData = event.data.object as Stripe.Invoice
       chargedAmount = paymentData.amount_paid
 
@@ -121,12 +123,13 @@ export async function POST(req: NextRequest) {
       paymentData = event.data.object as Stripe.Checkout.Session
       chargedAmount = paymentData.amount_total ?? 0
 
-      // if the payment is for a subscription, ignore it as it will be handled in the invoice.paid event
+      // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
-        return NextResponse.json(
-          { error: 'Subscription payment received, but handled in invoice.paid event' },
-          { status: 200 }
-        )
+        const subscriptionDetails = await getSubscriptionDetails(paymentData.subscription as string)
+        if (subscriptionDetails) {
+          subscriptionEnd = subscriptionDetails.current_period_end
+          stripePriceId = subscriptionDetails.stripePriceId
+        }
       }
     } else {
       return NextResponse.json(
@@ -137,6 +140,7 @@ export async function POST(req: NextRequest) {
 
     const metadata = paymentData.metadata as Record<string, string>
 
+    // filter out the event 
     if (!metadata?.userId) {
       return NextResponse.json(
         { error: 'Missing userId in metadata' },
