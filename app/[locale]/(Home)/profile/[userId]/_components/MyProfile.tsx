@@ -23,6 +23,7 @@ interface PaymentHistoryItem {
   createdAt: Date
   type: PaymentType
   expiresAt?: Date | null
+  quantity: number
   event: {
     id: string
     title: string
@@ -124,6 +125,7 @@ const MyProfile = async ({
                       <th className="px-4 py-3 text-center">{t('end-date')}</th>
                       <th className="px-4 py-3 text-center">{t('location')}</th>
                       <th className="px-4 py-3 text-center">{t('price')}</th>
+                      <th className="px-4 py-3 text-center">{t('quantity')}</th>
                       <th className="px-4 py-3 text-center">{t('status')}</th>
                     </tr>
                   </thead>
@@ -170,7 +172,7 @@ const MyProfile = async ({
                                 {startDate.toLocaleDateString('en-GB')}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                {endDate.toLocaleDateString()}
+                                {endDate.toLocaleDateString('en-GB')}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {payment.type === 'Membership'
@@ -179,6 +181,9 @@ const MyProfile = async ({
                               </td>
                               <td className="px-4 py-3 text-center">
                                 ${payment.pricePaid.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {payment.quantity}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <span

@@ -60,12 +60,12 @@ const ClassDescription = async ({
 
   // Check if user has already paid for this class
   const existingPayment = author
-    ? await prisma.payment.findUnique({
+    ? await prisma.payment.findMany({
         where: {
-          userId_eventId: {
-            userId: author,
-            eventId: classId,
-          },
+          AND: [
+            { userId: author },
+            { eventId: classId }
+          ]
         },
       })
     : null
@@ -147,12 +147,7 @@ const ClassDescription = async ({
 
       {/* Payment Options */}
       {author ? (
-        existingPayment ? (
-          <p className="font-medium text-green-600">
-            You have already paid for this class. Thank you and see you in the
-            class!
-          </p>
-        ) : (
+        <>
           <PaymentOptions
             stripePriceId={stripePriceId}
             stripeProductId={stripeProductId}
@@ -164,9 +159,15 @@ const ClassDescription = async ({
             title={title}
             userId={author}
           />
-        )
+
+          {existingPayment && (
+            <p className="font-medium text-green-600">
+              {t('alreadyPaid')}
+            </p>
+          )}
+        </>
       ) : (
-        <p className="italic">Please log in to make payment.</p>
+        <p className="italic">{t('loginToMakePayment')}.</p>
       )}
     </div>
   )

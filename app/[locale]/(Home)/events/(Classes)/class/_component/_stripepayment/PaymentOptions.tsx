@@ -93,6 +93,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   classKeyName={classKeyName}
                   userId={userId}
                   classId={classId}
+                  price={price}
                 />
               </div>
             )}
@@ -118,12 +119,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     <strong>payment@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>Class Name</em>, {t('etransfer-description-6')}:{' '}
-                    <em>{classKeyName}</em>
+                    {t('etransfer-description-2')} <em>Class Name</em>,{' '}
+                    {t('etransfer-description-6')}: <em>{classKeyName}</em>
                   </li>
                   <li>
-                    {t('etransfer-description-3')}:{' '}
-                    <strong>{title}</strong>
+                    {t('etransfer-description-3')}: <strong>{title}</strong>
                   </li>
                   <li>
                     {t('etransfer-description-4')}{' '}
