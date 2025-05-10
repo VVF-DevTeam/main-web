@@ -100,17 +100,23 @@ export async function POST(req: NextRequest) {
     let subscriptionId: string | null = null
     let subscriptionEnd: number | null = null
     let stripePriceId: string | null = null
+    let metadata: Record<string, string> | null = null
 
     if (event.type === 'payment_intent.succeeded') {
       paymentData = event.data.object as Stripe.PaymentIntent
       chargedAmount = paymentData.amount
+      metadata = paymentData.metadata as Record<string, string>
+
     } else if (event.type === 'invoice.paid') {
       // invoice.paid is triggered when a subscription is created or renewed
       // for this check, we only catch event when subscription is renewed, then it will have metadata.userId
       // otherwise, it will be handled in the checkout.session.completed event
       paymentData = event.data.object as Stripe.Invoice
       chargedAmount = paymentData.amount_paid
+      // metadata = paymentData.lines.data[0].metadata as Record<string, string>
+      metadata = paymentData.subscription_details.metadata as Record<string, string>;
 
+      // get subscription details
       if (paymentData.lines.data[0].subscription) {
         const subscriptionDetails = await getSubscriptionDetails(
           paymentData.lines.data[0].subscription as string
@@ -123,6 +129,7 @@ export async function POST(req: NextRequest) {
     } else if (event.type === 'checkout.session.completed') {
       paymentData = event.data.object as Stripe.Checkout.Session
       chargedAmount = paymentData.amount_total ?? 0
+      metadata = paymentData.metadata as Record<string, string>
 
       // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
@@ -135,17 +142,15 @@ export async function POST(req: NextRequest) {
       }
     } else {
       return NextResponse.json(
-        { error: 'Unsupported event type' },
+        { error: { message: 'Unsupported event type' } },
         { status: 400 }
       )
     }
 
-    const metadata = paymentData.metadata as Record<string, string>
-
     // filter out the event
     if (!metadata?.userId) {
       return NextResponse.json(
-        { error: 'Missing userId in metadata' },
+        { error: { message: 'Missing userId in metadata', data: paymentData } },
         { status: 400 }
       )
     }
