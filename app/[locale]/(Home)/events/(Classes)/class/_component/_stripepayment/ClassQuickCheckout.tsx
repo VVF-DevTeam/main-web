@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axios'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter, usePathname } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 interface CheckoutFormProps {
   price: number
@@ -117,12 +118,12 @@ export default function ClassQuickCheckout({
   stripePriceId,
   stripeProductId,
 }: CheckoutFormProps) {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('event')
+
   return (
     <Elements stripe={stripePromise}>
-      <p className="pb-2">
-        Debit and Credit Card only. For other payment methods or paying for full
-        course, please use normal checkout if this doesn&apos;t work.
-      </p>
+      <p className="pb-2">{t('quick-checkout-description')}</p>
       <QuickCheckoutForm
         price={price}
         classId={classId}
