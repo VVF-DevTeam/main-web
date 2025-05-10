@@ -58,7 +58,7 @@ const MyProfile = async ({
 
         <div className="grid grid-cols-1 gap-8 pb-8 md:pb-5 lg:grid-cols-4">
           {/* Profile Section */}
-          <div className="bg-bgColor-white relative col-span-1 flex flex-col rounded-lg p-6 shadow-lg">
+          <div className="bg-bgColor-white relative col-span-1 flex flex-col rounded-lg p-6 shadow-lg justify-center items-center lg:justify-normal lg:items-stretch">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
@@ -87,17 +87,17 @@ const MyProfile = async ({
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <FiMail className="flex-shrink-0 text-xl text-textColor-gray" />
-                <span className="w-0 flex-1 break-words">{user.email}</span>
+                <span className="lg:w-0 flex-1 break-words">{user.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <FiPhone className="flex-shrink-0 text-xl text-textColor-gray" />
-                <span className="w-0 flex-1 break-words">
+                <span className="lg:w-0 flex-1 break-words">
                   {user.phone || 'N/A'}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <FiMapPin className="flex-shrink-0 text-xl text-textColor-gray" />
-                <span className="w-0 flex-1 break-words">
+                <span className="lg:w-0 flex-1 break-words">
                   {user.address || 'N/A'}
                 </span>
               </div>
@@ -105,7 +105,7 @@ const MyProfile = async ({
           </div>
 
           {/* Order History Section */}
-          <div className="bg-bgColor-white relative col-span-3 flex h-full flex-col rounded-lg p-6 shadow-lg">
+          <div className="bg-bgColor-white relative col-span-1 flex h-full flex-col rounded-lg p-6 shadow-lg lg:col-span-3">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
@@ -167,7 +167,7 @@ const MyProfile = async ({
                                 )}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                {startDate.toLocaleDateString()}
+                                {startDate.toLocaleDateString('en-GB')}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {endDate.toLocaleDateString()}

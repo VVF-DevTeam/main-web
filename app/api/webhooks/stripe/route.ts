@@ -25,20 +25,36 @@ async function getRawBody(
 async function getSubscriptionDetails(subscriptionId: string) {
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-    // get subscription start and end date
-    const { current_period_start, current_period_end } = subscription.items.data[0]
+    const { current_period_start, current_period_end } =
+      subscription.items.data[0]
 
-    // get subscription price id
     const { id } = subscription.items.data[0].price
+
     return { current_period_start, current_period_end, stripePriceId: id }
-  } catch (error) { 
+  } catch (error) {
     console.error('[SUBSCRIPTION_RETRIEVE_ERROR]', error)
+    return null
+  }
+}
+
+async function updateSubscriptionMetadata(
+  subscriptionId: string,
+  metadata: Record<string, string>
+) {
+  try {
+    const subscription = await stripe.subscriptions.update(subscriptionId, {
+      metadata,
+    })
+    return subscription
+  } catch (error) {
+    console.error('[SUBSCRIPTION_METADATA_UPDATE_ERROR]', error)
     return null
   }
 }
 
 export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature')
+
   if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
   }
@@ -69,32 +85,57 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
-  // handle successful payment
-  const successType = ['checkout.session.completed', 'payment_intent.succeeded']
+  const successType: Stripe.Event['type'][] = [
+    'checkout.session.completed',
+    'payment_intent.succeeded',
+    'invoice.paid',
+  ]
 
   if (successType.includes(event.type)) {
-    let paymentData: Stripe.PaymentIntent | Stripe.Checkout.Session
-    let chargedAmount: number
-    let subscriptionEnd = null
-    let stripePriceId = null
+    let paymentData:
+      | Stripe.PaymentIntent
+      | Stripe.Checkout.Session
+      | Stripe.Invoice
+    let chargedAmount: number = 0
+    let subscriptionEnd: number | null = null
+    let stripePriceId: string | null = null
 
     if (event.type === 'payment_intent.succeeded') {
       paymentData = event.data.object as Stripe.PaymentIntent
       chargedAmount = paymentData.amount
-    } else {
-      paymentData = event.data.object as Stripe.Checkout.Session
-      chargedAmount = paymentData.amount_total!
+    } else if (event.type === 'invoice.paid') {
+      // invoice.paid is triggered when a subscription is created or renewed
+      paymentData = event.data.object as Stripe.Invoice
+      chargedAmount = paymentData.amount_paid
 
-      if (paymentData.subscription) {
-        const subscriptionDetails = await getSubscriptionDetails(paymentData.subscription as string)
+      if (paymentData.lines.data[0].subscription) {
+        const subscriptionDetails = await getSubscriptionDetails(
+          paymentData.lines.data[0].subscription as string
+        )
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
           stripePriceId = subscriptionDetails.stripePriceId
         }
       }
+    } else if (event.type === 'checkout.session.completed') {
+      paymentData = event.data.object as Stripe.Checkout.Session
+      chargedAmount = paymentData.amount_total ?? 0
+
+      // if the payment is for a subscription, ignore it as it will be handled in the invoice.paid event
+      if (paymentData.subscription) {
+        return NextResponse.json(
+          { error: 'Subscription payment received, but handled in invoice.paid event' },
+          { status: 200 }
+        )
+      }
+    } else {
+      return NextResponse.json(
+        { error: 'Unsupported event type' },
+        { status: 400 }
+      )
     }
 
-    const metadata = paymentData.metadata
+    const metadata = paymentData.metadata as Record<string, string>
 
     if (!metadata?.userId) {
       return NextResponse.json(
@@ -104,9 +145,10 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const expiresAt = metadata.type === 'Membership' && subscriptionEnd 
-        ? new Date(subscriptionEnd * 1000)  // Convert Unix timestamp to milliseconds
-        : null
+      const expiresAt =
+        metadata.type === 'Membership' && subscriptionEnd
+          ? new Date(subscriptionEnd * 1000)
+          : null
 
       await prisma.payment.create({
         data: {
@@ -114,7 +156,7 @@ export async function POST(req: NextRequest) {
           eventId: metadata.eventId,
           stripeProductId: metadata.stripeProductId,
           stripePriceId: stripePriceId || metadata.stripePriceId,
-          pricePaid: (chargedAmount ?? 0) / 100,
+          pricePaid: chargedAmount / 100,
           type: metadata.type as PaymentType,
           expiresAt: expiresAt,
         },
@@ -129,17 +171,21 @@ export async function POST(req: NextRequest) {
             subscribeExpires: expiresAt,
           },
         })
+
+        if (metadata.subscriptionId) {
+          await updateSubscriptionMetadata(metadata.subscriptionId, metadata)
+        }
       }
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('[PRISMA_CREATE_PAYMENT_ERROR]', error)
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to save payment record to database using prisma'
+          : 'Failed to save payment record to database'
       return NextResponse.json({ error: message }, { status: 500 })
     }
   } else {
-    console.log('Not supported event type', event)
+    console.log('Not supported event type', event.type)
   }
 
   return NextResponse.json({ received: true }, { status: 200 })

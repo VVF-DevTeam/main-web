@@ -23,11 +23,15 @@ export async function POST(req: Request) {
         {
           price: stripePriceId,
           quantity: 1,
-          adjustable_quantity: {
-            enabled: true,
-            minimum: 1,
-            maximum: 10,
-          },
+          ...(type === 'Membership'
+            ? {}
+            : {
+                adjustable_quantity: {
+                  enabled: true,
+                  minimum: 1,
+                  maximum: 10,
+                },
+              }),
         },
       ],
       mode: type === 'Membership' ? 'subscription' : 'payment',

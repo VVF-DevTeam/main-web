@@ -19,6 +19,7 @@ export default function Sidebar({
 
   const sections = {
     'my-profile': t('my-profile'),
+    'subscription': t('subscription'),
     'update-profile': t('update-profile'),
     'change-password': t('change-password'),
     'delete-account': t('delete-account'),

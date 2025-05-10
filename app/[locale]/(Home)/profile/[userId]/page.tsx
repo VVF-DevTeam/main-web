@@ -8,6 +8,7 @@ import MyProfile from './_components/MyProfile'
 import UpdateProfileForm from './_components/UpdateProfileForm'
 import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
+import SubscriptionInfo from './_components/SubscriptionInfo'
 
 // Main Component
 export default async function ProfilePage({
@@ -32,7 +33,7 @@ export default async function ProfilePage({
   if (!user) {
     return <p className="mt-10 text-center">No user data available.</p>
   }
-  console.log(user.id)
+
   // get payment history
   const paymentHistory = await prisma.payment.findMany({
     where: {
@@ -69,6 +70,8 @@ export default async function ProfilePage({
       return <PasswordForm user={user} />
     case 'delete-account':
       return <DeleteForm user={user} />
+    case 'subscription':
+      return <SubscriptionInfo paymentHistory={paymentHistory} />
     default:
       return (
         <MyProfile
