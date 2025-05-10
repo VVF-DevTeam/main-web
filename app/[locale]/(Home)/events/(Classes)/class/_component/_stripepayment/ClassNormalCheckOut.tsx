@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
+import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
+import { useState, useEffect } from 'react'
+import { getRemainSessions } from '@/lib/actions/event/getRemainSessions'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+
+type PaymentType = 'drop-in' | 'full-course'
 
 interface ClassNormalCheckOutProps {
   stripePriceId?: string
@@ -14,6 +21,7 @@ interface ClassNormalCheckOutProps {
   userId: string
   classId: string
   stripeSubscribedPriceId?: string
+  price: number
 }
 
 export default function ClassNormalCheckOut({
@@ -24,9 +32,36 @@ export default function ClassNormalCheckOut({
   userId,
   classId,
   stripeSubscribedPriceId,
+  price,
 }: ClassNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [paymentType, setPaymentType] = useState<PaymentType>('drop-in')
+  const [remainSessions, setRemainSessions] = useState(0)
+  const [fullCoursePrice, setFullCoursePrice] = useState(0)
+
+  // Check if the user is subscribed to the class and get remaining sessions
+  useEffect(() => {
+    const checkSubAndSessions = async () => {
+      try {
+        const [subResult, sessions] = await Promise.all([
+          checkSubscription(userId),
+          getRemainSessions(classId),
+        ])
+        setRemainSessions(sessions)
+        setIsSubscribed(subResult)
+        setFullCoursePrice(price * 0.5 * sessions)
+        // Calculate full course price with 50% discount, and additional 20% if subscribed
+      } catch (error) {
+        console.error('Error checking subscription or sessions:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    checkSubAndSessions()
+  }, [userId, classId, price])
 
   return (
     // Edit classname if needed
@@ -39,16 +74,75 @@ export default function ClassNormalCheckOut({
           </Button>
         </Link>
       ) : (
-        <NormalCheckoutButton
-          stripePriceId={stripePriceId!}
-          stripeProductId={stripeProductId!} // stripeProductId will exist if stripePriceId exists
-          stripeSubscribedPriceId={stripeSubscribedPriceId!}
-          eventKeyName={classKeyName}
-          userId={userId}
-          eventId={classId}
-          buttonText='reserve-button'
-          type='Class'
-        />
+        <div className="flex flex-col gap-4">
+          {isLoading ? (
+            <Button disabled>Loading...</Button>
+          ) : (
+            <>
+              {!isSubscribed && (
+                <p className="text-sm text-gray-500">
+                  {t('payment-membershipIntro')}{' '}
+                  <Link
+                    href="/registration/membership"
+                    className="text-blue-500 hover:underline"
+                  >
+                    membership
+                  </Link>
+                  !
+                </p>
+              )}
+              <RadioGroup
+                value={paymentType}
+                onValueChange={(value) => setPaymentType(value as PaymentType)}
+                className="flex flex-col gap-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="drop-in" id="drop-in" />
+                  <Label htmlFor="drop-in">
+                    Drop-in {isSubscribed ? `(${price * 0.8})` : `(${price})`}{' '}
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="full-course" id="full-course" />
+                  <Label htmlFor="full-course">
+                    Full course - {remainSessions} {t('sessions')} (50% off){' '}
+                    {isSubscribed
+                      ? `(${fullCoursePrice * 0.8})`
+                      : `(${fullCoursePrice})`}
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              {paymentType === 'drop-in' ? (
+                <NormalCheckoutButton
+                  stripePriceId={
+                    isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
+                  }
+                  stripeProductId={stripeProductId!}
+                  eventKeyName={classKeyName}
+                  userId={userId}
+                  eventId={classId}
+                  buttonText="reserve-button"
+                  type="Class"
+                />
+              ) : (
+                <NormalCheckoutButton
+                  stripePriceId={
+                    isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
+                  }
+                  stripeProductId={stripeProductId!}
+                  eventKeyName={classKeyName}
+                  userId={userId}
+                  eventId={classId}
+                  buttonText="reserve-button"
+                  type="Class"
+                  price={isSubscribed ? fullCoursePrice * 0.8 : fullCoursePrice}
+                  numberSession={remainSessions}
+                />
+              )}
+            </>
+          )}
+        </div>
       )}
     </>
   )

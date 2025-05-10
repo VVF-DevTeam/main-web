@@ -45,6 +45,7 @@ export default async function ProfilePage({
       createdAt: true,
       expiresAt: true,
       type: true,
+      quantity: true,
       event: {
         select: {
           id: true,

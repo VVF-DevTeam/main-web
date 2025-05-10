@@ -52,6 +52,16 @@ async function updateSubscriptionMetadata(
   }
 }
 
+async function getCheckoutSessionQuantity(sessionId: string) {
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ['line_items'],
+  });
+
+  if (!session.line_items) return null;
+
+  return session.line_items.data.map((item) => item.quantity)[0] ?? null;
+}
+
 export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature')
 
@@ -101,12 +111,13 @@ export async function POST(req: NextRequest) {
     let subscriptionEnd: number | null = null
     let stripePriceId: string | null = null
     let metadata: Record<string, string> | null = null
+    let quantity: number | null = null
 
     if (event.type === 'payment_intent.succeeded') {
       paymentData = event.data.object as Stripe.PaymentIntent
       chargedAmount = paymentData.amount
       metadata = paymentData.metadata as Record<string, string>
-
+      quantity = 1;
     } else if (event.type === 'invoice.paid') {
       // invoice.paid is triggered when a subscription is created or renewed
       // for this check, we only catch event when subscription is renewed, then it will have metadata.userId
@@ -117,6 +128,7 @@ export async function POST(req: NextRequest) {
       // get metadata from the parent subscription (invoice created by checkout.session.completed will not have parent's metadata)
       // metadata = paymentData.lines.data[0].metadata as Record<string, string>
       metadata = paymentData.parent!.subscription_details!.metadata as Record<string, string>;
+      quantity = paymentData.lines.data.map((item) => item.quantity)[0] ?? 1;
 
       // get subscription details
       if (paymentData.lines.data[0].subscription) {
@@ -132,6 +144,7 @@ export async function POST(req: NextRequest) {
       paymentData = event.data.object as Stripe.Checkout.Session
       chargedAmount = paymentData.amount_total ?? 0
       metadata = paymentData.metadata as Record<string, string>
+      quantity = await getCheckoutSessionQuantity(paymentData.id) ?? 1;
 
       // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
@@ -172,6 +185,7 @@ export async function POST(req: NextRequest) {
           pricePaid: chargedAmount / 100,
           type: metadata.type as PaymentType,
           expiresAt: expiresAt,
+          quantity: quantity,
         },
       })
 

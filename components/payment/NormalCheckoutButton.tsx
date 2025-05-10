@@ -8,8 +8,6 @@ import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { ArrowRight } from 'lucide-react'
 import { PaymentType } from '@prisma/client'
-import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
-import { useState, useEffect } from 'react'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -18,42 +16,28 @@ const stripePromise = loadStripe(
 interface NormalCheckoutButtonProps {
   stripePriceId: string
   stripeProductId: string
-  stripeSubscribedPriceId?: string
   eventKeyName?: string
   userId: string
   eventId?: string
   buttonText: string
   type: PaymentType
+  price?: number
+  numberSession?: number
 }
 
 export default function NormalCheckoutButton({
   stripePriceId,
   stripeProductId,
-  stripeSubscribedPriceId,
   eventKeyName,
   userId,
   eventId,
   buttonText,
   type,
+  price,
+  numberSession,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
-  const [isSubscribed, setIsSubscribed] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const checkSub = async () => {
-      try {
-        const result = await checkSubscription(userId)
-        setIsSubscribed(result)
-      } catch (error) {
-        console.error('Error checking subscription:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    checkSub()
-  }, [userId])
 
   const handleCheckout = async (priceId: string) => {
     const stripe = await stripePromise
@@ -68,6 +52,8 @@ export default function NormalCheckoutButton({
           userId: userId,
           eventId: eventId,
           type: type,
+          price: price,
+          numberSession: numberSession,
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
@@ -92,27 +78,9 @@ export default function NormalCheckoutButton({
   }
 
   return (
-    <>
-      {isLoading ? (
-        <Button disabled>Loading...</Button>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {isSubscribed ? (
-            <Button
-              onClick={() => handleCheckout(stripeSubscribedPriceId!)}
-              disabled={!isSubscribed}
-            >
-              {t(buttonText)}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={() => handleCheckout(stripePriceId)}>
-              {t(buttonText)}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      )}
-    </>
+    <Button onClick={() => handleCheckout(stripePriceId)}>
+      {t(buttonText)}
+      <ArrowRight className="h-4 w-4" />
+    </Button>
   )
 }

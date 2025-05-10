@@ -229,7 +229,7 @@ model Payment {
   updatedAt DateTime @updatedAt
   type PaymentType
   expiresAt   DateTime? // for subscription payment
-
+  quantity Int
   // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -241,8 +241,6 @@ model Payment {
   stripeProductId String   // Immutable snapshot of what was sold
   stripePriceId   String   // Immutable snapshot of price paid
   pricePaid       Decimal  // Actual amount charged, always saved
-
-  @@unique([userId, eventId]) // Only if one payment per user per event is guaranteed
 }
 
 model PostLikes {

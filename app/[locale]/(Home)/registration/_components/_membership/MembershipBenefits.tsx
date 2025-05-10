@@ -32,9 +32,7 @@ export const MembershipBenefits = async ({
       priceId: 'price_1RMdOq06wc04MarVTraVJ0GL',
       features: [
         t('premium-feature-1'),
-        t('premium-feature-2'),
-        t('premium-feature-3'),
-        t('premium-feature-4'),
+        t('premium-feature-2')
       ],
     },
     // {
@@ -59,7 +57,7 @@ export const MembershipBenefits = async ({
           <h3 className="mb-2 text-2xl font-semibold text-primary">
             {tier.title}
           </h3>
-          <p className="mb-4 text-3xl font-bold">{tier.price}</p>
+          <p className="mb-4 text-3xl font-bold">{tier.price} CAD</p>
           <ul className="space-y-3">
             {tier.features.map((feature, featureIndex) => (
               <li key={featureIndex} className="flex items-center">

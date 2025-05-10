@@ -44,7 +44,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
   }
 
   return (
-    <div ref={dropdownRef} className="relative w-full -mr-1">
+    <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
           'flex items-center justify-center gap-x-[5px] font-semibold transition-all',
@@ -77,6 +77,17 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         )}
       >
         <Link
+          href="/registration/membership"
+          className={classNames(
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
+          )}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {t('job-navMembership')}
+        </Link>
+        <div className="border-b border-gray-200" />
+        <Link
           href="/registration/jobs"
           className={classNames(
             'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
@@ -87,16 +98,6 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
           {t('job-navRegistration')}
         </Link>
 
-        <Link
-          href="/registration/membership"
-          className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
-            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
-          )}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {t('job-navMembership')}
-        </Link>
         {/* <div className="border-b border-gray-200" />
         <Link
           href="/about/directors"
