@@ -8,6 +8,7 @@ import MyProfile from './_components/MyProfile'
 import UpdateProfileForm from './_components/UpdateProfileForm'
 import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
+import SubscriptionInfo from './_components/SubscriptionInfo'
 
 // Main Component
 export default async function ProfilePage({
@@ -69,6 +70,8 @@ export default async function ProfilePage({
       return <PasswordForm user={user} />
     case 'delete-account':
       return <DeleteForm user={user} />
+    case 'subscription':
+      return <SubscriptionInfo user={user} paymentHistory={paymentHistory} />
     default:
       return (
         <MyProfile
