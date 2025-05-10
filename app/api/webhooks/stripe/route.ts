@@ -113,8 +113,10 @@ export async function POST(req: NextRequest) {
       // otherwise, it will be handled in the checkout.session.completed event
       paymentData = event.data.object as Stripe.Invoice
       chargedAmount = paymentData.amount_paid
+
+      // get metadata from the parent subscription (invoice created by checkout.session.completed will not have parent's metadata)
       // metadata = paymentData.lines.data[0].metadata as Record<string, string>
-      metadata = paymentData.subscription_details.metadata as Record<string, string>;
+      metadata = paymentData.parent!.subscription_details!.metadata as Record<string, string>;
 
       // get subscription details
       if (paymentData.lines.data[0].subscription) {
