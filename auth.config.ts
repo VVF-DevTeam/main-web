@@ -249,6 +249,11 @@ export default {
             }
           }
         } else {
+          // temporarily bypass auth for subscriptions
+          if (path.includes('subscriptions')) {
+            return NextResponse.next()
+          }
+
           const secretHeader = request.headers.get('secret')
           const response = NextResponse.next()
           if (secretHeader && validateSecretToken(secretHeader)) {

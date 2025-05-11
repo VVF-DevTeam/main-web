@@ -5,12 +5,12 @@ import { format } from 'date-fns'
 import { Decimal } from '@prisma/client/runtime/library'
 import { PaymentType } from '@prisma/client'
 import CancelSubscriptionButton from './CancelSubscriptionButton'
-import { useRouter } from 'next/navigation'
 
 interface User {
   subscribedAt: Date | null
   subscribeExpires: Date | null
   stripeSubscriptionId: string | null
+  id: string
 }
 
 interface PaymentHistoryItem {
@@ -37,13 +37,13 @@ export default function SubscriptionInfo({
   paymentHistory: PaymentHistoryItem[]
   user: User
 }) {
-  const router = useRouter()
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
 
   const getSubscriptionType = (createdAt: Date, expiresAt: Date) => {
-    const months = (expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30)
-    return months <= 1 ? 'Monthly' : 'Annual'
+    const months =
+      (expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30)
+    return months >= 12 ? 'Annual' : 'Monthly'
   }
 
   const activeSubscription = paymentHistory.find(
@@ -74,24 +74,28 @@ export default function SubscriptionInfo({
               <div className="flex items-center justify-between border-b pb-4">
                 <span className="text-textColor-gray">{t('expires-at')}</span>
                 <span className="font-medium">
-                  {format(new Date(activeSubscription.expiresAt as Date), 'PPP')}
+                  {format(
+                    new Date(activeSubscription.expiresAt as Date),
+                    'PPP'
+                  )}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b pb-4">
                 <span className="text-textColor-gray">{t('plan-type')}</span>
                 <span className="font-medium">
-                  {activeSubscription && getSubscriptionType(
-                    new Date(activeSubscription.createdAt),
-                    new Date(activeSubscription.expiresAt as Date)
-                  )}
+                  {activeSubscription &&
+                    getSubscriptionType(
+                      new Date(activeSubscription.createdAt),
+                      new Date(activeSubscription.expiresAt as Date)
+                    )}
                 </span>
               </div>
-              <CancelSubscriptionButton 
-                subscriptionId={user.stripeSubscriptionId} 
-                onSuccess={() => {
-                  router.refresh()
-                }}
+              <CancelSubscriptionButton
+                subscriptionId={user.stripeSubscriptionId}
               />
+              <p className="text-textColor-gray italic text-sm">
+                *{t('cancel-subscription-description')}
+              </p>
             </>
           )}
         </div>

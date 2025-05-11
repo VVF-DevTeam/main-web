@@ -163,7 +163,7 @@ const ClassDescription = async ({
             fullCourseDiscount={fullCourseDiscount}
           />
 
-          {existingPayment && (
+          {existingPayment && existingPayment.length > 0 && (
             <p className="font-medium text-green-600">
               {t('alreadyPaid')}
             </p>

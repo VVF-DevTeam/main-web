@@ -26,5 +26,6 @@ export async function getCurrentUserInfo() {
     subscribedAt: user.subscribedAt ?? null,
     subscribeExpires: user.subscribeExpires ?? null,
     stripeSubscriptionId: user.stripeSubscriptionId ?? null,
+    role: user.role ?? [],
   }
 }
