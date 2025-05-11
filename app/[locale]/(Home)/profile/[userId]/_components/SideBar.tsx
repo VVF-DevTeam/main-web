@@ -5,13 +5,15 @@ import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import MobileSidebar from './MobileSidebar' // Import the new component
 
-export default function Sidebar({
-  locale,
-  userId,
-}: {
+interface SidebarProps {
   locale: string
   userId: string
-}) {
+  user: {
+    role: string[]
+  }
+}
+
+export default function Sidebar({ locale, userId, user }: SidebarProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
   const searchParams = useSearchParams()
@@ -23,6 +25,7 @@ export default function Sidebar({
     'update-profile': t('update-profile'),
     'change-password': t('change-password'),
     'delete-account': t('delete-account'),
+    'payment-management': t('payment-management'),
   }
 
   return (
@@ -36,16 +39,29 @@ export default function Sidebar({
         <ul className="space-y-4">
           {Object.entries(sections).map(([key, label]) => (
             <li key={key}>
-              <Link
-                href={`/${locale}/profile/${userId}?section=${key}`}
-                className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
-                  currentSection === key
-                    ? 'text-textColor-black bg-white font-medium shadow-sm'
-                    : 'text-textColor-black hover:bg-bgColor-white'
-                }`}
-              >
-                {label}
-              </Link>
+              {key === 'payment-management' && user.role.includes('HOST') ? (
+                <Link
+                  href={`/${locale}/profile/${userId}?section=${key}`}
+                  className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
+                    currentSection === key
+                      ? 'text-textColor-black bg-white font-medium shadow-sm'
+                      : 'text-textColor-black hover:bg-bgColor-white'
+                  }`}
+                >
+                  {label}
+                </Link>
+              ) : key !== 'payment-management' ? (
+                <Link
+                  href={`/${locale}/profile/${userId}?section=${key}`}
+                  className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
+                    currentSection === key
+                      ? 'text-textColor-black bg-white font-medium shadow-sm'
+                      : 'text-textColor-black hover:bg-bgColor-white'
+                  }`}
+                >
+                  {label}
+                </Link>
+              ) : null}
             </li>
           ))}
         </ul>

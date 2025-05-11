@@ -20,7 +20,7 @@ export default async function Layout({
     <div>
       <div className="bg-bgColor-white flex min-h-screen flex-col md:flex-row">
         {/* Sidebar (Passes locale & userId for navigation) */}
-        <Sidebar locale={locale} userId={userId} />
+        <Sidebar locale={locale} userId={userId} user={user} />
 
         {/* Page Content */}
         <div className="flex-1 p-4 md:p-10">{children}</div>

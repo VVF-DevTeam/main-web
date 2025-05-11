@@ -9,6 +9,7 @@ import UpdateProfileForm from './_components/UpdateProfileForm'
 import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
+import PaymentManagement from './_components/PaymentManagement'
 
 // Main Component
 export default async function ProfilePage({
@@ -73,6 +74,12 @@ export default async function ProfilePage({
       return <DeleteForm user={user} />
     case 'subscription':
       return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
+    case 'payment-management':
+      // Only show payment management for hosts
+      if (user.role && user.role.includes('HOST')) {
+        return <PaymentManagement user={user} />
+      }
+      return <p className="mt-10 text-center">You do not have permission to view this page.</p>
     default:
       return (
         <MyProfile
