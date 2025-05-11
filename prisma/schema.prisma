@@ -34,6 +34,7 @@ model Event {
   stripeProductId String?
   stripePriceId String?
   subscribedPriceId String?
+
   // Metadata
   location    String?
   price       Decimal?      @default(0)
@@ -44,6 +45,7 @@ model Event {
   ticketsSold Int?
   startTime   String?
   endTime     String?
+  fullCourseDiscount Int?
 
   // States
   isPublished Boolean  @default(false)
@@ -228,8 +230,10 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type PaymentType
+
   expiresAt   DateTime? // for subscription payment
   quantity Int
+
   // Relations
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -334,6 +338,7 @@ enum TicketType {
 
 enum PaymentType {
   Membership
-  Class
+  ClassFullCourse
+  ClassDropIn
   Concert
 }

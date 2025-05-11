@@ -30,6 +30,7 @@ interface ClassDescriptionProps {
   price: number
   title: string
   stripeSubscribedPriceId: string
+  fullCourseDiscount?: number
 }
 
 // Main Code
@@ -51,6 +52,7 @@ const ClassDescription = async ({
   keyName,
   classId,
   price,
+  fullCourseDiscount,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -158,6 +160,7 @@ const ClassDescription = async ({
             classId={classId}
             title={title}
             userId={author}
+            fullCourseDiscount={fullCourseDiscount}
           />
 
           {existingPayment && (

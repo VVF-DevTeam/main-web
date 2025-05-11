@@ -19,6 +19,7 @@ import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
+import EventFullDiscount from './_components/EventFullDiscount'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
@@ -71,14 +72,13 @@ const EditEventPage = async ({
     !!event.title,
     !!event.eventType,
     !!event.description,
-    !!event.capacity,
-    !!event.imgUrl,
-    !!event.location,
-    !!event.endTime,
     !!event.price,
+    !!event.capacity,
+    !!event.location,
+    !!event.imgUrl,
+    !!event.startTime && !!event.endTime,
     !!event.startDate,
     !!event.endDate,
-    !!event.startTime,
     // !!event.formLink,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
@@ -105,6 +105,9 @@ const EditEventPage = async ({
             </h1>
             <span className="text-sm text-muted-foreground">
               Fill all the fields to publish your event.
+            </span>
+            <span className="mt-1 text-sm text-muted-foreground">
+              Please complete the first 14 steps, the rest are optional.
             </span>
             <span className="mt-1 text-sm text-muted-foreground">
               Steps completed: {completionText}
@@ -235,6 +238,14 @@ const EditEventPage = async ({
               <span className="text-gray-500">Step XIV :</span> Event Categories
             </h2>
             <EventCategories event={event} categories={categories} />
+          </div>
+
+          {/* Event Full Discount */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XV :</span> Full Course Discount (Class Only)
+            </h2>
+            <EventFullDiscount event={event} />
           </div>
 
           {/* Event Registration Form Link */}
