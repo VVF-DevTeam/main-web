@@ -4,6 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { Decimal } from '@prisma/client/runtime/library'
 import { PaymentType } from '@prisma/client'
+import CancelSubscriptionButton from './CancelSubscriptionButton'
+import { useRouter } from 'next/navigation'
+
+interface User {
+  subscribedAt: Date | null
+  subscribeExpires: Date | null
+  stripeSubscriptionId: string | null
+}
 
 interface PaymentHistoryItem {
   id: string
@@ -24,9 +32,12 @@ interface PaymentHistoryItem {
 
 export default function SubscriptionInfo({
   paymentHistory,
+  user,
 }: {
   paymentHistory: PaymentHistoryItem[]
+  user: User
 }) {
+  const router = useRouter()
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
 
@@ -75,6 +86,12 @@ export default function SubscriptionInfo({
                   )}
                 </span>
               </div>
+              <CancelSubscriptionButton 
+                subscriptionId={user.stripeSubscriptionId} 
+                onSuccess={() => {
+                  router.refresh()
+                }}
+              />
             </>
           )}
         </div>

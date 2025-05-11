@@ -100,7 +100,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         classId={publishedClass.id}
         price={publishedClass.price?.toNumber()!}
         title={publishedClass.title}
-        fullCourseDiscount={publishedClass.fullCourseDiscount || 100}
+        fullCourseDiscount={publishedClass.fullCourseDiscount || 0}
       />
     </div>
   )

@@ -43,7 +43,7 @@ export default function ClassNormalCheckOut({
   const [paymentType, setPaymentType] = useState<PaymentType>('drop-in')
   const [remainSessions, setRemainSessions] = useState(0)
   const [fullCoursePrice, setFullCoursePrice] = useState(0)
-  const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 100
+  const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 1
 
   // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
@@ -53,7 +53,6 @@ export default function ClassNormalCheckOut({
           checkSubscription(userId),
           getRemainSessions(classId),
         ])
-        console.log('sessions', sessions)
         setRemainSessions(sessions)
         setIsSubscribed(subResult)
         setFullCoursePrice(price * discount * sessions)

@@ -23,5 +23,8 @@ export async function getCurrentUserInfo() {
     age: user.age ?? '',
     image: user.image ?? undefined,
     password: user.password ?? '',
+    subscribedAt: user.subscribedAt ?? null,
+    subscribeExpires: user.subscribeExpires ?? null,
+    stripeSubscriptionId: user.stripeSubscriptionId ?? null,
   }
 }

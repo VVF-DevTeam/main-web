@@ -35,6 +35,13 @@ interface PaymentHistoryItem {
   } | null
 }
 
+const paymentTypeMap = {
+  Membership: 'Membership',
+  ClassDropIn: 'Class Drop-in',
+  ClassFullCourse: 'Class Full Course',
+  Concert: 'Concert',
+}
+
 const MyProfile = async ({
   user,
   locale,
@@ -126,6 +133,7 @@ const MyProfile = async ({
                       <th className="px-4 py-3 text-center">{t('location')}</th>
                       <th className="px-4 py-3 text-center">{t('price')}</th>
                       <th className="px-4 py-3 text-center">{t('quantity')}</th>
+                      <th className="px-4 py-3 text-center">{t('type')}</th>
                       <th className="px-4 py-3 text-center">{t('status')}</th>
                     </tr>
                   </thead>
@@ -184,6 +192,9 @@ const MyProfile = async ({
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {payment.quantity}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {paymentTypeMap[payment.type]}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <span

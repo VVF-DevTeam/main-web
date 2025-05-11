@@ -136,6 +136,7 @@ model User {
   updatedAt DateTime @updatedAt
   subscribedAt DateTime?
   subscribeExpires DateTime?
+  stripeSubscriptionId String?
 
   purchases    Purchase[]
   posts        Post[]

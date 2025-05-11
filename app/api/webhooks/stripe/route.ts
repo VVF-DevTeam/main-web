@@ -196,9 +196,11 @@ export async function POST(req: NextRequest) {
           data: {
             subscribedAt: new Date(),
             subscribeExpires: expiresAt,
+            stripeSubscriptionId: subscriptionId,
           },
         })
-
+        
+        // update subscription metadata for future subscription invoices
         if (subscriptionId) {
           await updateSubscriptionMetadata(subscriptionId, metadata)
         }
