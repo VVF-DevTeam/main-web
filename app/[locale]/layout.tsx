@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 }
 
 // namespaces for translations
-const i18nNamespaces = ['homePage', 'common', 'event', 'job', 'profile', 'signIn-signUp']
+const i18nNamespaces = ['homePage', 'common', 'event', 'job', 'profile', 'signIn-signUp', 'membership']
 
 // Main Component
 export default async function RootLayout({

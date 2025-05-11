@@ -19,11 +19,12 @@ export const MembershipBenefits = async ({
     {
       title: t('basic-membership'),
       price: 5,
-      priceId: 'price_1RMH3r06wc04MarV0wWvGuq9',
+      priceId: 'price_1RMFpi06wc04MarVvcc6OXj0',
       features: [
         t('basic-feature-1'),
         t('basic-feature-2'),
         t('basic-feature-3'),
+        t('basic-feature-4'),
       ],
     },
     {
@@ -55,7 +56,7 @@ export const MembershipBenefits = async ({
           className="relative rounded-lg border p-6 pb-20 shadow-sm transition-shadow hover:shadow-md"
         >
           <h3 className="mb-2 text-2xl font-semibold text-primary">
-            {tier.title}
+            {tier.title} (monthly)
           </h3>
           <p className="mb-4 text-3xl font-bold">{tier.price} CAD</p>
           <ul className="space-y-3">

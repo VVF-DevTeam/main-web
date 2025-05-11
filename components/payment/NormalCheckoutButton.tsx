@@ -36,8 +36,8 @@ export default function NormalCheckoutButton({
   price,
   numberSession,
 }: NormalCheckoutButtonProps) {
-  // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation('event')
+    // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation(['event', 'membership'])
 
   const handleCheckout = async (priceId: string) => {
     const stripe = await stripePromise
@@ -79,7 +79,7 @@ export default function NormalCheckoutButton({
 
   return (
     <Button onClick={() => handleCheckout(stripePriceId)}>
-      {t(buttonText)}
+      {buttonText === 'become-member' ? t(`membership:${buttonText}`) : t(buttonText)}
       <ArrowRight className="h-4 w-4" />
     </Button>
   )
