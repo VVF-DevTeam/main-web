@@ -72,7 +72,7 @@ export default async function ProfilePage({
     case 'delete-account':
       return <DeleteForm user={user} />
     case 'subscription':
-      return <SubscriptionInfo paymentHistory={paymentHistory} />
+      return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
     default:
       return (
         <MyProfile
