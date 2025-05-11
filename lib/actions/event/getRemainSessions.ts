@@ -20,7 +20,7 @@ export async function getRemainSessions(eventId: string) {
 
     const today = new Date();
     const endDate = new Date(event.endDate);
-    
+
     // If event has already ended
     if (endDate < today) {
       return 0;
@@ -41,6 +41,7 @@ export async function getRemainSessions(eventId: string) {
     });
     let remainingSessions = 0;
     const currentDate = new Date(today);
+    currentDate.setHours(0, 0, 0, 0);
 
     // Count remaining sessions until end date
     while (currentDate <= endDate) {

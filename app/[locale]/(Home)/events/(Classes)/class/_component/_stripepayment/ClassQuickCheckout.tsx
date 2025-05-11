@@ -159,7 +159,7 @@ export default function ClassQuickCheckout({
         userId={userId}
         stripePriceId={stripePriceId}
         stripeProductId={stripeProductId}
-        type="Class"
+        type="ClassDropIn"
       />
     </Elements>
   )

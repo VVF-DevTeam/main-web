@@ -22,6 +22,7 @@ interface ClassNormalCheckOutProps {
   classId: string
   stripeSubscribedPriceId?: string
   price: number
+  fullCourseDiscount?: number
 }
 
 export default function ClassNormalCheckOut({
@@ -33,6 +34,7 @@ export default function ClassNormalCheckOut({
   classId,
   stripeSubscribedPriceId,
   price,
+  fullCourseDiscount,
 }: ClassNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -41,6 +43,7 @@ export default function ClassNormalCheckOut({
   const [paymentType, setPaymentType] = useState<PaymentType>('drop-in')
   const [remainSessions, setRemainSessions] = useState(0)
   const [fullCoursePrice, setFullCoursePrice] = useState(0)
+  const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 100
 
   // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
@@ -50,10 +53,10 @@ export default function ClassNormalCheckOut({
           checkSubscription(userId),
           getRemainSessions(classId),
         ])
+        console.log('sessions', sessions)
         setRemainSessions(sessions)
         setIsSubscribed(subResult)
-        setFullCoursePrice(price * 0.5 * sessions)
-        // Calculate full course price with 50% discount, and additional 20% if subscribed
+        setFullCoursePrice(price * discount * sessions)
       } catch (error) {
         console.error('Error checking subscription or sessions:', error)
       } finally {
@@ -99,16 +102,16 @@ export default function ClassNormalCheckOut({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="drop-in" id="drop-in" />
                   <Label htmlFor="drop-in">
-                    Drop-in {isSubscribed ? `(${price * 0.8})` : `(${price})`}{' '}
+                    Drop-in {isSubscribed ? `(${price * 0.8}$)` : `(${price}$)`}{' '}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="full-course" id="full-course" />
                   <Label htmlFor="full-course">
-                    Full course - {remainSessions} {t('sessions')} (50% off){' '}
+                    Full course - {remainSessions} {t('sessions')} ({fullCourseDiscount}% off){' '}
                     {isSubscribed
-                      ? `(${fullCoursePrice * 0.8})`
-                      : `(${fullCoursePrice})`}
+                      ? `(${Math.round(fullCoursePrice * 0.8)}$)`
+                      : `(${Math.round(fullCoursePrice)}$)`}
                   </Label>
                 </div>
               </RadioGroup>
@@ -123,7 +126,7 @@ export default function ClassNormalCheckOut({
                   userId={userId}
                   eventId={classId}
                   buttonText="reserve-button"
-                  type="Class"
+                  type="ClassDropIn"
                 />
               ) : (
                 <NormalCheckoutButton
@@ -135,8 +138,8 @@ export default function ClassNormalCheckOut({
                   userId={userId}
                   eventId={classId}
                   buttonText="reserve-button"
-                  type="Class"
-                  price={isSubscribed ? fullCoursePrice * 0.8 : fullCoursePrice}
+                  type="ClassFullCourse"
+                  price={isSubscribed ? Math.round(fullCoursePrice * 0.8) : Math.round(fullCoursePrice)}
                   numberSession={remainSessions}
                 />
               )}
