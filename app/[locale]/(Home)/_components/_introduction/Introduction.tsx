@@ -4,7 +4,6 @@ import initTranslation from '@/app/i18n'
 // Components
 import IntroCard from './IntroCard'
 import Image from 'next/image'
-import { Separator } from '@/components/ui/separator'
 
 const introductionData = [
   {
@@ -59,7 +58,9 @@ const Introduction = async ({ locale }: IntroductionProps) => {
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}
       </div>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
+
+      {/* Separator */}
+      <div className="mx-auto mt-12 w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
     </div>
   )
 }

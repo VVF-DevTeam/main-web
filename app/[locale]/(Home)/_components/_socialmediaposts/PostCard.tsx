@@ -17,7 +17,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       : post.content
 
   return (
-    <div className="block min-h-[28rem] transform cursor-pointer rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl">
+    <div className="relative block min-h-[28rem] transform cursor-pointer rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl">
+      <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
       <div className="flex h-full flex-col justify-between">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">

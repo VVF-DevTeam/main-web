@@ -3,8 +3,8 @@ import initTranslation from '@/app/i18n'
 
 // Components
 import PostCard from './PostCard'
-import { Separator } from '@/components/ui/separator'
 import { getSocialMediaPosts } from '@/lib/actions/post/getSocialPost'
+
 interface SocialMediaProps {
   locale: string
 }
@@ -28,7 +28,9 @@ const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
           ))}
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
+
+      {/* Separator */}
+      <div className="mx-auto mt-12 w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
     </div>
   )
 }

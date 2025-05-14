@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next'
 //Components
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 
 // Interfaces & Types
@@ -149,7 +148,8 @@ const ImageCarousel = ({
         </div>
       </div>
 
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
+      {/* Separator */}
+      <div className="mx-auto mt-12 w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
     </div>
   )
 }
