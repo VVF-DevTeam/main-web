@@ -10,6 +10,7 @@ import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
+import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
 
 // Main Component
 export default async function ProfilePage({
@@ -80,6 +81,8 @@ export default async function ProfilePage({
         return <PaymentManagement user={user} />
       }
       return <p className="mt-10 text-center">You do not have permission to view this page.</p>
+    case 'privacy-policy':
+      return <PrivacyPolicy locale={locale} />
     default:
       return (
         <MyProfile

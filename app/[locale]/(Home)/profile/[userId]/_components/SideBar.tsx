@@ -26,6 +26,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'change-password': t('change-password'),
     'delete-account': t('delete-account'),
     'payment-management': t('payment-management'),
+    'privacy-policy': t('privacy-policy'),
   }
 
   return (
