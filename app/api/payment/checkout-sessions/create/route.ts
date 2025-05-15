@@ -17,8 +17,9 @@ export async function POST(req: Request) {
       type,
       price,
       numberSession,
+      email,
     } = await req.json()
-
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -56,6 +57,7 @@ export async function POST(req: Request) {
             },
       ],
       mode: type === 'Membership' ? 'subscription' : 'payment',
+      customer_email: email,
       success_url:
         type === 'Membership'
           ? `${origin}/registration/membership/payment/success`

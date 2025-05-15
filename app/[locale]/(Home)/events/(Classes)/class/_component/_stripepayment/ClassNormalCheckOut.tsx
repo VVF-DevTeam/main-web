@@ -23,6 +23,7 @@ interface ClassNormalCheckOutProps {
   stripeSubscribedPriceId?: string
   price: number
   fullCourseDiscount?: number
+  email: string
 }
 
 export default function ClassNormalCheckOut({
@@ -35,6 +36,7 @@ export default function ClassNormalCheckOut({
   stripeSubscribedPriceId,
   price,
   fullCourseDiscount,
+  email,
 }: ClassNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -126,6 +128,7 @@ export default function ClassNormalCheckOut({
                   eventId={classId}
                   buttonText="reserve-button"
                   type="ClassDropIn"
+                  email={email}
                 />
               ) : (
                 <NormalCheckoutButton
@@ -140,6 +143,7 @@ export default function ClassNormalCheckOut({
                   type="ClassFullCourse"
                   price={isSubscribed ? Math.round(fullCoursePrice * 0.8) : Math.round(fullCoursePrice)}
                   numberSession={remainSessions}
+                  email={email}
                 />
               )}
             </>

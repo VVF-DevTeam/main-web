@@ -59,6 +59,7 @@ const ClassDescription = async ({
   // Get the current user's id
   const session = await auth()
   const author = session?.user?.id!
+  const email = session?.user?.email!
 
   // Check if user has already paid for this class
   const existingPayment = author
@@ -161,6 +162,7 @@ const ClassDescription = async ({
             title={title}
             userId={author}
             fullCourseDiscount={fullCourseDiscount}
+            email={email}
           />
 
           {existingPayment && existingPayment.length > 0 && (

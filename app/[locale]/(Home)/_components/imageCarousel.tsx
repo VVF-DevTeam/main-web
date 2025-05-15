@@ -26,6 +26,7 @@ const ImageCarousel = ({
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('homePage')
 
+  // maximum 4 images, to increase please change the code
   const imageUrls = [
     {
       id: '1',
@@ -41,9 +42,9 @@ const ImageCarousel = ({
     },
     {
       id: '3',
-      url: 'https://drive.google.com/thumbnail?id=1QWFZ4Uhijftf5YT-7_KFU9jVJhPHT7PN&sz=w2000',
-      classUrl: `/${locale}/events/class/tennis-camp-2025`,
-      description: 'Tennis Camp 2025',
+      url: 'https://drive.google.com/thumbnail?id=1PXOhQS85yPIJcKuTx6AMUF9zOVKzCYhm&sz=w2000',
+      classUrl: `/${locale}/events/class/hiphop-dance-class-2025`,
+      description: 'Hiphop Dance Class 2025',
     },
     {
       id: '4',

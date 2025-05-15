@@ -13,6 +13,7 @@ export const MembershipBenefits = async ({
   const { t } = await initTranslation(locale, ['membership', 'common'])
   const session = await auth()
   const userId = session?.user?.id
+  const email = session?.user?.email!
   const isMember = await checkSubscription(userId)
 
   const benefits = [
@@ -92,6 +93,7 @@ export const MembershipBenefits = async ({
                   userId={userId}
                   buttonText="become-member"
                   type="Membership"
+                  email={email}
                 />
               </div>
             )
