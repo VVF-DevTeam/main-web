@@ -77,7 +77,7 @@ export default async function ProfilePage({
       return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
     case 'payment-management':
       // Only show payment management for hosts
-      if (user.role && user.role.includes('HOST')) {
+      if (user.role && (user.role.includes('HOST') || user.role.includes('ADMIN'))) {
         return <PaymentManagement user={user} />
       }
       return <p className="mt-10 text-center">You do not have permission to view this page.</p>
