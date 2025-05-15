@@ -247,6 +247,7 @@ model Payment {
   stripePriceId   String   // Immutable snapshot of price paid
   stripePaymentId String  // Payment ID from Stripe
   pricePaid       Decimal  // Actual amount charged, always saved
+  refunded  Boolean @default(false)
 }
 
 model PostLikes {

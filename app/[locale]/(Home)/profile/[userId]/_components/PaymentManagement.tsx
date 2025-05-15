@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import RefundButton from '@/components/payment/RefundButton'
+import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
 
 type PaymentWithRelations = {
   id: string
@@ -11,6 +12,7 @@ type PaymentWithRelations = {
   expiresAt: Date | null
   quantity: number
   stripeProductId: string
+  refunded: boolean
   user: {
     name: string | null
     email: string
@@ -48,21 +50,6 @@ const paymentTypeMap = {
   Concert: 'Concert',
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Active':
-    case 'Ongoing':
-      return 'text-green-600'
-    case 'Upcoming':
-      return 'text-blue-600'
-    case 'Expired':
-    case 'Past':
-      return 'text-red-600'
-    default:
-      return ''
-  }
-}
-
 export default async function PaymentManagement({
   user,
 }: PaymentManagementProps) {
@@ -79,6 +66,7 @@ export default async function PaymentManagement({
         expiresAt: true,
         quantity: true,
         stripeProductId: true,
+        refunded: true,
         user: {
           select: {
             name: true,
@@ -131,6 +119,7 @@ export default async function PaymentManagement({
         expiresAt: true,
         quantity: true,
         stripeProductId: true,
+        refunded: true,
         user: {
           select: {
             name: true,
@@ -191,16 +180,8 @@ export default async function PaymentManagement({
                       ? payment.expiresAt!
                       : payment.event?.endDate || payment.createdAt
                   )
-                  const status =
-                    payment.type === 'Membership'
-                      ? new Date() < endDate
-                        ? 'Active'
-                        : 'Expired'
-                      : new Date() < startDate
-                        ? 'Upcoming'
-                        : new Date() < endDate
-                          ? 'Ongoing'
-                          : 'Past'
+                  const status = getPaymentStatus(payment)
+                  const statusColor = getStatusColor(status)
 
                   return (
                     <tr key={index} className="bg-white">
@@ -229,7 +210,7 @@ export default async function PaymentManagement({
                         {paymentTypeMap[payment.type]}
                       </td>
                       <td
-                        className={`px-4 py-3 font-medium ${getStatusColor(status)}`}
+                        className={`px-4 py-3 font-medium ${statusColor}`}
                       >
                         {status}
                       </td>
@@ -238,7 +219,7 @@ export default async function PaymentManagement({
                           paymentId={payment.id}
                           stripeProductId={payment.stripeProductId}
                           amount={Number(payment.pricePaid)}
-                          disabled={status === 'Expired' || status === 'Past'}
+                          disabled={status === 'Expired' || status === 'Past' || status === 'Refunded'}
                         />
                       </td>
                     </tr>

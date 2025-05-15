@@ -52,6 +52,7 @@ export async function POST(req: Request) {
       where: { id: paymentId },
       data: {
         updatedAt: new Date(),
+        refunded: true,
       },
     })
 

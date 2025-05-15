@@ -6,8 +6,9 @@ import initTranslation from '@/app/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Event, PaymentType } from '@prisma/client'
-import { getEventStatus } from '@/lib/actions/event/getEventStatus'
 import { Decimal } from '@prisma/client/runtime/library'
+import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
+
 interface UserInfoProps {
   name: string
   email: string
@@ -17,18 +18,17 @@ interface UserInfoProps {
   image?: string
 }
 
-interface PaymentHistoryItem {
+type PaymentHistoryItem = {
   id: string
   pricePaid: Decimal
   createdAt: Date
   type: PaymentType
-  expiresAt?: Date | null
+  expiresAt: Date | null
   quantity: number
+  refunded: boolean
   event: {
-    id: string
     title: string
     keyName: string
-    imgUrl: string | null
     startDate: Date | null
     endDate: Date
     location: string | null
@@ -153,13 +153,8 @@ const MyProfile = async ({
                               ? payment!.expiresAt!
                               : event!.endDate
                           )
-                          const status =
-                            payment.type === 'Membership'
-                              ? getEventStatus(
-                                  payment.createdAt,
-                                  payment!.expiresAt!
-                                )
-                              : getEventStatus(startDate, endDate)
+                          const status = getPaymentStatus(payment)
+                          const statusColor = getStatusColor(status)
                           return (
                             <tr
                               key={index}
@@ -190,7 +185,7 @@ const MyProfile = async ({
                                   : event!.location!}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                ${payment.pricePaid.toFixed(2)}
+                                ${Number(payment.pricePaid).toFixed(2)}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {payment.quantity}
@@ -198,18 +193,10 @@ const MyProfile = async ({
                               <td className="px-4 py-3 text-center">
                                 {paymentTypeMap[payment.type]}
                               </td>
-                              <td className="px-4 py-3 text-center">
-                                <span
-                                  className={`rounded-full px-2 py-1 text-sm ${
-                                    status === 'Upcoming'
-                                      ? 'bg-bgColor-blue/20 text-textColor-blue'
-                                      : status === 'Ongoing'
-                                        ? 'bg-bgColor-green/20 text-textColor-green'
-                                        : 'bg-bgColor-yellow/20 text-textColor-yellow'
-                                  }`}
-                                >
-                                  {status}
-                                </span>
+                              <td
+                                className={`px-4 py-3 font-medium ${statusColor} text-center`}
+                              >
+                                {status}
                               </td>
                             </tr>
                           )

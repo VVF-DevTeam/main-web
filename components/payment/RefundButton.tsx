@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
+import { useRouter } from 'next/navigation'
 
 interface RefundButtonProps {
   paymentId: string
@@ -18,7 +19,7 @@ export default function RefundButton({
   stripeProductId,
 }: RefundButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
-
+  const router = useRouter()
   const handleRefund = async () => {
     try {
       setIsLoading(true)
@@ -28,6 +29,9 @@ export default function RefundButton({
         stripeProductId,
       })
       toast.success('Refund processed successfully')
+      
+      // Refresh the page data
+      router.refresh()
     } catch (error) {
       toast.error('Failed to process refund')
       console.error('Refund error:', error)
