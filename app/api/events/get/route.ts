@@ -18,6 +18,8 @@ export const GET = async (request: NextRequest) => {
   let event = null
   let totalEvent = 0
 
+  const requestTime = new Date()
+
   try {
     if (!eventId) {
       const [events, total] = await Promise.all([
@@ -35,6 +37,7 @@ export const GET = async (request: NextRequest) => {
             capacity: true,
             ticketsSold: true,
             days: true,
+            endDate: true,
           },
           where: {
             title: {
@@ -44,6 +47,9 @@ export const GET = async (request: NextRequest) => {
             ...(isPublished !== undefined && {
               isPublished: isPublished,
             }),
+            endDate: {
+              gte: requestTime,
+            },
           },
           orderBy: {
             updatedAt: 'desc',
@@ -80,6 +86,7 @@ export const GET = async (request: NextRequest) => {
           imgUrl: true,
           endTime: true,
           formLink: true,
+          endDate: true,
           hosts: {
             select: {
               name: true,
@@ -96,6 +103,9 @@ export const GET = async (request: NextRequest) => {
         },
         where: {
           id: eventId,
+          endDate: {
+            gte: requestTime,
+          },
         },
       })
       if (!event)
