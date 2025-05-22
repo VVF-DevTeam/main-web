@@ -129,6 +129,7 @@ model User {
   role     Role[]
   age      String?
   phone    String? @unique
+  phoneVerified Boolean? @default(false)
   address  String?
   password String?
 
