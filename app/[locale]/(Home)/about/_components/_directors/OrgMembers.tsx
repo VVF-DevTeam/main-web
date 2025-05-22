@@ -51,7 +51,7 @@ const directors = [
     imageUrl:
       'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn&sz=w1000',
     name: 'Luna Nguyen',
-    title: 'CHO',
+    title: 'CHRO',
   },
 ]
 

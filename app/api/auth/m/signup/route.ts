@@ -51,6 +51,24 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
+    const existedPhonenumber = await prisma.user.findUnique({
+      select: {
+        id: true,
+      },
+      where: {
+        phone: parsedCredentials.data.phoneNumber,
+      },
+    })
+
+    if (existedPhonenumber) {
+      return NextResponse.json(
+        {
+          message: 'This phone number is already in used',
+        },
+        { status: 409 }
+      )
+    }
+
     const hashedPassword = bcrypt.hashSync(
       signUpRequestData.password,
       Number(process.env.BCRYPT_SALT)!

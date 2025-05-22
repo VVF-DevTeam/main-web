@@ -26,6 +26,7 @@ const ImageCarousel = ({
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('homePage')
 
+  // maximum 4 images, to increase please change the code
   const imageUrls = [
     {
       id: '1',
@@ -35,18 +36,25 @@ const ImageCarousel = ({
     },
     {
       id: '2',
+      url: 'https://drive.google.com/thumbnail?id=1PXOhQS85yPIJcKuTx6AMUF9zOVKzCYhm&sz=w2000',
+      classUrl: `/${locale}/events/class/hiphop-dance-class-2025`,
+      description: 'Hiphop Dance Class 2025',
+    },
+    {
+      id: '3',
       url: 'https://drive.google.com/thumbnail?id=1LzN0Kouxwfy1R07qkX0NfxWByIHMtyGJ&sz=w3000',
       classUrl: `/${locale}/events/class/tennis-camp-2025`,
       description: 'Tennis Camp 2025',
     },
+
     {
-      id: '3',
+      id: '4',
       url: 'https://drive.google.com/thumbnail?id=1QWFZ4Uhijftf5YT-7_KFU9jVJhPHT7PN&sz=w2000',
       classUrl: `/${locale}/events/class/tennis-camp-2025`,
       description: 'Tennis Camp 2025',
     },
     {
-      id: '4',
+      id: '5',
       url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000',
       classUrl: `/${locale}/events/concert/fridaychill`,
       description: 'Friday Chill Series',
@@ -91,8 +99,9 @@ const ImageCarousel = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="md:ml-[12.5vw] md:w-[75vw] overflow-hidden rounded-sm w-[90vw] ml-[5vw]">
-        <div className="relative h-[50vh] md:w-[300vw] w-[360vw] md:h-[60vh] xl:h-[70vh]">
+      <div className="ml-[5vw] w-[90vw] overflow-hidden rounded-sm md:ml-[12.5vw] md:w-[75vw]">
+        {/* To increase the number of images, please the width according (75 | 60 * number of images) */}
+        <div className="relative h-[50vh] w-[450vw] md:h-[60vh] md:w-[375vw] xl:h-[70vh]">
           <div className="flex h-full w-full items-center">
             {imageUrls.map((img) => (
               <div
@@ -131,16 +140,16 @@ const ImageCarousel = ({
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] md:max-w-[75vw] max-w-[90vw] px-4">
+          <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] max-w-[90vw] px-4 md:max-w-[75vw]">
             <button aria-label="prev-image">
               <ArrowLeft
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight opacity-75"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand opacity-75 transition-all hover:bg-bgColor-brandLight"
                 onClick={() => changeImage('left')}
               />
             </button>
             <button aria-label="next-image">
               <ArrowRight
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand transition-all hover:bg-bgColor-brandLight opacity-75"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand opacity-75 transition-all hover:bg-bgColor-brandLight"
                 onClick={() => changeImage('right')}
               />
             </button>

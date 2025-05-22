@@ -23,6 +23,7 @@ interface NormalCheckoutButtonProps {
   type: PaymentType
   price?: number
   numberSession?: number
+  email: string
 }
 
 export default function NormalCheckoutButton({
@@ -35,6 +36,7 @@ export default function NormalCheckoutButton({
   type,
   price,
   numberSession,
+  email,
 }: NormalCheckoutButtonProps) {
     // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
@@ -54,6 +56,7 @@ export default function NormalCheckoutButton({
           type: type,
           price: price,
           numberSession: numberSession,
+          email: email,
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })

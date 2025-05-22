@@ -1,4 +1,30 @@
 import { prisma } from '@/lib/db'
+import { PaymentType } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
+import RefundButton from '@/components/payment/RefundButton'
+import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
+
+type PaymentWithRelations = {
+  id: string
+  pricePaid: Decimal
+  createdAt: Date
+  type: PaymentType
+  expiresAt: Date | null
+  quantity: number
+  stripeProductId: string
+  refunded: boolean
+  user: {
+    name: string | null
+    email: string
+  }
+  event: {
+    title: string
+    keyName: string
+    startDate: Date | null
+    endDate: Date
+    location: string | null
+  } | null
+}
 
 interface PaymentManagementProps {
   user: {
@@ -24,56 +50,99 @@ const paymentTypeMap = {
   Concert: 'Concert',
 }
 
-export default async function PaymentManagement({ user }: PaymentManagementProps) {
-  // Get all events where user is a host
-  const hostedEvents = await prisma.event.findMany({
-    where: {
-      hosts: {
-        some: {
-          id: user.id
-        }
-      }
-    },
-    select: {
-      id: true
-    }
-  })
+export default async function PaymentManagement({
+  user,
+}: PaymentManagementProps) {
+  let payments: PaymentWithRelations[] | null = null
 
-  const hostedEventIds = hostedEvents.map(event => event.id)
-
-  // Get all payments for hosted events
-  const payments = await prisma.payment.findMany({
-    where: {
-      eventId: {
-        in: hostedEventIds
-      }
-    },
-    select: {
-      pricePaid: true,
-      createdAt: true,
-      type: true,
-      expiresAt: true,
-      quantity: true,
-      user: {
-        select: {
-          name: true,
-          email: true
-        }
+  // If Admin, get all payments
+  if (user.role.includes('ADMIN')) {
+    payments = await prisma.payment.findMany({
+      select: {
+        id: true,
+        pricePaid: true,
+        createdAt: true,
+        type: true,
+        expiresAt: true,
+        quantity: true,
+        stripeProductId: true,
+        refunded: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        event: {
+          select: {
+            title: true,
+            keyName: true,
+            startDate: true,
+            endDate: true,
+            location: true,
+          },
+        },
       },
-      event: {
-        select: {
-          title: true,
-          keyName: true,
-          startDate: true,
-          endDate: true,
-          location: true
-        }
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  })
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+  } else if (user.role.includes('HOST')) {
+    // If Host, get all payments for hosted events
+    const hostedEvents = await prisma.event.findMany({
+      where: {
+        hosts: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    const hostedEventIds = hostedEvents!.map((event) => event.id)
+
+    // Get all payments for hosted events
+    payments = await prisma.payment.findMany({
+      where: {
+        eventId: {
+          in: hostedEventIds,
+        },
+      },
+      select: {
+        id: true,
+        pricePaid: true,
+        createdAt: true,
+        type: true,
+        expiresAt: true,
+        quantity: true,
+        stripeProductId: true,
+        refunded: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        event: {
+          select: {
+            title: true,
+            keyName: true,
+            startDate: true,
+            endDate: true,
+            location: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+  } else {
+    return <div>You are not allowed to view this page</div>
+  }
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -95,30 +164,30 @@ export default async function PaymentManagement({ user }: PaymentManagementProps
                 <th className="px-4 py-3 text-left">Quantity</th>
                 <th className="px-4 py-3 text-left">Type</th>
                 <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {payments.length > 0 ? (
+              {payments && payments.length > 0 ? (
                 payments.map((payment, index) => {
-                  if (!payment.event) return null;
-                  
                   const startDate = new Date(
                     payment.type === 'Membership'
                       ? payment.createdAt
-                      : payment.event.startDate!
+                      : payment.event?.startDate || payment.createdAt
                   )
                   const endDate = new Date(
                     payment.type === 'Membership'
                       ? payment.expiresAt!
-                      : payment.event.endDate
+                      : payment.event?.endDate || payment.createdAt
                   )
-                  const status = payment.type === 'Membership' 
-                    ? (new Date() < endDate ? 'Active' : 'Expired')
-                    : (new Date() < endDate ? 'Upcoming' : 'Past')
+                  const status = getPaymentStatus(payment)
+                  const statusColor = getStatusColor(status)
 
                   return (
                     <tr key={index} className="bg-white">
-                      <td className="px-4 py-3">{payment.event.title}</td>
+                      <td className="px-4 py-3">
+                        {payment.event?.title || '-'}
+                      </td>
                       <td className="px-4 py-3">
                         {payment.user.name || payment.user.email}
                       </td>
@@ -129,7 +198,9 @@ export default async function PaymentManagement({ user }: PaymentManagementProps
                         {endDate.toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-4 py-3">
-                        {payment.type === 'Membership' ? '-' : payment.event.location}
+                        {payment.type === 'Membership'
+                          ? '-'
+                          : payment.event?.location || '-'}
                       </td>
                       <td className="px-4 py-3">
                         ${Number(payment.pricePaid).toFixed(2)}
@@ -138,7 +209,19 @@ export default async function PaymentManagement({ user }: PaymentManagementProps
                       <td className="px-4 py-3">
                         {paymentTypeMap[payment.type]}
                       </td>
-                      <td className="px-4 py-3">{status}</td>
+                      <td
+                        className={`px-4 py-3 font-medium ${statusColor}`}
+                      >
+                        {status}
+                      </td>
+                      <td className="px-4 py-3">
+                        <RefundButton
+                          paymentId={payment.id}
+                          stripeProductId={payment.stripeProductId}
+                          amount={Number(payment.pricePaid)}
+                          disabled={status === 'Expired' || status === 'Past' || status === 'Refunded'}
+                        />
+                      </td>
                     </tr>
                   )
                 })
@@ -155,4 +238,4 @@ export default async function PaymentManagement({ user }: PaymentManagementProps
       </div>
     </div>
   )
-} 
+}

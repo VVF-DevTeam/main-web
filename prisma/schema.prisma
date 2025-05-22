@@ -246,7 +246,9 @@ model Payment {
   // These fields below are changeable by host and admin, so we save them as the snapshot instead of joining them through Event table
   stripeProductId String   // Immutable snapshot of what was sold
   stripePriceId   String   // Immutable snapshot of price paid
+  stripePaymentId String  // Payment ID from Stripe
   pricePaid       Decimal  // Actual amount charged, always saved
+  refunded  Boolean @default(false)
 }
 
 model PostLikes {

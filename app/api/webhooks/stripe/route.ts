@@ -55,11 +55,11 @@ async function updateSubscriptionMetadata(
 async function getCheckoutSessionQuantity(sessionId: string) {
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ['line_items'],
-  });
+  })
 
-  if (!session.line_items) return null;
+  if (!session.line_items) return null
 
-  return session.line_items.data.map((item) => item.quantity)[0] ?? null;
+  return session.line_items.data.map((item) => item.quantity)[0] ?? null
 }
 
 export async function POST(req: NextRequest) {
@@ -112,12 +112,14 @@ export async function POST(req: NextRequest) {
     let stripePriceId: string | null = null
     let metadata: Record<string, string> | null = null
     let quantity: number | null = null
+    let paymentId: string | null = null
 
     if (event.type === 'payment_intent.succeeded') {
       paymentData = event.data.object as Stripe.PaymentIntent
       chargedAmount = paymentData.amount
       metadata = paymentData.metadata as Record<string, string>
-      quantity = 1;
+      paymentId = paymentData.id
+      quantity = 1
     } else if (event.type === 'invoice.paid') {
       // invoice.paid is triggered when a subscription is created or renewed
       // for this check, we only catch event when subscription is renewed, then it will have metadata.userId
@@ -125,10 +127,18 @@ export async function POST(req: NextRequest) {
       paymentData = event.data.object as Stripe.Invoice
       chargedAmount = paymentData.amount_paid
 
-      // get metadata from the parent subscription (invoice created by checkout.session.completed will not have parent's metadata)
-      // metadata = paymentData.lines.data[0].metadata as Record<string, string>
-      metadata = paymentData.parent!.subscription_details!.metadata as Record<string, string>;
-      quantity = paymentData.lines.data.map((item) => item.quantity)[0] ?? 1;
+      // @ts-ignore - payment_intent exists on Invoice but not in type definition
+      if (paymentData.payment_intent) {
+        // @ts-ignore - payment_intent exists on Invoice but not in type definition
+        paymentId = paymentData.payment_intent as string
+      }
+
+      // get metadata from the parent subscription
+      metadata = paymentData.parent!.subscription_details!.metadata as Record<
+        string,
+        string
+      >
+      quantity = paymentData.lines.data.map((item) => item.quantity)[0] ?? 1
 
       // get subscription details
       if (paymentData.lines.data[0].subscription) {
@@ -144,7 +154,8 @@ export async function POST(req: NextRequest) {
       paymentData = event.data.object as Stripe.Checkout.Session
       chargedAmount = paymentData.amount_total ?? 0
       metadata = paymentData.metadata as Record<string, string>
-      quantity = await getCheckoutSessionQuantity(paymentData.id) ?? 1;
+      quantity = (await getCheckoutSessionQuantity(paymentData.id)) ?? 1
+      paymentId = paymentData.payment_intent as string
 
       // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
@@ -160,6 +171,11 @@ export async function POST(req: NextRequest) {
         { error: { message: 'Unsupported event type' } },
         { status: 400 }
       )
+    }
+
+    // in case paymentId is not found, set it to an empty string, then admin can ask devs to fix it
+    if (!paymentId) {
+      paymentId = ''
     }
 
     // filter out the event
@@ -182,6 +198,7 @@ export async function POST(req: NextRequest) {
           eventId: metadata.eventId,
           stripeProductId: metadata.stripeProductId,
           stripePriceId: stripePriceId || metadata.stripePriceId,
+          stripePaymentId: paymentId,
           pricePaid: chargedAmount / 100,
           type: metadata.type as PaymentType,
           expiresAt: expiresAt,
@@ -199,7 +216,7 @@ export async function POST(req: NextRequest) {
             stripeSubscriptionId: subscriptionId,
           },
         })
-        
+
         // update subscription metadata for future subscription invoices
         if (subscriptionId) {
           await updateSubscriptionMetadata(subscriptionId, metadata)

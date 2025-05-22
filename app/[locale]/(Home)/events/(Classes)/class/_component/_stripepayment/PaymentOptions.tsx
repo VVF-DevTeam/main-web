@@ -19,6 +19,7 @@ interface PaymentOptionsProps {
   title: string
   userId: string
   fullCourseDiscount?: number
+  email: string
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -34,6 +35,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   title,
   userId,
   fullCourseDiscount,
+  email,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -97,6 +99,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   classId={classId}
                   price={price}
                   fullCourseDiscount={fullCourseDiscount}
+                  email={email}
                 />
               </div>
             )}

@@ -31,6 +31,12 @@ const Footer = async ({ locale }: { locale: string }) => {
                 {t(route.label.toLowerCase() + '-footer')}
               </Link>
             ))}
+            <Link
+              href="/policy"
+              className="hover:text-textColor-brandLight hover:underline"
+            >
+              {t('policy-footer')}
+            </Link>
           </div>
         </div>
         {/* Column 2 */}

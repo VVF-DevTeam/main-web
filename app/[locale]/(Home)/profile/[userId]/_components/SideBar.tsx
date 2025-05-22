@@ -26,6 +26,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'change-password': t('change-password'),
     'delete-account': t('delete-account'),
     'payment-management': t('payment-management'),
+    'privacy-policy': t('privacy-policy'),
   }
 
   return (
@@ -39,7 +40,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
         <ul className="space-y-4">
           {Object.entries(sections).map(([key, label]) => (
             <li key={key}>
-              {key === 'payment-management' && user.role.includes('HOST') ? (
+              {key === 'payment-management' && (user.role.includes('HOST') || user.role.includes('ADMIN')) ? (
                 <Link
                   href={`/${locale}/profile/${userId}?section=${key}`}
                   className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
