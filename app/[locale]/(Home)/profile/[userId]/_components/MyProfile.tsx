@@ -60,10 +60,10 @@ const MyProfile = async ({
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
 
-  const onVerify = (phone?: string) => {
-    // phoneVerified = true
-    console.log('******************************** Verified ', phone)
-  }
+  // const onVerify = (phone?: string) => {
+  //   // phoneVerified = true
+  //   console.log('******************************** Verified ', phone)
+  // }
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -109,12 +109,13 @@ const MyProfile = async ({
                 <FiPhone className="flex-shrink-0 text-xl text-textColor-gray" />
                 <span className="lg:w-0 flex-1 break-words">
                   {user.phone || 'N/A'}
-                  {user.phone && (
-                    !user.phoneVerified
-                      ? <SmsOtpVerificationPopover />
-                      : <span>Verified</span>
-                  )}
+                  
                 </span>
+                <span>{user.phone && (
+                    user.phoneVerified
+                      ? <SmsOtpVerificationPopover phoneNumber={user.phone}/>
+                      : <span className='text-green-500 text-sm inline-block'>verified</span>
+                  )}</span>
               </div>
               <div className="flex items-center gap-3">
                 <FiMapPin className="flex-shrink-0 text-xl text-textColor-gray" />

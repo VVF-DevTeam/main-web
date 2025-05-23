@@ -14,11 +14,15 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 
-function SmsOtpVerificationInput() {
-  const router = useRouter()
+type Props = {
+  phoneNumberVerifyNeeded: string;
+};
+
+function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
+  // const router = useRouter()
 
   const [phoneNumber, setPhoneNumber] = useState('')
   const [otp, setOtp] = useState('')
@@ -27,8 +31,8 @@ function SmsOtpVerificationInput() {
   const [resendCountdown, setResendCountdown] = useState(0)
 
   // prevent auto web scraping tools
-  const [recaptchaVerifier, setRecaptchaVerifier] =
-    useState<RecaptchaVerifier | null>(null)
+  // const [recaptchaVerifier, setRecaptchaVerifier] =
+  //   useState<RecaptchaVerifier | null>(null)
   const recaptchaVerifierRef = useRef<RecaptchaVerifier>();
 
   // after send the request for Firebase, we get this confirmationResult back from that
@@ -95,6 +99,7 @@ function SmsOtpVerificationInput() {
       try {
         await confirmationResult?.confirm(otp)
       } catch (err) {
+        console.log(err)
         setError('Failed to verify OTP. Please check the OTP.')
       }
     })
@@ -115,7 +120,7 @@ function SmsOtpVerificationInput() {
       try {
         const confirmationResult = await signInWithPhoneNumber(
           auth,
-          phoneNumber,
+          phoneNumberVerifyNeeded,
           recaptchaVerifierRef.current
         )
 

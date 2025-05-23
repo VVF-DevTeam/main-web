@@ -8,7 +8,12 @@ import SmsOtpVerificationInput from './SmsOtpVerificationInput'
 
 import React from 'react'
 
-function SmsOtpVerificationPopover() {
+
+type Props = {
+  phoneNumber: string;
+};
+
+function SmsOtpVerificationPopover({ phoneNumber }: Props) {
   return (
     <div >
       <Popover>
@@ -16,7 +21,7 @@ function SmsOtpVerificationPopover() {
             <Button variant='outline'>Verify</Button>
         </PopoverTrigger>
         <PopoverContent>
-            <SmsOtpVerificationInput/>
+            <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber}/>
         </PopoverContent>
       </Popover>
     </div>

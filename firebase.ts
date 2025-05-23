@@ -8,14 +8,26 @@ import { getAuth } from "firebase/auth"
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDJiXek4nGovAFA6z5YGMXutlDgdexP7DI",
-  authDomain: "test-af7b1.firebaseapp.com",
-  projectId: "test-af7b1",
-  storageBucket: "test-af7b1.firebasestorage.app",
-  messagingSenderId: "562766862337",
-  appId: "1:562766862337:web:ddea7dcd18bedcfa6ac800",
-  measurementId: "G-WN5WLVZE4W"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyD-4dM4JT-UBhtZVABbScVMLc3CoZzupsk",
+//   authDomain: "otp-demo-f84ce.firebaseapp.com",
+//   projectId: "otp-demo-f84ce",
+//   storageBucket: "otp-demo-f84ce.firebasestorage.app",
+//   messagingSenderId: "1013556244616",
+//   appId: "1:1013556244616:web:ff803f69f5661980bd6f3d",
+//   measurementId: "G-PKV77EE0ZZ"
+// };
+
+// console.log("*************** FIREBASE: ",process.env.FIREBASE_PROJECT_ID)
 
 // const analytics = getAnalytics(app);
 
