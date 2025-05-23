@@ -122,7 +122,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 <ul className="ml-5 list-disc space-y-1">
                   <li>
                     {t('etransfer-description-1')}{' '}
-                    <strong>payment@vietvibe.org</strong>
+                    <strong>finance@vietvibe.org</strong>
                   </li>
                   <li>
                     {t('etransfer-description-2')} <em>Class Name</em>,{' '}
@@ -153,6 +153,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     {t('etransfer-description-5')}
                   </li>
                 </ul>
+                <p className="italic pt-2 text-xs">*{t('etransfer-description-7')}</p>
               </div>
             )}
           </motion.div>
