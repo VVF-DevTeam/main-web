@@ -112,7 +112,7 @@ const MyProfile = async ({
                   
                 </span>
                 <span>{user.phone && (
-                    user.phoneVerified
+                    !user.phoneVerified
                       ? <SmsOtpVerificationPopover phoneNumber={user.phone}/>
                       : <span className='text-green-500 text-sm inline-block'>verified</span>
                   )}</span>
