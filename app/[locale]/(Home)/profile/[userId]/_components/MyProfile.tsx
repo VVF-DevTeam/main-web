@@ -1,4 +1,4 @@
-import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart, FiCheck } from 'react-icons/fi'
+import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi'
 
 import { RiCalendarEventFill } from 'react-icons/ri'
 
