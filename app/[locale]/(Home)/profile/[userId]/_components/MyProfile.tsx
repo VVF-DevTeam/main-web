@@ -1,4 +1,4 @@
-import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi'
+import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart, FiCheck } from 'react-icons/fi'
 
 import { RiCalendarEventFill } from 'react-icons/ri'
 
@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { Event, PaymentType } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
+import SmsOtpVerificationPopover from './SmsOtpVerificationPopover'
+
 
 interface UserInfoProps {
   name: string
@@ -16,6 +18,7 @@ interface UserInfoProps {
   address?: string
   age?: string
   image?: string
+  phoneVerified?: boolean
 }
 
 type PaymentHistoryItem = {
@@ -56,6 +59,11 @@ const MyProfile = async ({
   paymentHistory: PaymentHistoryItem[]
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
+
+  const onVerify = (phone?: string) => {
+    // phoneVerified = true
+    console.log('******************************** Verified ', phone)
+  }
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -101,6 +109,11 @@ const MyProfile = async ({
                 <FiPhone className="flex-shrink-0 text-xl text-textColor-gray" />
                 <span className="lg:w-0 flex-1 break-words">
                   {user.phone || 'N/A'}
+                  {user.phone && (
+                    !user.phoneVerified
+                      ? <SmsOtpVerificationPopover />
+                      : <span>Verified</span>
+                  )}
                 </span>
               </div>
               <div className="flex items-center gap-3">

@@ -39,6 +39,7 @@ export default {
             transform: 'translateY(30px)',
           },
         },
+        
         roll: {
           '0%': {
             opacity: '0',
@@ -80,10 +81,15 @@ export default {
             transform: 'rotate(15deg)',
           },
         },
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
       },
       animation: {
         placeHolderFade: 'placeHolderFade 3s ease-in infinite',
         roll: 'roll 3s linear infinite 0.2s',
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
       },
 
       colors: {
