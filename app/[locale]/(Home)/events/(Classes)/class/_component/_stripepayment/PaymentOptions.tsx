@@ -45,7 +45,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   const options: { id: OptionType; label: string }[] = [
     { id: 'checkout', label: 'normal-checkout' },
-    { id: 'quick', label: 'quick-checkout' },
+    // only show quick checkout if not using formLink
+    ...(!formLink ? [{ id: 'quick' as OptionType, label: 'quick-checkout' }] : []),
     { id: 'etransfer', label: 'E-transfer' },
   ]
 

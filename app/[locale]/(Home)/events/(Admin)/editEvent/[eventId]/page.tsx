@@ -2,6 +2,7 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
+import Link from 'next/link'
 
 // Components
 import PublishButton from '@/app/[locale]/components/PublishButton'
@@ -237,6 +238,7 @@ const EditEventPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step XIV :</span> Event Categories
             </h2>
+            <p> To add categories, please click <Link href="/events/createEventCategory" target="_blank" className="text-blue-700 underline">here</Link>. After adding, please refresh the page.</p>
             <EventCategories event={event} categories={categories} />
           </div>
 

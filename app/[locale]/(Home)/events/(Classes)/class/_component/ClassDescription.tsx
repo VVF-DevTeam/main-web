@@ -65,10 +65,7 @@ const ClassDescription = async ({
   const existingPayment = author
     ? await prisma.payment.findMany({
         where: {
-          AND: [
-            { userId: author },
-            { eventId: classId }
-          ]
+          AND: [{ userId: author }, { eventId: classId }],
         },
       })
     : null
@@ -136,15 +133,23 @@ const ClassDescription = async ({
         </h1>
         <h3 className="mb-2 italic">({t('subHeaderSchedule')})</h3>
         <div className="flex flex-col gap-y-4">
-          {schedules.map((schedule) => (
-            <ScheduleItem
-              key={schedule.id}
-              startTime={schedule.startTime!}
-              endTime={schedule.endTime!}
-              description={schedule.description!}
-              locale={locale}
-            />
-          ))}
+          {/* Sort by position, and then filter out the ones that don't have a startTime, endTime, or description */}
+          {schedules
+            .sort((a, b) => (a.position || 0) - (b.position || 0))
+            .map(
+              (schedule) =>
+                schedule.startTime &&
+                schedule.endTime &&
+                schedule.description && (
+                  <ScheduleItem
+                    key={schedule.id}
+                    startTime={schedule.startTime}
+                    endTime={schedule.endTime}
+                    description={schedule.description}
+                    locale={locale}
+                  />
+                )
+            )}
         </div>
       </div>
 
@@ -166,9 +171,7 @@ const ClassDescription = async ({
           />
 
           {existingPayment && existingPayment.length > 0 && (
-            <p className="font-medium text-green-600">
-              {t('alreadyPaid')}
-            </p>
+            <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
           )}
         </>
       ) : (

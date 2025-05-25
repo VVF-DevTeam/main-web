@@ -26,7 +26,7 @@ const EventAdminButtons = async () => {
       </Link>
       {/* Create New Tag */}
       {isAdmin && (
-        <Link href={'/tags/createTag'}>
+        <Link href={'/events/createEventCategory'}>
           <Button variant={'gray'} size={'lg'}>
             Create New Tag
           </Button>

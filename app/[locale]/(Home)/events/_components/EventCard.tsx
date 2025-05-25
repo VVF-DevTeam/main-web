@@ -11,10 +11,12 @@ import { Tag, MapPin, Ticket, CalendarDays } from 'lucide-react'
 import EventButton from './EventButton'
 
 // Interfaces & Types
-import { Event } from '@prisma/client'
+import { Event, EventCategory } from '@prisma/client'
 
 interface EventCardProps {
-  event: Event
+  event: Event & {
+    categories: EventCategory[]
+  }
   locale: string
 }
 
@@ -40,15 +42,25 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
 
       <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg">
         {/* Tags */}
-        <div
-          className={cn(
-            'absolute left-3 top-2 mx-auto max-w-[30%] rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
-            event.eventType === 'CLASS'
-              ? 'bg-blue-950 hover:bg-blue-700/80'
-              : 'bg-yellow-500 hover:bg-yellow-400/80'
-          )}
-        >
-          {event.eventType.toLowerCase()}
+        <div className="absolute left-3 top-2 flex flex-wrap gap-2">
+          {event.categories?.sort((a) => 
+            a.type.toLowerCase() === 'primary' ? -1 : 1
+          ).map((category) => (
+            <div
+              key={category.id}
+              className={cn(
+                'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
+                category.isBold && 'font-bold',
+                category.isItalic && 'italic'
+              )}
+              style={{
+                backgroundColor: category.bgColor,
+                color: category.textColor,
+              }}
+            >
+              {category.title}
+            </div>
+          ))}
         </div>
 
         {/* Title */}

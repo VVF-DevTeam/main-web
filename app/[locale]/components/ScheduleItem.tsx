@@ -81,6 +81,8 @@ const ScheduleItem = ({
     }
   }
 
+  // TODO: Remove this function, and when admin add new schedule item, do it on the front end first. 
+  // Then add a save button to save all the schedule items at once (Remove the save button from the form as well).
   const addScheduleItem = async (scheduleItemId: string | null) => {
     const data = {
       scheduleItemId: scheduleItemId,
@@ -107,6 +109,7 @@ const ScheduleItem = ({
       })
     }
   }
+
   const onSubmit = async (data: z.infer<typeof scheduleItemSchema>) => {
     let response
     try {
@@ -222,7 +225,7 @@ const ScheduleItem = ({
             <Button
               variant={'destructive'}
               size={'sm'}
-              disabled={!isValid || isLoading || scheduleItemId === null}
+              disabled={ isLoading || scheduleItemId === null}
               type="button"
               onClick={() => deleteScheduleItem(scheduleItemId)}
             >
