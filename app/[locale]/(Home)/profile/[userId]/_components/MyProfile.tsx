@@ -43,6 +43,8 @@ const paymentTypeMap = {
   ClassDropIn: 'Class Drop-in',
   ClassFullCourse: 'Class Full Course',
   Concert: 'Concert',
+  Camping: 'Camping',
+  Event: 'Event',
 }
 
 const MyProfile = async ({

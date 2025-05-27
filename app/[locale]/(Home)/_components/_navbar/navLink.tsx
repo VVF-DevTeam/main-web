@@ -26,12 +26,13 @@ interface NavLinkProps {
 }
 
 // Main Component
-const NavLink: React.FC<NavLinkProps> = ({ label, path, logo, mode }) => {
+const NavLink = ({ label, path, logo, mode }: NavLinkProps) => {
   const Icon = navLogos[logo]
   const pathname = usePathname()
   const isActive =
-    pathname.toLowerCase().includes(label.toLowerCase()) ||
-    (label.toLowerCase() === 'home' && pathname.split('/').length <=  2)
+    path === '/' 
+      ? pathname === '/' || pathname.split('/').length <= 2
+      : pathname.toLowerCase().includes(path.toLowerCase())
 
   // css variables
   const baseClasses =

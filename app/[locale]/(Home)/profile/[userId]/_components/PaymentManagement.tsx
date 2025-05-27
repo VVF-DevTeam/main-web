@@ -48,6 +48,8 @@ const paymentTypeMap = {
   ClassDropIn: 'Class Drop-in',
   ClassFullCourse: 'Class Full Course',
   Concert: 'Concert',
+  Camping: 'Camping',
+  Event: 'Event',
 }
 
 export default async function PaymentManagement({
@@ -219,7 +221,7 @@ export default async function PaymentManagement({
                           paymentId={payment.id}
                           stripeProductId={payment.stripeProductId}
                           amount={Number(payment.pricePaid)}
-                          disabled={status === 'Expired' || status === 'Past' || status === 'Refunded'}
+                          disabled={status === 'Expired' || status === 'Past' || status === 'Refunded' || payment.stripeProductId === 'etf'}
                         />
                       </td>
                     </tr>

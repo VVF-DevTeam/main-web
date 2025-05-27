@@ -17,7 +17,7 @@ import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { PaymentType } from '@prisma/client'
 interface CheckoutFormProps {
   price: number
-  classId: string
+  eventId: string
   userId: string
   stripePriceId: string
   stripeProductId: string
@@ -26,10 +26,11 @@ interface CheckoutFormProps {
 
 interface QuickCheckoutFormProps {
   price: number
-  classId: string
+  eventId: string
   userId: string
   stripePriceId: string
   stripeProductId: string
+  type: string
 }
 
 const stripePromise = loadStripe(
@@ -38,12 +39,13 @@ const stripePromise = loadStripe(
 
 function QuickCheckoutForm({
   price,
-  classId,
+  eventId,
   userId,
   stripePriceId,
   stripeProductId,
   type,
 }: CheckoutFormProps) {
+  console.log(type)
   const stripe = useStripe()
   const elements = useElements()
   const { toast } = useToast()
@@ -66,7 +68,7 @@ function QuickCheckoutForm({
       }
     }
     checkSubAndSessions()
-  }, [userId, classId, price])  
+  }, [userId, eventId, price])  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,7 +79,7 @@ function QuickCheckoutForm({
     try {
       const { data } = await axiosInstance.post('/api/payment/intents/create', {
         amount: isSubscribed ? price * 0.8 * 100 : price * 100,
-        classId,
+        eventId,
         userId,
         stripePriceId,
         stripeProductId,
@@ -140,12 +142,13 @@ function QuickCheckoutForm({
   )
 }
 
-export default function ClassQuickCheckout({
+export default function EventQuickCheckout({
   price,
-  classId,
+  eventId,
   userId,
   stripePriceId,
   stripeProductId,
+  type,
 }: QuickCheckoutFormProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -155,11 +158,11 @@ export default function ClassQuickCheckout({
       <p className="pb-2">{t('quick-checkout-description')}</p>
       <QuickCheckoutForm
         price={price}
-        classId={classId}
+        eventId={eventId}
         userId={userId}
         stripePriceId={stripePriceId}
         stripeProductId={stripeProductId}
-        type="ClassDropIn"
+        type={type === "Class" ? "ClassDropIn" : type as PaymentType}
       />
     </Elements>
   )

@@ -27,7 +27,7 @@ interface EventTypeProps {
   event: Event
 }
 
-const zEnum = z.enum(['CONCERT', 'CLASS'])
+const zEnum = z.enum(['CONCERT', 'CLASS', 'CAMPING', 'EVENT'])
 
 const EventTypeSchema = z.object({
   eventType: zEnum,
@@ -118,6 +118,12 @@ const EventType = ({ event }: EventTypeProps) => {
                           </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="CONCERT">
                             Concert
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="CAMPING">
+                            Camping
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="EVENT">
+                            Event
                           </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                       </DropdownMenuContent>

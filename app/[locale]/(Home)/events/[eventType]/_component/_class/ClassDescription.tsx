@@ -4,9 +4,9 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 
 // Components
-import ScheduleItem from './ScheduleItem'
+import ClassScheduleItem from './ClassScheduleItem'
 import TextPreview from '@/app/[locale]/components/TextPreview'
-import PaymentOptions from './_stripepayment/PaymentOptions'
+import PaymentOptions from '../_stripepayment/PaymentOptions'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
@@ -31,6 +31,14 @@ interface ClassDescriptionProps {
   title: string
   stripeSubscribedPriceId: string
   fullCourseDiscount?: number
+  eventType: string
+}
+
+const typeMap = {
+  CLASS: 'Class',
+  CONCERT: 'Concert',
+  CAMPING: 'Camping',
+  EVENT: 'Event',
 }
 
 // Main Code
@@ -53,6 +61,7 @@ const ClassDescription = async ({
   classId,
   price,
   fullCourseDiscount,
+  eventType,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -65,10 +74,7 @@ const ClassDescription = async ({
   const existingPayment = author
     ? await prisma.payment.findMany({
         where: {
-          AND: [
-            { userId: author },
-            { eventId: classId }
-          ]
+          AND: [{ userId: author }, { eventId: classId }],
         },
       })
     : null
@@ -136,15 +142,23 @@ const ClassDescription = async ({
         </h1>
         <h3 className="mb-2 italic">({t('subHeaderSchedule')})</h3>
         <div className="flex flex-col gap-y-4">
-          {schedules.map((schedule) => (
-            <ScheduleItem
-              key={schedule.id}
-              startTime={schedule.startTime!}
-              endTime={schedule.endTime!}
-              description={schedule.description!}
-              locale={locale}
-            />
-          ))}
+          {/* Sort by position, and then filter out the ones that don't have a startTime, endTime, or description */}
+          {schedules
+            .sort((a, b) => (a.position || 0) - (b.position || 0))
+            .map(
+              (schedule) =>
+                schedule.startTime &&
+                schedule.endTime &&
+                schedule.description && (
+                  <ClassScheduleItem
+                    key={schedule.id}
+                    startTime={schedule.startTime}
+                    endTime={schedule.endTime}
+                    description={schedule.description}
+                    locale={locale}
+                  />
+                )
+            )}
         </div>
       </div>
 
@@ -156,19 +170,18 @@ const ClassDescription = async ({
             stripeProductId={stripeProductId}
             stripeSubscribedPriceId={stripeSubscribedPriceId}
             formLink={formLink}
-            classKeyName={keyName}
+            eventKeyName={keyName}
             price={price}
-            classId={classId}
+            eventId={classId}
             title={title}
             userId={author}
             fullCourseDiscount={fullCourseDiscount}
             email={email}
+            type={typeMap[eventType as keyof typeof typeMap]}
           />
 
           {existingPayment && existingPayment.length > 0 && (
-            <p className="font-medium text-green-600">
-              {t('alreadyPaid')}
-            </p>
+            <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
           )}
         </>
       ) : (

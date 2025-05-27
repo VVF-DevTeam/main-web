@@ -28,6 +28,9 @@ const EventsPage = async ({
     where: {
       isPublished: true,
     },
+    include: {
+      categories: true
+    }
   })
   if (allEvents.length === 0) {
     return (

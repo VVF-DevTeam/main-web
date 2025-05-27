@@ -10,7 +10,7 @@ interface ScheduleItemProps {
 }
 
 // Main Code
-const ScheduleItem = async ({
+const ClassScheduleItem = async ({
   startTime,
   endTime,
   description,
@@ -63,4 +63,4 @@ const ScheduleItem = async ({
   )
 }
 
-export default ScheduleItem
+export default ClassScheduleItem

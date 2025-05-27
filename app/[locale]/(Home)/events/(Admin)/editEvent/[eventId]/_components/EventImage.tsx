@@ -27,6 +27,7 @@ interface EventImageProps {
 
 const EventImageSchema = z.object({
   imgUrl: z.string().min(1, { message: 'Event Image is required' }),
+  subImgUrls: z.array(z.string()).max(2).optional(),
 })
 
 const EventImage = ({ event }: EventImageProps) => {
@@ -38,11 +39,11 @@ const EventImage = ({ event }: EventImageProps) => {
     resolver: zodResolver(EventImageSchema),
     defaultValues: {
       imgUrl: event?.imgUrl || '',
+      subImgUrls: (event?.subImgUrls as string[]) || [],
     },
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventImageSchema>) => {
-    console.log(values)
     try {
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
@@ -94,12 +95,40 @@ const EventImage = ({ event }: EventImageProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Input placeholder="Enter Image URL" {...field} />
+                    <Input placeholder="Enter Cover Image URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            {event.eventType === 'CONCERT' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="subImgUrls.0"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <Input placeholder="Enter First Sub Image URL. This will be the big image on the right of top of the page" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="subImgUrls.1"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <Input placeholder="Enter Second Sub Image URL. This will be the small image on the middle of top of the page" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
             <Button disabled={isSubmitting || !isValid}>Save</Button>
           </form>
         </Form>
@@ -108,13 +137,29 @@ const EventImage = ({ event }: EventImageProps) => {
           Add an image for this event.
         </p>
       ) : (
-        <div className="relative mx-auto aspect-video h-[250px] w-[560px]">
-          <Image
-            fill
-            src={event?.imgUrl}
-            alt="Event Image"
-            className="rounded-md object-cover"
-          ></Image>
+        <div className="flex flex-col gap-y-4">
+          <div className="relative mx-auto aspect-video h-[250px] w-[560px]">
+            <Image
+              fill
+              src={event?.imgUrl}
+              alt="Event Cover Image"
+              className="rounded-md object-cover"
+            />
+          </div>
+          {event.eventType === 'CONCERT' && (event?.subImgUrls as string[])?.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-4">
+              {(event?.subImgUrls as string[]).map((subImage, index) => (
+                <div key={index} className="relative aspect-video h-[200px] w-[400px]">
+                  <Image
+                    fill
+                    src={subImage}
+                    alt={`Event Sub Image ${index + 1}`}
+                    className="rounded-md object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

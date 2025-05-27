@@ -52,7 +52,7 @@ export default function RefundButton({
         }
       `}
     >
-      {isLoading ? 'Processing...' : 'Refund'}
+      {stripeProductId === 'etf' ? 'Payment by ETF (Refund not available here)' : isLoading ? 'Processing...' : 'Refund'}
     </button>
   )
 } 

@@ -5,11 +5,13 @@ import initTranslation from '@/app/i18n'
 import EventCard from './EventCard'
 
 // Interfaces & Types
-import { Event } from '@prisma/client'
+import { Event, EventCategory } from '@prisma/client'
 
 // Interfaces & Types
 interface EventListProps {
-  events: Event[]
+  events: (Event & {
+    categories: EventCategory[]
+  })[]
   locale: string
   finished?: boolean
 }
