@@ -66,8 +66,6 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
   const { isValid, isLoading } = form.formState
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
-    console.log(data)
-
     //Format title to trims whitespaces
     const title = data.title.replace(/\s+/g, ' ').trim()
 
@@ -151,6 +149,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
                 <FormLabel className="text-textColor-brand">
                   Event Title
                 </FormLabel>
+                <FormDescription className='text-[11px]'>(This will be the keyname in URL path. To change, please create a new event or ask dev team to update)</FormDescription>    
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
@@ -158,8 +157,6 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>What is your event about?</FormDescription>
-                <FormDescription className='text-[11px]'>(This will be the keyname in URL path. To change, please create a new one or ask dev team to update)</FormDescription>    
                 <FormMessage />
               </FormItem>
             )}
@@ -172,6 +169,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
                 <FormLabel className="mr-2 text-textColor-brand">
                   Event Type:
                 </FormLabel>
+                <FormDescription className='text-[11px]'>(For other event types, use &quot;Event&quot; or ask dev team to add)</FormDescription>
                 <FormControl>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -192,6 +190,12 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="CONCERT">
                           Concert
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="CAMPING">
+                          Camping
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="EVENT">
+                          Event
                         </DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
                     </DropdownMenuContent>

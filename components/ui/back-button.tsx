@@ -40,6 +40,8 @@ export interface BackButtonProps
   asChild?: boolean
 }
 
+const eventType = ['concert', 'class', 'camping', 'event']
+
 // Main Component
 const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
   async ({ className, variant, size, asChild = false, ...props }, ref) => {
@@ -57,9 +59,18 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
     } else if (parentPath.split('/').at(-1) === 'editEvent') {
       // For Edit Post Page, the flow is from allPosts to editPost
       parentPath = parentPath.replace('editEvent', 'allEvents')
-    } else if (parentPath.includes('class')) {
-      // For Event Class Page, class page is is just a bridge page so we will skip it
-      parentPath = parentPath.replace('/class', '')
+    } else if (eventType.some(type => parentPath.includes(type))) {
+      // For Event Pages, these pages are bridge pages so we will skip them
+      const matchedType = eventType.find(type => parentPath.includes(type))
+
+      if (matchedType === 'event') {
+        if (currentPath?.includes('/event/')) {
+          // match exactly /event
+          parentPath = parentPath.replace(/\/event(?:\/|$)/, '')
+        }
+      } else {
+        parentPath = parentPath.replace(`/${matchedType}`, '')
+      }
     } else if (parentPath.includes('job')) {
       // For Event Class Page, class page is is just a bridge page so we will skip it
       parentPath = parentPath.replace('editJob', 'allJobs')

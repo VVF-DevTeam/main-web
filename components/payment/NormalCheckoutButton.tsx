@@ -38,7 +38,7 @@ export default function NormalCheckoutButton({
   numberSession,
   email,
 }: NormalCheckoutButtonProps) {
-    // @ts-ignore: useTranslation will always throw an error for typescript
+  // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
 
   const handleCheckout = async (priceId: string) => {

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import ClassNormalCheckOut from './ClassNormalCheckOut'
-import ClassQuickCheckout from './ClassQuickCheckout'
+import EventNormalCheckOut from './EventNormalCheckOut'
+import EventQuickCheckout from './EventQuickCheckout'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,13 +13,14 @@ interface PaymentOptionsProps {
   stripeProductId: string
   stripeSubscribedPriceId: string
   formLink: string
-  classKeyName: string
+  eventKeyName: string
   price: number
-  classId: string
+  eventId: string
   title: string
   userId: string
   fullCourseDiscount?: number
   email: string
+  type: string
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -29,13 +30,14 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   stripeProductId,
   stripeSubscribedPriceId,
   formLink,
-  classKeyName,
+  eventKeyName,
   price,
-  classId,
+  eventId,
   title,
   userId,
   fullCourseDiscount,
   email,
+  type,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -46,12 +48,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   const options: { id: OptionType; label: string }[] = [
     { id: 'checkout', label: 'normal-checkout' },
     // only show quick checkout if not using formLink
-    ...(!formLink ? [{ id: 'quick' as OptionType, label: 'quick-checkout' }] : []),
+    ...(!formLink ? [{ id: 'quick' as OptionType, label: type === 'CLASS' ? 'quick-checkout-class' : 'quick-checkout' }] : []),
     { id: 'etransfer', label: 'E-transfer' },
   ]
 
   return (
-    <div className="w-full">
+    <div className="w-full text-bgColor-black">
       <Button
         variant="default"
         onClick={() => setShowOptions((prev) => !prev)}
@@ -90,28 +92,30 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
             {selected === 'checkout' && (
               <div className="w-fit">
-                <ClassNormalCheckOut
+                <EventNormalCheckOut
                   stripePriceId={stripePriceId}
                   stripeProductId={stripeProductId}
                   stripeSubscribedPriceId={stripeSubscribedPriceId}
                   formLink={formLink}
-                  classKeyName={classKeyName}
+                  eventKeyName={eventKeyName}
                   userId={userId}
-                  classId={classId}
+                  eventId={eventId}
                   price={price}
                   fullCourseDiscount={fullCourseDiscount}
                   email={email}
+                  type={type}
                 />
               </div>
             )}
             {selected === 'quick' && (
               <div className="w-fit">
-                <ClassQuickCheckout
+                <EventQuickCheckout
                   price={price}
-                  classId={classId}
+                  eventId={eventId}
                   userId={userId}
                   stripePriceId={stripePriceId}
                   stripeProductId={stripeProductId}
+                  type={type}
                 />
               </div>
             )}
@@ -126,11 +130,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     <strong>finance@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>Class Name</em>,{' '}
-                    {t('etransfer-description-6')}: <em>{classKeyName}</em>
+                    {t('etransfer-description-2')} <em>What is the event name?</em>,{' '}
+                    {t('etransfer-description-6')}: <em>{eventKeyName}</em>
                   </li>
                   <li>
-                    {t('etransfer-description-3')}: <strong>{title}</strong>
+                    {t('etransfer-description-3')}: <strong>{title}</strong>, {t('etransfer-description-3_5')}
                   </li>
                   <li>
                     {t('etransfer-description-4')}{' '}

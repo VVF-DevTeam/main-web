@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
@@ -14,50 +12,47 @@ model EventCategory {
   id        String       @id @default(cuid())
   title     String
   bgColor   String
-  textColor String
+  eventId   String?
   isBold    Boolean      @default(false)
   isItalic  Boolean      @default(false)
+  textColor String
   type      CategoryType
-  eventId   String?
-  event     Event[]
-  post      Post[]
+  post      Post[]       @relation("EventCategoryToPost")
+  event     Event[]      @relation("EventToEventCategory")
 }
 
 model Event {
-  id          String    @id @default(cuid())
-  title       String    @unique
-  keyName     String    @unique 
-  eventType   EventType
-  description String?
-  imgUrl      String?
-  formLink    String?
-  stripeProductId String?
-  stripePriceId String?
-  subscribedPriceId String?
-
-  // Metadata
-  location    String?
-  price       Decimal?      @default(0)
-  startDate   DateTime? @default(now())
-  endDate     DateTime  @default(now())
-  days        String[]
-  capacity    Int?
-  ticketsSold Int?
-  startTime   String?
-  endTime     String?
+  id                 String          @id @default(cuid())
+  title              String          @unique
+  subtitle           String?         // Optional subtitle field
+  description        String?
+  location           String?
+  startTime          String?
+  endTime            String?
+  capacity           Int?
+  ticketsSold        Int?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  days               String[]
+  endDate            DateTime        @default(now())
+  eventType          EventType
+  formLink           String?
   fullCourseDiscount Int?
-
-  // States
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  hosts      User[]
-  categories EventCategory[]
-  tickets    EventTicket[]
-  schedules  EventSchedule[]
-  payments   Payment[]
+  imgUrl             String?
+  subImgUrls         Json?           // Array of sub-image URLs for concert events
+  isPublished        Boolean         @default(false)
+  keyName            String          @unique
+  price              Decimal?        @default(0)
+  startDate          DateTime?       @default(now())
+  stripePriceId      String?
+  stripeProductId    String?
+  subscribedPriceId  String?
+  socialLinks        Json?           // Array of { platform: string, url: string }
+  schedules          EventSchedule[]
+  tickets            EventTicket[]
+  payments           Payment[]
+  categories         EventCategory[] @relation("EventToEventCategory")
+  hosts              User[]          @relation("EventToUser")
 
   @@unique([title, eventType])
   @@index([id])
@@ -80,188 +75,149 @@ model EventTicket {
   type      TicketType
   price     Float
   capacity  Int
-
-  // relation
-  eventId String
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
-// Ticket tiers
 model Ticket {
-  id          String  @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String?
   description String?
   price       Float
   eventId     String
-
-  // States
-  published Boolean  @default(false)
-  updatedAt DateTime @default(now())
-  createdAt DateTime @updatedAt
-
-  // For ticket checking
-  consumed Boolean @default(false)
-
-  // Relations
-  purchases Purchase[]
+  published   Boolean    @default(false)
+  updatedAt   DateTime   @default(now())
+  createdAt   DateTime   @updatedAt
+  consumed    Boolean    @default(false)
+  purchases   Purchase[]
 }
 
-// Act like a purchased ticket
 model Purchase {
   id            String  @id @default(cuid())
-  user          User    @relation(fields: [userId], references: [id])
   userId        String
-  ticket        Ticket  @relation(fields: [ticketId], references: [id])
   ticketId      String
   paymentMethod String?
+  ticket        Ticket  @relation(fields: [ticketId], references: [id])
+  user          User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, ticketId])
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-
-  role     Role[]
-  age      String?
-  phone    String? @unique
-  address  String?
-  password String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  subscribedAt DateTime?
-  subscribeExpires DateTime?
+  id                   String        @id @default(cuid())
+  name                 String?
+  email                String        @unique
+  age                  String?
+  phone                String?       @unique
+  address              String?
+  password             String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  emailVerified        DateTime?
+  image                String?
+  role                 Role[]
   stripeSubscriptionId String?
-
-  purchases    Purchase[]
-  posts        Post[]
-  likedPosts   PostLikes[]
-  visitedPosts PostVisits[]
-  EventHost    Event[]
-  jobs         Job[]
-  applications Application[]
-  payments     Payment[]
+  subscribeExpires     DateTime?
+  subscribedAt         DateTime?
+  phoneVerified        Boolean?      @default(false)
+  accounts             Account[]
+  applications         Application[]
+  jobs                 Job[]
+  payments             Payment[]
+  posts                Post[]
+  likedPosts           PostLikes[]
+  visitedPosts         PostVisits[]
+  purchases            Purchase[]
+  EventHost            Event[]       @relation("EventToUser")
 }
 
-// Posts made by admins
 model Post {
-  id          String   @id @default(cuid())
-  title       String   @unique
+  id          String          @id @default(cuid())
+  title       String          @unique
   content     String?
   summary     String?
   imgUrl      String?
-  isPublished Boolean? @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  postLikes  PostLikes[]
-  postVisits PostVisits[]
-  categories EventCategory[]
-
-  // relation
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublished Boolean?        @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postLikes   PostLikes[]
+  postVisits  PostVisits[]
+  categories  EventCategory[] @relation("EventCategoryToPost")
 
   @@unique([id, userId])
   @@index([id])
 }
 
-// Jobs made by admins
 model Job {
-  id          String   @id @default(cuid())
-  title       String   @unique
-  keyName     String   @unique
-
-  // Metadata
-  description     String?
-  jobType     JobType
-  summary     String?
-  startDate   DateTime? @default(now())
-  endDate     DateTime? @default(now())
-  location    String?
-
-  // States
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // relation
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  title        String        @unique
+  keyName      String        @unique
+  description  String?
+  jobType      JobType
+  summary      String?
+  startDate    DateTime?     @default(now())
+  endDate      DateTime?     @default(now())
+  location     String?
+  isPublished  Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String
   applications Application[]
-  
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([id, userId])
   @@index([id])
 }
 
 model Application {
-  id       String   @id @default(uuid())
-
-  // Metadata
-  firstName     String
-  lastName     String
-  address  String
-  city     String
-  country  String
-  postCode String
-  email    String
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  address     String
+  city        String
+  country     String
+  postCode    String
+  email       String
   phoneNumber String
-  resume   Bytes
-
-  // States
-  appliedAt DateTime @default(now())
-
-  // Relations
-  jobId    String
-  job      Job      @relation(fields: [jobId], references: [id])
-  userId   String
-  user     User     @relation(fields: [userId], references: [id]) 
+  resume      Bytes
+  appliedAt   DateTime @default(now())
+  jobId       String
+  userId      String
+  job         Job      @relation(fields: [jobId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
   @@unique([jobId, userId])
   @@index([id])
 }
 
 model Payment {
-  id String @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  type PaymentType
-
-  expiresAt   DateTime? // for subscription payment
-  quantity Int
-
-  // Relations
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  eventId String?
-  event   Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  // These fields below are changeable by host and admin, so we save them as the snapshot instead of joining them through Event table
-  stripeProductId String   // Immutable snapshot of what was sold
-  stripePriceId   String   // Immutable snapshot of price paid
-  stripePaymentId String  // Payment ID from Stripe
-  pricePaid       Decimal  // Actual amount charged, always saved
-  refunded  Boolean @default(false)
+  id              String      @id @default(cuid())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  type            PaymentType
+  expiresAt       DateTime?
+  quantity        Int
+  userId          String
+  eventId         String?
+  stripeProductId String
+  stripePriceId   String
+  stripePaymentId String
+  pricePaid       Decimal
+  refunded        Boolean     @default(false)
+  event           Event?      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PostLikes {
-  id String @id @default(cuid())
-
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // relations
-  postId String
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
 }
@@ -270,10 +226,9 @@ model PostVisits {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  // relations
   postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
@@ -291,11 +246,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
 }
@@ -318,6 +271,8 @@ enum Role {
 enum EventType {
   CLASS
   CONCERT
+  CAMPING
+  EVENT
 }
 
 enum JobType {
@@ -344,4 +299,6 @@ enum PaymentType {
   ClassFullCourse
   ClassDropIn
   Concert
+  Camping
+  Event
 }
