@@ -43,24 +43,24 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
       <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg">
         {/* Tags */}
         <div className="absolute left-3 top-2 flex flex-wrap gap-2">
-          {event.categories?.sort((a) => 
-            a.type.toLowerCase() === 'primary' ? -1 : 1
-          ).map((category) => (
-            <div
-              key={category.id}
-              className={cn(
-                'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
-                category.isBold && 'font-bold',
-                category.isItalic && 'italic'
-              )}
-              style={{
-                backgroundColor: category.bgColor,
-                color: category.textColor,
-              }}
-            >
-              {category.title}
-            </div>
-          ))}
+          {event.categories
+            ?.sort((a) => (a.type.toLowerCase() === 'primary' ? -1 : 1))
+            .map((category) => (
+              <div
+                key={category.id}
+                className={cn(
+                  'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
+                  category.isBold && 'font-bold',
+                  category.isItalic && 'italic'
+                )}
+                style={{
+                  backgroundColor: category.bgColor,
+                  color: category.textColor,
+                }}
+              >
+                {category.title}
+              </div>
+            ))}
         </div>
 
         {/* Title */}
@@ -100,8 +100,14 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
           <span className="flex items-center gap-x-2 text-sm md:text-lg">
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
             <div>
-              <p>{event.startDate.toLocaleDateString('en-GB')}</p>
-              <p>{event.endDate.toLocaleDateString('en-GB')}</p>
+              {event.startDate.getTime() === event.endDate.getTime() ? (
+                <p>{event.startDate.toLocaleDateString('en-GB')}</p>
+              ) : (
+                <>
+                  <p>{event.startDate.toLocaleDateString('en-GB')}</p>
+                  <p>{event.endDate.toLocaleDateString('en-GB')}</p>
+                </>
+              )}
             </div>
           </span>
 

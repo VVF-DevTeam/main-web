@@ -2,8 +2,9 @@
 import React, { useState } from 'react'
 import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
@@ -45,10 +46,10 @@ const EventPriceSchema = z.object({
 })
 
 const EventPrice = ({ event }: EventPriceProps) => {
-  const { toast } = useToast()
-
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const currentDateTime = getCurrentDateTime()
+
   const form = useForm<z.infer<typeof EventPriceSchema>>({
     resolver: zodResolver(EventPriceSchema),
     defaultValues: {
@@ -92,18 +93,29 @@ const EventPrice = ({ event }: EventPriceProps) => {
       // update event with new price in database and stripeData
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event price updated successfully',
+      toast.success('Event price updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'An unknown error occurred'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

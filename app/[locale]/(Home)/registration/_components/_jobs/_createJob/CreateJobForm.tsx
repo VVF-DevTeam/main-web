@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 // Components
 import Link from 'next/link'
@@ -50,8 +51,8 @@ const createJobSchema = z.object({
 // Main Component
 const CreateJobForm = ({ author }: CreateJobFormProps) => {
 
-  const { toast } = useToast()
   const router = useRouter()
+  const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
@@ -78,10 +79,15 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
       }
       const response = await axios.post('/api/jobs/create', jobData)
       if (response.status === 200) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: 'Job created successfully',
+        toast.success('Job created successfully', {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
         })
       }
 
@@ -91,33 +97,53 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Job Title',
-            description:
-              'There is already a job with this title, please reuse it or delete it',
+          toast.error('Duplicate Job Title', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>There is already a job with this title, please reuse it or delete it</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
-            description:
-              error.response?.data ||
-              'Something went wrong. Please contact the admin',
+          toast.error('Error making request to database', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>{error.response?.data || 'Something went wrong. Please contact the admin'}</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         }
       } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description:
-            error?.message || 'Something went wrong. Please contact the admin.',
+        toast.error(error.message || 'Something went wrong. Please contact the admin.', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Something went wrong. Please contact the admin.',
+        toast.error('Error', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     }

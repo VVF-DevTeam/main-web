@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
 import Editor from '@/app/[locale]/components/Editor'
@@ -33,8 +33,6 @@ const JobDescriptionSchema = z.object({
 })
 
 const JobDescription = ({ job }: JobDescriptionProps) => {
-  const { toast } = useToast()
-
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const form = useForm<z.infer<typeof JobDescriptionSchema>>({
@@ -48,19 +46,11 @@ const JobDescription = ({ job }: JobDescriptionProps) => {
     try {
       await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Job description updated successfully',
-      })
+      toast.success('Job description updated successfully')
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      toast.error('Something went wrong', { description: 'Please try again later' })
     }
   }
 

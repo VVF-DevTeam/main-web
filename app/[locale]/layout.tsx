@@ -6,7 +6,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
 
 // Components
-import { Toaster } from '@/components/ui/toaster'
 import { Toaster as SonnerToaster } from 'sonner'
 
 // CSS and CSS Modules
@@ -45,7 +44,6 @@ export default async function RootLayout({
           className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
         >
           <main>{children}</main>
-          <Toaster />
           <SonnerToaster />
           <Analytics/>
           <SpeedInsights />

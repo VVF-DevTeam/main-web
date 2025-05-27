@@ -38,7 +38,6 @@ export const signupAction = async (formData: signupActionProps) => {
         success: false,
       }
     }
-    console.log('Before checking password')
 
     // CHECK IF THE PASSWORDS MATCH
 
@@ -48,7 +47,6 @@ export const signupAction = async (formData: signupActionProps) => {
         success: false,
       }
     }
-    console.log('Before checking user')
     // CHECK IF THE USER ALREADY EXISTS
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -67,7 +65,6 @@ export const signupAction = async (formData: signupActionProps) => {
         success: false,
       }
     }
-    console.log('Before creating user')
     // CREATE THE USER
     const hashedPassword = bcrypt.hashSync(
       password,
@@ -85,8 +82,6 @@ export const signupAction = async (formData: signupActionProps) => {
         role: ['USER'],
       },
     })
-
-    console.log('After creating user')
 
     // Send Verification Email
     const verificationToken = await createToken(user.email)

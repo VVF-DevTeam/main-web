@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 // Components
 import {
@@ -37,8 +38,6 @@ const ApplicationForm = ({
   keyName,
   jobType,
 }: ApplicationProps) => {
-  const { toast } = useToast()
-
   const form = useForm<z.infer<typeof createApplicationSchema>>({
     resolver: zodResolver(createApplicationSchema),
     defaultValues: {
@@ -53,6 +52,8 @@ const ApplicationForm = ({
       resume: undefined,
     },
   })
+
+  const currentDateTime = getCurrentDateTime()
 
   const onSubmit = async (data: z.infer<typeof createApplicationSchema>) => {
     try {
@@ -77,43 +78,58 @@ const ApplicationForm = ({
         }
       )
       if (response.status === 200) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description:
-            'Job applied successfully. Thank you for your application! Please wait for our response, we will get back to you soon.',
-        })
+        toast.success('Job applied successfully. Thank you for your application! Please wait for our response, we will get back to you soon.')
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Application',
-            description:
-              'You have already applied for this job, if you want to add new information, please send an email to the admin',
+          toast.error('Duplicate Application', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>You have already applied for this job, if you want to add new information, please send an email to the admin</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
-            description:
-              error.response?.data ||
-              'Something went wrong. Please contact the admin',
+          toast.error('Error making request to database', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>{error.response?.data || 'Something went wrong. Please contact the admin'}</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         }
       } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description:
-            error?.message || 'Something went wrong. Please contact the admin.',
+        toast.error(error?.message || 'Something went wrong. Please contact the admin.', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Something went wrong. Please contact the admin.',
+        toast.error('Error', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     }

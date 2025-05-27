@@ -3,8 +3,9 @@ import React, { useState } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
 import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
@@ -31,7 +32,7 @@ const EventEndDateSchema = z.object({
 const EventEndDate = ({ event }: EventEndDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof EventEndDateSchema>>({
     resolver: zodResolver(EventEndDateSchema),
@@ -50,10 +51,15 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
       : null
 
     if (startDate !== null && endDate < startDate) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'End Date cannot be before the Start Date',
+      toast.error('End Date cannot be before the Start Date', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
       return
     }
@@ -65,19 +71,30 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
         data
       )
       console.log(response)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event End Date updated successfully',
+      toast.success('Event End Date updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       setIsEditing(false)
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

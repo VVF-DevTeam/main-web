@@ -14,9 +14,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { deleteUser } from '@/lib/actions/user/deleteUser'
 import { useRouter } from 'next/navigation'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 const deleteAccountSchema = z.object({
   confirmationText: z
@@ -39,8 +40,8 @@ const DeleteForm = ({
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
-  const { toast } = useToast()
   const router = useRouter()
+  const currentDateTime = getCurrentDateTime()
   const form = useForm<DeleteAccountFormValues>({
     resolver: zodResolver(deleteAccountSchema),
     defaultValues: {
@@ -52,10 +53,16 @@ const DeleteForm = ({
   const onSubmit = async (data: DeleteAccountFormValues) => {
     try {
       if (!user?.email) {
-        toast({
-          title: 'Error',
-          description: 'User email is missing',
-          variant: 'destructive',
+        toast.error('User email is missing', { 
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Please check your email and try again later.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
         return
       }
@@ -68,21 +75,42 @@ const DeleteForm = ({
       const response = await deleteUser(requestData)
 
       if (response.success) {
-        toast({ title: 'Success', description: t('account-deleted') })
+        toast.success(t('account-deleted'), {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
+        })
         router.replace('/')
       } else {
-        toast({
-          title: 'Error',
-          description: response.message || t('delete-account-failed'),
-          variant: 'destructive',
+        toast.error(response.message || t('delete-account-failed'), { 
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Please try again later or contact support for assistance.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     } catch (error) {
       console.error('Error deleting account:', error)
-      toast({
-        title: 'Error',
-        description: t('delete-account-failed'),
-        variant: 'destructive',
+      toast.error(t('delete-account-failed'), { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>An error occurred while deleting your account. Please try again later or contact support for assistance.</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

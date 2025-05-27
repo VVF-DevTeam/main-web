@@ -56,7 +56,7 @@ const ImageCarousel = ({
     {
       id: '5',
       url: 'https://drive.google.com/thumbnail?id=1mMK7znhBvIrMP0w9SrK6gp32bHtZgoc-&sz=w2000',
-      classUrl: `/${locale}/events/concert/fridaychill`,
+      classUrl: `/${locale}/events/concert/friday-chill`,
       description: 'Friday Chill Series',
     },
   ]

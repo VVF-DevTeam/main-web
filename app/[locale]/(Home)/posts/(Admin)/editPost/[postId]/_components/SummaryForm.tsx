@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Post } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -29,7 +29,6 @@ const PostSummarySchema = z.object({
 })
 
 const PostSummary = ({ post }: PostSummaryProps) => {
-  const { toast } = useToast()
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const form = useForm<z.infer<typeof PostSummarySchema>>({
@@ -43,18 +42,20 @@ const PostSummary = ({ post }: PostSummaryProps) => {
     try {
       await axiosInstance.put(`/api/posts/edit/${post.id}`, values)
       setEditing(false)
-      toast({
-        variant: 'default',
-        title: 'Success',
+      toast.success('Success', {
         description: 'Post summary updated successfully',
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
+      toast.error('Error', {
         description: 'Something went wrong',
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

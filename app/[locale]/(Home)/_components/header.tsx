@@ -8,20 +8,18 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Mail, Copy, Globe } from 'lucide-react'
-
+import { toast } from 'sonner'
 // Libraries
-import { useToast } from '@/hooks/use-toast'
 import LanguageChanger from '@/components/translator/LanguageChanger'
 import React from 'react'
 
 // Main Component
 const Header = () => {
-  const { toast } = useToast()
-
   const handleClick = (text: string) => {
     navigator.clipboard.writeText(text)
-    toast({
-      title: 'Copied to clipboard',
+    toast('Copied to clipboard', {
+      icon: <Copy className="h-4 w-4" />,
+      className: 'text-green-500'
     })
   }
 

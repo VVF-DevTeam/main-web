@@ -6,9 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Image from 'next/image'
 import { User } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { updateUser } from '@/lib/actions/user/updateUser'
-import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 import {
   Form,
@@ -36,7 +36,6 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('profile')
-  const { toast } = useToast()
   const [imagePreview, setImagePreview] = useState(user.image || '')
 
   const form = useForm<ProfileFormValues>({
@@ -60,24 +59,13 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
     try {
       const response = await updateUser(data)
       if (response.success) {
-        toast({
-          title: 'Success',
-          description: 'Profile updated successfully!',
-        })
+        toast.success('Profile updated successfully!')
       } else {
-        toast({
-          title: 'Error',
-          description: response.error || 'Update failed',
-          variant: 'destructive',
-        })
+        toast.error(response.error || 'Update failed', { description: 'Something went wrong' })
       }
     } catch (error) {
       console.log(error)
-      toast({
-        title: 'Error',
-        description: 'Something went wrong',
-        variant: 'destructive',
-      })
+      toast.error('Something went wrong', { description: 'Please try again later' })
     }
   }
 

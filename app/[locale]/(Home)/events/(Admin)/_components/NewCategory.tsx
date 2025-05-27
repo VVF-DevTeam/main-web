@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { ColorPicker, useColor } from 'react-color-palette'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -28,7 +28,6 @@ const NewCategory = () => {
   const [titleColor, setTitleColor] = useColor('#1A1A1A')
 
   const router = useRouter()
-  const { toast } = useToast()
 
   const isDisabled = title.length === 0 || categoryType.length === 0
 
@@ -46,11 +45,7 @@ const NewCategory = () => {
     try {
       const response = await axiosInstance.post(`/api/categories/create`, data)
       if (response.status === 200) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: 'Category created successfully',
-        })
+        toast.success('Category created successfully')
       }
       // reset all states
       setTitle('')
@@ -61,11 +56,7 @@ const NewCategory = () => {
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
-      })
+      toast.error('Something went wrong', { description: 'Please try again later' })
     }
   }
 
