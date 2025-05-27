@@ -10,39 +10,42 @@ import { useState, useEffect } from 'react'
 import { getRemainSessions } from '@/lib/actions/event/getRemainSessions'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
+import { PaymentType } from '@prisma/client'
 
-type PaymentType = 'drop-in' | 'full-course'
+type PaymentButtonType = 'drop-in' | 'full-course'
 
-interface ClassNormalCheckOutProps {
+interface EventNormalCheckOutProps {
   stripePriceId?: string
   stripeProductId?: string
   formLink?: string // form link is a legacy property from the old version of the website for payment
-  classKeyName: string
+  eventKeyName: string
   userId: string
-  classId: string
+  eventId: string
   stripeSubscribedPriceId?: string
   price: number
   fullCourseDiscount?: number
   email: string
+  type: string
 }
 
-export default function ClassNormalCheckOut({
+export default function EventNormalCheckOut({
   stripePriceId,
   stripeProductId,
   formLink,
-  classKeyName,
+  eventKeyName,
   userId,
-  classId,
+  eventId,
   stripeSubscribedPriceId,
   price,
   fullCourseDiscount,
   email,
-}: ClassNormalCheckOutProps) {
+  type,
+}: EventNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [paymentType, setPaymentType] = useState<PaymentType>('drop-in')
+  const [paymentType, setPaymentType] = useState<PaymentButtonType>('drop-in')
   const [remainSessions, setRemainSessions] = useState(0)
   const [fullCoursePrice, setFullCoursePrice] = useState(0)
   const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 1
@@ -53,7 +56,7 @@ export default function ClassNormalCheckOut({
       try {
         const [subResult, sessions] = await Promise.all([
           checkSubscription(userId),
-          getRemainSessions(classId),
+          getRemainSessions(eventId),
         ])
         setRemainSessions(sessions)
         setIsSubscribed(subResult)
@@ -65,7 +68,7 @@ export default function ClassNormalCheckOut({
       }
     }
     checkSubAndSessions()
-  }, [userId, classId, price])
+  }, [userId, eventId, price])
 
   return (
     // Edit classname if needed
@@ -97,24 +100,32 @@ export default function ClassNormalCheckOut({
               )}
               <RadioGroup
                 value={paymentType}
-                onValueChange={(value) => setPaymentType(value as PaymentType)}
+                onValueChange={(value) =>
+                  setPaymentType(value as PaymentButtonType)
+                }
                 className="flex flex-col gap-2"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="drop-in" id="drop-in" />
                   <Label htmlFor="drop-in">
-                    Drop-in {isSubscribed ? `(${price * 0.8}$)` : `(${price}$)`}{' '}
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="full-course" id="full-course" />
-                  <Label htmlFor="full-course">
-                    Full course - {remainSessions} {t('sessions')} ({fullCourseDiscount}% off){' '}
+                    {type === 'Class' ? 'Drop-in' : t('buy-tickets')}{' '}
                     {isSubscribed
-                      ? `(${Math.round(fullCoursePrice * 0.8)}$)`
-                      : `(${Math.round(fullCoursePrice)}$)`}
+                      ? `(${Math.round(price * 0.8 * 100) / 100}$)`
+                      : `(${Math.round(price * 100) / 100}$)`}{' '}
                   </Label>
                 </div>
+                {type === 'Class' && (
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="full-course" id="full-course" />
+                    <Label htmlFor="full-course">
+                      Full course - {remainSessions} {t('sessions')} (
+                      {fullCourseDiscount}% off){' '}
+                      {isSubscribed
+                        ? `(${Math.round(fullCoursePrice * 0.8 * 100) / 100}$)`
+                        : `(${Math.round(fullCoursePrice * 100) / 100}$)`}
+                    </Label>
+                  </div>
+                )}
               </RadioGroup>
 
               {paymentType === 'drop-in' ? (
@@ -123,11 +134,13 @@ export default function ClassNormalCheckOut({
                     isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
                   }
                   stripeProductId={stripeProductId!}
-                  eventKeyName={classKeyName}
+                  eventKeyName={eventKeyName}
                   userId={userId}
-                  eventId={classId}
+                  eventId={eventId}
                   buttonText="reserve-button"
-                  type="ClassDropIn"
+                  type={
+                    type === 'Class' ? 'ClassDropIn' : (type as PaymentType)
+                  }
                   email={email}
                 />
               ) : (
@@ -136,12 +149,16 @@ export default function ClassNormalCheckOut({
                     isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
                   }
                   stripeProductId={stripeProductId!}
-                  eventKeyName={classKeyName}
+                  eventKeyName={eventKeyName}
                   userId={userId}
-                  eventId={classId}
+                  eventId={eventId}
                   buttonText="reserve-button"
                   type="ClassFullCourse"
-                  price={isSubscribed ? Math.round(fullCoursePrice * 0.8) : Math.round(fullCoursePrice)}
+                  price={
+                    isSubscribed
+                      ? Math.round(fullCoursePrice * 0.8)
+                      : Math.round(fullCoursePrice)
+                  }
                   numberSession={remainSessions}
                   email={email}
                 />

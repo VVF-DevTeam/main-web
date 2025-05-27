@@ -43,7 +43,7 @@ const ClassImage = async ({
           {t(title)}
         </h2>
         <span>
-          {t('classBy-guitar')}{' '}
+          {t('hostedBy')}{' '}
           <span className="font-bold">
             {hosts.map((h) => h.name).join(', ')}
           </span>

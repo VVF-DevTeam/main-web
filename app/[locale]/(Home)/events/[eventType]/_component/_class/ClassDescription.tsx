@@ -4,9 +4,9 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 
 // Components
-import ScheduleItem from './ScheduleItem'
+import ClassScheduleItem from './ClassScheduleItem'
 import TextPreview from '@/app/[locale]/components/TextPreview'
-import PaymentOptions from './_stripepayment/PaymentOptions'
+import PaymentOptions from '../_stripepayment/PaymentOptions'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
@@ -31,6 +31,14 @@ interface ClassDescriptionProps {
   title: string
   stripeSubscribedPriceId: string
   fullCourseDiscount?: number
+  eventType: string
+}
+
+const typeMap = {
+  CLASS: 'Class',
+  CONCERT: 'Concert',
+  CAMPING: 'Camping',
+  EVENT: 'Event',
 }
 
 // Main Code
@@ -53,6 +61,7 @@ const ClassDescription = async ({
   classId,
   price,
   fullCourseDiscount,
+  eventType,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -141,7 +150,7 @@ const ClassDescription = async ({
                 schedule.startTime &&
                 schedule.endTime &&
                 schedule.description && (
-                  <ScheduleItem
+                  <ClassScheduleItem
                     key={schedule.id}
                     startTime={schedule.startTime}
                     endTime={schedule.endTime}
@@ -161,13 +170,14 @@ const ClassDescription = async ({
             stripeProductId={stripeProductId}
             stripeSubscribedPriceId={stripeSubscribedPriceId}
             formLink={formLink}
-            classKeyName={keyName}
+            eventKeyName={keyName}
             price={price}
-            classId={classId}
+            eventId={classId}
             title={title}
             userId={author}
             fullCourseDiscount={fullCourseDiscount}
             email={email}
+            type={typeMap[eventType as keyof typeof typeMap]}
           />
 
           {existingPayment && existingPayment.length > 0 && (
