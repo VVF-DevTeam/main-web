@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
 import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -33,7 +33,6 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [noEndDate, setNoEndDate] = useState(false) // NEW STATE
   const router = useRouter()
-  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof JobEndDateSchema>>({
     resolver: zodResolver(JobEndDateSchema),
@@ -53,33 +52,35 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
       : null
 
     if (startDate !== null && endDate && new Date(endDate).getTime() < startDate) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
+      toast.error('Error', {
         description: 'End Date cannot be before the Start Date',
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
       return
     }
 
-						
     try {
       const response = await axiosInstance.put(`/api/jobs/edit/${job.id}`, {
         endDate,
       })
       console.log(response)
-      toast({
-        variant: 'default',
-        title: 'Success',
+      toast.success('Success', {
         description: 'Job End Date updated successfully',
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       setIsEditing(false)
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
+      toast.error('Error', {
         description: 'Something went wrong',
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

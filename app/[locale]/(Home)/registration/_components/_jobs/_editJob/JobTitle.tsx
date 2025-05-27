@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -33,7 +33,6 @@ const JobTitleSchema = z.object({
 const JobTitle = ({ job }: JobTitleProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
-  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof JobTitleSchema>>({
     resolver: zodResolver(JobTitleSchema),
@@ -45,10 +44,11 @@ const JobTitle = ({ job }: JobTitleProps) => {
   const onSubmit = async (data: z.infer<typeof JobTitleSchema>) => {
     try {
       const response = await axios.put(`/api/jobs/edit/${job.id}`, data)
-      toast({
-        variant: 'default',
-        title: 'Success',
+      toast.success('Success', {
         description: 'Job title updated successfully',
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       console.log(response)
       setIsEditing(false)
@@ -56,32 +56,33 @@ const JobTitle = ({ job }: JobTitleProps) => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Job Title',
+          toast.error('Error', {
             description: 'There is already an Job with this title',
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
-            description:
-              error.response?.data ||
-              'Something went wrong. Please contact the admin',
+          toast.error('Error', {
+            description: error.response?.data || 'Something went wrong',
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         }
       } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description:
-            error?.message || 'Something went wrong. Please contact the admin.',
+        toast.error('Error', {
+          description: error?.message || 'Something went wrong',
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Something went wrong. Please contact the admin.',
+        toast.error('Error', {
+          description: 'Something went wrong',
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     }

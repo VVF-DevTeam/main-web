@@ -1,6 +1,8 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { signupAction } from '@/lib/actions/auth/signupAction'
@@ -22,14 +24,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
-import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
   const [showPassword, setShowPassword] = useState(false)
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -49,24 +51,40 @@ const SignUpForm = () => {
       const response: ServerActionResponse = await signupAction(data)
       // Check if the account was created
       if (response.success) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: response.message,
+        toast.success(response.message, {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: response.message,
+        toast.error(response.message, {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
       // Show error to the user
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
       throw error
     }

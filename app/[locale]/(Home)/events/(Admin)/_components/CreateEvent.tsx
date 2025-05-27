@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 // Components
 import Link from 'next/link'
@@ -32,7 +33,6 @@ import {
 
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
-import { useToast } from '@/hooks/use-toast'
 import { axiosInstance } from '@/lib/axios'
 
 // Interfaces
@@ -53,7 +53,6 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
   // TODO: Add author field for event
   console.log(author)
-  const { toast } = useToast()
   const router = useRouter()
 
   const form = useForm<z.infer<typeof createEventSchema>>({
@@ -80,11 +79,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
       }
       const response = await axiosInstance.post('/api/events/create', eventData)
       if (response.status === 200) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: 'Event created successfully',
-        })
+        toast.success('Event created successfully')
       }
 
       form.reset()
@@ -93,31 +88,22 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Event Title',
+          toast.error('Duplicate Event Title', {
             description: 'There is already an event with this title',
           })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
+          toast.error('Error making request to database', {
             description:
               error.response?.data ||
               'Something went wrong. Please contact the admin',
           })
         }
       } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description:
-            error?.message || 'Something went wrong. Please contact the admin.',
+        toast.error(error?.message || 'Something went wrong. Please contact the admin.', {
+          description: 'Error'
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
+        toast.error('Error', {
           description: 'Something went wrong. Please contact the admin.',
         })
       }

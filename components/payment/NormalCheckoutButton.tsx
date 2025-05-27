@@ -62,20 +62,36 @@ export default function NormalCheckoutButton({
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
 
       if (result.error) {
-        toast.error(`Stripe redirect error: ${result.error.message}`)
+        toast.error('Error', {
+          description: `Stripe redirect error: ${result.error.message}`,
+          style: {
+            color: '#ef4444' // red-500 color
+          }
+        })
       }
     } catch (error: unknown) {
       if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message ||
-            'A network or server error occurred. Please try again.'
-        )
+        toast.error('Error', {
+          description: error.response?.data?.message ||
+            'A network or server error occurred. Please try again.',
+          style: {
+            color: '#ef4444' // red-500 color
+          }
+        })
       } else if (error instanceof Error) {
-        toast.error(error.message || 'Unexpected error occurred.')
+        toast.error('Error', {
+          description: error.message || 'Unexpected error occurred.',
+          style: {
+            color: '#ef4444' // red-500 color
+          }
+        })
       } else {
-        toast.error(
-          'Unexpected error occurred. Please contact our developer team for support.'
-        )
+        toast.error('Error', {
+          description: 'Unexpected error occurred. Please contact our developer team for support.',
+          style: {
+            color: '#ef4444' // red-500 color
+          }
+        })
       }
     }
   }

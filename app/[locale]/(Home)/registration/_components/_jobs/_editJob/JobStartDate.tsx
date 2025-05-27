@@ -4,7 +4,7 @@ import DatePicker from '@/components/ui/DatePicker'
 import 'react-day-picker/style.css'
 import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -32,7 +32,6 @@ const JobStartDateSchema = z.object({
 const JobStartDate = ({ job }: JobStartDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
-  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof JobStartDateSchema>>({
     resolver: zodResolver(JobStartDateSchema),
@@ -44,20 +43,22 @@ const JobStartDate = ({ job }: JobStartDateProps) => {
   const onSubmit = async (data: z.infer<typeof JobStartDateSchema>) => {
     try {
       const response = await axiosInstance.put(`/api/jobs/edit/${job.id}`, data)
-      toast({
-        variant: 'default',
-        title: 'Success',
+      toast.success('Success', {
         description: 'Job Start Date updated successfully',
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       console.log(response)
       setIsEditing(false)
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
+      toast.error('Error', {
         description: 'Something went wrong',
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

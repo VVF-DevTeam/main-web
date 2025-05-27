@@ -8,9 +8,10 @@ import { LogIn } from 'lucide-react'
 
 // Libraries
 import { signOutAction } from '@/lib/actions/auth/signoutAction'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 // Interfaces
 interface AuthButtonProps {
@@ -23,6 +24,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const isActive = pathname.includes('signIn')
+  const currentDateTime = getCurrentDateTime()
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('homePage')
 
@@ -37,19 +39,31 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
     try {
       const response: ServerActionResponse = await signOutAction()
       if (response.success) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: response.message,
+        toast.success('Success', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>{response.message}</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
         })
       }
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Error', {
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>Something went wrong</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

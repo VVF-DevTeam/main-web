@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 // Components
 import Link from 'next/link'
@@ -22,7 +23,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
-import { useToast } from '@/hooks/use-toast'
 import { axiosInstance } from '@/lib/axios'
 
 // Interfaces
@@ -32,7 +32,6 @@ interface CreatePostFormProps {
 
 // Main Component
 const CreatePostForm = ({ author }: CreatePostFormProps) => {
-  const { toast } = useToast()
   const router = useRouter()
 
   const form = useForm<z.infer<typeof createPostSchema>>({
@@ -51,11 +50,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
       }
       const response = await axiosInstance.post('/api/posts/create', postData)
       if (response.status === 200) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: 'Post created successfully',
-        })
+        toast.success('Post created successfully')
       }
 
       form.reset()
@@ -65,24 +60,12 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
       console.log(error)
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Post',
-            description: 'There is already a post with this title',
-          })
+          toast.error('Duplicate Post', { description: 'There is already a post with this title' })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
-            description: 'Something went wrong. Please contact the admin',
-          })
+          toast.error('Error making request to database', { description: 'Something went wrong. Please contact the admin' })
         }
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Something went wrong. Please contact the admin',
-        })
+        toast.error('Error', { description: 'Something went wrong. Please contact the admin' })
       }
     }
   }

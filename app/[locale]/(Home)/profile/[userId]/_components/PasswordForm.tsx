@@ -8,6 +8,8 @@ import { changePassword } from '@/lib/actions/auth/changePassword'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { passwordSchema } from '@/lib/zodSchema/passwordSchema'
 
@@ -20,7 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/hooks/use-toast'
 
 type PasswordFormValues = z.infer<typeof passwordSchema>
 
@@ -31,7 +32,7 @@ const PasswordForm = ({
 }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('profile')
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,
     newPassword: false,
@@ -59,21 +60,42 @@ const PasswordForm = ({
       })
 
       if (result.success) {
-        toast({ title: 'Success', description: t('password-success') })
+        toast.success(t('password-success'), {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
+        })
         form.reset()
       } else {
-        toast({
-          title: 'Error',
-          description: result.message || t('password-failed'),
-          variant: 'destructive',
+        toast.error(result.message || t('password-failed'), {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>{result.message || t('password-failed')}</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     } catch (error) {
       console.error('API Call Failed:', error)
-      toast({
-        title: 'Error',
-        description: t('password-failed'),
-        variant: 'destructive',
+      toast.error(t('password-failed'), {
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{t('password-failed')}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

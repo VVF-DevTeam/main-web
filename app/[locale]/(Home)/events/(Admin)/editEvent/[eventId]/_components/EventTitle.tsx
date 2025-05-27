@@ -2,8 +2,9 @@
 import React, { useState } from 'react'
 import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
@@ -34,7 +35,7 @@ const EventTitleSchema = z.object({
 const EventTitle = ({ event }: EventTitleProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof EventTitleSchema>>({
     resolver: zodResolver(EventTitleSchema),
@@ -49,10 +50,15 @@ const EventTitle = ({ event }: EventTitleProps) => {
         `/api/events/edit/${event.id}`,
         data
       )
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event title updated successfully',
+      toast.success('Event title updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       console.log(response)
       setIsEditing(false)
@@ -60,32 +66,53 @@ const EventTitle = ({ event }: EventTitleProps) => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          toast({
-            variant: 'destructive',
-            title: 'Duplicate Event Title',
-            description: 'There is already an event with this title',
+          toast.error('Duplicate Event Title', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>There is already an event with this title</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error making request to database',
-            description:
-              error.response?.data ||
-              'Something went wrong. Please contact the admin',
+          toast.error('Error making request to database', {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>{error.response?.data || 'Something went wrong. Please contact the admin'}</span>
+                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444' // red-500 color
+            }
           })
         }
       } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description:
-            error?.message || 'Something went wrong. Please contact the admin.',
+        toast.error(error.message || 'Something went wrong. Please contact the admin.', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Error</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Something went wrong. Please contact the admin.',
+        toast.error('Error', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            </div>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     }
