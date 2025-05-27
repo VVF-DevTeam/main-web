@@ -248,7 +248,7 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
       </div>
 
       {isPending && loadingIndicator}
-      <div id="recaptcha-container" className='hidden'></div>
+      <div id="recaptcha-container"></div>
     </div>
   )
 }
