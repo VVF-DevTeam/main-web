@@ -98,17 +98,17 @@ body {
       opacity: 1;
       transform: translateY(0);
     }
-    25% {
-      opcacity: 0.2;
+      25% {
+        opacity: 0.2;
       transform: translateY(15px);
     }
-    50% {
-      opcacity: 0;
+      50% {
+        opacity: 0;
       transform: translateY(30px);
     }
 
-    75% {
-      opcacity: 0.8;
+      75% {
+        opacity: 0.8;
       transform: translateY(15px);
     }
 
