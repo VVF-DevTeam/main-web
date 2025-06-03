@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import axios, { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 import 'react-quill/dist/quill.snow.css'
 
@@ -31,12 +32,12 @@ import {
 
 import EmailSuggestion from './EmailSuggestion'
 
-interface event {
+interface Event {
   id: string
   title: string
 }
 
-interface eventParticipants {
+interface EventParticipants {
   userId: string
   eventId: string | null
   user: {
@@ -55,21 +56,18 @@ const sendEmailSchema = z.object({
   attachments: z.array(z.instanceof(File)).optional(),
 })
 
-type SendEmailFormValues = {
-  event: string
-  recipients: string[]
-  subject: string
-  content: string
-  attachments: File[]
-}
+type SendEmailFormValues = z.infer<typeof sendEmailSchema>
 
 const EmailComposition = ({
   events,
   eventParticipants,
 }: {
-  events: event[]
-  eventParticipants: eventParticipants[]
+  events: Event[]
+  eventParticipants: EventParticipants[]
 }) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('profile')
+
   const ReactQuill = useMemo(
     () => dynamic(() => import('react-quill-new'), { ssr: false }),
     []
@@ -85,8 +83,9 @@ const EmailComposition = ({
       attachments: [],
     },
   })
+
   const [selectedEvent, setSelectedEvent] = useState('')
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false)
 
   const modules = {
     toolbar: [
@@ -108,18 +107,14 @@ const EmailComposition = ({
       formData.append('recipients', JSON.stringify(data.recipients))
       formData.append('subject', data.subject)
       formData.append('content', data.content)
-      data.attachments.forEach((file) => {
-        formData.append('attachments', file)
-      })
+      data.attachments?.forEach((file) => formData.append('attachments', file))
 
       const response = await axios.post('/api/admin/sendEmail', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
 
       if (response.status === 200) {
-        toast.success('Email sent successfully!', {
+        toast.success(t('email-sent-successfully'), {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
@@ -127,59 +122,28 @@ const EmailComposition = ({
           ),
           style: { color: '#22c55e' }, // green-500
         })
-
         form.reset()
       }
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error('Failed to send email', {
-          description: (
-            <div className="flex flex-col gap-1">
-              <span>
-                {error.response?.data ||
-                  'Something went wrong. Please contact the admin.'}
-              </span>
-              <span style={{ color: 'var(--muted-foreground)' }}>
-                {currentDateTime}
-              </span>
-            </div>
-          ),
-          style: {
-            color: '#ef4444', // red-500
-          },
-        })
-      } else if (error instanceof Error) {
-        toast.error(
-          error?.message || 'Something went wrong. Please contact the admin.',
-          {
-            description: (
-              <div className="flex flex-col gap-1">
-                <span>Something went wrong. Please contact the admin.</span>
-                <span style={{ color: 'var(--muted-foreground)' }}>
-                  {currentDateTime}
-                </span>
-              </div>
-            ),
-            style: {
-              color: '#ef4444', // red-500
-            },
-          }
-        )
-      } else {
-        toast.error('Error', {
-          description: (
-            <div className="flex flex-col gap-1">
-              <span>Something went wrong. Please contact the admin.</span>
-              <span style={{ color: 'var(--muted-foreground)' }}>
-                {currentDateTime}
-              </span>
-            </div>
-          ),
-          style: {
-            color: '#ef4444', // red-500
-          },
-        })
-      }
+      const errorMessage =
+        error instanceof AxiosError
+          ? error.response?.data ||
+            'Something went wrong. Please contact the admin.'
+          : error instanceof Error
+            ? error.message || 'Something went wrong. Please contact the admin.'
+            : 'Something went wrong. Please contact the admin.'
+
+      toast.error('Failed to send email', {
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{errorMessage}</span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          </div>
+        ),
+        style: { color: '#ef4444' }, // red-500
+      })
     } finally {
       setLoading(false)
     }
@@ -189,7 +153,7 @@ const EmailComposition = ({
     <div className="min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Send Email</h1>
+          <h1 className="text-3xl font-bold">{t('email-composition')}</h1>
         </div>
 
         <Form {...form}>
@@ -200,7 +164,7 @@ const EmailComposition = ({
               name="event"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Event</FormLabel>
+                  <FormLabel>{t('select-an-event')}</FormLabel>
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value)
@@ -211,7 +175,7 @@ const EmailComposition = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select an event" />
+                        <SelectValue placeholder={t('select-an-event')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -233,10 +197,7 @@ const EmailComposition = ({
               name="recipients"
               render={({ field }) => (
                 <EmailSuggestion
-                  field={{
-                    value: field.value,
-                    onChange: field.onChange,
-                  }}
+                  field={field}
                   emails={eventParticipants
                     .filter((p) => p.eventId === selectedEvent && p.user?.email)
                     .map((p) => ({
@@ -253,12 +214,12 @@ const EmailComposition = ({
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject</FormLabel>
+                  <FormLabel>{t('Subject')}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       maxLength={100}
-                      placeholder="Event Communication"
+                      placeholder={t('Subject') ?? ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -272,7 +233,7 @@ const EmailComposition = ({
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Content</FormLabel>
+                  <FormLabel>{t('email-content')}</FormLabel>
                   <FormControl>
                     <ReactQuill
                       theme="snow"
@@ -293,12 +254,12 @@ const EmailComposition = ({
               name="attachments"
               render={() => (
                 <FormItem>
-                  <FormLabel>Attachments</FormLabel>
+                  <FormLabel>{t('Attachments')}</FormLabel>
                   <FormControl>
                     <div className="flex items-center space-x-2">
                       <label className="cursor-pointer rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50">
                         <FiPaperclip className="mr-2 inline-block" />
-                        Add Files
+                        {t('Add-file')}
                         <input
                           type="file"
                           multiple
@@ -355,7 +316,7 @@ const EmailComposition = ({
                 disabled={loading}
                 className={loading ? 'bg-bgColor-brand' : ''}
               >
-                {loading ? 'Sending...' : 'Send Email'}
+                {loading ? t('email-sending') : t('email-send')}
               </Button>
             </div>
           </form>

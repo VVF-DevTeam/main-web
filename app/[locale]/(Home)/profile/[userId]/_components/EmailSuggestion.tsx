@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import {
   FormItem,
   FormLabel,
@@ -50,11 +51,13 @@ const handleAddEmail = (
 }
 
 const EmailSuggestion = ({ field, emails }: EmailSuggestionProps) => {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('profile')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const value = field.value
   return (
     <FormItem>
-      <FormLabel>To</FormLabel>
+      <FormLabel>{t('To')}</FormLabel>
       <FormControl>
         <div className="relative">
           <div className="flex flex-wrap items-center gap-1 rounded-md border px-2 py-1 focus-within:ring-2 focus-within:ring-bgColor-black">
@@ -78,7 +81,7 @@ const EmailSuggestion = ({ field, emails }: EmailSuggestionProps) => {
 
             <input
               type="text"
-              placeholder="Recipients"
+              placeholder={t('Recipients') ?? ''}
               className="min-w-[150px] flex-1 border-none text-sm outline-none"
               onFocus={() => setShowSuggestions(true)}
               onBlur={(e) => {
