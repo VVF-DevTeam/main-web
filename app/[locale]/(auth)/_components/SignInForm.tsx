@@ -30,8 +30,6 @@ import { useSearchParams } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
 
-// TODO: Fix bug that if email and password are prefilled, even if users click on other method to login like Github, it will login with email and password
-
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')

@@ -10,8 +10,8 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   function (config) {
     if (config.method === 'get') {
-      const secrectToken = createSecretToken()
-      config.headers.set('secret', secrectToken)
+      const secretToken = createSecretToken()
+      config.headers.set('secret', secretToken)
     }
     return config
   },

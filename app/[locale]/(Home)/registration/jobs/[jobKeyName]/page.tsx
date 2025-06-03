@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { jobKeyName } = await params
 
-  // TODO:Simplify code to only query once to get data
+  // TODO: Simplify code to only query once to get data
   const publishedJob = await prisma.job.findUnique({
     where: {
       keyName: jobKeyName,

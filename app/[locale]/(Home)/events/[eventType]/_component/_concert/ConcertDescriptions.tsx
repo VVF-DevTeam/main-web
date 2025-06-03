@@ -1,4 +1,3 @@
-// TODO: Add Concerts
 
 import React from 'react'
 import initTranslation from '@/app/i18n'
