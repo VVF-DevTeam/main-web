@@ -7,7 +7,8 @@
     "dev": "i18nexus pull && cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "i18nexus pull && prisma generate && next build",
     "start": "i18nexus pull &&  next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -101,6 +102,8 @@
     "prisma": "^6.2.1",
     "tailwind-scrollbar": "^4.0.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.3.0",
+    "vite": "^5.2.0"
   }
 }
