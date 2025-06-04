@@ -47,10 +47,14 @@ const JobApplyModal = ({
   return (
     <div>
       {/* Apply Button */}
-      {author ? <Button onClick={openModal}>{t('apply-button')}</Button> : "Please log in to apply for this job"}
+      {author ? (
+        <Button onClick={openModal}>{t('apply-button')}</Button>
+      ) : (
+        'Please log in to apply for this job'
+      )}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="scrollbar-thumb-rounded-full h-[80%] w-[80%] overflow-x-clip bg-bgColor pt-0">
-          <DialogHeader className="sticky top-0 -mx-8 overflow-x-visible border-b-2 border-bgColor-black bg-bgColor px-6 pt-6 rounded-t-3xl">
+        <DialogContent className="scrollbar-thumb-rounded-full flex h-[80vh] max-h-[600px] w-[80vw] flex-col overflow-hidden overflow-x-clip rounded-xl bg-bgColor p-0">
+          <DialogHeader className="sticky top-0 overflow-x-visible border-b-2 border-bgColor-black bg-bgColor px-6 pt-6">
             <DialogTitle className="mb-5">
               Application Form for {title}
             </DialogTitle>
@@ -59,8 +63,13 @@ const JobApplyModal = ({
               <span className="sr-only">Close</span>
             </DialogClose>
           </DialogHeader>
-          <DialogDescription className='overflow-x-clip overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400'>
-            <ApplicationForm author={author} id={id} keyName={keyName} jobType={jobType} />
+          <DialogDescription className="overflow-x-clip overflow-y-scroll px-3 pb-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400">
+            <ApplicationForm
+              author={author}
+              id={id}
+              keyName={keyName}
+              jobType={jobType}
+            />
           </DialogDescription>
         </DialogContent>
       </Dialog>
