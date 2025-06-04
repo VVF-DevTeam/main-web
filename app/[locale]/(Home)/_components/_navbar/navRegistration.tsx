@@ -100,7 +100,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
 
         {/* <div className="border-b border-gray-200" />
         <Link
-          href="/about/directors"
+          href="/about/members"
           className={classNames(
             'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'

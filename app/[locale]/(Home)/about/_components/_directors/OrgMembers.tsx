@@ -41,7 +41,7 @@ const directors = [
     bio: 'bio-KhaiHung',
     imageUrl:
       'https://drive.google.com/thumbnail?id=1mmoqu-ALmc7mJ1ZmY9_Srfcb1AZD-0eh&sz=w1000',
-    name: 'Khai Hung',
+    name: 'Khai Hung Luong',
     title: 'CTO',
   },
   {
