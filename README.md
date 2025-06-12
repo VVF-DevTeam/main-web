@@ -50,6 +50,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
  5. Conventions & Wiki:
    - There are conventions and rules about coding we need to follow to ensure our project's efficiency and cleanliness
    - Please *__thoroughly read__* through the [Wiki](https://github.com/Viet-Vibe-Foundation/main-web/wiki)
+   - You can also visit [our repo Deep Wiki](https://deepwiki.com/Viet-Vibe-Foundation/main-web) 
     
 # Learn More
 This template is written in [Next.js](https://nextjs.org/docs) 15 using the [Next.js App Router](https://nextjs.org/docs/app).
