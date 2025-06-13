@@ -123,4 +123,9 @@ body {
     background-color: black;
     border-radius: 100px;
   }
+  
+  .ql-editor {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
 }

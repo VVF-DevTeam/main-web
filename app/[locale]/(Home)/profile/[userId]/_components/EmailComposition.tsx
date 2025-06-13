@@ -114,7 +114,7 @@ const EmailComposition = ({
       })
 
       if (response.status === 200) {
-        toast.success(t('email-sent-successfully'), {
+        toast.success(t('Email sent successfully'), {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
@@ -150,8 +150,8 @@ const EmailComposition = ({
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen p-4">
+      <div className="mx-auto w-full max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">{t('email-composition')}</h1>
         </div>
@@ -240,7 +240,8 @@ const EmailComposition = ({
                       value={field.value}
                       onChange={field.onChange}
                       modules={modules}
-                      className="h-fit w-full"
+                      className="min-h-[200px] w-full"
+                      style={{ resize: 'vertical', maxWidth: '100%' }}
                     />
                   </FormControl>
                   <FormMessage />
