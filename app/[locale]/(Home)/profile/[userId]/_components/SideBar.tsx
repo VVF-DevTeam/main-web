@@ -21,11 +21,12 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
 
   const sections = {
     'my-profile': t('my-profile'),
-    'subscription': t('subscription'),
+    subscription: t('subscription'),
     'update-profile': t('update-profile'),
     'change-password': t('change-password'),
     'delete-account': t('delete-account'),
-    'payment-management': t('payment-management'),
+    'admin-payment-management': t('payment-management'),
+    'admin-email-composition': t('email-composition'),
     'privacy-policy': t('privacy-policy'),
   }
 
@@ -40,7 +41,8 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
         <ul className="space-y-4">
           {Object.entries(sections).map(([key, label]) => (
             <li key={key}>
-              {key === 'payment-management' && (user.role.includes('HOST') || user.role.includes('ADMIN')) ? (
+              {key.includes('admin') &&
+              (user.role.includes('HOST') || user.role.includes('ADMIN')) ? (
                 <Link
                   href={`/${locale}/profile/${userId}?section=${key}`}
                   className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
@@ -51,7 +53,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                 >
                   {label}
                 </Link>
-              ) : key !== 'payment-management' ? (
+              ) : !key.includes('admin') ? (
                 <Link
                   href={`/${locale}/profile/${userId}?section=${key}`}
                   className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${

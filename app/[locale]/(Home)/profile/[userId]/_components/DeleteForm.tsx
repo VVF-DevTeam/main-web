@@ -53,16 +53,18 @@ const DeleteForm = ({
   const onSubmit = async (data: DeleteAccountFormValues) => {
     try {
       if (!user?.email) {
-        toast.error('User email is missing', { 
+        toast.error('User email is missing', {
           description: (
             <div className="flex flex-col gap-1">
               <span>Please check your email and try again later.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
             </div>
           ),
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
         return
       }
@@ -77,40 +79,49 @@ const DeleteForm = ({
       if (response.success) {
         toast.success(t('account-deleted'), {
           description: (
-            <span style={{ color: "var(--muted-foreground)" }}>
+            <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
             </span>
           ),
           style: {
-            color: '#22c55e' // green-500 color
-          }
+            color: '#22c55e', // green-500 color
+          },
         })
         router.replace('/')
       } else {
-        toast.error(response.message || t('delete-account-failed'), { 
+        toast.error(response.message || t('delete-account-failed'), {
           description: (
             <div className="flex flex-col gap-1">
-              <span>Please try again later or contact support for assistance.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              <span>
+                Please try again later or contact support for assistance.
+              </span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
             </div>
           ),
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     } catch (error) {
       console.error('Error deleting account:', error)
-      toast.error(t('delete-account-failed'), { 
+      toast.error(t('delete-account-failed'), {
         description: (
           <div className="flex flex-col gap-1">
-            <span>An error occurred while deleting your account. Please try again later or contact support for assistance.</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span>
+              An error occurred while deleting your account. Please try again
+              later or contact support for assistance.
+            </span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -158,10 +169,7 @@ const DeleteForm = ({
           />
 
           <div className="col-span-1 mt-6 flex justify-center">
-            <Button
-              type="submit"
-              variant="destructive"
-            >
+            <Button type="submit" variant="destructive">
               {t('delete-account')}
             </Button>
           </div>
