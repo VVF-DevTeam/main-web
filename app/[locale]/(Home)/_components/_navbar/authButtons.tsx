@@ -73,8 +73,8 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
       className={cn(
         'flex items-center justify-center transition-all font-semibold whitespace-nowrap',
         mode === 'desktop'
-          ? 'gap-x-2 text-sm'
-          : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl',
+          ? 'text-sm gap-x-[5px]'
+          : 'mt-2 h-full w-full rounded-md p-4 text-xl gap-x-4',
         isActive
           ? 'text-textColor-brand'
           : mode === 'desktop'
