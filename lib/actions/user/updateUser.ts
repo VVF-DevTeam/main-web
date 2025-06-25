@@ -9,6 +9,7 @@ export const updateUser = async (data: {
   address?: string | null 
   age?: string | null 
   image?: string | null 
+  phoneVerified?: boolean | null
 }) => {
   try {
     // Validate input data
@@ -25,6 +26,7 @@ export const updateUser = async (data: {
         address: data.address ?? null,
         age: data.age ?? null,
         image: data.image ?? null, // Include image update if needed
+        phoneVerified: data.phoneVerified ?? null, // Handle phone verification status
       },
     })  
 

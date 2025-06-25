@@ -11,7 +11,7 @@ import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
-
+import { PhoneVerifiedContextProvider } from './_components/PhoneVerifiedContext'
 // Main Component
 export default async function ProfilePage({
   params,
@@ -78,21 +78,30 @@ export default async function ProfilePage({
       return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
     case 'payment-management':
       // Only show payment management for hosts
-      if (user.role && (user.role.includes('HOST') || user.role.includes('ADMIN'))) {
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
         return <PaymentManagement user={user} />
       }
-      return <p className="mt-10 text-center">You do not have permission to view this page.</p>
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
     case 'privacy-policy':
       return <PrivacyPolicy locale={locale} />
     default:
       return (
-        <MyProfile
-          user={user}
-          locale={locale}
-          // events={eventList}
-          upcoming_events={eventList}
-          paymentHistory={paymentHistory}
-        />
+        <PhoneVerifiedContextProvider>
+          <MyProfile
+            user={user}
+            locale={locale}
+            // events={eventList}
+            upcoming_events={eventList}
+            paymentHistory={paymentHistory}
+          />
+        </PhoneVerifiedContextProvider>
       )
   }
 }

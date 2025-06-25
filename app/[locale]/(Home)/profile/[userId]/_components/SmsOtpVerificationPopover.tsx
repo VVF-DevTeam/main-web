@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import {
   Popover,
@@ -5,23 +6,33 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import SmsOtpVerificationInput from './SmsOtpVerificationInput'
-
+import { useEffect, useState } from 'react'
+import { usePhoneVerifiedContext } from './PhoneVerifiedContext'
 import React from 'react'
 
-
 type Props = {
-  phoneNumber: string;
-};
+  phoneNumber: string
+  userId: string
+}
 
-function SmsOtpVerificationPopover({ phoneNumber }: Props) {
+function SmsOtpVerificationPopover({ phoneNumber, userId }: Props) {
+  const [open, setOpen] = useState(false)
+  const { phoneVerified } = usePhoneVerifiedContext()
+
+  useEffect(() => {
+    if (phoneVerified) {
+      setOpen(false)
+    }
+  }, [phoneVerified])
+
   return (
-    <div >
-      <Popover>
+    <div>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-            <Button variant='outline'>Verify</Button>
+            <Button variant='outline' onClick={() => setOpen(true)}>Verify</Button>
         </PopoverTrigger>
         <PopoverContent>
-            <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber}/>
+            <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber} userId={userId}/>
         </PopoverContent>
       </Popover>
     </div>

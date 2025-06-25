@@ -109,7 +109,6 @@ model User {
   email                String        @unique
   age                  String?
   phone                String?       @unique
-  phoneVerified Boolean? @default(false)
   address              String?
   password             String?
   createdAt            DateTime      @default(now())

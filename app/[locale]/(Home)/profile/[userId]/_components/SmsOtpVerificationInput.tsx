@@ -6,7 +6,13 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-import React, { FormEvent, useEffect, useState, useTransition, useRef } from 'react'
+import React, {
+  FormEvent,
+  useEffect,
+  useState,
+  useTransition,
+  useRef,
+} from 'react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -14,32 +20,43 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
-// import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+} from '@/components/ui/select'
+import { usePhoneVerifiedContext } from './PhoneVerifiedContext'
 
 type Props = {
-  phoneNumberVerifyNeeded: string;
-};
+  phoneNumberVerifyNeeded: string
+  userId: string
+}
 
-function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
-  // const router = useRouter()
-
-  const [phoneNumber, setPhoneNumber] = useState('')
+function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
+  // const [phoneNumber, setPhoneNumber] = useState('')
   const [otp, setOtp] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState('')
   const [resendCountdown, setResendCountdown] = useState(0)
-
+  const [regionCode, setRegionCode] = useState('canada') // default to Canada
+  const [otpEntered, setOtpEntered] = useState(false)
   // prevent auto web scraping tools
-  // const [recaptchaVerifier, setRecaptchaVerifier] =
-  //   useState<RecaptchaVerifier | null>(null)
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier>();
+  const [recaptchaVerifier, setRecaptchaVerifier] =
+    useState<RecaptchaVerifier | null>(null)
+  // const recaptchaVerifierRef = useRef<RecaptchaVerifier>();
 
   // after send the request for Firebase, we get this confirmationResult back from that
   const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null)
 
   const [isPending, startTransition] = useTransition()
+
+  const { setPhoneVerified } = usePhoneVerifiedContext()
 
   useEffect(() => {
     let timer: NodeJS.Timeout
@@ -49,60 +66,90 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
     return () => clearTimeout(timer)
   }, [resendCountdown])
 
-  // useEffect(() => {
-  //   const recaptchaVerifier = new RecaptchaVerifier(
-  //     auth,
-  //     'recaptcha-container',
-  //     {
-  //       size: 'invisible',
-  //     }
-  //   )
-
-  //   setRecaptchaVerifier(recaptchaVerifier)
-
-  //   return () => {
-  //     recaptchaVerifier.clear()
-  //   }
-  // }, [auth])
-
   useEffect(() => {
-    // only initialize once
-    if (!recaptchaVerifierRef.current) {
-      recaptchaVerifierRef.current = new RecaptchaVerifier(
-        auth ,
-        "recaptcha-container",
-        { size: "invisible" },          
-      );
-      // render it a single time
-      recaptchaVerifierRef.current.render().catch(console.error);
+    const recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      'recaptcha-container',
+      {
+        size: 'invisible',
+      }
+    )
+
+    // Render the recaptcha widget
+    recaptchaVerifier.render().catch(console.error)
+    setRecaptchaVerifier(recaptchaVerifier)
+
+    return () => {
+      recaptchaVerifier.clear()
     }
-    // empty deps → runs only on mount
-  }, [auth]);
+  }, [auth])
+
+  // useEffect(() => {
+  //   // only initialize once
+  //   if (!recaptchaVerifierRef.current) {
+  //     recaptchaVerifierRef.current = new RecaptchaVerifier(
+  //       auth ,
+  //       "recaptcha-container",
+  //       { size: "invisible" },
+  //     );
+  //     // render it a single time
+  //     recaptchaVerifierRef.current.render().catch(console.error);
+  //   }
+  //   // empty deps → runs only on mount
+  // }, [auth]);
+  const updatePhoneVerifiedInDB = async (value: boolean) => {
+    await fetch('/api/users/phone-verified', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, phoneVerified: value }),
+    })
+  }
 
   useEffect(() => {
     const hasEnteredAllDigits = otp.length === 6
     if (hasEnteredAllDigits) {
-      verifyOtp()
+      setOtpEntered(true)
     }
-
   }, [otp])
 
   const verifyOtp = async () => {
     startTransition(async () => {
-      setError("")
+      setError('')
 
-      if(!confirmationResult) {
-        setError("Please request OTP first.")
+      if (!confirmationResult) {
+        setError('Please request OTP first.')
         return
       }
 
       try {
         await confirmationResult?.confirm(otp)
+        setSuccess('OTP verified successfully.')
+        setPhoneVerified(true)
+        await updatePhoneVerifiedInDB(true)
       } catch (err) {
         console.log(err)
         setError('Failed to verify OTP. Please check the OTP.')
+        await updatePhoneVerifiedInDB(false)
       }
     })
+  }
+
+  const formatPhoneNumberWithRegionCode = (phone: string) => {
+    try {
+      if (regionCode === 'canada') {
+        console.log('Formatting phone number for Canada:', phone)
+        return `+1${phone}` // Canada uses +1
+      } else if (regionCode === 'vietnam') {
+        console.log('Formatting phone number for Vietnam:', phone)
+        // Remove leading zero if present
+        if (phone.startsWith('0')) {
+          phone = phone.substring(1)
+        }
+        return `+84${phone}` // Vietnam uses +84
+      }
+    } catch (error) {
+      console.error('Error formatting phone number:', error)
+    }
   }
 
   const requestOtp = async (e?: FormEvent<HTMLFormElement>) => {
@@ -113,26 +160,27 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
     startTransition(async () => {
       setError('')
 
-      if (!recaptchaVerifierRef.current) {
+      if (!recaptchaVerifier) {
+        // or recaptchaVerifierRef.current
         return setError('RecaptchaVerifier is not initialized')
       }
+      const formattedPhoneNumber = formatPhoneNumberWithRegionCode(phoneNumberVerifyNeeded)
 
       try {
         const confirmationResult = await signInWithPhoneNumber(
           auth,
-          phoneNumberVerifyNeeded,
-          recaptchaVerifierRef.current
+          formattedPhoneNumber || '',
+          recaptchaVerifier // or recaptchaVerifierRef.current
         )
-
-        // console.log("************ CONFIRMATION RESULT ", confirmationResult)
-        setResendCountdown(0)
+        // setResendCountdown(0)
         setConfirmationResult(confirmationResult)
         setSuccess('OTP sent successfully.')
       } catch (error) {
-        // console.log('******************** THIS IS ERROR OTP: ', error)
         setResendCountdown(0)
 
-        if (error.code === 'auth/too-many-requests') {
+        if (error.code === 'auth/invalid-phone-number') {
+          setError('Invalid phone number format. Please check and try again.')
+        } else if (error.code === 'auth/too-many-requests') {
           setError('Too many requests. Please try again later.')
         } else {
           setError('Failed to send OTP. Please try again.')
@@ -199,23 +247,23 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
 
   return (
     <div className="justify-center">
-      {!confirmationResult && (
-        <form onSubmit={requestOtp}>
-          <Input
-            className="text-black"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <p className="mt-2 text-xs text-gray-400">
-            Please enter your phone number with the country code (i.e. +1 for
-            US/Canada)
-          </p>
-        </form>
-      )}
+      {/* Select Country Region Code */}
+      <Select value={regionCode} onValueChange={setRegionCode}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Country" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Region Code</SelectLabel>
+            <SelectItem value="canada">Canada (+1)</SelectItem>
+            <SelectItem value="vietnam">Vietnam (+84)</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <br />
 
       {confirmationResult && (
-        <InputOTP maxLength={6} value="otp" onChange={(value) => setOtp(value)}>
+        <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
@@ -241,14 +289,24 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded }: Props) {
             ? 'Sending OTP'
             : 'Send OTP'}
       </Button>
+  
+      <br />
+      <Button
+        disabled={!otpEntered || isPending}
+        onClick={verifyOtp}
+        className="mx-auto mt-5 block"
+      >
+        {isPending ? 'Verifying OTP...' : 'Verify OTP'}
+      </Button>
 
+      {/* Display error or success messages */}
       <div className="p-10 text-center">
         {error && <p className="text-red-500">{error}</p>}
         {success && <p className="text-green-500">{success}</p>}
       </div>
 
       {isPending && loadingIndicator}
-      <div id="recaptcha-container"></div>
+      <div id="recaptcha-container" hidden />
     </div>
   )
 }
