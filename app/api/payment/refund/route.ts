@@ -57,7 +57,8 @@ export async function POST(req: Request) {
     })
 
     // If it's an event payment, remove the user from the event
-    if (payment.type !== 'Membership' && payment.eventId) {
+    // If user has deleted their account, no need to disconnect them from the event
+    if (payment.type !== 'Membership' && payment.eventId && payment.userId) {
       await prisma.event.update({
         where: { id: payment.eventId },
         data: {

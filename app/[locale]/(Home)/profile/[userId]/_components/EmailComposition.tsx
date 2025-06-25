@@ -43,7 +43,7 @@ interface EventParticipants {
   user: {
     email: string
     name: string | null
-  } | null
+  }
 }
 
 const sendEmailSchema = z.object({
