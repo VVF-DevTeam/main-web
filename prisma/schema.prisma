@@ -40,6 +40,7 @@ model Event {
   fullCourseDiscount Int?
   imgUrl             String?
   subImgUrls         Json?           // Array of sub-image URLs for concert events
+  imgUrls            Json?           // Array of gallery image URLs
   isPublished        Boolean         @default(false)
   keyName            String          @unique
   price              Decimal?        @default(0)
