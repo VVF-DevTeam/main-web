@@ -11,7 +11,6 @@ import React, {
   useEffect,
   useState,
   useTransition,
-  useRef,
 } from 'react'
 import {
   InputOTP,
@@ -20,7 +19,6 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectTrigger,
