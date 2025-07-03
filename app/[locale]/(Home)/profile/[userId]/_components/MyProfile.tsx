@@ -65,10 +65,6 @@ const MyProfile = async ({
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
 
-  console.log('******************************** MyProfile phoneVerified ', user.phoneVerified)
-  console.log('******************************** MyProfile user ', user)
-
- 
   return (
     
     <div className="min-h-screen p-4 md:p-8">

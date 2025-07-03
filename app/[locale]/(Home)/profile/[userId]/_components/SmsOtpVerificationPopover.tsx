@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/popover'
 import SmsOtpVerificationInput from './SmsOtpVerificationInput'
 import { useEffect, useState } from 'react'
-import { usePhoneVerifiedContext } from './PhoneVerifiedContext'
 import React from 'react'
 
 type Props = {
@@ -17,8 +16,9 @@ type Props = {
 
 function SmsOtpVerificationPopover({ phoneNumber, userId }: Props) {
   const [open, setOpen] = useState(false)
-  const { phoneVerified } = usePhoneVerifiedContext()
+  const [phoneVerified, setPhoneVerified] = useState<string | boolean>(false)
 
+  // if phoneVerified is true, close the popover
   useEffect(() => {
     if (phoneVerified) {
       setOpen(false)
@@ -32,7 +32,7 @@ function SmsOtpVerificationPopover({ phoneNumber, userId }: Props) {
             <Button variant='outline' onClick={() => setOpen(true)}>Verify</Button>
         </PopoverTrigger>
         <PopoverContent>
-            <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber} userId={userId}/>
+            <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber} userId={userId} open={open} setPhoneVerified={setPhoneVerified}/>
         </PopoverContent>
       </Popover>
     </div>

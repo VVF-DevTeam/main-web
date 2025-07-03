@@ -11,7 +11,7 @@ import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
-import { PhoneVerifiedContextProvider } from './_components/PhoneVerifiedContext'
+
 // Main Component
 export default async function ProfilePage({
   params,
@@ -93,15 +93,13 @@ export default async function ProfilePage({
       return <PrivacyPolicy locale={locale} />
     default:
       return (
-        <PhoneVerifiedContextProvider>
-          <MyProfile
-            user={user}
-            locale={locale}
-            // events={eventList}
-            upcoming_events={eventList}
-            paymentHistory={paymentHistory}
-          />
-        </PhoneVerifiedContextProvider>
+        <MyProfile
+          user={user}
+          locale={locale}
+          // events={eventList}
+          upcoming_events={eventList}
+          paymentHistory={paymentHistory}
+        />
       )
   }
 }

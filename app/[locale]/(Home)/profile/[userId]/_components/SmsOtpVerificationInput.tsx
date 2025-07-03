@@ -7,7 +7,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-import React, { FormEvent, useEffect, useState, useTransition } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -24,14 +24,20 @@ import {
   SelectLabel,
   SelectItem,
 } from '@/components/ui/select'
-import { usePhoneVerifiedContext } from './PhoneVerifiedContext'
 
 type Props = {
   phoneNumberVerifyNeeded: string
   userId: string
+  open: boolean
+  setPhoneVerified: (value: boolean) => void
 }
 
-function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
+function SmsOtpVerificationInput({
+  phoneNumberVerifyNeeded,
+  userId,
+  open,
+  setPhoneVerified,
+}: Props) {
   // const [phoneNumber, setPhoneNumber] = useState('')
   const [otp, setOtp] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +45,7 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
   const [resendCountdown, setResendCountdown] = useState(0)
   const [regionCode, setRegionCode] = useState('canada') // default to Canada
   const [otpEntered, setOtpEntered] = useState(false)
+
   // prevent auto web scraping tools
   const [recaptchaVerifier, setRecaptchaVerifier] =
     useState<RecaptchaVerifier | null>(null)
@@ -48,10 +55,9 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
   const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null)
 
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
 
-  const { setPhoneVerified } = usePhoneVerifiedContext()
-
+  // Countdown for resend OTP
   useEffect(() => {
     let timer: NodeJS.Timeout
     if (resendCountdown > 0) {
@@ -60,46 +66,41 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
     return () => clearTimeout(timer)
   }, [resendCountdown])
 
+  // Initialize the recaptcha verifier and check if open is closed, then clear recaptcha verifier
   useEffect(() => {
-    const recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      'recaptcha-container',
-      {
-        size: 'invisible',
-        callback: () => {
-          console.log('reCAPTCHA resolved successfully')
-        },
-      }
-    )
+    if (!open) return
 
-    // Render the recaptcha widget
-    recaptchaVerifier
-      .render()
-      .then((widgetId) => {
-        console.log('reCAPTCHA widget rendered:', widgetId)
-      })
-      .catch(console.error)
+    // Generate a unique ID
+    const recaptchaId = `recaptcha-container-${Date.now()}`
 
-    setRecaptchaVerifier(recaptchaVerifier)
+    // Create the container
+    const container = document.createElement('div')
+    container.id = recaptchaId
+    container.hidden = true
+    document.body.appendChild(container)
+
+    // Create the verifier
+    const verifier = new RecaptchaVerifier(auth, recaptchaId, {
+      size: 'invisible',
+      callback: () => {
+        console.log('reCAPTCHA resolved successfully')
+      },
+    })
+
+    verifier.render().then(widgetId => {
+      console.log('reCAPTCHA widget rendered:', widgetId)
+    }).catch(console.error)
+
+    setRecaptchaVerifier(verifier)
 
     return () => {
-      recaptchaVerifier.clear()
+      verifier.clear()
+      // Remove the container from the DOM
+      const el = document.getElementById(recaptchaId)
+      if (el) el.remove()
     }
-  }, [auth])
+  }, [auth, open])
 
-  // useEffect(() => {
-  //   // only initialize once
-  //   if (!recaptchaVerifierRef.current) {
-  //     recaptchaVerifierRef.current = new RecaptchaVerifier(
-  //       auth ,
-  //       "recaptcha-container",
-  //       { size: "invisible" },
-  //     );
-  //     // render it a single time
-  //     recaptchaVerifierRef.current.render().catch(console.error);
-  //   }
-  //   // empty deps → runs only on mount
-  // }, [auth]);
   const updatePhoneVerifiedInDB = async (value: boolean) => {
     await fetch('/api/users/phone-verified', {
       method: 'POST',
@@ -116,25 +117,25 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
   }, [otp])
 
   const verifyOtp = async () => {
-    startTransition(async () => {
-      setError('')
+    setIsPending(true)
+    setError('')
 
-      if (!confirmationResult) {
-        setError('Please request OTP first.')
-        return
-      }
+    if (!confirmationResult) {
+      setError('Please request OTP first.')
+      return
+    }
 
-      try {
-        await confirmationResult?.confirm(otp)
-        setSuccess('OTP verified successfully.')
-        setPhoneVerified(true)
-        await updatePhoneVerifiedInDB(true)
-      } catch (err) {
-        console.log(err)
-        setError('Failed to verify OTP. Please check the OTP.')
-        await updatePhoneVerifiedInDB(false)
-      }
-    })
+    try {
+      await confirmationResult?.confirm(otp)
+      setSuccess('OTP verified successfully.')
+      setPhoneVerified(true)
+      await updatePhoneVerifiedInDB(true)
+    } catch (err) {
+      console.log(err)
+      setError('Failed to verify OTP. Please check the OTP.')
+      await updatePhoneVerifiedInDB(false)
+    }
+    setIsPending(false)
   }
 
   const formatPhoneNumberWithRegionCode = (phone: string) => {
@@ -160,38 +161,41 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
 
     setResendCountdown(60)
 
-    startTransition(async () => {
-      setError('')
+    setIsPending(true)
+    setError('')
 
-      if (!recaptchaVerifier) {
-        // or recaptchaVerifierRef.current
-        return setError('RecaptchaVerifier is not initialized')
-      }
-      const formattedPhoneNumber = formatPhoneNumberWithRegionCode(
-        phoneNumberVerifyNeeded
+    if (!recaptchaVerifier) {
+      // or recaptchaVerifierRef.current
+      return setError('RecaptchaVerifier is not initialized')
+    }
+    const formattedPhoneNumber = formatPhoneNumberWithRegionCode(
+      phoneNumberVerifyNeeded
+    )
+
+    try {
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        formattedPhoneNumber || '',
+        recaptchaVerifier // or recaptchaVerifierRef.current
       )
+      // setResendCountdown(0)
+      setConfirmationResult(confirmationResult)
+      setSuccess('OTP sent successfully.')
+    } catch (error) {
+      setResendCountdown(0)
 
-      try {
-        const confirmationResult = await signInWithPhoneNumber(
-          auth,
-          formattedPhoneNumber || '',
-          recaptchaVerifier // or recaptchaVerifierRef.current
+      if (error.code === 'auth/invalid-phone-number') {
+        setError('Invalid phone number format. Please check and try again.')
+      } else if (error.code === 'auth/too-many-requests') {
+        setError('Too many requests. Please try again later.')
+      } else {
+        console.log(error)
+        setError(
+          'Failed to send OTP. Please try again later or contact IT team for support.'
         )
-        // setResendCountdown(0)
-        setConfirmationResult(confirmationResult)
-        setSuccess('OTP sent successfully.')
-      } catch (error) {
-        setResendCountdown(0)
-
-        if (error.code === 'auth/invalid-phone-number') {
-          setError('Invalid phone number format. Please check and try again.')
-        } else if (error.code === 'auth/too-many-requests') {
-          setError('Too many requests. Please try again later.')
-        } else {
-          setError('Failed to send OTP. Please try again later or contact IT team for support.')
-        }
       }
-    })
+    }
+    setIsPending(false)
   }
 
   const loadingIndicator = (
@@ -311,7 +315,6 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
       </div>
 
       {isPending && loadingIndicator}
-      <div id="recaptcha-container" hidden />
     </div>
   )
 }
