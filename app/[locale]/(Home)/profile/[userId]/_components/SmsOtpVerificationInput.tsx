@@ -1,17 +1,13 @@
 'use client'
 
+// NOTE: Please change from localhost to 127.0.0.1:3000 to test the recaptcha
 import { auth } from '@/firebase'
 import {
   ConfirmationResult,
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-import React, {
-  FormEvent,
-  useEffect,
-  useState,
-  useTransition,
-} from 'react'
+import React, { FormEvent, useEffect, useState, useTransition } from 'react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -70,11 +66,20 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
       'recaptcha-container',
       {
         size: 'invisible',
+        callback: () => {
+          console.log('reCAPTCHA resolved successfully')
+        },
       }
     )
 
     // Render the recaptcha widget
-    recaptchaVerifier.render().catch(console.error)
+    recaptchaVerifier
+      .render()
+      .then((widgetId) => {
+        console.log('reCAPTCHA widget rendered:', widgetId)
+      })
+      .catch(console.error)
+
     setRecaptchaVerifier(recaptchaVerifier)
 
     return () => {
@@ -162,7 +167,9 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
         // or recaptchaVerifierRef.current
         return setError('RecaptchaVerifier is not initialized')
       }
-      const formattedPhoneNumber = formatPhoneNumberWithRegionCode(phoneNumberVerifyNeeded)
+      const formattedPhoneNumber = formatPhoneNumberWithRegionCode(
+        phoneNumberVerifyNeeded
+      )
 
       try {
         const confirmationResult = await signInWithPhoneNumber(
@@ -181,7 +188,7 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
         } else if (error.code === 'auth/too-many-requests') {
           setError('Too many requests. Please try again later.')
         } else {
-          setError('Failed to send OTP. Please try again.')
+          setError('Failed to send OTP. Please try again later or contact IT team for support.')
         }
       }
     })
@@ -287,7 +294,7 @@ function SmsOtpVerificationInput({ phoneNumberVerifyNeeded, userId }: Props) {
             ? 'Sending OTP'
             : 'Send OTP'}
       </Button>
-  
+
       <br />
       <Button
         disabled={!otpEntered || isPending}
