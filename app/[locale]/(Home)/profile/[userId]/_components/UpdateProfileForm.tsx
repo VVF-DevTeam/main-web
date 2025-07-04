@@ -99,7 +99,7 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-y-6 pt-2 md:grid-cols-2 md:gap-x-8"
+          className="flex flex-col gap-y-6 pt-2 md:grid md:grid-cols-2 md:gap-x-8"
         >
           {/* Profile Image Upload */}
           <div className="col-span-2 flex flex-col items-center">
