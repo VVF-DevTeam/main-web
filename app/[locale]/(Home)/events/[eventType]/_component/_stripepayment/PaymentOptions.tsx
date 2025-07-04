@@ -130,8 +130,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     <strong>finance@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>What is the event name?</em>,{' '}
-                    {t('etransfer-description-6')}: <em>{eventKeyName}</em>
+                    {t('etransfer-description-2')} <em>&quot;What is the event name?&quot;</em>,{' '}
+                    {t('etransfer-description-6')}: <em>&quot;{eventKeyName}&quot;</em>
                   </li>
                   <li>
                     {t('etransfer-description-3')}: <strong>{title}</strong>, {t('etransfer-description-3_5')}

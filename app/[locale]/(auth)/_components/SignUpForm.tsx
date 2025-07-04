@@ -32,7 +32,6 @@ const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
   const [showPassword, setShowPassword] = useState(false)
-  const { toast } = useToast()
   const [phoneExtension, setPhoneExtension] = useState<string>("+1")
   const currentDateTime = getCurrentDateTime()
 
