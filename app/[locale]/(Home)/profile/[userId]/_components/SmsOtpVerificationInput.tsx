@@ -73,7 +73,7 @@ function SmsOtpVerificationInput({
     // Generate a unique ID
     const recaptchaId = `recaptcha-container-${Date.now()}`
 
-    // Create the container
+    // Create the container in the base of the document because the widget does not need to be in the pop over
     const container = document.createElement('div')
     container.id = recaptchaId
     container.hidden = true
@@ -82,14 +82,18 @@ function SmsOtpVerificationInput({
     // Create the verifier
     const verifier = new RecaptchaVerifier(auth, recaptchaId, {
       size: 'invisible',
+      defaultCountry: 'VN',
       callback: () => {
         console.log('reCAPTCHA resolved successfully')
       },
     })
 
-    verifier.render().then(widgetId => {
-      console.log('reCAPTCHA widget rendered:', widgetId)
-    }).catch(console.error)
+    verifier
+      .render()
+      .then((widgetId) => {
+        console.log('reCAPTCHA widget rendered:', widgetId)
+      })
+      .catch(console.error)
 
     setRecaptchaVerifier(verifier)
 
@@ -168,9 +172,9 @@ function SmsOtpVerificationInput({
       // or recaptchaVerifierRef.current
       return setError('RecaptchaVerifier is not initialized')
     }
-    const formattedPhoneNumber = formatPhoneNumberWithRegionCode(
-      phoneNumberVerifyNeeded
-    )
+    const formattedPhoneNumber = phoneNumberVerifyNeeded.startsWith('+')
+      ? phoneNumberVerifyNeeded
+      : formatPhoneNumberWithRegionCode(phoneNumberVerifyNeeded)
 
     try {
       const confirmationResult = await signInWithPhoneNumber(
@@ -178,6 +182,7 @@ function SmsOtpVerificationInput({
         formattedPhoneNumber || '',
         recaptchaVerifier // or recaptchaVerifierRef.current
       )
+
       // setResendCountdown(0)
       setConfirmationResult(confirmationResult)
       setSuccess('OTP sent successfully.')
