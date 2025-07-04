@@ -17,6 +17,7 @@ export const GET = async (request: Request) => {
         phone: true,
         age: true,
         address: true,
+        phoneVerified: true,
       },
       where: {
         id: userId,

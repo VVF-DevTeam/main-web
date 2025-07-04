@@ -6,8 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Image from 'next/image'
 import { User } from 'lucide-react'
+import { Select } from '@/components/ui/select'
+import { SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { toast } from 'sonner'
-
 import { updateUser } from '@/lib/actions/user/updateUser'
 import { useTranslation } from 'react-i18next'
 import {
@@ -43,6 +44,25 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
     defaultValues: user,
   })
 
+  // Extract extension and number from user.phone if present
+  const initialPhone = user.phone || ''
+  let initialExtension = '+1'
+  let initialPhoneNumber = initialPhone
+  if (initialPhone.startsWith('+84')) {
+    initialExtension = '+84'
+    initialPhoneNumber = initialPhone.replace(/^\+84/, '')
+  } else if (initialPhone.startsWith('+1')) {
+    initialExtension = '+1'
+    initialPhoneNumber = initialPhone.replace(/^\+1/, '')
+  }
+  const [phoneExtension, setPhoneExtension] = useState<string>(initialExtension)
+
+  // Set the phone field to just the number part for editing
+  React.useEffect(() => {
+    form.setValue('phone', initialPhoneNumber)
+    // eslint-disable-next-line
+  }, [])
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0]
@@ -57,7 +77,9 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      const response = await updateUser(data)
+      // Combine extension and phone number
+      const fullPhone = data.phone ? `${phoneExtension}${data.phone}` : ''
+      const response = await updateUser({ ...data, phone: fullPhone })
       if (response.success) {
         toast.success('Profile updated successfully!')
       } else {
@@ -174,7 +196,18 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
               <FormItem>
                 <FormLabel>{t('phone')}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="1234567890" />
+                  <div className="flex">
+                    <Select value={phoneExtension} onValueChange={setPhoneExtension}>
+                      <SelectTrigger className="w-28 rounded-r-none">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="+1">(🇨🇦) +1</SelectItem>
+                        <SelectItem value="+84">(🇻🇳) +84</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input {...field} placeholder="1234567890" className="rounded-l-none" />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

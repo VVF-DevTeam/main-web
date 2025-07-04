@@ -25,11 +25,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useTranslation } from 'react-i18next'
+import { Select } from '@/components/ui/select'
+import { SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
   const [showPassword, setShowPassword] = useState(false)
+  const { toast } = useToast()
+  const [phoneExtension, setPhoneExtension] = useState<string>("+1")
   const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -48,7 +52,9 @@ const SignUpForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
-      const response: ServerActionResponse = await signupAction(data)
+      // Combine extension and phone number
+      const fullPhone = data.phoneNumber ? `${phoneExtension}${data.phoneNumber}` : ''
+      const response: ServerActionResponse = await signupAction({ ...data, phoneNumber: fullPhone })
       // Check if the account was created
       if (response.success) {
         toast.success(response.message, {
@@ -204,12 +210,18 @@ const SignUpForm = () => {
                     {t('phoneNumber')}
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="eg: 1234567890"
-                      type="number"
-                      {...field}
-                      className="text-textColor lg:max-w-[360px]"
-                    />
+                    <div className="flex">
+                      <Select value={phoneExtension} onValueChange={setPhoneExtension}>
+                        <SelectTrigger className="w-28 rounded-r-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="+1">(🇨🇦) +1</SelectItem>
+                          <SelectItem value="+84">(🇻🇳) +84</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input {...field} placeholder="eg: 1234567890" type="number" className="rounded-l-none text-textColor lg:max-w-[360px]" />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
