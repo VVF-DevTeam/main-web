@@ -16,7 +16,7 @@ type PaymentWithRelations = {
   user: {
     name: string | null
     email: string
-  }
+  } | null
   event: {
     title: string
     keyName: string
@@ -191,7 +191,7 @@ export default async function PaymentManagement({
                         {payment.event?.title || '-'}
                       </td>
                       <td className="px-4 py-3">
-                        {payment.user.name || payment.user.email}
+                        {payment.user?.name || payment.user?.email || '-'}
                       </td>
                       <td className="px-4 py-3">
                         {startDate.toLocaleDateString('en-GB')}

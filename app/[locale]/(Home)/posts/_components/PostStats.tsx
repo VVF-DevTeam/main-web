@@ -3,8 +3,8 @@
 // Libraries
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 // Components
 import { ThumbsUp, ChartNoAxesColumn } from 'lucide-react'
@@ -29,15 +29,12 @@ const PostStats = ({
   hasViewed,
   postViews,
 }: PostStatsProps) => {
-  const { toast } = useToast()
   const router = useRouter()
 
   const updateLikes = async (action: 'like' | 'unlike') => {
     if (!userId) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'You must be logged in to like a post',
+      toast.error('You must be logged in to like a post', {
+        description: 'Please log in to like this post',
       })
       return
     }
@@ -48,18 +45,12 @@ const PostStats = ({
         action: action,
       })
 
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: `You have ${action === 'like' ? 'liked' : 'unliked'} this post`,
-      })
+      toast.success(`You have ${action === 'like' ? 'liked' : 'unliked'} this post`)
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', {
+        description: 'Please try again later',
       })
     }
   }

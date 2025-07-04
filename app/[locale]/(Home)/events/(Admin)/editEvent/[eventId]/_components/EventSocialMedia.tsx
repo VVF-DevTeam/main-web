@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Event } from '@prisma/client'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 interface EventSocialMediaProps {
   event: Event
@@ -23,8 +24,8 @@ const socialMediaOptions = [
 ]
 
 const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
-  const { toast } = useToast()
   const router = useRouter()
+  const currentDateTime = getCurrentDateTime()
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>(
     event.socialLinks as { platform: string; url: string }[] || []
   )
@@ -51,18 +52,29 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
       const completeLinks = socialLinks.filter(link => link.platform && link.url)
       
       await axiosInstance.put(`/api/events/edit/${event.id}`, { socialLinks: completeLinks })
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Social media links updated successfully',
+      toast.success('Social media links updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to update social media links',
+      toast.error('Failed to update social media links', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

@@ -1,4 +1,3 @@
-// TODO: Add Concerts
 
 import React from 'react'
 import initTranslation from '@/app/i18n'
@@ -79,11 +78,18 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
                     day: 'numeric',
                     month: 'short',
                   })}{' '}
-                  -{' '}
-                  {event.endDate?.toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
+                  {/* If the start date and end date are the same, don't show the end date */}
+                  {event.startDate?.getTime() === event.endDate?.getTime() ? (
+                    <p></p>
+                  ) : (
+                    <>
+                      -{' '}
+                      {event.endDate?.toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
+                    </>
+                  )}
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">{t('timeHeader')}:</span>

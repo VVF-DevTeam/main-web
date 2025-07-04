@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { signinAction } from '@/lib/actions/auth/signinAction'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,7 +22,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
-import { useToast } from '@/hooks/use-toast'
 import { signInSchema } from '@/lib/zodSchema/signinSchema'
 
 import { redirect } from 'next/navigation'
@@ -29,8 +30,6 @@ import { useSearchParams } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
 
-// TODO: Fix bug that if email and password are prefilled, even if users click on other method to login like Github, it will login with email and password
-
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
@@ -38,7 +37,7 @@ const SignInForm = () => {
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
   const searchParams = useSearchParams()
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
 
   useEffect(() => {
     // Retrieve the 'message' parameter from the URL query string
@@ -46,10 +45,13 @@ const SignInForm = () => {
 
     // Check if the message is 'sign-in-required'
     if (message === 'sign-in-required') {
-      toast({
-        variant: 'default',
-        title: 'Sign In Required',
-        description: 'You need to sign in to access the requested page',
+      toast.info('Sign In Required', {
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>You need to sign in to access the requested page</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        )
       })
     }
   }, [searchParams])
@@ -75,26 +77,42 @@ const SignInForm = () => {
       const response: ServerActionResponse = await signinAction(data)
 
       if (response.success) {
-        toast({
-          variant: 'default',
-          title: 'Success',
-          description: response.message,
+        toast.success(response.message, {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e' // green-500 color
+          }
         })
 
         setShouldRedirect(true)
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: response.message,
+        toast.error(response.message, {
+          description: (
+            <span style={{ color: "var(--muted-foreground)" }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       }
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     }
   }

@@ -10,11 +10,12 @@ import {
 } from '@stripe/react-stripe-js'
 import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axios'
-import { useToast } from '@/hooks/use-toast'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { PaymentType } from '@prisma/client'
+import { toast } from 'sonner'
+
 interface CheckoutFormProps {
   price: number
   eventId: string
@@ -45,11 +46,8 @@ function QuickCheckoutForm({
   stripeProductId,
   type,
 }: CheckoutFormProps) {
-  console.log(type)
   const stripe = useStripe()
   const elements = useElements()
-  const { toast } = useToast()
-  const [loading, setLoading] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const [isSubscribed, setIsSubscribed] = useState(false)
@@ -74,8 +72,6 @@ function QuickCheckoutForm({
     e.preventDefault()
     if (!stripe || !elements) return
 
-    setLoading(true)
-
     try {
       const { data } = await axiosInstance.post('/api/payment/intents/create', {
         amount: isSubscribed ? price * 0.8 * 100 : price * 100,
@@ -93,10 +89,11 @@ function QuickCheckoutForm({
       })
 
       if (result.error) {
-        toast({
-          variant: 'destructive',
-          title: 'Payment failed',
+        toast.error('Error', {
           description: result.error.message,
+          style: {
+            color: '#ef4444' // red-500 color
+          }
         })
       } else if (result.paymentIntent?.status === 'succeeded') {
         router.push(`${pathname}/payment/success`)
@@ -105,13 +102,12 @@ function QuickCheckoutForm({
       const message =
         error instanceof Error ? error.message : 'An unexpected error occurred'
 
-      toast({
-        variant: 'destructive',
-        title: 'Error',
+      toast.error('Error', {
         description: message,
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -135,7 +131,7 @@ function QuickCheckoutForm({
           }}
         />
       </div>
-      <Button type="submit" disabled={!stripe || loading}>
+      <Button type="submit" disabled={!stripe}>
         Pay ${isSubscribed ? price * 0.8 : price}
       </Button>
     </form>

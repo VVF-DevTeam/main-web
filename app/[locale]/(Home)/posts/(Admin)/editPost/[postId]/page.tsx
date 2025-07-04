@@ -27,7 +27,6 @@ const EditPost = async ({ params }: EditPostProps) => {
     return redirect('/posts')
   }
 
-  // TODO: Check if user is admin
   const { postId } = await params
 
   // Fetch post by id from database

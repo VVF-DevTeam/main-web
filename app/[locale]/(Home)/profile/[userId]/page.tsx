@@ -11,6 +11,7 @@ import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
+import EmailComposition from './_components/EmailComposition'
 
 // Main Component
 export default async function ProfilePage({
@@ -65,6 +66,66 @@ export default async function ProfilePage({
       createdAt: 'desc',
     },
   })
+  // get list of events of ADMIN
+  const eventAdmin = await prisma.event.findMany({
+    where: {
+      isPublished: true,
+    },
+    select: {
+      id: true,
+      title: true,
+    },
+  })
+  // get list of events of HOST
+  const eventHost = await prisma.event.findMany({
+    where: {
+      hosts: {
+        some: {
+          id: user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+    },
+  })
+
+  //get list of participants in events
+  const eventParticipants = await prisma.payment.findMany({
+    where: {
+      type: {
+        not: 'Membership',
+      },
+      refunded: false,
+      userId: {
+        not: null,
+      },
+      eventId: {
+        not: null,
+      },
+      user: {
+        isNot: null,
+      },
+    },
+    distinct: ['userId', 'eventId'],
+    select: {
+      userId: true,
+      eventId: true,
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  }).then(results => 
+    results.filter((item): item is {
+      userId: string;
+      eventId: string;
+      user: { name: string | null; email: string };
+    } => item.userId !== null && item.eventId !== null && item.user !== null)
+  )
 
   // ✅ Switch component based on searchParams
   switch (section) {
@@ -76,13 +137,35 @@ export default async function ProfilePage({
       return <DeleteForm user={user} />
     case 'subscription':
       return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
-    case 'payment-management':
+    case 'admin-payment-management':
       // Only show payment management for hosts
       if (
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
         return <PaymentManagement user={user} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+    case 'admin-email-composition':
+      // Only show email composition for hosts and admins
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        const eventsToShow = user.role.includes('ADMIN')
+          ? eventAdmin
+          : eventHost
+
+        return (
+          <EmailComposition
+            events={eventsToShow}
+            eventParticipants={eventParticipants}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">

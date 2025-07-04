@@ -87,19 +87,29 @@ const ClassDescription = async ({
           <h1 className="mb-2 text-xl font-bold md:text-3xl lg:text-4xl">
             {t('headerInfo')}
           </h1>
+
+          {/* Date */}
           <p>
             {t('dateHeader')}:{' '}
             {startDate.toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
             })}{' '}
-            -{' '}
-            {endDate.toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-            })}
-            ,
+            {/* If the start date and end date are the same, don't show the end date */}
+            {startDate.getTime() === endDate.getTime() ? (
+              <p></p>
+            ) : (
+              <>
+                -{' '}
+                {endDate.toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </>
+            )}
           </p>
+
+          {/* Time */}
           <p>
             {t('timeHeader')}:{' '}
             {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
@@ -110,6 +120,7 @@ const ClassDescription = async ({
           </p>
         </div>
 
+        {/* Map */}
         <div>
           <iframe
             src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}

@@ -19,7 +19,7 @@ export default {
             transform: 'translateY(-30px)',
           },
           '3%': {
-            opcacity: '0',
+            opacity: '0',
             fontsize: '0px',
             transform: 'translateY(-30px)',
           },

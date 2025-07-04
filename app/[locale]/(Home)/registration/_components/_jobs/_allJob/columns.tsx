@@ -29,7 +29,6 @@ export const columns: ColumnDef<Job>[] = [
     accessorKey: 'jobType',
     header: () => <div className="text-center font-semibold">Job Type</div>,
     cell: ({ row }) => {
-      console.log(row)
       const content = (row.getValue('jobType') as string) || null
       return (
         <div className="text-center">

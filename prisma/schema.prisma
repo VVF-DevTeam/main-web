@@ -199,15 +199,15 @@ model Payment {
   type            PaymentType
   expiresAt       DateTime?
   quantity        Int
-  userId          String
+  userId          String?
   eventId         String?
   stripeProductId String
   stripePriceId   String
   stripePaymentId String
   pricePaid       Decimal
   refunded        Boolean     @default(false)
-  event           Event?      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event           Event?      @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  user            User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model PostLikes {

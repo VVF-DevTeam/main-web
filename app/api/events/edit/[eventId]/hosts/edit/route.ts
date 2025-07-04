@@ -38,8 +38,7 @@ export const PUT = async (
   }
 }
 
-// REmoce host from the database
-
+// Remove host from the database
 export const DELETE = async (
   request: Request,
   { params }: { params: Promise<{ eventId: string }> }

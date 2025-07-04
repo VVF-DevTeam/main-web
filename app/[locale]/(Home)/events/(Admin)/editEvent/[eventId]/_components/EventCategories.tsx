@@ -2,11 +2,12 @@
 import React, { useState } from 'react'
 import { Event, EventSchedule, EventCategory } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { Pencil, XIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import {
   DropdownMenu,
@@ -40,7 +41,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   const [isEditing, setIsEditing] = useState(false)
 
   const router = useRouter()
-  const { toast } = useToast()
+  const currentDateTime = getCurrentDateTime()
 
   const primaryTagsAvailable = () => {
     return (
@@ -66,10 +67,15 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
         data
       )
       console.log(response)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event categories updated successfully',
+      toast.success('Event categories updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       setPrimaryTags([])
       setSecondaryTags([])
@@ -77,10 +83,16 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     } finally {
       setLoading(false)
@@ -95,20 +107,31 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
         { data: { categoryId: tagId } }
       )
       console.log(response)
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Event categories updated successfully',
+      toast.success('Event categories updated successfully', {
+        description: (
+          <span style={{ color: "var(--muted-foreground)" }}>
+            {currentDateTime}
+          </span>
+        ),
+        style: {
+          color: '#22c55e' // green-500 color
+        }
       })
       setPrimaryTags([])
       setSecondaryTags([])
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong',
+      toast.error('Something went wrong', { 
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
+            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+          </div>
+        ),
+        style: {
+          color: '#ef4444' // red-500 color
+        }
       })
     } finally {
       setLoading(false)

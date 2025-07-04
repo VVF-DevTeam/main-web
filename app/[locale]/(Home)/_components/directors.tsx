@@ -65,7 +65,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
           </div>
         </div>
       </div>
-      <Link href={'/about/directors'}>
+      <Link href={'/about/members'}>
         <Button className="w-36 p-3" variant={'default'}>
           {t('button-director')}
         </Button>
