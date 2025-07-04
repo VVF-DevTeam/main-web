@@ -7,7 +7,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth'
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useEffect, useState, useRef } from 'react'
 import {
   InputOTP,
   InputOTPGroup,
@@ -24,6 +24,7 @@ import {
   SelectLabel,
   SelectItem,
 } from '@/components/ui/select'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   phoneNumberVerifyNeeded: string
@@ -38,6 +39,7 @@ function SmsOtpVerificationInput({
   open,
   setPhoneVerified,
 }: Props) {
+  const router = useRouter()
   // const [phoneNumber, setPhoneNumber] = useState('')
   const [otp, setOtp] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -56,6 +58,8 @@ function SmsOtpVerificationInput({
     useState<ConfirmationResult | null>(null)
 
   const [isPending, setIsPending] = useState(false)
+
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Countdown for resend OTP
   useEffect(() => {
@@ -134,6 +138,7 @@ function SmsOtpVerificationInput({
       setSuccess('OTP verified successfully.')
       setPhoneVerified(true)
       await updatePhoneVerifiedInDB(true)
+      router.refresh()
     } catch (err) {
       console.log(err)
       setError('Failed to verify OTP. Please check the OTP.')
@@ -203,6 +208,17 @@ function SmsOtpVerificationInput({
     setIsPending(false)
   }
 
+  // Auto-dismiss success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current)
+      successTimeoutRef.current = setTimeout(() => setSuccess(''), 3000)
+    }
+    return () => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current)
+    }
+  }, [success])
+
   const loadingIndicator = (
     <div role="status" className="flex justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
@@ -221,7 +237,6 @@ function SmsOtpVerificationInput({
           <stop offset="1" stopColor="#EFBAA4" stopOpacity="0"></stop>
         </radialGradient>
         <circle
-          transform-origin="center"
           fill="none"
           stroke="url(#a11)"
           strokeWidth="15"
@@ -244,7 +259,6 @@ function SmsOtpVerificationInput({
           ></animateTransform>
         </circle>
         <circle
-          transform-origin="center"
           fill="none"
           opacity=".2"
           stroke="#EFBAA4"
@@ -314,9 +328,19 @@ function SmsOtpVerificationInput({
       </Button>
 
       {/* Display error or success messages */}
-      <div className="p-10 text-center">
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
+      <div className="p-4 flex flex-col items-center min-h-[48px]">
+        {error && (
+          <div className="flex items-center gap-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded shadow animate-shake">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" /></svg>
+            <span>{error}</span>
+          </div>
+        )}
+        {success && (
+          <div className="flex items-center gap-2 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow animate-fade-in">
+            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            <span>{success}</span>
+          </div>
+        )}
       </div>
 
       {isPending && loadingIndicator}
