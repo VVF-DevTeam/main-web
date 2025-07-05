@@ -27,6 +27,7 @@ import EditorInstructions from '@/components/instruction/EditorInstructions'
 import EventFormLink from './_components/EventFormLink'
 import EventSocialMedia from './_components/EventSocialMedia'
 import EventSubtitle from './_components/EventSubtitle'
+import EventGallery from './_components/EventGallery'
 
 // Main Component
 const EditEventPage = async ({
@@ -268,13 +269,21 @@ const EditEventPage = async ({
           {/* Event Full Discount */}
           {event.eventType === 'CLASS' && (
             <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVII :</span> Full Course
-              Discount (Optional)
-                </h2>
+              <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+                <span className="text-gray-500">Step XVII :</span> Full Course
+                Discount (Optional)
+              </h2>
               <EventFullDiscount event={event} />
             </div>
           )}
+          {/* Event Gallery */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XVII :</span> Event Gallery
+              (Optional)
+            </h2>
+            <EventGallery event={event} />
+          </div>
         </div>
       </div>
     </div>

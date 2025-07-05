@@ -4,6 +4,7 @@ import ClassDescription from '../_component/_class/ClassDescription'
 import BackButton from '@/components/ui/back-button'
 import ConcertDescriptions from '../_component/_concert/ConcertDescriptions'
 import ConcertHeaders from '../_component/_concert/ConcertHeaders'
+import EventGalleryCarousel from '../_component/EventGalleryCarousel'
 
 // Libraries
 import { Metadata } from 'next'
@@ -49,7 +50,7 @@ interface ClassPageProps {
 // Main Component
 const ClassPage = async ({ params }: ClassPageProps) => {
   const { locale, eventKeyName } = await params
-  
+
   const publishedClass = await prisma.event.findUnique({
     where: {
       keyName: eventKeyName,
@@ -68,6 +69,12 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   if (!publishedClass) {
     return
   }
+
+  // Check if gallery carousel should be rendered
+  const shouldShowGallery =
+    publishedClass.imgUrls &&
+    Array.isArray(publishedClass.imgUrls as string[]) &&
+    (publishedClass.imgUrls as string[]).length > 0
 
   return (
     <>
@@ -112,6 +119,14 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             title={publishedClass.title}
             fullCourseDiscount={publishedClass.fullCourseDiscount || 0}
             eventType={publishedClass.eventType}
+          />
+        </div>
+      )}
+      {/* Gallery Carousel at the bottom */}
+      {shouldShowGallery && (
+        <div className="my-8">
+          <EventGalleryCarousel
+            imageUrls={publishedClass.imgUrls as string[]}
           />
         </div>
       )}
