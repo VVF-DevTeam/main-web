@@ -86,7 +86,6 @@ function SmsOtpVerificationInput({
     // Create the verifier
     const verifier = new RecaptchaVerifier(auth, recaptchaId, {
       size: 'invisible',
-      defaultCountry: 'VN',
       callback: () => {
         console.log('reCAPTCHA resolved successfully')
       },
