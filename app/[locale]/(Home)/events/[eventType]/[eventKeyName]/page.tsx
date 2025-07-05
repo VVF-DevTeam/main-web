@@ -95,6 +95,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
               hosts={publishedClass.hosts}
               title={publishedClass.title}
               locale={locale}
+              socialLinks={publishedClass.socialLinks as { platform: string; url: string }[] | null}
             />
           </div>
           <ClassDescription
