@@ -99,41 +99,38 @@ const ImageCarousel = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="ml-[5vw] w-[90vw] overflow-hidden rounded-sm md:ml-[12.5vw] md:w-[75vw]">
-        {/* To increase the number of images, please the width according (75 | 60 * number of images) */}
-        <div className="relative h-[50vh] w-[450vw] md:h-[60vh] md:w-[375vw] xl:h-[70vh]">
-          <div className="flex h-full w-full items-center">
+      <div className="mx-auto w-[90vw] max-w-[1100px] overflow-hidden rounded-sm md:w-[75vw]">
+        <div className="relative h-[50vh] w-full md:h-[60vh] xl:h-[70vh]">
+          <div
+            className="flex h-full w-full transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${imageIndex * 100}%)` }}
+          >
             {imageUrls.map((img) => (
               <div
                 key={img.id}
-                style={{
-                  transform: `translateX(-${imageIndex * 100}%)`,
-                }}
-                className={`relative h-full transition-transform duration-500 ease-out md:w-[${imageUrls.length * 75}vw] w-[${imageUrls.length * 90}vw]`}
+                className={`relative h-full w-full flex-shrink-0`}
               >
-                <div className="relative h-full w-full">
-                  <Image
-                    src={img.url}
-                    alt={`Image ${img.id}`}
-                    fill
-                    sizes="md:75vw 90vw"
-                    className="z-0 rounded-sm object-cover"
-                  />
+                <Image
+                  src={img.url}
+                  alt={`Image ${img.id}`}
+                  fill
+                  sizes="md:75vw 90vw"
+                  className="z-0 rounded-sm object-cover"
+                />
 
-                  {/* Description Link Overlay */}
-                  <div className="pointer-events-auto absolute bottom-0 left-0 w-full bg-white/80 px-4 py-2 text-sm text-black md:text-base">
-                    <Link
-                      href={img.classUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group z-30 flex items-center whitespace-nowrap font-semibold hover:underline"
-                    >
-                      {img.description}
-                      <span className="pl-1 transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1">
-                        <ArrowUpRight className="h-4 w-4" />
-                      </span>
-                    </Link>
-                  </div>
+                {/* Description Link Overlay */}
+                <div className="pointer-events-auto absolute bottom-0 left-0 w-full bg-white/80 px-4 py-2 text-sm text-black md:text-base">
+                  <Link
+                    href={img.classUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group z-30 flex items-center whitespace-nowrap font-semibold hover:underline"
+                  >
+                    {img.description}
+                    <span className="pl-1 transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </span>
+                  </Link>
                 </div>
               </div>
             ))}

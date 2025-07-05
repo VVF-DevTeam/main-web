@@ -30,12 +30,12 @@ function getValidImageUrl(url: string): string | null {
     // File link
     const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
     if (fileMatch && fileMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w1000`
+      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w2000`
     }
     // Thumbnail link
     const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
     if (idMatch && idMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w1000`
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w2000`
     }
     // Folder link (not supported)
     if (url.includes('/folders/')) {
@@ -129,12 +129,14 @@ const EventGallery = ({ event }: EventGalleryProps) => {
     <div className="flex flex-col gap-y-4 rounded-md bg-bgColor-grayLight px-4 py-6">
       <div className="flex flex-col gap-y-4">
         {/* Notification for Google Drive only */}
-        <div className="mb-2 rounded border border-textColor-yellow bg-bgColor-yellow/20 px-3 py-2 text-sm text-textColor-yellow">
-          Only Google Drive image file URLs are accepted. Please use a link
+        <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">
+          Only Google Drive image file URLs are accepted. Please use links
           like:
           <br />
           <span className="font-mono text-xs">
-            https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+            https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
+            <br/> 
+            https://drive.google.com/thumbnail?id=FILE_ID&sz=w1000 (refer above)
           </span>
         </div>
         {galleryImages.map((imageUrl, index) => (

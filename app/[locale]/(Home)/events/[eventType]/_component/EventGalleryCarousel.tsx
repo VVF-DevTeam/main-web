@@ -67,8 +67,8 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="ml-[5vw] w-[90vw] overflow-hidden rounded-sm md:ml-[12.5vw] md:w-[75vw] bg-bgColor-brandLighter">
-        <div className="bg-bgColor-white relative h-[50vh] w-full rounded-lg md:h-[60vh] xl:h-[70vh]">
+      <div className="mx-auto w-[90vw] max-w-[1000px] overflow-hidden rounded-sm bg-bgColor-black md:w-[75vw]">
+        <div className="bg-bgColor-white relative h-[50vh] w-full rounded-lg md:h-[60vh]">
           <div
             className="flex h-full w-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${imageIndex * 100}%)` }}
@@ -110,7 +110,6 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
           </div>
         </div>
       </div>
-
     </div>
   )
 }

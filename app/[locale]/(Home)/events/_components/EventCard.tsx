@@ -31,7 +31,7 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
     new Date(event.endDate) >= now
 
   return (
-    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100 xl:min-w-[400px]">
+    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-slate-100 xl:min-w-[400px]">
       <Image
         src={event.imgUrl!}
         alt="event thumbnail"
