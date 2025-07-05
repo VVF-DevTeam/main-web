@@ -30,12 +30,12 @@ function getValidImageUrl(url: string): string | null {
     // File link
     const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
     if (fileMatch && fileMatch[1]) {
-      return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`
+      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w1000`
     }
     // Thumbnail link
-    const thumbMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
-    if (thumbMatch && thumbMatch[1]) {
-      return `https://drive.google.com/uc?export=view&id=${thumbMatch[1]}`
+    const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
+    if (idMatch && idMatch[1]) {
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w1000`
     }
     // Folder link (not supported)
     if (url.includes('/folders/')) {
