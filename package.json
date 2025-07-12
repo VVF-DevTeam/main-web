@@ -7,7 +7,8 @@
     "dev": "i18nexus pull && cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "i18nexus pull && prisma generate && next build",
     "start": "i18nexus pull &&  next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -84,6 +85,8 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.4",
+    "@testing-library/jest-dom": "^6.6.3",
     "@types/crypto-js": "^4.2.2",
     "@types/google.maps": "^3.58.1",
     "@types/node": "^20",
@@ -94,6 +97,8 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "15.0.3",
     "i18nexus-cli": "^3.5.0",
+    "jest": "^30.0.4",
+    "jest-environment-jsdom": "^30.0.4",
     "postcss": "^8.5.2",
     "postcss-import": "^16.1.0",
     "postcss-loader": "^8.1.1",
@@ -105,6 +110,7 @@
     "prisma": "^6.2.1",
     "tailwind-scrollbar": "^4.0.1",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
