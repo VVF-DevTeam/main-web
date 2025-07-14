@@ -1,7 +1,7 @@
 "use server"
-import { prisma } from "@/lib/db";
 
 export async function getRemainSessions(eventId: string) {
+  const { prisma } = await import('@/lib/db');
   try {
     // Get event details from database
     const event = await prisma.event.findUnique({
