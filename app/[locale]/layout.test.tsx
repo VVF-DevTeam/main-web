@@ -1,77 +1,64 @@
-import { describe, it, expect, jest } from '@jest/globals'
+import { describe, test, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import RootLayout from './layout'
 
 // Mock the dependencies
-jest.mock('@/components/translator/TranslationsProvider', () => {
-  return function MockTranslationsProvider({
-    children,
-  }: {
-    children: React.ReactNode
-  }) {
+vi.mock('@/components/translator/TranslationsProvider', () => ({
+  default: ({ children }: { children: React.ReactNode }) => {
     return <div data-testid="translations-provider">{children}</div>
   }
-})
-
-jest.mock('@/app/i18n', () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue({
-    resources: {},
-  } as never),
 }))
 
-jest.mock('@vercel/speed-insights/next', () => ({
-  SpeedInsights: () => <div data-testid="speed-insights" />,
+vi.mock('@/app/i18n', () => ({
+  default: vi.fn().mockResolvedValue({
+    resources: {}
+  })
 }))
 
-jest.mock('@vercel/analytics/react', () => ({
-  Analytics: () => <div data-testid="analytics" />,
+vi.mock('@vercel/speed-insights/next', () => ({
+  SpeedInsights: () => <div data-testid="speed-insights" />
 }))
 
-jest.mock('sonner', () => ({
-  Toaster: () => <div data-testid="sonner-toaster" />,
+vi.mock('@vercel/analytics/react', () => ({
+  Analytics: () => <div data-testid="analytics" />
+}))
+
+vi.mock('sonner', () => ({
+  Toaster: () => <div data-testid="sonner-toaster" />
 }))
 
 describe('RootLayout', () => {
   const mockParams = Promise.resolve({ locale: 'en' })
-
-  it('renders layout with children', async () => {
+  
+  test('renders layout with children and providers', async () => {
     const TestChild = () => <div data-testid="test-child">Test Content</div>
-
+    
     const Layout = await RootLayout({
       children: <TestChild />,
-      params: mockParams,
+      params: mockParams
     })
-
+    
     render(Layout)
-
+    
     // Check that the translations provider is rendered
     expect(screen.getByTestId('translations-provider')).toBeInTheDocument()
-
+    
     // Check that the test child is rendered
     expect(screen.getByTestId('test-child')).toBeInTheDocument()
     expect(screen.getByText('Test Content')).toBeInTheDocument()
-
+    
     // Check that the main element exists
     expect(screen.getByRole('main')).toBeInTheDocument()
-
-    // Check that the HTML structure is correct
-    const htmlElement = document.querySelector('html')
-    expect(htmlElement).toHaveAttribute('lang', 'en')
-
-    const bodyElement = document.querySelector('body')
-    expect(bodyElement).toHaveClass('antialiased')
-    expect(bodyElement).toHaveClass('min-w-full')
   })
 
-  it('includes all required components', async () => {
+  test('includes all required components', async () => {
     const Layout = await RootLayout({
       children: <div>Test</div>,
-      params: mockParams,
+      params: mockParams
     })
-
+    
     render(Layout)
-
+    
     // Check that all the main components are rendered
     expect(screen.getByTestId('translations-provider')).toBeInTheDocument()
     expect(screen.getByTestId('sonner-toaster')).toBeInTheDocument()

@@ -1,9 +1,9 @@
-import { describe, expect, jest, test, beforeEach } from '@jest/globals'
+import { describe, expect, test, beforeEach, vi } from 'vitest'
 import { getRemainSessions } from './getRemainSessions'
 import { prisma } from '@/lib/__mocks__/db'
-import { mockReset } from 'jest-mock-extended'
+import { mockReset } from 'vitest-mock-extended'
 
-jest.mock('@/lib/db', () => ({
+vi.mock('@/lib/db', () => ({
   __esModule: true,
   prisma,
 }))

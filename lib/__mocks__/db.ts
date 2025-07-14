@@ -1,4 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { mockDeep } from 'jest-mock-extended'
+import { mockDeep } from 'vitest-mock-extended'
 
 export const prisma = mockDeep<PrismaClient>()
