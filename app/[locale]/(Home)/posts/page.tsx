@@ -43,7 +43,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
 
   return (
     <div>
-      <div className="width-max-default flex-col-default mx-auto min-h-screen p-6 pt-12">
+      <div className="width-max-default flex-col-default mx-auto p-6 pt-12">
         {/* Header */}
         <div className="flex flex-col gap-y-2">
           <h1 className="header-font-black header-sub lg:text-5xl">

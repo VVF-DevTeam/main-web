@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "postinstall": "prisma generate",
-    "dev": "i18nexus pull && cross-env NODE_OPTIONS='--inspect' next dev",
-    "build": "i18nexus pull && prisma generate && next build",
-    "start": "i18nexus pull &&  next start",
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
