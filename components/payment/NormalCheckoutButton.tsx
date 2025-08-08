@@ -97,9 +97,11 @@ export default function NormalCheckoutButton({
   }
 
   return (
-    <Button onClick={() => handleCheckout(stripePriceId)}>
-      {buttonText === 'become-member' ? t(`membership:${buttonText}`) : t(buttonText)}
-      <ArrowRight className="h-4 w-4" />
-    </Button>
+    <div className="w-fit">
+      <Button onClick={() => handleCheckout(stripePriceId)}>
+        {buttonText === 'become-member' ? t(`membership:${buttonText}`) : t(buttonText)}
+        <ArrowRight className="h-4 w-4" />
+      </Button>
+    </div>
   )
 }

@@ -48,8 +48,8 @@ export default function EventNormalCheckOut({
   const [paymentType, setPaymentType] = useState<PaymentButtonType>('drop-in')
   const [remainSessions, setRemainSessions] = useState(0)
   const [fullCoursePrice, setFullCoursePrice] = useState(0)
+  const [showForm, setShowForm] = useState(false)
   const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 1
-
   // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
     const checkSubAndSessions = async () => {
@@ -75,11 +75,29 @@ export default function EventNormalCheckOut({
     <>
       {formLink ? (
         // Link to google form payment (for old courses)
-        <Link href={formLink!} target="_blank" rel="noopener noreferrer">
-          <Button variant={'gray'}>
-            {t('reserve-button')} <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
+        // <Link href={formLink!} target="_blank" rel="noopener noreferrer">
+        //   <Button variant={'gray'}>
+        //     {t('reserve-button')} <ArrowRight className="h-4 w-4" />
+        //   </Button>
+        // </Link>
+        <div>
+          {!showForm ? (
+            <Button variant={'gray'} onClick={() => setShowForm(true)}>
+              {t('reserve-button')} <ArrowRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <div className="w-full max-w-full">
+              <iframe 
+                id="form-iframe"
+                title="form-iframe"
+                src={formLink!} 
+                width="100%" 
+                height="600"
+                className="min-h-[600px] w-full rounded border"
+              ></iframe>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           {isLoading ? (
