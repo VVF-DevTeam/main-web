@@ -18,7 +18,7 @@ export default async function NotFound() {
   const { t } = await initTranslations(locale, ['common'])
 
   return (
-    <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-10 text-center text-2xl">
+    <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-10 text-center text-2xl pb-4">
       <h1 className="text-4xl font-bold">{t('notFound')}</h1>
       <p className="text-lg">{t('notFoundDescription')}</p>
       <Image

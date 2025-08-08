@@ -17,7 +17,7 @@ const Layout = async ({
       <Header />
       <Navbar locale={locale} />
 
-      <div className="min-h-screen">{children}</div>
+      <div className="min-h-[calc(100vh-120px)] content-center">{children}</div>
       <div className="mt-auto">
         <Footer locale={locale} />
         <Copyright locale={locale} />
