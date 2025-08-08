@@ -1,5 +1,15 @@
 import React from 'react'
 import PrivacyPolicy from '../_components/_policy/PrivacyPolicy'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy - VVF',
+  description: 'Privacy Policy - VVF',
+  openGraph: {
+    title: 'Privacy Policy - VVF',
+    description: 'Privacy Policy - VVF',
+  },
+}
 
 const Policy = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params

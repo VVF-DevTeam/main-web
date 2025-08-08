@@ -4,6 +4,25 @@ import initTranslations from '@/app/i18n'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: '404 - Not Found',
+  description: 'The page you are looking for does not exist.',
+  openGraph: {
+    title: '404 - Not Found',
+    description: 'The page you are looking for does not exist.',
+    images: [
+      {
+        url: 'https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000',
+        width: 1200,
+        height: 630,
+        alt: 'Not Found',
+        type: 'image/png',
+      }
+    ],
+  }
+}
 
 export default async function NotFound() {
   // Get the locale from the URL path via headers (set by middleware)

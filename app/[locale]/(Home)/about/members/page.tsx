@@ -1,5 +1,11 @@
 // Components
 import OrgMembers from '../_components/_directors/OrgMembers'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Members - VVF',
+  description: 'Members - VVF',
+}
 
 // Main Component
 const AboutPageDirectors = async({
