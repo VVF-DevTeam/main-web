@@ -91,7 +91,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             </div>
 
             {selected === 'checkout' && (
-              <div className="w-fit">
+              <div className="w-full">
                 <EventNormalCheckOut
                   stripePriceId={stripePriceId}
                   stripeProductId={stripeProductId}
@@ -108,7 +108,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               </div>
             )}
             {selected === 'quick' && (
-              <div className="w-fit">
+              <div className="w-full">
                 <EventQuickCheckout
                   price={price}
                   eventId={eventId}
