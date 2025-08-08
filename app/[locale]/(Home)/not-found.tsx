@@ -26,7 +26,6 @@ export default async function NotFound() {
         alt="Not Found"
         width={450}
         height={450}
-        className="object-cover"
       />
       <Link
         href="/"
