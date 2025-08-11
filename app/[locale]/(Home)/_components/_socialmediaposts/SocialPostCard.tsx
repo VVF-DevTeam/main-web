@@ -6,18 +6,24 @@ import { SocialMediaPost } from '@/lib/types/socialMediaPostsType'
 
 interface PostCardProps {
   post: SocialMediaPost
+  forPostPage?: boolean
 }
 
 const MAX_CONTENT_LENGTH = 150 // show more text before truncation
 
-const PostCard: React.FC<PostCardProps> = ({ post }) => {
+const SocialPostCard: React.FC<PostCardProps> = ({
+  post,
+  forPostPage = false,
+}) => {
   const truncatedContent =
     post.content.length > MAX_CONTENT_LENGTH
       ? `${post.content.substring(0, MAX_CONTENT_LENGTH)}...`
       : post.content
 
   return (
-    <div className="relative block min-h-[28rem] transform rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl">
+    <div
+      className={`relative block ${forPostPage ? '' : 'min-h-[28rem]'} transform rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl`}
+    >
       <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
       <div className="flex h-full flex-col justify-between">
         {/* Header */}
@@ -79,4 +85,4 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   )
 }
 
-export default PostCard
+export default SocialPostCard

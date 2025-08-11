@@ -1,45 +1,36 @@
 import Link from 'next/link'
-
-import { auth } from '@/auth'
-import { getPublishedPostsByTitle } from '@/lib/actions/post/getPosts'
-import { prisma } from '@/lib/db'
 import { PlusCircle, ArrowRight } from 'lucide-react'
 import SearchBox from '../../components/SearchBox'
 import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
 import { Suspense } from 'react'
-
 import { Button } from '@/components/ui/button'
 import initTranslations from '@/app/i18n'
 import PublishedPosts from './_components/PublishedPosts'
+import PaginatedSocialPosts from '../_components/_socialmediaposts/PaginatedSocialPosts'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
     title: string
+    page?: number
+    socialPage?: number
   }>
 }
 
 const Posts = async ({ params, searchParams }: PostsProps) => {
   const { locale } = await params
-  const { title } = await searchParams
+  const { title, page, socialPage } = await searchParams
   const { t } = await initTranslations(locale, ['post', 'common'])
 
-  // TODO: Abstract this code to a db function.
-  const session = await auth()
-  const publishedPosts = await getPublishedPostsByTitle(title || '')
+  // Pagination setup
+  const currentPage = Number(page || 1)
+  const postsPerPage = 4
+  const currentSocialPage = Number(socialPage || 1)
+  const socialPostsPerPage = 4
 
-  const userEmail = session?.user?.email
-
-  const user = await prisma.user.findUnique({
-    where: {
-      email: userEmail || '',
-    },
-  })
-
-  let isAdmin = false
-  if (user?.role.includes('ADMIN')) {
-    isAdmin = true
-  }
+  // Check if user is admin
+  const isAdmin = await roleCheck({ role: 'ADMIN' })
 
   return (
     <div>
@@ -55,30 +46,71 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/* Search box */}
-
-        <div className="mt-6 md:mt-10 lg:mt-12">
-          <SearchBox placeholders={['Friday Chill', 'Guitar class', 'Tennis']} />
-          <p className="mt-2 pl-4 text-sm text-muted-foreground">
-            {publishedPosts !== null && publishedPosts.length > 0 ? (
+        <div className="mt-6 md:mt-5">
+          <SearchBox
+            placeholders={['Friday Chill', 'Guitar class', 'Tennis']}
+          />
+          {/* <p className="mt-2 pl-4 text-sm text-muted-foreground">
+            {paginationResult !== null && paginationResult.posts.length > 0 ? (
               <>
-                Showing {publishedPosts.length} posts{' '}
+                Showing {paginationResult.posts.length} of{' '}
+                {paginationResult.totalCount} posts{' '}
                 {title && (
                   <>
                     with title{' '}
                     <span className="font-semibold">&quot;{title}&quot;</span>
                   </>
                 )}
+                {paginationResult.totalPages > 1 && (
+                  <>
+                    {' '}
+                    (page {paginationResult.currentPage} of{' '}
+                    {paginationResult.totalPages})
+                  </>
+                )}
               </>
             ) : (
               'No results found'
             )}
-          </p>
+          </p> */}
         </div>
 
+        {/*Separator */}
+        <div className="h-px w-full bg-bgColor-gray/15" />
+
         {/* Posts */}
-        <Suspense key={title} fallback={<PostsSkeleton />}>
-          <PublishedPosts title={title} locale={locale} />
-        </Suspense>
+        <div className="flex-col-default md:grid md:grid-cols-[55%_45%]">
+          {/* Posts */}
+          <div className="border-b border-bgColor-gray/15 md:border-r md:border-b-0">
+            <Suspense
+              key={`${title}-${currentPage}`}
+              fallback={<PostsSkeleton />}
+            >
+              <PublishedPosts
+                title={title}
+                locale={locale}
+                currentPage={currentPage}
+                postsPerPage={postsPerPage}
+              />
+            </Suspense>
+          </div>
+
+          {/* Social Posts */}
+          <Suspense
+            key={`${title}-${currentSocialPage}`}
+            fallback={<PostsSkeleton />}
+          >
+            <PaginatedSocialPosts
+              content={title}
+              locale={locale}
+              currentPage={currentSocialPage}
+              postsPerPage={socialPostsPerPage}
+            />
+          </Suspense>
+        </div>
+
+        {/*Separator */}
+        <div className="h-px w-full bg-bgColor-gray/15" />
 
         {/* Admin Buttons */}
         {isAdmin && (
