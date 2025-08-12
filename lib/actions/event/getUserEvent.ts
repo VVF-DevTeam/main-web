@@ -25,9 +25,6 @@ export const getUserEvents = async ({
     },
   })
 
-  console.log(`Is published: ${isPublished}`)
-  console.log(`Is Old Event: ${isOldEvent}`)
-
   return Promise.all([
     prisma.payment.findMany({
       select: {
@@ -66,9 +63,6 @@ export const getUserEvents = async ({
         user: user,
         event: {
           isPublished,
-          ...(isOldEvent
-            ? { endDate: { lte: requestTime } }
-            : { endDate: { gte: requestTime } }),
         },
       },
     }),
