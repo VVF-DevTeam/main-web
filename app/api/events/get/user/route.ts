@@ -16,16 +16,21 @@ export const GET = async (request: NextRequest) => {
         ? false
         : undefined
   const requestTime = new Date()
-  const [event, count] = await getUserEvents({
-    requestTime,
+  const [inComingEvent, total] = await getUserEvents({
     userId,
-    isPublished,
     isOldEvent,
-    pageNum: pageNum,
-    pageSize: pageSize,
+    isPublished,
+    pageNum,
+    pageSize,
+    requestTime,
   })
   return NextResponse.json(
-    { data: event.map((p) => p.event), total: count, pageSize, pageNum },
+    {
+      data: inComingEvent.map((item) => item.event),
+      total,
+      pageNum: 0,
+      pageSize,
+    },
     { status: 200 }
   )
 }

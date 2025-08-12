@@ -18,11 +18,15 @@ export const getUserEvents = async ({
   const user = await prisma.user.findUniqueOrThrow({
     select: {
       id: true,
+      name: true,
     },
     where: {
       id: userId,
     },
   })
+
+  console.log(`Is published: ${isPublished}`)
+  console.log(`Is Old Event: ${isOldEvent}`)
 
   return Promise.all([
     prisma.payment.findMany({
@@ -49,9 +53,9 @@ export const getUserEvents = async ({
         user: { is: { id: user.id } },
         event: {
           isPublished,
-          ...(isOldEvent
-            ? { endDate: { gte: requestTime } }
-            : { endDate: { lte: requestTime } }),
+          startDate: {
+            gte: requestTime,
+          },
         },
       },
       skip: pageNum * pageSize,
@@ -63,8 +67,8 @@ export const getUserEvents = async ({
         event: {
           isPublished,
           ...(isOldEvent
-            ? { endDate: { gte: requestTime } }
-            : { endDate: { lte: requestTime } }),
+            ? { endDate: { lte: requestTime } }
+            : { endDate: { gte: requestTime } }),
         },
       },
     }),
