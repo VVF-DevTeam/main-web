@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { FiPaperclip, FiX } from 'react-icons/fi'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -29,23 +29,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-
+import {
+  getPublishedEvents,
+  getAllEventParticipants,
+  getEventsOfHost,
+} from '@/lib/actions/event/getEventInfo'
 import EmailSuggestion from './EmailSuggestion'
 
+// Interfaces
+interface UserInfoProps {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  address?: string
+  age?: string
+  image?: string
+  phoneVerified: boolean | null
+  role: string[]
+}
+interface EventParticipants {
+  userId: string | null
+  eventId: string | null
+  user: {
+    email: string
+    name: string | null
+  } | null
+}
+
+// Event Interfaces
 interface Event {
   id: string
   title: string
 }
 
-interface EventParticipants {
-  userId: string
-  eventId: string | null
-  user: {
-    email: string
-    name: string | null
-  }
-}
-
+// Zod Schema
 const sendEmailSchema = z.object({
   event: z.string(),
   recipients: z
@@ -58,21 +76,63 @@ const sendEmailSchema = z.object({
 
 type SendEmailFormValues = z.infer<typeof sendEmailSchema>
 
-const EmailComposition = ({
-  events,
-  eventParticipants,
-}: {
-  events: Event[]
-  eventParticipants: EventParticipants[]
-}) => {
+const EmailComposition = ({ user }: { user: UserInfoProps }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
 
+  //// filter events to show based on user role
+  const [events, setEvents] = useState<Event[]>([])
+  const [eventParticipants, setEventParticipants] = useState<
+    EventParticipants[]
+  >([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // get list of events for user
+        if (user.role.includes('ADMIN')) {
+          const publishedEvents = await getPublishedEvents()
+          setEvents(publishedEvents)
+        } else if (user.role.includes('HOST')) {
+          const eventsOfHost = await getEventsOfHost(user.id)
+          setEvents(eventsOfHost)
+        }
+
+        //get list of participants in events
+        const participants = await getAllEventParticipants().then(
+          (results: EventParticipants[]) =>
+            results.filter(
+              (
+                item
+              ): item is {
+                userId: string
+                eventId: string
+                user: { name: string | null; email: string }
+              } =>
+                item.userId !== null &&
+                item.eventId !== null &&
+                item.user !== null
+            )
+        )
+        setEventParticipants(participants)
+        
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+
+    fetchData()
+  }, [user.id, user.role])
+
+  //// end of filter events to show based on user role
+
+  // ReactQuill
   const ReactQuill = useMemo(
     () => dynamic(() => import('react-quill-new'), { ssr: false }),
     []
   )
 
+  // Form
   const form = useForm<SendEmailFormValues>({
     resolver: zodResolver(sendEmailSchema),
     defaultValues: {
@@ -179,7 +239,7 @@ const EmailComposition = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {events.map((event) => (
+                      {events.map((event: Event) => (
                         <SelectItem key={event.id} value={event.id}>
                           {event.title}
                         </SelectItem>
@@ -199,8 +259,11 @@ const EmailComposition = ({
                 <EmailSuggestion
                   field={field}
                   emails={eventParticipants
-                    .filter((p) => p.eventId === selectedEvent && p.user?.email)
-                    .map((p) => ({
+                    .filter(
+                      (p: EventParticipants) =>
+                        p.eventId === selectedEvent && p.user?.email
+                    )
+                    .map((p: EventParticipants) => ({
                       email: p.user!.email,
                       name: p.user?.name ?? null,
                     }))}

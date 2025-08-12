@@ -12,17 +12,8 @@ import {
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
 import SmsOtpVerificationPopover from './SmsOtpVerificationPopover'
+import { UserInfoProps } from '@/lib/types/userInfo'
 
-interface UserInfoProps {
-  id: string
-  name: string
-  email: string
-  phone?: string
-  address?: string
-  age?: string
-  image?: string
-  phoneVerified: boolean | null
-}
 
 type PaymentHistoryItem = {
   id: string

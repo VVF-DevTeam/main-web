@@ -52,7 +52,7 @@ export default function RefundButton({
         }
       `}
     >
-      {stripeProductId === 'etf' ? 'Payment by ETF (Refund not available here)' : isLoading ? 'Processing...' : 'Refund'}
+      {['etf', 'cash', 'bank-transfer'].includes(stripeProductId) ? `Payment by ${stripeProductId} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
     </button>
   )
 } 
