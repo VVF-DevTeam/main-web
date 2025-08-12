@@ -91,7 +91,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             </div>
 
             {selected === 'checkout' && (
-              <div className="w-fit">
+              <div className="w-full">
                 <EventNormalCheckOut
                   stripePriceId={stripePriceId}
                   stripeProductId={stripeProductId}
@@ -108,7 +108,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               </div>
             )}
             {selected === 'quick' && (
-              <div className="w-fit">
+              <div className="w-full">
                 <EventQuickCheckout
                   price={price}
                   eventId={eventId}
@@ -130,8 +130,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     <strong>finance@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>What is the event name?</em>,{' '}
-                    {t('etransfer-description-6')}: <em>{eventKeyName}</em>
+                    {t('etransfer-description-2')} <em>&quot;What is the event name?&quot;</em>,{' '}
+                    {t('etransfer-description-6')}: <em>&quot;{eventKeyName}&quot;</em>
                   </li>
                   <li>
                     {t('etransfer-description-3')}: <strong>{title}</strong>, {t('etransfer-description-3_5')}

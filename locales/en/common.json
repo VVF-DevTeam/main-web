@@ -1,1 +1,5 @@
-{}
+{
+    "notFound": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist on our site.",
+    "goHome": "Go to home"
+}

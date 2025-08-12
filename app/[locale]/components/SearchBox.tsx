@@ -34,10 +34,14 @@ const SearchBox = ({ placeholders }: SearchBoxProps) => {
 
   // UseEffect for debouncing to set the url search query
   useEffect(() => {
+    // Get all existing search parameters
+    const currentParams = Object.fromEntries(searchParams.entries())
+    
     const url = queryString.stringifyUrl(
       {
         url: currentPath,
         query: {
+          ...currentParams, // Preserve existing parameters
           title: debouncedValue,
           category: category === null ? null : category,
         },
@@ -46,7 +50,7 @@ const SearchBox = ({ placeholders }: SearchBoxProps) => {
     )
 
     router.push(url, { scroll: false })
-  }, [debouncedValue])
+  }, [debouncedValue, searchParams, currentPath, category])
 
   // UseEffect for dynamically changing placeholders.
   useEffect(() => {

@@ -36,7 +36,7 @@ const PostCard = ({
   userId,
 }: PostProps) => {
   return (
-    <div className="flex-col-default h-full w-full gap-y-1 overflow-hidden rounded-md border bg-bgColor-brandLighter shadow-lg hover:bg-[#F2E3D5] md:grid md:grid-cols-[30%_70%] md:gap-x-10 md:gap-y-6 lg:gap-x-12">
+    <div className="flex-col-default w-full gap-y-1 overflow-hidden rounded-md border bg-bgColor-brandLighter shadow-lg hover:bg-[#F2E3D5] lg:grid lg:grid-cols-[28%_1fr] lg:gap-x-8 lg:gap-y-6 xl:gap-x-10">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -50,14 +50,14 @@ const PostCard = ({
       </div>
 
       {/* Column2 - Content title createdAt */}
-      <div className="flex-col-default flex-wrap gap-y-3 px-4 py-8 md:gap-y-6 xl:px-8 xl:py-10">
+      <div className="flex-col-default flex-wrap gap-y-3 px-4 py-8 md:gap-y-4 md:py-6 lg:px-4 xl:px-6 xl:py-8">
         <h2 className="text-2xl font-bold tracking-wide xl:text-3xl">
           {title}
         </h2>
         <p className="text-sm text-muted-foreground">
           {createdAt.toLocaleString()}
         </p>
-        <p className="mt-1 text-wrap break-words text-textColor-gray md:mt-4 md:max-w-[90%]">
+        <p className="mt-1 text-wrap break-words text-textColor-gray md:mt-2 md:max-w-[90%]">
           {summary}
         </p>
         <div className="flex-between">
@@ -71,7 +71,7 @@ const PostCard = ({
             hasViewed={hasViewed}
           />
 
-          <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-12">
+          <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-4 lg:pr-2 xl:pr-4">
             <Button
               variant={'default'}
               className="flex-center gap-x-2 text-sm md:text-base"

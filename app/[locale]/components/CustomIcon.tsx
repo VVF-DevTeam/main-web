@@ -5,11 +5,13 @@ interface logoProps {
   height?: number
   width?: number
   src?: string
+  color?: string
 }
 const CustomIcon = ({
   height = 120,
   width = 120,
   src = '/logo/main-logo.jpg',
+  color = 'black',
 }: logoProps) => {
   return (
     <Image
@@ -18,6 +20,7 @@ const CustomIcon = ({
       width={height}
       height={width}
       priority
+      className={`${color === 'white' ? 'invert' : ''} duration-300 transition-all hover:brightness-110 hover:contrast-125 hover:drop-shadow-lg hover:scale-110`}
     />
   )
 }

@@ -14,24 +14,28 @@ import EventCalendar from './_components/EventCalendar'
 // Main Component
 const EventsPage = async ({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ upcomingPage?: number; finishedPage?: number }>
 }) => {
   const { locale } = await params
-
+  const { upcomingPage, finishedPage } = await searchParams
+  // Check if user is admin or host
   const isAdmin = await roleCheck({ role: 'ADMIN' })
   const isHost = await roleCheck({ role: 'HOST' })
 
-  // TODO: Fix: Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
   // Get all events
   const allEvents = await prisma.event.findMany({
     where: {
       isPublished: true,
     },
     include: {
-      categories: true
-    }
+      categories: true,
+    },
   })
+
+  // If no events, return component with message
   if (allEvents.length === 0) {
     return (
       <p className="text-center text-xl text-muted-foreground">
@@ -49,15 +53,47 @@ const EventsPage = async ({
     (event) => new Date(event.endDate) < now
   )
 
+  // For pagination
+  const upcomingPageNum = Number(upcomingPage || 1)
+  const finishedPageNum = Number(finishedPage || 1)
+  const eventsPerPage = 3
+  const totalPagesUpcoming = Math.ceil(upcomingEvents.length / eventsPerPage)
+  const totalPagesFinished = Math.ceil(finishedEvents.length / eventsPerPage)
+
+  // Paginate the filtered arrays
+  const paginatedUpcomingEvents = upcomingEvents.slice(
+    (upcomingPageNum - 1) * eventsPerPage,
+    upcomingPageNum * eventsPerPage
+  )
+  // console.log(paginatedUpcoming)
+
+  const paginatedFinishedEvents = finishedEvents.slice(
+    (finishedPageNum - 1) * eventsPerPage,
+    finishedPageNum * eventsPerPage
+  )
+
   return (
     <div className="flex flex-col gap-y-6">
       <EventHeroImage locale={locale} />
-      <EventList events={upcomingEvents} locale={locale} />
+      <EventList
+        events={paginatedUpcomingEvents}
+        locale={locale}
+        currentPage={upcomingPageNum}
+        totalPages={totalPagesUpcoming}
+        totalItems={upcomingEvents.length}
+      />
       {(isAdmin || isHost) && <EventAdminButtons />}
       <EventInstruction locale={locale} />
       <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
-        <EventList events={finishedEvents} locale={locale} finished={true} />
+        <EventList
+          events={paginatedFinishedEvents}
+          locale={locale}
+          finished={true}
+          currentPage={finishedPageNum}
+          totalPages={totalPagesFinished}
+          totalItems={finishedEvents.length}
+        />
       )}
     </div>
   )

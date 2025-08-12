@@ -98,6 +98,15 @@ export default async function ProfilePage({
         not: 'Membership',
       },
       refunded: false,
+      userId: {
+        not: null,
+      },
+      eventId: {
+        not: null,
+      },
+      user: {
+        isNot: null,
+      },
     },
     distinct: ['userId', 'eventId'],
     select: {
@@ -110,7 +119,13 @@ export default async function ProfilePage({
         },
       },
     },
-  })
+  }).then(results => 
+    results.filter((item): item is {
+      userId: string;
+      eventId: string;
+      user: { name: string | null; email: string };
+    } => item.userId !== null && item.eventId !== null && item.user !== null)
+  )
 
   // ✅ Switch component based on searchParams
   switch (section) {

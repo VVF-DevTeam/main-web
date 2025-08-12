@@ -16,8 +16,8 @@ export const signUpSchema = z
       .min(1, { message: 'Invalid age' }),
     phoneNumber: z
       .string({ required_error: 'Phone number is required' })
-      .min(10, { message: 'Incomplete phone number' })
-      .max(10, { message: 'Invalid phone number' }),
+      .min(9, { message: 'Incomplete phone number' })
+      .max(16, { message: 'Invalid phone number' }),
     address: z.string().min(10, { message: 'Incomplete address' }),
     password: z
       .string({ required_error: 'password is required' })

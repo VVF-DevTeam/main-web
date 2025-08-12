@@ -1,6 +1,16 @@
 // Components
 import FounderStoryCard from '../_components/_founder/FounderStory'
 import { Separator } from '@/components/ui/separator'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Founders - VVF',
+  description: 'Founders - VVF',
+  openGraph: {
+    title: 'Founders - VVF',
+    description: 'Founders - VVF',
+  },
+}
 
 // Data
 const foundingStory = [

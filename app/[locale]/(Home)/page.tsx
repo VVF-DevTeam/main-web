@@ -1,9 +1,19 @@
 import ImageCarousel from '@/app/[locale]/(Home)/_components/imageCarousel'
 import Introduction from '@/app/[locale]/(Home)/_components/_introduction/Introduction'
-import Directors from './_components/directors'
-import Contact from './_components/contact'
-import JoinUs from './_components/joinUs'
-import SocialMediaPosts from './_components/_socialmediaposts/SocialMediaPosts'
+import Directors from '@/app/[locale]/(Home)/_components/directors'
+import Contact from '@/app/[locale]/(Home)/_components/contact'
+import JoinUs from '@/app/[locale]/(Home)/_components/joinUs'
+import SocialMediaPosts from '@/app/[locale]/(Home)/_components/_socialmediaposts/SocialMediaPosts'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Homepage - Viet Vibe Foundation',
+  description: 'Homepage - Viet Vibe Foundation',
+  openGraph: {
+    title: 'Homepage - Viet Vibe Foundation',
+    description: 'Homepage - Viet Vibe Foundation',
+  },
+}
 
 export default async function Home({
   params,
