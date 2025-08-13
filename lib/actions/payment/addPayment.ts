@@ -1,6 +1,7 @@
 'use server'
 import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
+import { invalidatePaymentCache } from './paymentCache'
 
 interface AddPaymentParams {
   eventId?: string | null
@@ -33,12 +34,15 @@ export async function addPayment({
         pricePaid,
         quantity,
         stripePaymentId: paymentMethod,
-        stripeProductId: paymentMethod,
         stripePriceId: paymentMethod,
+        stripeProductId: paymentMethod,
         type: paymentType as PaymentType,
         expiresAt: membershipEndDate,
       },
     })
+
+    // Invalidate payment cache after creating new payment
+    invalidatePaymentCache()
 
     return {
       success: true,

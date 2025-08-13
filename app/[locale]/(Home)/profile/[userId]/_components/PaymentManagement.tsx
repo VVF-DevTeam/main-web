@@ -1,9 +1,9 @@
-import { prisma } from '@/lib/db'
 import RefundButton from '@/components/payment/RefundButton'
 import {
   getPaymentStatus,
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
+import { getPaginatedPayments } from '@/lib/actions/payment/getPaginatedPayments'
 import AddPaymentButton from './AddPaymentButton'
 import PaymentPagination from './PaymentPagination'
 import PaymentPageSizeSelect from './PaymentPageSizeSelect'
@@ -28,112 +28,24 @@ export default async function PaymentManagement({
   page?: number
   pageSize?: number
 }) {
-  let payments: PaymentWithRelations[] | null = null
-  let totalCount = 0
-  const skip = Math.max(0, (page - 1) * pageSize)
-
-  // If Admin, get all payments
-  if (user.role.includes('ADMIN')) {
-    ;[totalCount, payments] = await Promise.all([
-      prisma.payment.count(),
-      prisma.payment.findMany({
-        select: {
-          id: true,
-          pricePaid: true,
-          createdAt: true,
-          type: true,
-          expiresAt: true,
-          quantity: true,
-          stripeProductId: true,
-          refunded: true,
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-          event: {
-            select: {
-              title: true,
-              keyName: true,
-              startDate: true,
-              endDate: true,
-              location: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip,
-        take: pageSize,
-      }),
-    ])
-  } else if (user.role.includes('HOST')) {
-    // If Host, get all payments for hosted events
-    const hostedEvents = await prisma.event.findMany({
-      where: {
-        hosts: {
-          some: {
-            id: user.id,
-          },
-        },
-      },
-      select: {
-        id: true,
-      },
-    })
-
-    const hostedEventIds = hostedEvents!.map((event) => event.id)
-
-    // Get all payments for hosted events
-    const where = {
-      eventId: {
-        in: hostedEventIds,
-      },
-    } as const
-
-    ;[totalCount, payments] = await Promise.all([
-      prisma.payment.count({ where }),
-      prisma.payment.findMany({
-        where,
-        select: {
-          id: true,
-          pricePaid: true,
-          createdAt: true,
-          type: true,
-          expiresAt: true,
-          quantity: true,
-          stripeProductId: true,
-          refunded: true,
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-          event: {
-            select: {
-              title: true,
-              keyName: true,
-              startDate: true,
-              endDate: true,
-              location: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip,
-        take: pageSize,
-      }),
-    ])
-  } else {
+  // Check if user has permission
+  if (!user.role.includes('ADMIN') && !user.role.includes('HOST')) {
     return <div>You are not allowed to view this page</div>
   }
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  // Get paginated payments with caching
+  const {
+    payments,
+    totalCount,
+    totalPages,
+    fetchedCount,
+    isFromCache,
+    cacheReason,
+  } = await getPaginatedPayments(user, page, pageSize)
+
+  if (!payments) {
+    return <div>Error loading payments</div>
+  }
 
   return (
     <div className="min-h-screen md:p-8">
@@ -147,8 +59,8 @@ export default async function PaymentManagement({
         {/* Controls */}
         <div className="flex items-center justify-between">
           <PaymentPageSizeSelect value={pageSize} />
-          <div className="text-sm text-muted-foreground">
-            Total: {totalCount}
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Total: {totalCount}</span>
           </div>
         </div>
 

@@ -31,6 +31,7 @@ import { getUsersSimple } from '@/lib/actions/user/getAllUsersSimple'
 import { UserInfoProps, UserInfoSimpleProps } from '@/lib/types/userInfo'
 import { Input } from '@/components/ui/input'
 import { addPayment } from '@/lib/actions/payment/addPayment'
+import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
 import { useRouter } from 'next/navigation'
 
 const addPaymentSchema = z
@@ -435,6 +436,8 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
       })
       setShowAddClientModal(false)
       form.reset()
+      // Invalidate payment cache and refresh the page data
+      invalidatePaymentCache()
       router.refresh()
     } else {
       console.log(message)
