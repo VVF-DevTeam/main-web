@@ -1,12 +1,13 @@
-import { prisma } from '@/lib/db'
 import RefundButton from '@/components/payment/RefundButton'
 import {
   getPaymentStatus,
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
+import { getPaginatedPayments } from '@/lib/actions/payment/getPaginatedPayments'
 import AddPaymentButton from './AddPaymentButton'
+import PaymentPagination from './PaymentPagination'
+import PaymentPageSizeSelect from './PaymentPageSizeSelect'
 import { UserInfoProps } from '@/lib/types/userInfo'
-import { PaymentWithRelations } from '@/lib/types/payment'
 
 const paymentTypeMap = {
   Membership: 'Membership',
@@ -19,98 +20,27 @@ const paymentTypeMap = {
 
 export default async function PaymentManagement({
   user,
+  page = 1,
+  pageSize = 20,
 }: {
   user: UserInfoProps
+  page?: number
+  pageSize?: number
 }) {
-  let payments: PaymentWithRelations[] | null = null
-
-  // If Admin, get all payments
-  if (user.role.includes('ADMIN')) {
-    payments = await prisma.payment.findMany({
-      select: {
-        id: true,
-        pricePaid: true,
-        createdAt: true,
-        type: true,
-        expiresAt: true,
-        quantity: true,
-        stripeProductId: true,
-        refunded: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-        event: {
-          select: {
-            title: true,
-            keyName: true,
-            startDate: true,
-            endDate: true,
-            location: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-  } else if (user.role.includes('HOST')) {
-    // If Host, get all payments for hosted events
-    const hostedEvents = await prisma.event.findMany({
-      where: {
-        hosts: {
-          some: {
-            id: user.id,
-          },
-        },
-      },
-      select: {
-        id: true,
-      },
-    })
-
-    const hostedEventIds = hostedEvents!.map((event) => event.id)
-
-    // Get all payments for hosted events
-    payments = await prisma.payment.findMany({
-      where: {
-        eventId: {
-          in: hostedEventIds,
-        },
-      },
-      select: {
-        id: true,
-        pricePaid: true,
-        createdAt: true,
-        type: true,
-        expiresAt: true,
-        quantity: true,
-        stripeProductId: true,
-        refunded: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-        event: {
-          select: {
-            title: true,
-            keyName: true,
-            startDate: true,
-            endDate: true,
-            location: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-  } else {
+  // Check if user has permission
+  if (!user.role.includes('ADMIN') && !user.role.includes('HOST')) {
     return <div>You are not allowed to view this page</div>
+  }
+
+  // Get paginated payments with caching
+  const {
+    payments,
+    totalCount,
+    totalPages,
+  } = await getPaginatedPayments(user, page, pageSize)
+
+  if (!payments) {
+    return <div>Error loading payments</div>
   }
 
   return (
@@ -120,6 +50,14 @@ export default async function PaymentManagement({
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Payment Management</h1>
           <AddPaymentButton user={user} />
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-between">
+          <PaymentPageSizeSelect value={pageSize} />
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Total: {totalCount}</span>
+          </div>
         </div>
 
         {/* Table */}
@@ -212,6 +150,14 @@ export default async function PaymentManagement({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        <PaymentPagination
+          currentPage={page}
+          totalPages={totalPages}
+          showPageInfo
+          totalItems={totalCount}
+        />
       </div>
     </div>
   )

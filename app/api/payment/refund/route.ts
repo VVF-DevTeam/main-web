@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import Stripe from 'stripe'
+import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -55,6 +56,9 @@ export async function POST(req: Request) {
         refunded: true,
       },
     })
+
+    // Invalidate payment cache after updating payment
+    invalidatePaymentCache()
 
     // If it's an event payment, remove the user from the event
     // If user has deleted their account, no need to disconnect them from the event
