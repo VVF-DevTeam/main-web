@@ -13,6 +13,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form'
 
 import {
@@ -32,14 +33,27 @@ import { Input } from '@/components/ui/input'
 import { addPayment } from '@/lib/actions/payment/addPayment'
 import { useRouter } from 'next/navigation'
 
-const addPaymentSchema = z.object({
-  eventId: z.string().min(1),
-  userId: z.string().min(1),
-  pricePaid: z.number().min(1),
-  quantity: z.number().min(1),
-  paymentMethod: z.string().min(1),
-  paymentType: z.string().min(1),
-})
+const addPaymentSchema = z
+  .object({
+    eventId: z.string().optional(),
+    userId: z.string().min(1, 'User is required'),
+    pricePaid: z.number().min(1, 'Price must be greater than 0'),
+    quantity: z.number().min(1, 'Quantity must be greater than 0'),
+    paymentMethod: z.string().min(1, 'Payment method is required'),
+    paymentType: z.string().min(1, 'Payment type is required'),
+  })
+  .refine(
+    (data) => {
+      if (data.paymentType === 'Membership') {
+        return data.eventId === 'none'
+      }
+      return true
+    },
+    {
+      message: 'Event must be "None" for Membership payments',
+      path: ['eventId'],
+    }
+  )
 
 // Event Interfaces
 interface Event {
@@ -72,6 +86,7 @@ const AddClientModal = ({
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
 
+  // handle overlay click
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setShowAddClientModal(false)
@@ -104,6 +119,7 @@ const AddClientModal = ({
             className="flex flex-col gap-4 md:grid md:grid-cols-2"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            {/* Event */}
             <FormField
               control={form.control}
               name="eventId"
@@ -123,6 +139,7 @@ const AddClientModal = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
                         {events.map((event: Event) => (
                           <SelectItem key={event.id} value={event.id}>
                             {event.title}
@@ -131,6 +148,7 @@ const AddClientModal = ({
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -191,6 +209,7 @@ const AddClientModal = ({
                       </Select>
                     </FormControl>
                   </div>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -209,6 +228,7 @@ const AddClientModal = ({
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -227,6 +247,7 @@ const AddClientModal = ({
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -259,22 +280,27 @@ const AddClientModal = ({
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Event Type */}
+            {/* Payment Type */}
             <FormField
               control={form.control}
               name="paymentType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Type</FormLabel>
+                  <FormLabel>Payment Type</FormLabel>
                   <FormControl>
                     <Select
                       value={field.value}
                       onValueChange={(value) => {
                         field.onChange(value)
+
+                        if (value === 'Membership') {
+                          form.setValue('eventId', '')
+                        }
                       }}
                     >
                       <FormControl>
@@ -291,6 +317,7 @@ const AddClientModal = ({
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -356,23 +383,24 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
 
   // onSubmit
   const onSubmit = async (data: AddPaymentFormValues) => {
-    const { success } = await addPayment(data)
+    const { success, message } = await addPayment(data)
     if (success) {
       toast.success('Success', {
         description: 'Payment added successfully',
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       setShowAddClientModal(false)
       form.reset()
       router.refresh()
     } else {
+      console.log(message)
       toast.error('Error', {
         description: 'Something went wrong',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }

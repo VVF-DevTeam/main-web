@@ -114,7 +114,7 @@ export default async function PaymentManagement({
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen md:p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
         {/* Headers & Add Record Button */}
         <div className="flex items-center justify-between">

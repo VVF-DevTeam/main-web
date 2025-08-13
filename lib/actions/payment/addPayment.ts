@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
 
 interface AddPaymentParams {
-  eventId: string
+  eventId?: string | null
   userId: string
   pricePaid: number
   quantity: number
@@ -20,6 +20,10 @@ export async function addPayment({
   paymentType,
 }: AddPaymentParams) {
   try {
+    if (eventId === 'none') {
+      eventId = null
+    }
+
     const payment = await prisma.payment.create({
       data: {
         eventId,
@@ -42,7 +46,7 @@ export async function addPayment({
     console.error(error)
     return {
       success: false,
-      message: 'Failed to add payment',
+      message: 'Failed to add payment. Error: ' + error,
     }
   }
 }
