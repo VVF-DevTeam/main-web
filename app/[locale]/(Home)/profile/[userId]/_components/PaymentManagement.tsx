@@ -1,47 +1,12 @@
 import { prisma } from '@/lib/db'
-import { PaymentType } from '@prisma/client'
-import { Decimal } from '@prisma/client/runtime/library'
 import RefundButton from '@/components/payment/RefundButton'
-import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
-
-type PaymentWithRelations = {
-  id: string
-  pricePaid: Decimal
-  createdAt: Date
-  type: PaymentType
-  expiresAt: Date | null
-  quantity: number
-  stripeProductId: string
-  refunded: boolean
-  user: {
-    name: string | null
-    email: string
-  } | null
-  event: {
-    title: string
-    keyName: string
-    startDate: Date | null
-    endDate: Date
-    location: string | null
-  } | null
-}
-
-interface PaymentManagementProps {
-  user: {
-    id: string
-    name: string
-    email: string
-    phone: string
-    address: string
-    age: string
-    image: string | undefined
-    password: string
-    subscribedAt: Date | null
-    subscribeExpires: Date | null
-    stripeSubscriptionId: string | null
-    role: string[]
-  }
-}
+import {
+  getPaymentStatus,
+  getStatusColor,
+} from '@/lib/actions/payment/paymentStatus'
+import AddPaymentButton from './AddPaymentButton'
+import { UserInfoProps } from '@/lib/types/userInfo'
+import { PaymentWithRelations } from '@/lib/types/payment'
 
 const paymentTypeMap = {
   Membership: 'Membership',
@@ -54,7 +19,9 @@ const paymentTypeMap = {
 
 export default async function PaymentManagement({
   user,
-}: PaymentManagementProps) {
+}: {
+  user: UserInfoProps
+}) {
   let payments: PaymentWithRelations[] | null = null
 
   // If Admin, get all payments
@@ -147,13 +114,16 @@ export default async function PaymentManagement({
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between">
+    <div className="min-h-screen md:p-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8">
+        {/* Headers & Add Record Button */}
+        <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Payment Management</h1>
+          <AddPaymentButton user={user} />
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Table */}
+        <div className="overflow-x-scroll">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-100">
@@ -211,9 +181,7 @@ export default async function PaymentManagement({
                       <td className="px-4 py-3">
                         {paymentTypeMap[payment.type]}
                       </td>
-                      <td
-                        className={`px-4 py-3 font-medium ${statusColor}`}
-                      >
+                      <td className={`px-4 py-3 font-medium ${statusColor}`}>
                         {status}
                       </td>
                       <td className="px-4 py-3">
@@ -221,7 +189,14 @@ export default async function PaymentManagement({
                           paymentId={payment.id}
                           stripeProductId={payment.stripeProductId}
                           amount={Number(payment.pricePaid)}
-                          disabled={status === 'Expired' || status === 'Past' || status === 'Refunded' || payment.stripeProductId === 'etf'}
+                          disabled={
+                            status === 'Expired' ||
+                            status === 'Past' ||
+                            status === 'Refunded' ||
+                            payment.stripeProductId === 'etf' ||
+                            payment.stripeProductId === 'cash' ||
+                            payment.stripeProductId === 'bank-transfer'
+                          }
                         />
                       </td>
                     </tr>
