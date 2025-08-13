@@ -9,6 +9,7 @@ interface AddPaymentParams {
   quantity: number
   paymentMethod: string
   paymentType: string
+  membershipEndDate?: Date | null
 }
 
 export async function addPayment({
@@ -18,6 +19,7 @@ export async function addPayment({
   quantity,
   paymentMethod,
   paymentType,
+  membershipEndDate,
 }: AddPaymentParams) {
   try {
     if (eventId === 'none') {
@@ -34,6 +36,7 @@ export async function addPayment({
         stripeProductId: paymentMethod,
         stripePriceId: paymentMethod,
         type: paymentType as PaymentType,
+        expiresAt: membershipEndDate,
       },
     })
 

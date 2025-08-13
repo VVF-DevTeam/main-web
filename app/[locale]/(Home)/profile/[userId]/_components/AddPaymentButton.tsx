@@ -35,12 +35,15 @@ import { useRouter } from 'next/navigation'
 
 const addPaymentSchema = z
   .object({
-    eventId: z.string().optional(),
+    eventId: z.string().min(1, 'This field is required'),
     userId: z.string().min(1, 'User is required'),
     pricePaid: z.number().min(1, 'Price must be greater than 0'),
     quantity: z.number().min(1, 'Quantity must be greater than 0'),
     paymentMethod: z.string().min(1, 'Payment method is required'),
     paymentType: z.string().min(1, 'Payment type is required'),
+    membershipEndDate: z
+      .date()
+      .optional(),
   })
   .refine(
     (data) => {
@@ -54,6 +57,15 @@ const addPaymentSchema = z
       path: ['eventId'],
     }
   )
+  .refine((data) => {
+    if (data.paymentType === 'Membership') {
+      return data.membershipEndDate && data.membershipEndDate > new Date()
+    }
+    return true
+  }, {
+    message: 'Membership end date must be in the future',
+    path: ['membershipEndDate'],
+  })
 
 // Event Interfaces
 interface Event {
@@ -116,51 +128,17 @@ const AddClientModal = ({
         {/* Form for adding a client */}
         <Form {...form} key="add-payment-form">
           <form
-            className="flex flex-col gap-4 md:grid md:grid-cols-2"
+            className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            {/* Event */}
-            <FormField
-              control={form.control}
-              name="eventId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Event</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                      }}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('select-an-event')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {events.map((event: Event) => (
-                          <SelectItem key={event.id} value={event.id}>
-                            {event.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* User */}
-            <FormField
-              control={form.control}
-              name="userId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>User</FormLabel>
-                  <div className="space-y-2">
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+              {/* Event */}
+              <FormField
+                control={form.control}
+                name="eventId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event</FormLabel>
                     <FormControl>
                       <Select
                         value={field.value}
@@ -170,160 +148,223 @@ const AddClientModal = ({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a user" />
+                            <SelectValue placeholder={t('select-an-event')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <div className="pb-2">
-                            <Input
-                              type="search"
-                              autoComplete="off"
-                              placeholder="Search for username (if not shown in list)"
-                              value={searchTerm}
-                              onChange={(e) => {
-                                setSearchTerm(e.target.value)
-                              }}
-                              onKeyDown={async (e) => {
-                                e.stopPropagation()
-                                if (e.key === 'Enter') {
-                                  e.preventDefault()
-                                  if (searchTerm === '') {
-                                    setFilteredUsers(users)
-                                  } else {
-                                    const filtered = await getUsersSimple({
-                                      count: 15,
-                                      nameSortString: searchTerm,
-                                    })
-                                    setFilteredUsers(filtered)
-                                  }
-                                }
-                              }}
-                            />
-                          </div>
-                          {filteredUsers.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name}
+                          <SelectItem value="none">None</SelectItem>
+                          {events.map((event: Event) => (
+                            <SelectItem key={event.id} value={event.id}>
+                              {event.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Price Paid */}
-            <FormField
-              control={form.control}
-              name="pricePaid"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price Paid</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      value={field.value}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Quantity */}
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      value={field.value}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Payment Method */}
-            <FormField
-              control={form.control}
-              name="paymentMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Method</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                      }}
-                    >
+              {/* User */}
+              <FormField
+                control={form.control}
+                name="userId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User</FormLabel>
+                    <div className="space-y-2">
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a payment method" />
-                        </SelectTrigger>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                          }}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a user" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <div className="pb-2">
+                              <Input
+                                type="search"
+                                autoComplete="off"
+                                placeholder="Search for username (if not shown in list)"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                  setSearchTerm(e.target.value)
+                                }}
+                                onKeyDown={async (e) => {
+                                  e.stopPropagation()
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    if (searchTerm === '') {
+                                      setFilteredUsers(users)
+                                    } else {
+                                      const filtered = await getUsersSimple({
+                                        count: 15,
+                                        nameSortString: searchTerm,
+                                      })
+                                      setFilteredUsers(filtered)
+                                    }
+                                  }
+                                }}
+                              />
+                            </div>
+                            {filteredUsers.map((user) => (
+                              <SelectItem key={user.id} value={user.id}>
+                                {user.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="etf">E-transfer</SelectItem>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="bank-transfer">
-                          Bank Transfer
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Payment Type */}
-            <FormField
-              control={form.control}
-              name="paymentType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Type</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value)
+              {/* Price Paid */}
+              <FormField
+                control={form.control}
+                name="pricePaid"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price Paid (CAD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        value={field.value}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                        if (value === 'Membership') {
-                          form.setValue('eventId', '')
-                        }
-                      }}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an event type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(PaymentType).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        value={field.value}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Payment Method */}
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Method</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a payment method" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="etf">E-transfer</SelectItem>
+                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="bank-transfer">
+                            Bank Transfer
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Payment Type */}
+              <FormField
+                control={form.control}
+                name="paymentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Type</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+
+                          if (value === 'Membership') {
+                            form.setValue('eventId', 'none')
+                          }
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an event type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(PaymentType).map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.watch('paymentType') === 'Membership' && (
+                <FormField
+                  control={form.control}
+                  name="membershipEndDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Membership End Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value
+                              ? field.value.toISOString().split('T')[0]
+                              : ''
+                          }
+                          onChange={(e) =>
+                            field.onChange(new Date(e.target.value + 'T00:00:00'))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
-            />
+            </div>  
 
             {/* Submit Button */}
-            <Button type="submit">Add Payment</Button>
+            <Button type="submit">
+              Add Payment
+            </Button>
           </form>
         </Form>
       </div>
@@ -378,6 +419,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
       quantity: 0,
       paymentMethod: '',
       paymentType: '',
+      membershipEndDate: new Date(),
     },
   })
 
