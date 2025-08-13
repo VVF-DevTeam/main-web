@@ -78,8 +78,14 @@ export const validatePaymentCacheForPage = (
     return { isValid: false, reason: 'different host user' }
   }
 
-  const requiredCount = currentPage * pageSize + pageSize // Extra page as buffer
+  // If we have cached data and it's enough for the current page, use cache
+  // For small datasets (like 12 items), this will always be true
+  const requiredCount = currentPage * pageSize
   if (paymentsCache.data.length < requiredCount) {
+    // Special case: if we have all available data cached, use it regardless of page
+    if (paymentsCache.data.length === paymentsCache.totalCount) {
+      return { isValid: true, reason: 'all data cached' }
+    }
     return { isValid: false, reason: `insufficient cached data (have: ${paymentsCache.data.length}, need: ${requiredCount})` }
   }
 
