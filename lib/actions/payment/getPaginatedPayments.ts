@@ -2,7 +2,6 @@ import { prisma } from '@/lib/db'
 import { PaymentWithRelations } from '@/lib/types/payment'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import {
-  getPaymentCache,
   setPaymentCache,
   validatePaymentCacheForPage,
   getCachedPayments,
@@ -38,7 +37,7 @@ export const getPaginatedPayments = async (
     let payments: PaymentWithRelations[]
     let totalCount: number
     let isFromCache = false
-    let cacheReason = cacheValidation.reason
+    const cacheReason = cacheValidation.reason
 
     if (cacheValidation.isValid) {
       // Use cached data

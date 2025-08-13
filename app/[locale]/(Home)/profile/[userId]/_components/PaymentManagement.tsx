@@ -8,7 +8,6 @@ import AddPaymentButton from './AddPaymentButton'
 import PaymentPagination from './PaymentPagination'
 import PaymentPageSizeSelect from './PaymentPageSizeSelect'
 import { UserInfoProps } from '@/lib/types/userInfo'
-import { PaymentWithRelations } from '@/lib/types/payment'
 
 const paymentTypeMap = {
   Membership: 'Membership',
@@ -38,9 +37,6 @@ export default async function PaymentManagement({
     payments,
     totalCount,
     totalPages,
-    fetchedCount,
-    isFromCache,
-    cacheReason,
   } = await getPaginatedPayments(user, page, pageSize)
 
   if (!payments) {
