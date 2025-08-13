@@ -19,7 +19,7 @@ export default async function ProfilePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ section?: string }>
+  searchParams: Promise<{ section?: string; page?: string; pageSize?: string }>
 }) {
   const user = await getCurrentUserInfo()
   // Get all events
@@ -29,7 +29,7 @@ export default async function ProfilePage({
     },
   })
 
-  const { section } = await searchParams
+  const { section, page: pageStr, pageSize: pageSizeStr } = await searchParams
   const { locale } = await params
 
   // return if user is not logged in
@@ -83,7 +83,11 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        return <PaymentManagement user={user} />
+        const page = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
+        const pageSize = [10, 20, 50].includes(Number(pageSizeStr))
+          ? Number(pageSizeStr)
+          : 20
+        return <PaymentManagement user={user} page={page} pageSize={pageSize} />
       }
       return (
         <p className="mt-10 text-center">

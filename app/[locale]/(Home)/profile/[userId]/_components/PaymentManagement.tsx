@@ -5,6 +5,8 @@ import {
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
 import AddPaymentButton from './AddPaymentButton'
+import PaymentPagination from './PaymentPagination'
+import PaymentPageSizeSelect from './PaymentPageSizeSelect'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { PaymentWithRelations } from '@/lib/types/payment'
 
@@ -19,43 +21,54 @@ const paymentTypeMap = {
 
 export default async function PaymentManagement({
   user,
+  page = 1,
+  pageSize = 20,
 }: {
   user: UserInfoProps
+  page?: number
+  pageSize?: number
 }) {
   let payments: PaymentWithRelations[] | null = null
+  let totalCount = 0
+  const skip = Math.max(0, (page - 1) * pageSize)
 
   // If Admin, get all payments
   if (user.role.includes('ADMIN')) {
-    payments = await prisma.payment.findMany({
-      select: {
-        id: true,
-        pricePaid: true,
-        createdAt: true,
-        type: true,
-        expiresAt: true,
-        quantity: true,
-        stripeProductId: true,
-        refunded: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
+    ;[totalCount, payments] = await Promise.all([
+      prisma.payment.count(),
+      prisma.payment.findMany({
+        select: {
+          id: true,
+          pricePaid: true,
+          createdAt: true,
+          type: true,
+          expiresAt: true,
+          quantity: true,
+          stripeProductId: true,
+          refunded: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          event: {
+            select: {
+              title: true,
+              keyName: true,
+              startDate: true,
+              endDate: true,
+              location: true,
+            },
           },
         },
-        event: {
-          select: {
-            title: true,
-            keyName: true,
-            startDate: true,
-            endDate: true,
-            location: true,
-          },
+        orderBy: {
+          createdAt: 'desc',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+        skip,
+        take: pageSize,
+      }),
+    ])
   } else if (user.role.includes('HOST')) {
     // If Host, get all payments for hosted events
     const hostedEvents = await prisma.event.findMany({
@@ -74,44 +87,53 @@ export default async function PaymentManagement({
     const hostedEventIds = hostedEvents!.map((event) => event.id)
 
     // Get all payments for hosted events
-    payments = await prisma.payment.findMany({
-      where: {
-        eventId: {
-          in: hostedEventIds,
-        },
+    const where = {
+      eventId: {
+        in: hostedEventIds,
       },
-      select: {
-        id: true,
-        pricePaid: true,
-        createdAt: true,
-        type: true,
-        expiresAt: true,
-        quantity: true,
-        stripeProductId: true,
-        refunded: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
+    } as const
+
+    ;[totalCount, payments] = await Promise.all([
+      prisma.payment.count({ where }),
+      prisma.payment.findMany({
+        where,
+        select: {
+          id: true,
+          pricePaid: true,
+          createdAt: true,
+          type: true,
+          expiresAt: true,
+          quantity: true,
+          stripeProductId: true,
+          refunded: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          event: {
+            select: {
+              title: true,
+              keyName: true,
+              startDate: true,
+              endDate: true,
+              location: true,
+            },
           },
         },
-        event: {
-          select: {
-            title: true,
-            keyName: true,
-            startDate: true,
-            endDate: true,
-            location: true,
-          },
+        orderBy: {
+          createdAt: 'desc',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+        skip,
+        take: pageSize,
+      }),
+    ])
   } else {
     return <div>You are not allowed to view this page</div>
   }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
   return (
     <div className="min-h-screen md:p-8">
@@ -120,6 +142,14 @@ export default async function PaymentManagement({
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Payment Management</h1>
           <AddPaymentButton user={user} />
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-between">
+          <PaymentPageSizeSelect value={pageSize} />
+          <div className="text-sm text-muted-foreground">
+            Total: {totalCount}
+          </div>
         </div>
 
         {/* Table */}
@@ -212,6 +242,14 @@ export default async function PaymentManagement({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        <PaymentPagination
+          currentPage={page}
+          totalPages={totalPages}
+          showPageInfo
+          totalItems={totalCount}
+        />
       </div>
     </div>
   )
