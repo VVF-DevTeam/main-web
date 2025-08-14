@@ -130,6 +130,14 @@ model User {
   visitedPosts         PostVisits[]
   purchases            Purchase[]
   EventHost            Event[]       @relation("EventToUser")
+  Devices              UserDevice[]
+}
+
+model UserDevice {
+  id String @id @default(cuid())
+  userId String
+  token String @unique
+  User User @relation(fields: [userId], references: [id])
 }
 
 model Post {
