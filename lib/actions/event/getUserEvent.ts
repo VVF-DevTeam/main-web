@@ -15,6 +15,7 @@ export const getUserEvents = async ({
   pageSize: number
   requestTime: Date
 }) => {
+  console.log(isOldEvent)
   const user = await prisma.user.findUniqueOrThrow({
     select: {
       id: true,

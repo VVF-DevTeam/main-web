@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
 import { getEventById } from '@/lib/actions/event/getEventById'
 import { getEventPagiation } from '@/lib/actions/event/getEventPagination'
 
