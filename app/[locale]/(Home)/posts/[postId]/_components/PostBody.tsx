@@ -28,13 +28,17 @@ const PostBody = ({
         By <span className="font-semibold">{author}</span>
       </span>
       <div className="relative aspect-video h-[100%] w-[100%] overflow-hidden rounded-lg">
-        <Image
-          src={imageUrl}
-          alt={title}
-          fill
-          loading="eager"
-          className="absolute object-cover hover-focus-zoomIn"
-        />
+        {imageUrl ? (
+          <div className="relative aspect-video h-[100%] w-[100%] overflow-hidden rounded-lg">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              loading="eager"
+              className="hover-focus-zoomIn absolute object-cover"
+            />
+          </div>
+        ) : null}
       </div>
       <div className="mt-4 w-full text-pretty">
         <TextPreview value={content} />
