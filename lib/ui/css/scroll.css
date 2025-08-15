@@ -48,4 +48,23 @@
       transform: translateX(0);
     }
   }
+
+  /* Right-to-left infinite scroll animation */
+  .animate-scroll-rtl {
+    animation: scroll-rtl 15s linear infinite;
+  }
+
+  @keyframes scroll-rtl {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  /* Pause animation on hover */
+  .animate-scroll-rtl:hover {
+    animation-play-state: paused;
+  }
   

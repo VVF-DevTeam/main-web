@@ -11,7 +11,7 @@ export default function PaymentPageSizeSelect({ value }: { value: number }) {
     const params = new URLSearchParams(searchParams)
     params.set('pageSize', newValue)
     params.set('page', '1')
-    router.push(`?${params.toString()}`)
+    router.push(`?${params.toString()}`, { scroll: false })
   }
 
   return (
