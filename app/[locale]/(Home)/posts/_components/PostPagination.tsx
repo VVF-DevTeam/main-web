@@ -45,7 +45,7 @@ const PostPagination = ({
     startTransition(() => {
       const params = new URLSearchParams(searchParams)
       params.set('page', page.toString())
-      router.push(`?${params.toString()}`)
+      router.push(`?${params.toString()}`, { scroll: false })
     })
   }, [router, searchParams, totalPages, currentPage])
 

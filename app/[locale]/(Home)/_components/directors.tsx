@@ -17,7 +17,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-3 md:p-10 lg:gap-y-12 lg:pb-28 lg:pt-5">
+    <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-3 md:p-10 lg:gap-y-12 lg:pt-5">
       <span className="header-font-black header-sub pb-4 md:pb-8">
         {t('header-director')}
       </span>

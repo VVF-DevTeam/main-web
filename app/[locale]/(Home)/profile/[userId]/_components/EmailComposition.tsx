@@ -34,6 +34,7 @@ import {
   getAllEventParticipants,
   getEventsOfHost,
 } from '@/lib/actions/event/getEventInfo'
+import { getPublishedEventsForReviewsWithSearch } from '@/lib/actions/review/reviewActions'
 import EmailSuggestion from './EmailSuggestion'
 
 // Interfaces
@@ -82,6 +83,8 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
 
   //// filter events to show based on user role
   const [events, setEvents] = useState<Event[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
+  const [eventSearchTerm, setEventSearchTerm] = useState('')
   const [eventParticipants, setEventParticipants] = useState<
     EventParticipants[]
   >([])
@@ -93,9 +96,11 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
         if (user.role.includes('ADMIN')) {
           const publishedEvents = await getPublishedEvents()
           setEvents(publishedEvents)
+          setFilteredEvents(publishedEvents)
         } else if (user.role.includes('HOST')) {
           const eventsOfHost = await getEventsOfHost(user.id)
           setEvents(eventsOfHost)
+          setFilteredEvents(eventsOfHost)
         }
 
         //get list of participants in events
@@ -146,6 +151,16 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
 
   const [selectedEvent, setSelectedEvent] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Handle event search
+  const handleEventSearch = async (searchTerm: string) => {
+    if (searchTerm === '') {
+      setFilteredEvents(events)
+    } else {
+      const filtered = await getPublishedEventsForReviewsWithSearch(searchTerm, 15)
+      setFilteredEvents(filtered)
+    }
+  }
 
   const modules = {
     toolbar: [
@@ -239,7 +254,25 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {events.map((event: Event) => (
+                      <div className="pb-2">
+                        <Input
+                          type="search"
+                          autoComplete="off"
+                          placeholder="Search for event (if not shown in list)"
+                          value={eventSearchTerm}
+                          onChange={(e) => {
+                            setEventSearchTerm(e.target.value)
+                          }}
+                          onKeyDown={async (e) => {
+                            e.stopPropagation()
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              await handleEventSearch(eventSearchTerm)
+                            }
+                          }}
+                        />
+                      </div>
+                      {filteredEvents.map((event: Event) => (
                         <SelectItem key={event.id} value={event.id}>
                           {event.title}
                         </SelectItem>

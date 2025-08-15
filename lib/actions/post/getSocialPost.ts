@@ -165,23 +165,23 @@ export const getSocialMediaPostsPaginated = async (
       hasEnoughCachedPosts =
         cachedCount >= requiredPosts || previouslyReachedEnd
 
-      console.log(
-        `Cache validation: have ${cachedCount}, need ${requiredPosts}, previousLimit ${previousFetchLimit}, reachedEnd ${previouslyReachedEnd}`
-      )
+      // console.log(
+      //   `Cache validation: have ${cachedCount}, need ${requiredPosts}, previousLimit ${previousFetchLimit}, reachedEnd ${previouslyReachedEnd}`
+      // )
     }
 
     if (hasEnoughCachedPosts) {
-      console.log(
-        `Using cached data: ${postsCache!.data.length} posts available`
-      )
+      // console.log(
+      //   `Using cached data: ${postsCache!.data.length} posts available`
+      // )
       // Use cached data - we have enough posts or reached end
       allFetchedPosts = postsCache!.data
     } else {
       // Need to fetch more data (cache invalid OR insufficient posts AND not at end)
-      const reason = !isCacheValid
-        ? 'cache invalid/expired'
-        : `insufficient cached posts and haven't reached end (have: ${postsCache?.data.length || 0}, need: ${requiredPosts})`
-      console.log(`Fetching fresh data: ${reason}`)
+      // const reason = !isCacheValid
+      //   ? 'cache invalid/expired'
+      //   : `insufficient cached posts and haven't reached end (have: ${postsCache?.data.length || 0}, need: ${requiredPosts})`
+      // console.log(`Fetching fresh data: ${reason}`)
 
       // Fetch posts from both platforms in parallel
       const [fbRes, igRes] = await Promise.all([
@@ -246,9 +246,9 @@ export const getSocialMediaPostsPaginated = async (
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       )
 
-      console.log(
-        `Fetched ${allFetchedPosts.length} posts with limit ${smartFetchLimit} per platform`
-      )
+      // console.log(
+      //   `Fetched ${allFetchedPosts.length} posts with limit ${smartFetchLimit} per platform`
+      // )
 
       // Update cache with merged results
       postsCache = {
