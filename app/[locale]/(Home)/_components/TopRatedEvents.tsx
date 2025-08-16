@@ -23,14 +23,44 @@ const TopRatedEvents = async ({ locale }: TopRatedEventsProps) => {
   const topEvents = await getTopRatedRecentEvents(5)
 
   const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${
-          i < Math.floor(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-        }`}
-      />
-    ))
+    const fullStars = Math.floor(rating)
+    const hasPartialStar = rating % 1 !== 0
+    const partialStarFill = (rating % 1) * 100
+
+    return Array.from({ length: 5 }, (_, i) => {
+      if (i < fullStars) {
+        // Full star
+        return (
+          <Star
+            key={i}
+            className="h-4 w-4 fill-yellow-400 text-yellow-400"
+          />
+        )
+      } else if (i === fullStars && hasPartialStar) {
+        // Partial star
+        return (
+          <div key={i} className="relative h-4 w-4">
+            {/* Background empty star */}
+            <Star className="absolute h-4 w-4 text-gray-300" />
+            {/* Partial fill overlay */}
+            <div 
+              className="absolute overflow-hidden"
+              style={{ width: `${partialStarFill}%` }}
+            >
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            </div>
+          </div>
+        )
+      } else {
+        // Empty star
+        return (
+          <Star
+            key={i}
+            className="h-4 w-4 text-gray-300"
+          />
+        )
+      }
+    })
   }
 
   if (!topEvents || topEvents.length === 0) {
@@ -48,7 +78,13 @@ const TopRatedEvents = async ({ locale }: TopRatedEventsProps) => {
 
       {/* Events Carousel Container */}
       <div className="w-full max-w-4xl overflow-hidden">
-        <div className="flex animate-scroll-rtl gap-6 whitespace-nowrap">
+        <div 
+          className="flex gap-6"
+          style={{
+            animation: `scroll-infinite ${topEvents.length * 6}s linear infinite`,
+            width: 'max-content'
+          }}
+        >
           {/* Duplicate events for seamless loop */}
           {[...topEvents, ...topEvents].map((event, index) => (
             <div
