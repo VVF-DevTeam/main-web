@@ -26,7 +26,6 @@ export default async function Home({
   return (
     <div className="flex flex-col gap-y-12 overflow-hidden">
       <Introduction locale={locale} />
-      {/* Intro cards */}
       <ImageCarousel autoSlide={true} locale={locale} />
       <SocialMediaPosts locale={locale} />
       <TopRatedEvents locale={locale} />
