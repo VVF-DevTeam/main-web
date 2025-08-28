@@ -36,7 +36,7 @@ const EventList = async ({
       className={`flex w-full flex-col items-center gap-y-6 py-10 xl:gap-y-12 xl:pt-20 ${finished ? 'bg-gray-100' : ''}`}
     >
       {finished ? (
-        <h2 className="header-main text-center">{t('header-finishedEvent')}</h2>
+        <h2 className="header-main text-center dark:text-textColor">{t('header-finishedEvent')}</h2>
       ) : (
         <h2 className="header-main text-center">{t('header-upcomingEvent')}</h2>
       )}
