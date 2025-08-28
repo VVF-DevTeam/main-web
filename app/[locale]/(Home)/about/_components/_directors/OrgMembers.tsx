@@ -80,10 +80,10 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
   return (
     <div className="flex-col-center py-20">
       {/* Header */}
-      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl dark:text-textColor-brand">
         {t('header-directors-aboutUs')}
       </h1>
-      <Separator className="mb-10 w-2/3 bg-bgColor-brandDark lg:w-1/2" />
+      <Separator className="mb-10 w-2/3 bg-bgColor-brandDark lg:w-1/2 dark:bg-bgColor-brand" />
 
       {/* Directors */}
       <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
@@ -111,11 +111,11 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
       {/* All other members */}
       <div className="flex-col-center px-6 py-14 md:w-2/3">
-        <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark">
+        <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark dark:text-textColor-brand">
           {t('header-allmembers')}
         </p>
 
-        <p>
+        <p className='dark:text-gray-400'>
           Minh Tue Nguyen (Co-founder), Khue Le (Co-founder), Jayant Puri, Elena
           Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi Dat, Tran Quyet Tien,
           Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan, Phu Loc, Thanh Hang
