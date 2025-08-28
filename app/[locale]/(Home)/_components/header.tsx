@@ -194,7 +194,7 @@ const Header = () => {
         {/* LanguageChanger: Top-Right Corner */}
         <div className="flex-center gap-x-2 pl-7 ">
           <Globe className="h-5 w-5" />
-          <LanguageChanger className="dark:text-textColor-grey" />
+          <LanguageChanger />
         </div>
       </div>
     </div>

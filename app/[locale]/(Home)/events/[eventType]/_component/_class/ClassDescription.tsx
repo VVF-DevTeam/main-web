@@ -138,7 +138,7 @@ const ClassDescription = async ({
           {t('headerAbout')}
         </h1>
         <div className="mt-4 w-full text-pretty">
-          <TextPreview className="dark:text-muted-foreground" value={description} />
+          <TextPreview value={description} />
         </div>
         {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
