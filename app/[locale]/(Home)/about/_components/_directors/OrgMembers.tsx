@@ -94,9 +94,9 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
       {/* Honorary Members */}
       <div className="flex-center px-6 py-14">
-        <h1 className="header-sub header-font-default mb-10 text-3xl italic text-textColor-brandDark lg:text-5xl">
+        <h1 className="header-sub header-font-default mb-10 text-3xl italic text-textColor-brandDark lg:text-5xl dark:text-textColor-brand">
           {t('header-honorableMention-aboutUs')}
-          <Separator className="mt-2 bg-bgColor-brandDark" />
+          <Separator className="mt-2 bg-bgColor-brandDark dark:bg-bgColor-brand" />
         </h1>
       </div>
       <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
