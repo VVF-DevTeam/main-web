@@ -313,7 +313,7 @@ const ReviewsDisplay = ({
       <div className="space-y-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-end">
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-textColor-white">
               {t('searchReviews')}
             </label>
             <div className="relative">
@@ -328,7 +328,7 @@ const ReviewsDisplay = ({
           </div>
 
           <div className="w-full md:w-48">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-textColor-white">
               {t('filterByEvent')}
             </label>
             <Select value={selectedEvent} onValueChange={setSelectedEvent}>
@@ -365,7 +365,7 @@ const ReviewsDisplay = ({
           </div>
 
           <div className="w-full md:w-48">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-textColor-white">
               {t('filterByRating')}
             </label>
             <Select value={selectedRating} onValueChange={setSelectedRating}>
@@ -383,11 +383,11 @@ const ReviewsDisplay = ({
             </Select>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 dark:text-textColor dark:bg-bgColor-black">
             <Button
               variant="outline"
               onClick={handleClearFilters}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 dark:text-textColor dark:hover:text-white"
             >
               <Filter className="h-4 w-4" />
               {t('clear')}
@@ -515,7 +515,7 @@ const ReviewsDisplay = ({
                         )}
                       </div>
 
-                      <p className="mb-2 text-gray-800">{review.comment}</p>
+                      <p className="mb-2 text-gray-800 dark:text-textColor-white">{review.comment}</p>
 
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
@@ -586,6 +586,7 @@ const ReviewsDisplay = ({
             variant="outline"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
+            className='dark:bg-gray-800 dark:text-white dark:hover:bg-gray-600'
           >
             {t('previous')}
           </Button>
@@ -600,6 +601,7 @@ const ReviewsDisplay = ({
             variant="outline"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
+            className='dark:bg-gray-800 dark:text-white dark:hover:bg-gray-600'
           >
             {t('next')}
           </Button>

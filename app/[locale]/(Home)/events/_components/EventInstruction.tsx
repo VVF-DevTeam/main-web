@@ -36,8 +36,8 @@ const EventInstruction = async ({ locale }: EventInstructionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="mx-auto bg-gray-100 px-12 py-16">
-      <h1 className="text-center text-3xl font-bold tracking-wide">
+    <div className="mx-auto bg-gray-100 px-12 py-16 dark:bg-gray-100">
+      <h1 className="text-center text-3xl font-bold tracking-wide dark:text-textColor">
         {t('header-eventInstruction')}
       </h1>
       <div className="flex-col-default grid-all-cols-3 py-10">

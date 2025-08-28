@@ -64,7 +64,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
       {closestEvent && (
         <div className="flex w-full justify-center">
           <div className="max-w-7xl rounded-lg p-4 text-center">
-            <p className="overflow-hidden text-ellipsis pt-4 text-xl leading-relaxed tracking-wide sm:whitespace-normal md:text-2xl md:leading-relaxed lg:text-2xl lg:leading-relaxed">
+            <p className="overflow-hidden text-ellipsis pt-4 text-xl leading-relaxed tracking-wide sm:whitespace-normal md:text-2xl md:leading-relaxed lg:text-2xl lg:leading-relaxed dark:text-white">
               <Image
                 src="https://drive.google.com/thumbnail?id=1KOA45MZfxUJyqGmNMO7x00U-bYXHJmaU&sz=w1000"
                 alt="Penguin icon"

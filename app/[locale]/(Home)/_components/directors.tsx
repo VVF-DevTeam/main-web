@@ -18,7 +18,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
 
   return (
     <div className="flex-col-center h-full w-full gap-y-10 pb-10 pt-3 md:p-10 lg:gap-y-12 lg:pt-5">
-      <span className="header-font-black header-sub pb-4 md:pb-8">
+      <span className="header-font-black header-sub pb-4 md:pb-8 dark:text-textColor-white">
         {t('header-director')}
       </span>
       <div className="flex-col-default grid-all-cols-2 gap-x-0 pb-5">
@@ -32,7 +32,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
             className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex-col-center gap-y-2 md:items-start">
-            <span className="header-font-black text-xl font-bold">
+            <span className="header-font-black text-xl font-bold dark:text-textColor-white">
               {t('name1-director')}
             </span>
             <span className="header-font-black text-sm font-semibold text-textColor-brand">
@@ -44,7 +44,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
           </div>
         </div>
         {/* Second Director */}
-        <div className="flex-col-center w-full gap-x-5 gap-y-3 md:flex-row md:justify-start md:pl-4">
+        <div className="flex-col-center w-full gap-x-5 gap-y-3 md:flex-row md:justify-start md:pl-4 ">
           <Image
             src="https://drive.google.com/thumbnail?id=14oie7aYFMkMRwPYx9Ngty7B7wx-2NczG&sz=w1000"
             alt="Eattle Nguyen"
@@ -53,7 +53,7 @@ const Directors = async ({ locale }: DirectorsProps) => {
             className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex-col-center gap-y-2 md:items-start">
-            <span className="header-font-black text-xl font-bold">
+            <span className="header-font-black text-xl font-bold dark:text-textColor-white">
               {t('name2-director')}
             </span>
             <span className="header-font-black text-sm font-semibold text-textColor-brand">

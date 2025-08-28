@@ -69,7 +69,7 @@ const PostStats = ({
               : 'group-hover:fill-red-700/80'
           )}
         />{' '}
-        <span className="text-xs font-semibold text-foreground">
+        <span className="text-xs font-semibold text-foreground dark:text-textColor">
           {postLikes}
         </span>
       </button>
@@ -84,7 +84,7 @@ const PostStats = ({
             hasViewed ? 'text-sky-700' : 'text-black'
           )}
         />
-        <span className="text-xs font-semibold text-foreground">
+        <span className="text-xs font-semibold text-foreground dark:text-textColor">
           {postViews}
         </span>
       </div>

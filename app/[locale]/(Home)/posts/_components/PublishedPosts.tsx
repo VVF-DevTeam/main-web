@@ -29,7 +29,7 @@ const PublishedPosts = async ({
     <div className="flex flex-col gap-y-12 py-12">
       {/* Header */}
       <div className="flex flex-col gap-y-2 md:pl-8">
-        <h2 className="header-font-black text-2xl font-bold">
+        <h2 className="header-font-black text-2xl font-bold dark:text-textColor-white">
           {t('postsHeader')}
         </h2>
         <p className="text-sm text-muted-foreground">{t('postsDescription')}</p>

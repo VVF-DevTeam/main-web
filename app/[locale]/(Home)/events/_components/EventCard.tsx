@@ -40,7 +40,7 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
         className="hover-opacity-blur z-0 max-h-[300px] w-full basis-1/2 rounded-t-lg object-cover"
       />
 
-      <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg">
+      <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg dark:text-textColor">
         {/* Tags */}
         <div className="absolute left-3 top-2 flex flex-wrap gap-2">
           {event.categories
