@@ -39,7 +39,7 @@ const ClassImage = async ({
         />
       </div>
       <div className="flex-col-center gap-y-4 rounded-b-sm bg-bgColor-black px-4 py-10 text-left text-textColor-white md:h-[35vh] md:gap-y-6 md:rounded-r-sm md:rounded-bl-none lg:h-[50vh] lg:pl-8 lg:pt-2">
-        <span className="text-sm text-muted">
+        <span className="text-sm text-muted dark:text-muted-foreground">
           {startDate.toLocaleDateString()} | {location}
         </span>
         <h2 className="-mt-3 mb-1 text-center text-4xl font-extrabold">
