@@ -194,9 +194,11 @@ model Application {
   phoneNumber String
   resume      Bytes
   appliedAt   DateTime @default(now())
-  jobId       String
+  positionToApply String?
+  reasonToApply String?
+  jobId       String?
   userId      String
-  job         Job      @relation(fields: [jobId], references: [id])
+  job         Job?      @relation(fields: [jobId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 
   @@unique([jobId, userId])
