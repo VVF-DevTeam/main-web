@@ -129,7 +129,9 @@ export default {
               // Only logged in user can apply
               if (path.includes('apply')) {
                 if (!(await roleCheckToken({ req: request }))) {
-                  return new NextResponse('Please log in to apply.', { status: 403 })
+                  return new NextResponse('Please log in to apply.', {
+                    status: 403,
+                  })
                 }
               } else {
                 // For job API, only allow Admin
@@ -152,12 +154,16 @@ export default {
             } else if (path.includes('users')) {
               // For users API, only logged in user can upload avatar
               if (!(await roleCheckToken({ req: request }))) {
-                return new NextResponse('Please log in to upload avatar.', { status: 403 })
+                return new NextResponse('Please log in to upload avatar.', {
+                  status: 403,
+                })
               }
             } else if (path.includes('payment')) {
               // For users API, only logged in user can make payment
               if (!(await roleCheckToken({ req: request }))) {
-                return new NextResponse('Please log in to make payment.', { status: 403 })
+                return new NextResponse('Please log in to make payment.', {
+                  status: 403,
+                })
               }
             }
             return NextResponse.next()
