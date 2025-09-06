@@ -19,7 +19,7 @@ export default async function ProfilePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ section?: string }>
+  searchParams: Promise<{ section?: string; page?: string; pageSize?: string }>
 }) {
   const user = await getCurrentUserInfo()
   // Get all events
@@ -29,7 +29,7 @@ export default async function ProfilePage({
     },
   })
 
-  const { section } = await searchParams
+  const { section, page: pageStr, pageSize: pageSizeStr } = await searchParams
   const { locale } = await params
 
   // return if user is not logged in
@@ -37,7 +37,7 @@ export default async function ProfilePage({
     return <p className="mt-10 text-center">No user data available.</p>
   }
 
-  // get payment history
+  // get payment history (put here since default page is MyProfile)
   const paymentHistory = await prisma.payment.findMany({
     where: {
       userId: user.id,
@@ -66,66 +66,6 @@ export default async function ProfilePage({
       createdAt: 'desc',
     },
   })
-  // get list of events of ADMIN
-  const eventAdmin = await prisma.event.findMany({
-    where: {
-      isPublished: true,
-    },
-    select: {
-      id: true,
-      title: true,
-    },
-  })
-  // get list of events of HOST
-  const eventHost = await prisma.event.findMany({
-    where: {
-      hosts: {
-        some: {
-          id: user.id,
-        },
-      },
-    },
-    select: {
-      id: true,
-      title: true,
-    },
-  })
-
-  //get list of participants in events
-  const eventParticipants = await prisma.payment.findMany({
-    where: {
-      type: {
-        not: 'Membership',
-      },
-      refunded: false,
-      userId: {
-        not: null,
-      },
-      eventId: {
-        not: null,
-      },
-      user: {
-        isNot: null,
-      },
-    },
-    distinct: ['userId', 'eventId'],
-    select: {
-      userId: true,
-      eventId: true,
-      user: {
-        select: {
-          name: true,
-          email: true,
-        },
-      },
-    },
-  }).then(results => 
-    results.filter((item): item is {
-      userId: string;
-      eventId: string;
-      user: { name: string | null; email: string };
-    } => item.userId !== null && item.eventId !== null && item.user !== null)
-  )
 
   // ✅ Switch component based on searchParams
   switch (section) {
@@ -143,7 +83,11 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        return <PaymentManagement user={user} />
+        const page = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
+        const pageSize = [10, 20, 50].includes(Number(pageSizeStr))
+          ? Number(pageSizeStr)
+          : 20
+        return <PaymentManagement user={user} page={page} pageSize={pageSize} />
       }
       return (
         <p className="mt-10 text-center">
@@ -156,15 +100,9 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        const eventsToShow = user.role.includes('ADMIN')
-          ? eventAdmin
-          : eventHost
 
         return (
-          <EmailComposition
-            events={eventsToShow}
-            eventParticipants={eventParticipants}
-          />
+          <EmailComposition user={user}/>
         )
       }
       return (

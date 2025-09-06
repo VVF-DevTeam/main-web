@@ -24,7 +24,6 @@ model EventCategory {
 model Event {
   id                 String          @id @default(cuid())
   title              String          @unique
-  subtitle           String?         // Optional subtitle field
   description        String?
   location           String?
   startTime          String?
@@ -39,8 +38,6 @@ model Event {
   formLink           String?
   fullCourseDiscount Int?
   imgUrl             String?
-  subImgUrls         Json?           // Array of sub-image URLs for concert events
-  imgUrls            Json?           // Array of gallery image URLs
   isPublished        Boolean         @default(false)
   keyName            String          @unique
   price              Decimal?        @default(0)
@@ -48,10 +45,14 @@ model Event {
   stripePriceId      String?
   stripeProductId    String?
   subscribedPriceId  String?
-  socialLinks        Json?           // Array of { platform: string, url: string }
+  socialLinks        Json?
+  subtitle           String?
+  subImgUrls         Json?
+  imgUrls            Json?
   schedules          EventSchedule[]
   tickets            EventTicket[]
   payments           Payment[]
+  Review             Review[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
 
@@ -129,15 +130,16 @@ model User {
   likedPosts           PostLikes[]
   visitedPosts         PostVisits[]
   purchases            Purchase[]
-  EventHost            Event[]       @relation("EventToUser")
+  Review               Review[]
   Devices              UserDevice[]
+  EventHost            Event[]       @relation("EventToUser")
 }
 
 model UserDevice {
-  id String @id @default(cuid())
+  id     String @id @default(cuid())
   userId String
-  token String @unique
-  User User @relation(fields: [userId], references: [id])
+  token  String @unique
+  User   User   @relation(fields: [userId], references: [id])
 }
 
 model Post {
@@ -192,9 +194,11 @@ model Application {
   phoneNumber String
   resume      Bytes
   appliedAt   DateTime @default(now())
-  jobId       String
+  positionToApply String?
+  reasonToApply String?
+  jobId       String?
   userId      String
-  job         Job      @relation(fields: [jobId], references: [id])
+  job         Job?      @relation(fields: [jobId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 
   @@unique([jobId, userId])
@@ -215,8 +219,8 @@ model Payment {
   stripePaymentId String
   pricePaid       Decimal
   refunded        Boolean     @default(false)
-  event           Event?      @relation(fields: [eventId], references: [id], onDelete: SetNull)
-  user            User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  event           Event?      @relation(fields: [eventId], references: [id])
+  user            User?       @relation(fields: [userId], references: [id])
 }
 
 model PostLikes {
@@ -271,6 +275,18 @@ model VerificationToken {
   @@unique([email, token])
 }
 
+model Review {
+  id        String       @id @default(cuid())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  userId    String
+  eventId   String?
+  rating    ReviewRating
+  comment   String
+  event     Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum Role {
   USER
   ADMIN
@@ -310,4 +326,12 @@ enum PaymentType {
   Concert
   Camping
   Event
+}
+
+enum ReviewRating {
+  One   @map("1")
+  Two   @map("2")
+  Three @map("3")
+  Four  @map("4")
+  Five  @map("5")
 }

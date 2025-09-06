@@ -48,4 +48,39 @@
       transform: translateX(0);
     }
   }
+
+  /* Right-to-left infinite scroll animation with seamless loop */
+  .animate-scroll-rtl {
+    animation: scroll-rtl 30s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes scroll-rtl {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* New seamless infinite scroll animation */
+  @keyframes scroll-infinite {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  
+  /* Pause animation on hover */
+  .animate-scroll-rtl:hover {
+    animation-play-state: paused;
+  }
+
+  /* Pause the inline animation on hover */
+  div[style*="scroll-infinite"]:hover {
+    animation-play-state: paused !important;
+  }
   

@@ -1,7 +1,8 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
+import { UserInfoProps } from '@/lib/types/userInfo'
 
-export async function getCurrentUserInfo() {
+export async function getCurrentUserInfo() : Promise<UserInfoProps | null> {
   const session = await auth()
   const userEmail = session?.user?.email
 

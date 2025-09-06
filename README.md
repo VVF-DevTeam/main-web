@@ -33,7 +33,7 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
 4. Pull Request & Deployment:
 
    a. This project uses Vercel to host the production and dev branches, and AWS Amplify for backup and preview:
-      - Vercel: www.vietvibe.or
+      - Vercel: www.vietvibe.org
       - Amplify: https://dev.duxsz6wwtbq9f.amplifyapp.com
       g
   

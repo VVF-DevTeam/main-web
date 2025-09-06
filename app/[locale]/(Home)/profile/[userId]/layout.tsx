@@ -23,7 +23,7 @@ export default async function Layout({
         <Sidebar locale={locale} userId={userId} user={user} />
 
         {/* Page Content */}
-        <div className="flex-1 p-4 md:p-10">{children}</div>
+        <div className="flex-1 p-4 md:p-10 overflow-x-auto">{children}</div>
       </div>
     </div>
   )

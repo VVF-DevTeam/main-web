@@ -5,9 +5,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Image from 'next/image'
-import { User } from 'lucide-react'
+import {  User } from 'lucide-react'
 import { Select } from '@/components/ui/select'
-import { SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import {
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
 import { updateUser } from '@/lib/actions/user/updateUser'
 import { useTranslation } from 'react-i18next'
@@ -22,23 +27,32 @@ import {
 import { FiEdit2 } from 'react-icons/fi'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import axios from 'axios'
+import Loader from './Loader'
 
 const profileSchema = z.object({
   email: z.string().email('Invalid email').nonempty(),
   name: z.string(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(15, 'Phone number must be less than 15 digits'),
   address: z.string().optional(),
   age: z.string().optional(),
   image: z.string().optional(),
 })
 
+
+// Types
+import { UserInfoProps } from '@/lib/types/userInfo'
+
 type ProfileFormValues = z.infer<typeof profileSchema>
 
-const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
+const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('profile')
   const [imagePreview, setImagePreview] = useState(user.image || '')
-
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: user,
@@ -63,31 +77,56 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
     // eslint-disable-next-line
   }, [])
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files[0]) {
+      setIsLoading(true)
       const file = event.target.files[0]
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-        form.setValue('image', reader.result as string)
+      console.log(file)
+      const formData = new FormData()
+      formData.append('file', file)
+      const response = await axios.post('/api/users/avatars', formData)
+      if (response.status === 200) {
+        setImagePreview(response.data.url)
+        form.setValue('image', response.data.url)
       }
-      reader.readAsDataURL(file)
+      setIsLoading(false)
     }
   }
 
   const onSubmit = async (data: ProfileFormValues) => {
+    setIsLoading(true)
     try {
       // Combine extension and phone number
       const fullPhone = data.phone ? `${phoneExtension}${data.phone}` : ''
       const response = await updateUser({ ...data, phone: fullPhone })
       if (response.success) {
-        toast.success('Profile updated successfully!')
+        toast.success('Profile updated successfully!', {
+          style: {
+            color: '#22c55e',
+          },
+        })
       } else {
-        toast.error(response.error || 'Update failed', { description: 'Something went wrong' })
+        toast.error('Update failed', {
+          description:
+            (response.error || 'Update failed') +
+            ', this phone number may have been used by another user',
+          style: {
+            color: '#ef4444',
+          },
+        })
       }
     } catch (error) {
       console.log(error)
-      toast.error('Something went wrong', { description: 'Please try again later' })
+      toast.error('Update failed', {
+        description: 'Please try again later',
+        style: {
+          color: '#ef4444',
+        },
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -109,9 +148,8 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
                   <Image
                     src={imagePreview}
                     alt="Profile"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-lg"
+                    fill
+                    className="rounded-lg object-cover"
                   />
                   <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-bgColor-blue p-2 transition-colors hover:bg-bgColor-blue/50">
                     <FiEdit2 className="h-4 w-4 text-textColor-white" />
@@ -197,7 +235,10 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
                 <FormLabel>{t('phone')}</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <Select value={phoneExtension} onValueChange={setPhoneExtension}>
+                    <Select
+                      value={phoneExtension}
+                      onValueChange={setPhoneExtension}
+                    >
                       <SelectTrigger className="w-28 rounded-r-none">
                         <SelectValue />
                       </SelectTrigger>
@@ -206,7 +247,11 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
                         <SelectItem value="+84">(🇻🇳) +84</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Input {...field} placeholder="1234567890" className="rounded-l-none" />
+                    <Input
+                      {...field}
+                      placeholder="1234567890"
+                      className="rounded-l-none"
+                    />
                   </div>
                 </FormControl>
                 <FormMessage />
@@ -240,6 +285,8 @@ const UpdateProfileForm = ({ user }: { user: ProfileFormValues }) => {
           </div>
         </form>
       </Form>
+
+      {isLoading && <Loader />}
     </div>
   )
 }

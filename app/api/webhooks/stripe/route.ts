@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
+import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -205,6 +206,9 @@ export async function POST(req: NextRequest) {
           quantity: quantity,
         },
       })
+
+      // Invalidate payment cache after creating new payment
+      invalidatePaymentCache()
 
       // add role member to user
       if (metadata.type === 'Membership') {

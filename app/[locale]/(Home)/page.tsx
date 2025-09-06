@@ -3,6 +3,7 @@ import Introduction from '@/app/[locale]/(Home)/_components/_introduction/Introd
 import Directors from '@/app/[locale]/(Home)/_components/directors'
 import Contact from '@/app/[locale]/(Home)/_components/contact'
 import JoinUs from '@/app/[locale]/(Home)/_components/joinUs'
+import TopRatedEvents from '@/app/[locale]/(Home)/_components/TopRatedEvents'
 import SocialMediaPosts from '@/app/[locale]/(Home)/_components/_socialmediaposts/SocialMediaPosts'
 import { Metadata } from 'next'
 
@@ -25,9 +26,9 @@ export default async function Home({
   return (
     <div className="flex flex-col gap-y-12 overflow-hidden">
       <Introduction locale={locale} />
-      {/* Intro cards */}
       <ImageCarousel autoSlide={true} locale={locale} />
       <SocialMediaPosts locale={locale} />
+      <TopRatedEvents locale={locale} />
       <JoinUs locale={locale} />
       <Directors locale={locale} />
       <Contact locale={locale} />
