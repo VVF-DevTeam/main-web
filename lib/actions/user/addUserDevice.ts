@@ -7,13 +7,13 @@ export const addUserDevice = async ({
   userId: string
   token: string
 }) => {
-  const user = await prisma.user.findUnique({
+  let user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
   })
   if (!user) throw new Error("User's not exist")
-  prisma.userDevice.create({
+  return prisma.userDevice.create({
     data: {
       token,
       userId: user.id,
