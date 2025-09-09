@@ -1,7 +1,7 @@
 'use client'
 
 // NOTE: Please change from localhost to 127.0.0.1:3000 to test the recaptcha
-import { auth } from '@/firebase'
+import { auth } from '@/firebaseClient'
 import {
   ConfirmationResult,
   RecaptchaVerifier,
@@ -327,16 +327,40 @@ function SmsOtpVerificationInput({
       </Button>
 
       {/* Display error or success messages */}
-      <div className="p-4 flex flex-col items-center min-h-[48px]">
+      <div className="flex min-h-[48px] flex-col items-center p-4">
         {error && (
-          <div className="flex items-center gap-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded shadow animate-shake">
-            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" /></svg>
+          <div className="animate-shake flex items-center gap-2 rounded border border-red-400 bg-red-100 px-4 py-2 text-red-700 shadow">
+            <svg
+              className="h-5 w-5 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"
+              />
+            </svg>
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="flex items-center gap-2 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow animate-fade-in">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          <div className="animate-fade-in flex items-center gap-2 rounded border border-green-400 bg-green-100 px-4 py-2 text-green-700 shadow">
+            <svg
+              className="h-5 w-5 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
             <span>{success}</span>
           </div>
         )}
