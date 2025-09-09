@@ -7,7 +7,7 @@ export const addUserDevice = async ({
   userId: string
   token: string
 }) => {
-  let user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
