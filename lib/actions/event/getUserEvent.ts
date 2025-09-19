@@ -48,7 +48,7 @@ export const getUserEvents = async ({
         },
       },
       where: {
-        user: { is: { id: user.id } },
+        user: { id: user.id },
         event: {
           isPublished,
           startDate: {
