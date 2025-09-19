@@ -108,7 +108,7 @@ const EventPagination = ({
   if (totalPages <= 1) return null
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 dark:text-textColor">
       {/* Page Information Display */}
       {showPageInfo && totalItems && (
         <div className="text-sm text-muted-foreground">

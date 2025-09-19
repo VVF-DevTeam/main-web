@@ -12,6 +12,7 @@ import { Toaster as SonnerToaster } from 'sonner'
 import '@/lib/ui/css/globals.css'
 import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
 import { roboto } from '@/lib/ui/fonts/Roboto'
+import { ThemeProvider } from 'next-themes'
 
 // Metadata
 export const metadata: Metadata = {
@@ -39,14 +40,16 @@ export default async function RootLayout({
       locale={locale}
       resources={resources}
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
         >
-          <main>{children}</main>
-          <SonnerToaster />
-          <Analytics/>
-          <SpeedInsights />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <main>{children}</main>
+            <SonnerToaster />
+            <Analytics/>
+            <SpeedInsights />
+          </ThemeProvider>
         </body>
       </html>
     </TranslationsProvider>

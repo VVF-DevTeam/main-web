@@ -66,10 +66,10 @@ const Founder = async ({ params }: { params: Promise<{ locale: string }> }) => {
     <div className="flex-col-center md:gap-y-30 mx-auto max-w-[1000px] gap-y-20 px-5 py-20 lg:gap-y-40">
       {/* Header */}
       <div className='flex-col-center'>
-        <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+        <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl dark:text-textColor-brand">
           Founding History
         </h1>
-        <Separator className="bg-bgColor-brandDark w-[170%]" />
+        <Separator className="bg-bgColor-brandDark w-[170%] dark:bg-bgColor-brand" />
       </div>
 
       {/* Intro */}

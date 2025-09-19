@@ -8,10 +8,10 @@ interface JobHeaderProps {
 
 const JobHeader = ({ title, summary }: JobHeaderProps) => {
   return (
-    <div className='flex-col-center gap-y-6 p-4 pt-32'>
+    <div className='flex-col-center gap-y-6 p-4 pt-32 '>
       {/* Title */}
-      <h1 className="header-main header-font-black">{title}</h1>
-      <h2 className="header-text header-font-black">{summary}</h2>
+      <h1 className="header-main header-font-black dark:text-textColor-white">{title}</h1>
+      <h2 className="header-text header-font-black dark:text-textColor-white">{summary}</h2>
     </div>
   )
 }

@@ -7,8 +7,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Mail, Copy, Globe } from 'lucide-react'
+import { Mail, Copy, Globe, Moon, Sun } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 // Libraries
 import LanguageChanger from '@/components/translator/LanguageChanger'
 import React from 'react'
@@ -16,12 +18,28 @@ import Link from 'next/link'
 
 // Main Component
 const Header = () => {
+  const { theme, setTheme } = useTheme()
+
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
+
   const handleClick = (text: string) => {
     navigator.clipboard.writeText(text)
     toast('Copied to clipboard', {
       icon: <Copy className="h-4 w-4" />,
       className: 'text-green-500',
     })
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (
@@ -143,10 +161,38 @@ const Header = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-x-1 rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  onClick={toggleTheme}
+                  aria-label="Toggle dark mode"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                  <span className="text-xs">
+                    {theme === 'dark' ? 'Light' : 'Dark'}
+                  </span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-bgColor-black">
+                <p className="text-sm text-textColor-brandLight">
+                  Switch to {theme === 'dark' ? 'light' : 'dark'} mode
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        
 
         {/* LanguageChanger: Top-Right Corner */}
-        <div className="flex-center gap-x-2 pl-7">
+        <div className="flex-center gap-x-2 pl-7 ">
           <Globe className="h-5 w-5" />
           <LanguageChanger />
         </div>

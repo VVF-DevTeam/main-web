@@ -18,14 +18,14 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
     <div className="flex-col-center gap-y-10 px-5 py-20 lg:gap-y-20">
     {/* Header */}
     <div className="flex-col-center">
-      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl dark:text-textColor-brand">
         {t('header-benefits')}
       </h1>
-      <Separator className="w-[170%] bg-bgColor-brandDark" />
+      <Separator className="w-[170%] bg-bgColor-brandDark dark:bg-bgColor-brand" />
     </div>
 
     {/* Benefits */}
-    <div className="flex-col-default">
+    <div className="flex-col-default dark:text-gray-300">
       <p>
         {t('benefits-description1')}
       </p>

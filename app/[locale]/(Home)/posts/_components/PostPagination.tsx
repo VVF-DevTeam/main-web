@@ -97,7 +97,7 @@ const PostPagination = ({
 
   // CSS classes for hover states
   const hoverClasses = useMemo(() => {
-    return 'hover:bg-bgColor-brandLighter transition-colors duration-200'
+    return 'hover:bg-bgColor-brandLighter dark:bg-gray-800 dark:text-white dark:hover:bg-gray-600 transition-colors duration-200'
   }, [])
 
   // Don't render pagination if there's only one page or no pages

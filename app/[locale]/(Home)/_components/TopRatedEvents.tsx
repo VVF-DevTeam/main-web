@@ -71,7 +71,7 @@ const TopRatedEvents = async ({ locale }: TopRatedEventsProps) => {
     <div className="flex flex-col items-center justify-center gap-y-8 px-5 py-3 lg:py-5 text-center">
       {/* Header */}
       <div>
-        <h2 className="header-font-black header-sub">
+        <h2 className="header-font-black header-sub dark:text-textColor-white">
           {t('topRatedEvents')}
         </h2>
       </div>

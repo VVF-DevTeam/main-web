@@ -92,7 +92,7 @@ const EventCalendarMonth = ({
               className={`min-h-[120px] border p-2 text-sm ${
                 isCurrentMonth
                   ? 'bg-bgColor-white'
-                  : 'text-textColor-grayLight bg-bgColor-grayLight'
+                  : 'text-textColor-grayLight bg-bgColor-grayLight dark:bg-gray-500 dark:text-white'
               }`}
             >
               <div

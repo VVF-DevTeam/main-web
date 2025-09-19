@@ -102,10 +102,10 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
       <div className="width-max-default flex-col-default mx-auto p-6 pt-12">
         {/* Header */}
         <div className="flex flex-col gap-y-2">
-          <h1 className="header-font-black header-sub lg:text-5xl">
+          <h1 className="header-font-black header-sub lg:text-5xl dark:text-textColor-white">
             {t('header')}
           </h1>
-          <p className="header-font-black md:text-md text-sm text-muted-foreground">
+          <p className="header-font-black md:text-md text-sm text-muted-foreground dark:text-textColor-white">
             {t('description-header')}
           </p>
         </div>
@@ -205,7 +205,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         {/* Reviews */}
         <div className="flex flex-col">
           <div id="top-rated-events" className="mb-6 flex items-center justify-between">
-            <h2 className="header-font-black header-sub lg:text-5xl">
+            <h2 className="header-font-black header-sub lg:text-5xl dark:text-textColor-white">
               {t('reviews')}
             </h2>
             {session?.user ? (

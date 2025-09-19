@@ -50,7 +50,7 @@ const PostCard = ({
       </div>
 
       {/* Column2 - Content title createdAt */}
-      <div className="flex-col-default flex-wrap gap-y-3 px-4 py-8 md:gap-y-4 md:py-6 lg:px-4 xl:px-6 xl:py-8">
+      <div className="flex-col-default flex-wrap gap-y-3 px-4 py-8 md:gap-y-4 md:py-6 lg:px-4 xl:px-6 xl:py-8 dark:text-textColor">
         <h2 className="text-2xl font-bold tracking-wide xl:text-3xl">
           {title}
         </h2>

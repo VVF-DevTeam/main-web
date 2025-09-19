@@ -23,10 +23,10 @@ const IntroDescription = async ({
 
   return (
     <div className="flex-col-center text-place-default default-gap pr-6 md:max-w-96">
-      <h1 className="text-3xl font-bold tracking-wide text-textColor">
+      <h1 className="text-3xl font-bold tracking-wide text-textColor dark:text-textColor-white">
         {t(title)}
       </h1>
-      <p className="text-sm text-textColor">{t(description)}</p>
+      <p className="text-sm text-textColor dark:text-textColor-white">{t(description)}</p>
       <Link href={'/events'} className="md:place-self-start">
         <Button variant={'default'}>{t('button-introduction')}</Button>
       </Link>

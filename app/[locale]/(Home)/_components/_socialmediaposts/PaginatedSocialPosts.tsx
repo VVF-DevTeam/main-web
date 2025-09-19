@@ -33,7 +33,7 @@ const PaginatedSocialPosts = async ({
       <div className="mx-auto flex flex-col gap-y-12">
         {/* Header */}
         <div className="flex flex-col gap-y-2">
-          <h2 className="text-2xl font-bold header-font-black">{t('socialPostsHeader')}</h2>
+          <h2 className="text-2xl font-bold header-font-black dark:text-textColor-white">{t('socialPostsHeader')}</h2>
           <p className="text-sm text-muted-foreground">{t('socialPostsDescription')}</p>
         </div>
 

@@ -18,7 +18,7 @@ const SocialMediaPosts = async ({ locale }: SocialMediaProps) => {
   return (
     <div className="flex-col-center default-gap lg:mt-6">
       {/* Title & Separator */}
-      <span className="header-font-black header-sub">
+      <span className="header-font-black header-sub dark:text-textColor-white">
         {t('socialPostHeader')}
       </span>
 
