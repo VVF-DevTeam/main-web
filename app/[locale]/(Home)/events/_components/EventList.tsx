@@ -4,6 +4,7 @@ import initTranslation from '@/app/i18n'
 // Components
 import EventCard from './EventCard'
 import EventPagination from './EventPagination'
+import Image from 'next/image'
 
 // Interfaces & Types
 import { Event, EventCategory } from '@prisma/client'
@@ -40,11 +41,27 @@ const EventList = async ({
       ) : (
         <h2 className="header-main text-center">{t('header-upcomingEvent')}</h2>
       )}
-      <div className="flex-col-default grid-all-cols-3 mx-auto p-6 pb-4 md:gap-y-12">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} locale={locale} />
-        ))}
-      </div>
+      {events.length > 0 ? (
+        <div className="flex-col-default grid-all-cols-3 mx-auto p-6 pb-4 md:gap-y-12">
+          {events.map((event) => (
+            <EventCard key={event.id} event={event} locale={locale} />
+          ))}
+        </div>
+      ) : (
+        <div className="mx-auto p-4">
+          <div className="flex items-center gap-x-2">
+            <Image
+              src="https://drive.google.com/thumbnail?id=1KOA45MZfxUJyqGmNMO7x00U-bYXHJmaU&sz=w1000"
+              alt="Penguin icon"
+              width={50}
+              height={50}
+              className="inline-block align-middle"
+            />
+            <h2 className="text-sm text-textColor">{t('noEvent')}</h2>
+          </div>
+        </div>
+      )}
+
       <EventPagination
         currentPage={currentPage}
         totalPages={totalPages}
