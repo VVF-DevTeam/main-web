@@ -204,17 +204,14 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
 
         {/* Reviews */}
         <div className="flex flex-col">
-          <div id="top-rated-events" className="mb-6 flex items-center justify-between">
+          <div
+            id="top-rated-events"
+            className="mb-6 flex items-center justify-between"
+          >
             <h2 className="header-font-black header-sub lg:text-5xl">
               {t('reviews')}
             </h2>
-            {session?.user ? (
-              <AddReviewButton user={session.user} />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Sign in to add a review
-              </p>
-            )}
+            <AddReviewButton user={session?.user} />
           </div>
 
           <Suspense fallback={<div>Loading reviews...</div>}>

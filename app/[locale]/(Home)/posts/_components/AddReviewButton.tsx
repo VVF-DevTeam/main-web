@@ -27,11 +27,15 @@ import { createReview } from '@/lib/actions/review/reviewActions'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { Star } from 'lucide-react'
+import Switch from './Switch'
 
 const addReviewSchema = z.object({
   eventId: z.string().optional(),
   rating: z.string().min(1, 'Please select a rating'),
-  comment: z.string().min(1, 'Please share your experience with us, thank you!'),
+  comment: z
+    .string()
+    .min(1, 'Please share your experience with us, thank you!'),
+  anonymous: z.boolean().optional(),
 })
 
 // Event Interfaces
@@ -118,7 +122,9 @@ const AddReviewModal = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">No specific event</SelectItem>
+                          <SelectItem value="none">
+                            No specific event
+                          </SelectItem>
                           {events.map((event: Event) => (
                             <SelectItem key={event.id} value={event.id}>
                               {event.title}
@@ -132,25 +138,46 @@ const AddReviewModal = ({
                 )}
               />
 
-              {/* Rating */}
-              <FormField
-                control={form.control}
-                name="rating"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rating</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-2">
-                        {renderStars(Number(field.value) || 0)}
-                        <span className="ml-2 text-sm text-gray-600">
-                          {field.value ? `${field.value}/5` : 'Select rating'}
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex justify-between">
+                {/* Rating */}
+                <FormField
+                  control={form.control}
+                  name="rating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rating</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-2">
+                          {renderStars(Number(field.value) || 0)}
+                          <span className="ml-2 text-sm text-gray-600">
+                            {field.value ? `${field.value}/5` : 'Select rating'}
+                          </span>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Anonymous */}
+                <FormField
+                  control={form.control}
+                  name="anonymous"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anonymous</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Comment */}
               <FormField
@@ -220,6 +247,7 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
       eventId: 'none',
       rating: '',
       comment: '',
+      anonymous: false,
     },
   })
 
@@ -242,7 +270,10 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
         eventId: data.eventId === 'none' ? undefined : data.eventId,
         rating: Number(data.rating) as unknown as ReviewRating,
         comment: data.comment,
+        anonymous: data.anonymous,
       }
+
+      console.log(reviewData)
 
       const { success, message } = await createReview(reviewData)
       if (success) {
@@ -278,9 +309,32 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
     }
   }
 
+  const openAddReviewModal = () => {
+    if (user?.id) {
+      setShowAddReviewModal(true)
+    } else {
+      toast.error('Error', {
+        description: (
+          <div className="flex flex-col gap-2">
+            <span>Please log in to submit a review, thank you.</span>
+            <button
+              onClick={() => router.push('/signIn')}
+              className="text-left font-medium text-blue-500 underline hover:text-blue-700"
+            >
+              Click here to sign in
+            </button>
+          </div>
+        ),
+        style: {
+          color: '#ef4444',
+        },
+      })
+    }
+  }
+
   return (
     <>
-      <Button onClick={() => setShowAddReviewModal(true)} disabled={events.length === 0}>
+      <Button onClick={openAddReviewModal} disabled={events.length === 0}>
         Add Review
       </Button>
       {showAddReviewModal && (

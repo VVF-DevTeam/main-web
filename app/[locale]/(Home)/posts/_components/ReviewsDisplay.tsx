@@ -41,6 +41,22 @@ interface Event {
   title: string
 }
 
+const generateRandomNumber = (id: string) => {
+  // Create a simple hash from the ID string
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    const char = id.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Convert to positive number and get 4 digits (1000-9999)
+  const positiveHash = Math.abs(hash);
+  const fourDigitNumber = (positiveHash % 9000) + 1000;
+  
+  return fourDigitNumber.toString();
+}
+
 const ReviewsDisplay = ({
   currentPage,
   reviewsPerPage,
@@ -53,7 +69,6 @@ const ReviewsDisplay = ({
   initialSelectedEvent,
   initialSelectedRating,
 }: ReviewsDisplayProps) => {
-  console.log(reviewsPerPage)
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('post')
 
@@ -519,11 +534,11 @@ const ReviewsDisplay = ({
 
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
-                          {t('by')} {review.user?.name || t('anonymous')}
+                          {t('by')} {review.anonymous ? t('anonymous') + ' ' + generateRandomNumber(review.id) : review.user?.name || t('anonymous') + ' ' + generateRandomNumber(review.id)} 
                         </span>
                         <div className="flex items-center gap-2">
                           <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-gray-200">
-                            {review.user?.image ? (
+                            {review.user?.image && !review.anonymous ? (
                               <Image
                                 src={review.user.image}
                                 alt={review.user?.name || 'User'}

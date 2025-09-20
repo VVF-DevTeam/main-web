@@ -283,6 +283,7 @@ model Review {
   eventId   String?
   rating    ReviewRating
   comment   String
+  anonymous Boolean      @default(false)  
   event     Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

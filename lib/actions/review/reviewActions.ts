@@ -8,6 +8,7 @@ export interface CreateReviewData {
   eventId?: string
   rating: string
   comment: string
+  anonymous?: boolean
 }
 
 export interface ReviewWithUserAndEvent {
@@ -18,6 +19,7 @@ export interface ReviewWithUserAndEvent {
   eventId: string | null
   rating: ReviewRating
   comment: string
+  anonymous: boolean
   user: {
     name: string | null
     image: string | null
@@ -51,6 +53,7 @@ export async function createReview(data: CreateReviewData) {
         eventId: data.eventId || null,
         rating: RatingToString[data.rating as keyof typeof RatingToString] || ReviewRating.One,
         comment: data.comment,
+        anonymous: data.anonymous || false,
       }
     })
 
