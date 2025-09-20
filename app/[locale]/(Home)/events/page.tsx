@@ -9,7 +9,21 @@ import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
+// Interfaces & Types
+import { Event, EventCategory } from '@prisma/client'
+
 // import { Suspense } from 'react'
+// Simple in-memory cache to reduce API calls
+let eventsCache: {
+  data: (Event & {
+    categories: EventCategory[]
+  })[]
+  timestamp: number
+  locale: string
+  fetchLimit?: number // Track how many posts we attempted to fetch
+} | null = null
+
+const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes
 
 // Main Component
 const EventsPage = async ({
@@ -25,15 +39,33 @@ const EventsPage = async ({
   const isAdmin = await roleCheck({ role: 'ADMIN' })
   const isHost = await roleCheck({ role: 'HOST' })
 
-  // Get all events
-  const allEvents = await prisma.event.findMany({
-    where: {
-      isPublished: true,
-    },
-    include: {
-      categories: true,
-    },
-  })
+  // Get all events with caching
+  const nowTimestamp = Date.now()
+  const isCacheValid = eventsCache && eventsCache.locale === locale && nowTimestamp - eventsCache.timestamp < CACHE_DURATION
+  
+  let allEvents
+  if (isCacheValid) {
+    allEvents = eventsCache!.data
+  } else {
+    allEvents = await prisma.event.findMany({
+      where: {
+        isPublished: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        categories: true,
+      },
+    })
+    
+    // Update cache
+    eventsCache = {
+      data: allEvents,
+      timestamp: nowTimestamp,
+      locale,
+    }
+  }
 
   // If no events, return component with message
   if (allEvents.length === 0) {
