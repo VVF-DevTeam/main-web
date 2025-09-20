@@ -69,6 +69,8 @@ const ReviewsDisplay = ({
   initialSelectedEvent,
   initialSelectedRating,
 }: ReviewsDisplayProps) => {
+  console.log(reviewsPerPage) // Do not remove, will use for later
+
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('post')
 
