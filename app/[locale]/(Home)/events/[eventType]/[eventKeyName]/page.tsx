@@ -89,6 +89,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           <div className="width-max-default mx-auto">
             <BackButton variant={'responsive'} />
             <ClassImage
+              eventId={publishedClass.id}
               imageUrl={publishedClass.imgUrl!}
               location={publishedClass.location!}
               startDate={publishedClass.startDate!}

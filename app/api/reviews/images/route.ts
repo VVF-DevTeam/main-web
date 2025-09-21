@@ -9,7 +9,7 @@ export const config = {
 }
 
 export async function GET() {
-  const avatars = await listDriveImages("avatars")
+  const avatars = await listDriveImages("reviews")
   return NextResponse.json({ avatars })
 }
 
@@ -25,6 +25,6 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(arrayBuffer)
   const mimetype = file.type || 'image/jpeg'
 
-  const uploaded = await uploadDriveImage("avatars", buffer, file.name, mimetype)
+  const uploaded = await uploadDriveImage("reviews", buffer, file.name, mimetype)
   return NextResponse.json(uploaded, { status: 200 })
 }

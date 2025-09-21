@@ -1,12 +1,15 @@
 // Components
 import Image from 'next/image'
 import IconTray from '@/app/[locale]/(Home)/events/_components/IconTray'
-import AddReviewButton from '@/app/[locale]/(Home)/posts/_components/AddReviewButton'
+import AddReviewButton from '@/components/review/AddReviewButton'
 
 // Libraries
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 interface ClassImageProps {
+  eventId: string
   imageUrl: string
   location: string
   startDate: Date
@@ -18,6 +21,7 @@ interface ClassImageProps {
 }
 
 const ClassImage = async ({
+  eventId,
   imageUrl,
   location,
   startDate,
@@ -83,7 +87,16 @@ const ClassImage = async ({
         </div>
       </div>
 
-      <div className="place-self-end p-6">
+      <div className="place-self-end pr-6 flex flex-col items-end gap-2">
+        <Link
+          href={`/posts?reviewEvent=${eventId}&reviewPage=1#reviews-section`}
+          className="group inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t('jumpToReviewsSection')}{' '}
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+        </Link>
         <AddReviewButton user={session?.user} />
       </div>
     </div>

@@ -27,7 +27,11 @@ import { createReview } from '@/lib/actions/review/reviewActions'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { Star } from 'lucide-react'
-import Switch from './Switch'
+import { Switch } from '@/components/ui/switch'
+import Image from 'next/image'
+import { ImageIcon } from 'lucide-react'
+import { FiEdit2 } from 'react-icons/fi'
+import axios from 'axios'
 
 const addReviewSchema = z.object({
   eventId: z.string().optional(),
@@ -36,6 +40,7 @@ const addReviewSchema = z.object({
     .string()
     .min(1, 'Please share your experience with us, thank you!'),
   anonymous: z.boolean().optional(),
+  image: z.string().optional(),
 })
 
 // Event Interfaces
@@ -56,6 +61,32 @@ const AddReviewModal = ({
   setShowAddReviewModal: (show: boolean) => void
   onSubmit: (data: AddReviewFormValues) => void
 }) => {
+  const [imagePreview, setImagePreview] = useState('')
+  const [isImageLoading, setIsImageLoading] = useState(false)
+
+  // Handle image upload
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files && event.target.files[0]) {
+      setIsImageLoading(true)
+      const file = event.target.files[0]
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const response = await axios.post('/api/reviews/images', formData)
+        if (response.status === 200) {
+          setImagePreview(response.data.url)
+          form.setValue('image', response.data.url)
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        toast.error('Failed to upload image')
+      }
+      setIsImageLoading(false)
+    }
+  }
+
   // handle overlay click
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -167,11 +198,14 @@ const AddReviewModal = ({
                     <FormItem>
                       <FormLabel>Anonymous</FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center space-x-2">
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
+                          <span className="text-sm text-gray-600">
+                            {field.value ? 'Yes' : 'No'}
+                          </span>
                         </div>
                       </FormControl>
                     </FormItem>
@@ -198,6 +232,51 @@ const AddReviewModal = ({
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* Review Image Upload */}
+            <span>Image (Optional)</span>
+            <div className="flex flex-col">
+              <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
+                {imagePreview ? (
+                  <div className="flex items-center justify-center">
+                    <Image
+                      src={imagePreview}
+                      alt="Review"
+                      fill
+                      className="rounded-lg object-cover"
+                    />
+                    <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
+                      <FiEdit2 className="h-3 w-3 text-white" />
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        disabled={isImageLoading}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center space-y-1 text-center">
+                    <ImageIcon className="h-8 w-8 text-gray-400" />
+                    <p className="text-sm font-medium text-gray-600">
+                      Add Photo
+                    </p>
+                    <p className="text-xs text-gray-500">Optional</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={isImageLoading}
+                />
+              </label>
+              {isImageLoading && (
+                <p className="mt-2 text-sm text-blue-500">Uploading...</p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -248,6 +327,7 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
       rating: '',
       comment: '',
       anonymous: false,
+      image: '',
     },
   })
 
@@ -265,15 +345,15 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
         return
       }
 
+      console.log(data)
       const reviewData = {
         userId: user.id,
         eventId: data.eventId === 'none' ? undefined : data.eventId,
         rating: Number(data.rating) as unknown as ReviewRating,
         comment: data.comment,
         anonymous: data.anonymous,
+        imageLink: data.image,
       }
-
-      console.log(reviewData)
 
       const { success, message } = await createReview(reviewData)
       if (success) {
@@ -288,6 +368,7 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
           eventId: 'none',
           rating: '',
           comment: '',
+          image: '',
         })
         router.refresh()
       } else {

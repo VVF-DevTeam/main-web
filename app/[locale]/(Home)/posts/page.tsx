@@ -9,7 +9,7 @@ import PublishedPosts from './_components/PublishedPosts'
 import PaginatedSocialPosts from '../_components/_socialmediaposts/PaginatedSocialPosts'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { auth } from '@/auth'
-import AddReviewButton from './_components/AddReviewButton'
+import AddReviewButton from '@/components/review/AddReviewButton'
 import ReviewsDisplay from './_components/ReviewsDisplay'
 import {
   getReviewsPaginated,
@@ -101,13 +101,25 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     <div>
       <div className="width-max-default flex-col-default mx-auto p-6 pt-12">
         {/* Header */}
-        <div className="flex flex-col gap-y-2">
-          <h1 className="header-font-black header-sub lg:text-5xl">
-            {t('header')}
-          </h1>
-          <p className="header-font-black md:text-md text-sm text-muted-foreground">
-            {t('description-header')}
-          </p>
+        <div className="flex flex-col md:flex-row md:justify-between gap-y-2">
+          <div className="flex flex-col gap-y-2">
+            <h1 className="header-font-black header-sub lg:text-5xl">
+              {t('header')}
+            </h1>
+            <p className="header-font-black md:text-md text-sm text-muted-foreground">
+              {t('description-header')}
+            </p>
+          </div>
+          {/* Quick navigation to reviews */}
+          <div>
+            <Link
+              href="#reviews-section"
+              className="inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline group"
+            >
+              <span>Go to Reviews</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
 
         {/* Search box */}
@@ -203,11 +215,12 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         <div className="h-px w-full bg-bgColor-gray/15" />
 
         {/* Reviews */}
-        <div className="flex flex-col">
-          <div
-            id="top-rated-events"
-            className="mb-6 flex items-center justify-between"
-          >
+        <div
+          id="reviews-section"
+          className="flex flex-col"
+          style={{ scrollMarginTop: '90px' }}
+        >
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="header-font-black header-sub lg:text-5xl">
               {t('reviews')}
             </h2>

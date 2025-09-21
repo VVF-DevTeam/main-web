@@ -9,6 +9,7 @@ export interface CreateReviewData {
   rating: string
   comment: string
   anonymous?: boolean
+  imageLink?: string
 }
 
 export interface ReviewWithUserAndEvent {
@@ -20,6 +21,7 @@ export interface ReviewWithUserAndEvent {
   rating: ReviewRating
   comment: string
   anonymous: boolean
+  imageLink: string | null
   user: {
     name: string | null
     image: string | null
@@ -54,6 +56,7 @@ export async function createReview(data: CreateReviewData) {
         rating: RatingToString[data.rating as keyof typeof RatingToString] || ReviewRating.One,
         comment: data.comment,
         anonymous: data.anonymous || false,
+        imageLink: data.imageLink || null,
       }
     })
 
@@ -98,7 +101,16 @@ export async function getReviewsPaginated(
     const [reviews, totalCount] = await Promise.all([
       prisma.review.findMany({
         where: whereClause,
-        include: {
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          userId: true,
+          eventId: true,
+          rating: true,
+          comment: true,
+          anonymous: true,
+          imageLink: true,
           user: {
             select: {
               name: true,
@@ -196,7 +208,7 @@ export async function getPublishedEventsForReviewsWithSearch(
 }
 
 // Update a review (owner only)
-export async function updateReview(reviewId: string, data: { comment: string; rating: ReviewRating }) {
+export async function updateReview(reviewId: string, data: { comment: string; rating: ReviewRating; anonymous?: boolean; imageLink?: string | null }) {
   try {
     await prisma.review.update({
       where: {
@@ -205,6 +217,8 @@ export async function updateReview(reviewId: string, data: { comment: string; ra
       data: {
         comment: data.comment,
         rating: data.rating,
+        anonymous: data.anonymous,
+        imageLink: data.imageLink,
         updatedAt: new Date(),
       },
     })

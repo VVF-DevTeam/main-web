@@ -10,7 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Star, Search, Filter, Trash2, Edit } from 'lucide-react'
+import { Star, Search, Filter, Trash2, Edit, Image as ImageIcon } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { FiEdit2 } from 'react-icons/fi'
+import axios from 'axios'
 import {
   deleteReview,
   updateReview,
@@ -87,6 +90,10 @@ const ReviewsDisplay = ({
   const [editingReview, setEditingReview] = useState<string | null>(null)
   const [editComment, setEditComment] = useState('')
   const [editRating, setEditRating] = useState<ReviewRating | null>(null)
+  const [editAnonymous, setEditAnonymous] = useState(false)
+  const [editImagePreview, setEditImagePreview] = useState('')
+  const [isEditImageLoading, setIsEditImageLoading] = useState(false)
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
 
   // Debounce search term to avoid too many API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
@@ -243,10 +250,50 @@ const ReviewsDisplay = ({
     [events]
   )
 
+  // Handle image modal
+  const openImageModal = (imageUrl: string) => {
+    setModalImageUrl(imageUrl)
+  }
+
+  const closeImageModal = () => {
+    setModalImageUrl(null)
+  }
+
+  // Handle click outside modal to close
+  const handleModalOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      closeImageModal()
+    }
+  }
+
+  // Handle image upload for edit mode
+  const handleEditImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files && event.target.files[0]) {
+      setIsEditImageLoading(true)
+      const file = event.target.files[0]
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const response = await axios.post('/api/reviews/images', formData)
+        if (response.status === 200) {
+          setEditImagePreview(response.data.url)
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        toast.error('Failed to upload image')
+      }
+      setIsEditImageLoading(false)
+    }
+  }
+
   const handleEditReview = (review: ReviewWithUserAndEvent) => {
     setEditingReview(review.id)
     setEditComment(review.comment)
     setEditRating(review.rating)
+    setEditAnonymous(review.anonymous)
+    setEditImagePreview(review.imageLink || '')
   }
 
   const handleSaveEdit = async (reviewId: string) => {
@@ -259,6 +306,8 @@ const ReviewsDisplay = ({
       const { success } = await updateReview(reviewId, {
         comment: editComment.trim(),
         rating: editRating,
+        anonymous: editAnonymous,
+        imageLink: editImagePreview || null,
       })
 
       if (success) {
@@ -266,6 +315,8 @@ const ReviewsDisplay = ({
         setEditingReview(null)
         setEditComment('')
         setEditRating(null)
+        setEditAnonymous(false)
+        setEditImagePreview('')
         // Refresh the page to get updated data
         router.refresh()
       } else {
@@ -281,6 +332,8 @@ const ReviewsDisplay = ({
     setEditingReview(null)
     setEditComment('')
     setEditRating(null)
+    setEditAnonymous(false)
+    setEditImagePreview('')
   }
 
   const handleDeleteReview = async (review: ReviewWithUserAndEvent) => {
@@ -325,7 +378,7 @@ const ReviewsDisplay = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Search and Filter Section */}
       <div className="space-y-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-end">
@@ -497,6 +550,78 @@ const ReviewsDisplay = ({
                         className="w-full"
                       />
 
+                      {/* Anonymous Toggle */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Anonymous</span>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={editAnonymous}
+                            onCheckedChange={setEditAnonymous}
+                          />
+                          <span className="text-sm text-gray-600">
+                            {editAnonymous ? 'Yes' : 'No'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Image Upload/Remove */}
+                      <div className="space-y-2">
+                        <span className="text-sm font-medium">Image (Optional)</span>
+                        <div className="flex flex-col items-center">
+                          <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
+                            {editImagePreview ? (
+                              <div className="flex items-center justify-center">
+                                <Image
+                                  src={editImagePreview}
+                                  alt="Review"
+                                  fill
+                                  className="rounded-lg object-cover"
+                                />
+                                <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
+                                  <FiEdit2 className="h-3 w-3 text-white" />
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    onChange={handleEditImageUpload}
+                                    accept="image/*"
+                                    disabled={isEditImageLoading}
+                                  />
+                                </label>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center space-y-1 text-center">
+                                <ImageIcon className="h-8 w-8 text-gray-400" />
+                                <p className="text-sm font-medium text-gray-600">
+                                  Add Photo
+                                </p>
+                                <p className="text-xs text-gray-500">Optional</p>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleEditImageUpload}
+                              disabled={isEditImageLoading}
+                            />
+                          </label>
+                          {isEditImageLoading && (
+                            <p className="mt-2 text-sm text-blue-500">Uploading...</p>
+                          )}
+                          {editImagePreview && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditImagePreview('')}
+                              className="mt-2 text-red-600 hover:text-red-800"
+                            >
+                              Remove Image
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
                       {/* Action buttons */}
                       <div className="flex gap-2">
                         <Button
@@ -533,6 +658,30 @@ const ReviewsDisplay = ({
                       </div>
 
                       <p className="mb-2 text-gray-800">{review.comment}</p>
+
+                      {/* Review Image */}
+                      {review.imageLink && (
+                        <div className="mb-3 flex justify-center">
+                          <div 
+                            className="relative h-48 w-full max-w-sm overflow-hidden rounded-lg border border-gray-200 cursor-pointer transition-transform hover:scale-105"
+                            onClick={() => openImageModal(review.imageLink!)}
+                          >
+                            <Image
+                              src={review.imageLink}
+                              alt="Review image"
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                            {/* Click indicator overlay */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                              <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-2">
+                                <Search className="h-5 w-5 text-gray-700" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
@@ -620,6 +769,32 @@ const ReviewsDisplay = ({
           >
             {t('next')}
           </Button>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {modalImageUrl && (
+          <div
+            className="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-0 m-0 [margin-top:0!important]"
+            onClick={handleModalOverlayClick}
+          >
+          <div className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-lg">
+            <Image
+              src={modalImageUrl}
+              alt="Review image full size"
+              width={800}
+              height={600}
+              className="h-auto w-auto max-h-[90vh] max-w-[90vw] object-contain"
+              sizes="90vw"
+            />
+            {/* Close button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 hover:bg-opacity-100 transition-all duration-200"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
     </div>
