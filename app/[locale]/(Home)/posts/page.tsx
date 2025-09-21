@@ -16,7 +16,7 @@ import {
   getPublishedEventsForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
 import { ReviewRating } from '@prisma/client'
-
+import ScrollToReviews from './_components/ScrollToReviews'
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
@@ -27,6 +27,7 @@ interface PostsProps {
     reviewSearch?: string
     reviewEvent?: string
     reviewRating?: string
+    redirectToReviewsSection?: boolean
   }>
 }
 
@@ -40,6 +41,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     reviewSearch,
     reviewEvent,
     reviewRating,
+    redirectToReviewsSection,
   } = await searchParams
 
   const { t } = await initTranslations(locale, ['post', 'common'])
@@ -99,6 +101,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
 
   return (
     <div>
+      {redirectToReviewsSection && <ScrollToReviews />}
       <div className="width-max-default flex-col-default mx-auto p-6 pt-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:justify-between gap-y-2">
@@ -112,13 +115,13 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
           </div>
           {/* Quick navigation to reviews */}
           <div>
-            <Link
+            <a
               href="#reviews-section"
               className="inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline group"
             >
               <span>Go to Reviews</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </a>
           </div>
         </div>
 

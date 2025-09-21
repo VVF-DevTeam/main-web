@@ -89,7 +89,7 @@ const ClassImage = async ({
 
       <div className="place-self-end pr-6 flex flex-col items-end gap-2">
         <Link
-          href={`/posts?reviewEvent=${eventId}&reviewPage=1#reviews-section`}
+          href={`/posts?reviewEvent=${eventId}&reviewPage=1&redirectToReviewsSection=true`}
           className="group inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline"
           target="_blank"
           rel="noopener noreferrer"
