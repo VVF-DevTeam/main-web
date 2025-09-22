@@ -1,0 +1,23 @@
+{
+    "becomehost-notLogin": "Veuillez vous connecter pour postuler en tant qu’hôte.",
+    "becomeHost-header": "Formulaire de candidature d’hôte",
+    "becomeHost-description": "Rejoignez notre communauté et partagez vos connaissances avec les autres",
+    "host-firstname": "Prénom",
+    "host-lastname": "Nom",
+    "host-phone": "Numéro de téléphone",
+    "host-address": "Adresse",
+    "host-city": "Ville",
+    "host-country": "Pays",
+    "host-postalCode": "Code postal",
+    "host-description": "Que souhaitez-vous enseigner/animer à VVF ?",
+    "host-experience": "Merci de partager votre expérience avec nous",
+    "host-availability": "Disponibilités",
+    "host-availability-header": "Sélectionnez vos créneaux disponibles pour les 2 prochaines semaines",
+    "host-availability-prev": "Semaine précédente",
+    "host-availability-next": "Semaine suivante",
+    "host-availability-summary": "Récapitulatif des disponibilités",
+    "host-availability-summary-empty": " Aucun créneau sélectionné pour le moment",
+    "host-submitting": "Envoi en cours ...",
+    "host-submit": "Envoyer la candidature"
+  }
+  

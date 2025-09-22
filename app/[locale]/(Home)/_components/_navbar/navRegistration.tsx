@@ -47,14 +47,14 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
     <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
-          'flex items-center justify-center  font-semibold transition-all',
+          'flex items-center justify-center font-semibold transition-all',
           mode === 'desktop'
-            ? `whitespace-nowrap text-sm gap-x-[5px] ${
+            ? `gap-x-[5px] whitespace-nowrap text-sm ${
                 isActive
                   ? 'text-textColor-brand'
                   : 'text-textColor hover:text-textColor-brand hover:underline'
               }`
-            : `mt-2 h-full w-full rounded-md p-4 text-xl gap-x-4 ${
+            : `mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl ${
                 isActive
                   ? 'text-textColor-brand'
                   : 'px-5 text-slate-200 hover:bg-bgColor-brand'
@@ -97,7 +97,17 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         >
           {t('job-navRegistration')}
         </Link>
-
+        <div className="border-b border-gray-200" />
+        <Link
+          href="/registration/becomeHost"
+          className={classNames(
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
+          )}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {t('job-navBecomeHost')}
+        </Link>
         {/* <div className="border-b border-gray-200" />
         <Link
           href="/about/members"

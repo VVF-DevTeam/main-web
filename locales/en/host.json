@@ -1,0 +1,22 @@
+{
+    "becomehost-notLogin":"Please sign in to apply to become a host.",
+    "becomeHost-header": "Host Application Form",
+    "becomeHost-description": "Join our community and share your knowledge with others",
+    "host-firstname": "First Name",
+    "host-lastname": "Last Name",
+    "host-phone": "Phone Number",
+    "host-address": "Address",
+    "host-city": "City",
+    "host-country": "Country",
+    "host-postalCode": "Postal Code",
+    "host-description": "What do you want to teach/host in VVF?",
+    "host-experience": "Please share your experience with us",
+    "host-availability": "Availability",
+    "host-availability-header": "Select your available time slots for the next 2 weeks",
+    "host-availability-prev": "Previous Week",
+    "host-availability-next": "Next Week",
+    "host-availability-summary": "Availability Summary",
+    "host-availability-summary-empty": " No time slots selected yet",
+    "host-submitting": "Submitting ...",
+    "host-submit": "Submit Application"
+}
