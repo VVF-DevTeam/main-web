@@ -113,7 +113,7 @@ const EmailTemplate = ({
     <div>
       {isHostApplication ? (
         <h1>
-          {firstName} {lastName}&apos;s Application for hosting {teachHost}
+          {firstName} {lastName}&apos;s Application for hosting event: {teachHost}
         </h1>
       ) : (
         <h1>
@@ -153,7 +153,11 @@ const EmailTemplate = ({
           <li>
             <strong>Availability:</strong>
             <br />
-            {availabilityText}
+            <div
+              dangerouslySetInnerHTML={{
+                __html: availabilityText.replace(/\n/g, '<br />'),
+              }}
+            />
           </li>
         )}
       </ul>
@@ -185,7 +189,7 @@ export async function sendApplication({
     from: 'VVF Admin <admin.tech@vietvibe.org>',
     to: emailMapping[jobType],
     subject: isHostApplication
-      ? `Host Application from ${data.firstName} ${data.lastName}`
+      ? `Event Host Application from ${data.firstName} ${data.lastName}`
       : `Application from ${data.firstName} ${data.lastName} for ${jobType}`,
     react: EmailTemplate(data),
   }

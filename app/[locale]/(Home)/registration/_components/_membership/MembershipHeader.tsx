@@ -12,10 +12,10 @@ export const MembershipHeader = async ({ locale }: MembershipHeaderProps) => {
   return (
     <div className="flex-col-center space-y-4 text-center">
       <div className="flex-col-center">
-        <h1 className="header-sub header-font-default text-4xl text-textColor-brandDark">
+        <h1 className="header-font-default text-5xl font-bold tracking-wider text-textColor-brandDark">
           {t('membership-header')}
         </h1>
-        <Separator className="w-[110%] bg-bgColor-brandDark" />
+        <Separator className="w-[140%] bg-bgColor-brandDark" />
       </div>
       <p className="mx-auto max-w-2xl text-lg text-gray-600">
         {t('membership-description')}

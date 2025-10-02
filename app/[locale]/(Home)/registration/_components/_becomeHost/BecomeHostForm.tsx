@@ -18,9 +18,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
 
 import AvailabilitySelector from './AvailabilitySelector'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Link from 'next/link'
 
 const hostApplicationSchema = z.object({
   firstName: z.string().min(1, 'Required'),
@@ -106,7 +108,19 @@ export default function BecomeHostForm({
       )
       if (response.status === 200) {
         toast.success(
-          'Job applied successfully. Thank you for your application! Please wait for our response, we will get back to you soon.'
+          'Job applied successfully.',
+          {
+            description: (
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                Thank you for your application! Please wait for our response, we will get back to you soon.
+                <br />
+                {currentDateTime}
+              </span>
+            ),
+            style: {
+              color: '#22c55e', // green-500 color
+            },
+          }
         )
       }
     } catch (error: unknown) {
@@ -116,8 +130,7 @@ export default function BecomeHostForm({
             description: (
               <div className="flex flex-col gap-1">
                 <span>
-                  You have already applied for this job, if you want to add new
-                  information, please send an email to the admin
+                  You have already applied for this job. If you want to update your application, please send us an email or message
                 </span>
                 <span style={{ color: 'var(--muted-foreground)' }}>
                   {currentDateTime}
@@ -182,39 +195,207 @@ export default function BecomeHostForm({
   }
 
   return (
-    <div className="min-h-screen bg-bgColor-grayLight py-6 sm:py-8 lg:py-12">
-      <div className="px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="mb-6 text-center sm:mb-8">
-          <h1 className="mb-3 text-2xl font-bold text-textColor-brand sm:mb-4 sm:text-3xl lg:text-4xl">
-            {t('becomeHost-header')}
-          </h1>
-          <p className="text-base text-textColor-gray sm:text-lg lg:text-xl">
+    <div className="min-h-screen py-6 sm:py-8 lg:py-12">
+      <div className="flex flex-col gap-y-6 px-4 sm:px-6 lg:px-8">
+        {/* Policy Section */}
+        <div>
+          {/* Header Section */}
+          <div className="mb-6 text-center sm:mb-8">
+            <h1 className="tracking header-font-default mb-3 text-4xl font-bold text-textColor-brandDark">
+              {t('becomeHost-header')}
+            </h1>
+            <div className="mx-auto w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
+            {/* <p className="text-base text-textColor-gray sm:text-lg lg:text-xl">
             {t('becomeHost-description')}
-          </p>
+          </p> */}
+          </div>
+
+          <div className="mb-2">
+            <p> {t('becomeHost-description1')} </p>
+            <p> {t('becomeHost-description2')} </p>
+            <div className="ml-8">
+              <ol className="list-decimal">
+                <li>
+                  {' '}
+                  {t('becomeHost-description3')}{' '}
+                  <Link
+                    className="text-blue-600 underline hover:text-blue-600/80"
+                    href="/registration/jobs"
+                  >
+                    member
+                  </Link>{' '}
+                </li>
+                <li> {t('becomeHost-description4')}</li>
+                <li> {t('becomeHost-description5')}</li>
+                <li> {t('becomeHost-description6')}</li>
+              </ol>
+            </div>
+            <p> {t('becomeHost-description7')} </p>
+          </div>
         </div>
 
         {/* Form Container */}
-        <div className="bg-bgColor-white rounded-lg p-4 sm:p-6 lg:p-8">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 sm:space-y-6"
-            >
-              {/* General Information Section */}
-              <div className="space-y-3 sm:space-y-4">
-                {/* Name Fields */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+        <div>
+          <div className="bg-bgColor-white rounded-lg p-4 sm:p-6 lg:p-8">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 sm:space-y-6"
+              >
+                {/* General Information Section */}
+                <div className="space-y-3 sm:space-y-4">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-firstname')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input autoComplete="given-name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-lastname')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input autoComplete="family-name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Contact Fields */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            Email
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              autoComplete="email"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-phone')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="tel" autoComplete="tel" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Address Section */}
+                <div className="space-y-3 sm:space-y-4">
                   <FormField
                     control={form.control}
-                    name="firstName"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-textColor-brand">
-                          {t('host-firstname')}
+                          {t('host-address')}
                         </FormLabel>
                         <FormControl>
-                          <Input autoComplete="given-name" {...field} />
+                          <Input autoComplete="street-address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-city')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input autoComplete="address-level2" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-country')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input autoComplete="country-name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-textColor-brand">
+                            {t('host-postalCode')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input autoComplete="postal-code" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Experience Section */}
+                <div className="space-y-3 sm:space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="teachHost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-textColor-brand">
+                          {t('host-description')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -222,14 +403,14 @@ export default function BecomeHostForm({
                   />
                   <FormField
                     control={form.control}
-                    name="lastName"
+                    name="experience"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-textColor-brand">
-                          {t('host-lastname')}
+                          {t('host-experience')}
                         </FormLabel>
                         <FormControl>
-                          <Input autoComplete="family-name" {...field} />
+                          <Textarea rows={4} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -237,171 +418,37 @@ export default function BecomeHostForm({
                   />
                 </div>
 
-                {/* Contact Fields */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-textColor-brand">
-                          Email
-                        </FormLabel>
-                        <FormControl>
-                          <Input type="email" autoComplete="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-textColor-brand">
-                          {t('host-phone')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input type="tel" autoComplete="tel" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* Availability Section */}
+                <div className="space-y-4 sm:space-y-6">
+                  <h2 className="text-textColor-black text-lg font-semibold sm:text-xl">
+                    {t('host-availability')}
+                  </h2>
+                  <div className="border-b border-gray-200" />
+                  <div className="w-full">
+                    <AvailabilitySelector
+                      value={availability}
+                      onChange={setAvailability}
+                      locale={locale}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Address Section */}
-              <div className="space-y-3 sm:space-y-4">
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-textColor-brand">
-                        {t('host-address')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input autoComplete="street-address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-textColor-brand">
-                          {t('host-city')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input autoComplete="address-level2" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-textColor-brand">
-                          {t('host-country')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input autoComplete="country-name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-textColor-brand">
-                          {t('host-postalCode')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input autoComplete="postal-code" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* Submit Button */}
+                <div className="flex justify-center pt-3 sm:pt-4">
+                  <Button
+                    type="submit"
+                    variant="default"
+                    size="lg"
+                    disabled={form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting
+                      ? t('host-submitting')
+                      : t('host-submit')}
+                  </Button>
                 </div>
-              </div>
-
-              {/* Experience Section */}
-              <div className="space-y-3 sm:space-y-4">
-                <FormField
-                  control={form.control}
-                  name="teachHost"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-textColor-brand">
-                        {t('host-description')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="experience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-textColor-brand">
-                        {t('host-experience')}
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea rows={4} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Availability Section */}
-              <div className="space-y-4 sm:space-y-6">
-                <h2 className="text-textColor-black text-lg font-semibold sm:text-xl">
-                  {t('host-availability')}
-                </h2>
-                <div className="border-b border-gray-200" />
-                <div className="w-full">
-                  <AvailabilitySelector
-                    value={availability}
-                    onChange={setAvailability}
-                    locale={locale}
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-center pt-3 sm:pt-4">
-                <button
-                  type="submit"
-                  disabled={form.formState.isSubmitting}
-                  className="rounded-lg bg-bgColor-blue px-4 py-3 font-medium text-textColor-white transition-colors hover:bg-bgColor-blue/80 focus:outline-none focus:ring-2 focus:ring-bgColor-blue focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
-                >
-                  {form.formState.isSubmitting
-                    ? t('host-submitting')
-                    : t('host-submit')}
-                </button>
-              </div>
-            </form>
-          </Form>
+              </form>
+            </Form>
+          </div>
         </div>
       </div>
     </div>

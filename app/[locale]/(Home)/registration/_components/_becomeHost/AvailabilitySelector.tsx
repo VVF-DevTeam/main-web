@@ -2,7 +2,15 @@
 
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { format, addDays, startOfWeek, addWeeks, subWeeks } from 'date-fns'
+import {
+  format,
+  addDays,
+  startOfWeek,
+  addWeeks,
+  subWeeks,
+  isBefore,
+  startOfDay,
+} from 'date-fns'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 // Utilities
@@ -46,9 +54,10 @@ function AvailabilitySelector({
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation(['host', 'event'])
 
-  const baseWeekStart = startOfWeek(addWeeks(new Date(), 1))
-  const maxDate = addWeeks(baseWeekStart, 1) // One week from week start
+  const baseWeekStart = startOfWeek(new Date())
+  const maxDate = addWeeks(baseWeekStart, 2) // One week from week start
   const [currentDate, setCurrentDate] = useState(baseWeekStart)
+  const today = startOfDay(new Date())
 
   const handlePrev = () => {
     const newDate = subWeeks(currentDate, 1)
@@ -73,6 +82,7 @@ function AvailabilitySelector({
   const canGoPrev = startOfWeek(subWeeks(currentDate, 1)) >= baseWeekStart
   const canGoNext = startOfWeek(addWeeks(currentDate, 1)) <= maxDate
 
+  // Display the week in the format of Month Year - Month Year
   const startMonth = new Intl.DateTimeFormat(locale, { month: 'long' }).format(
     weekStart
   )
@@ -92,8 +102,16 @@ function AvailabilitySelector({
     weekDisplay = `${startMonth} ${startYear} – ${endMonth} ${endYear}`
   }
 
+  // Toggle the availability for a given day and time
   const toggle = (dayIndex: number, time: string) => {
-    const date = format(addDays(weekStart, dayIndex), 'yyyy-MM-dd')
+    const currentDay = addDays(weekStart, dayIndex)
+
+    // Don't allow toggling for past days
+    if (isBefore(startOfDay(currentDay), today)) {
+      return
+    }
+
+    const date = format(currentDay, 'yyyy-MM-dd')
     const prev = value[date] ?? []
     const next = prev.includes(time)
       ? prev.filter((t) => t !== time)
@@ -148,17 +166,28 @@ function AvailabilitySelector({
           <div className="text-textColor-black border-r bg-bgColor-grayLight py-3 text-center text-sm font-bold">
             {t('time', { ns: 'event' })}
           </div>
-          {days.map((day, idx) => (
-            <div
-              key={day}
-              className="text-textColor-black border-l bg-bgColor-grayLight py-3 text-center text-sm font-bold"
-            >
-              <div>{t(day, { ns: 'event' })}</div>
-              <div className="text-xs text-textColor-gray">
-                {format(addDays(weekStart, idx), 'd')}
+          {days.map((day, idx) => {
+            const currentDay = addDays(weekStart, idx)
+            const isPastDay = isBefore(startOfDay(currentDay), today)
+
+            return (
+              <div
+                key={day}
+                className={`border-l py-3 text-center text-sm font-bold ${
+                  isPastDay
+                    ? 'bg-gray-100/70 text-gray-400'
+                    : 'text-textColor-black bg-bgColor-grayLight'
+                }`}
+              >
+                <div>{t(day, { ns: 'event' })}</div>
+                <div
+                  className={`text-xs ${isPastDay ? 'text-gray-400' : 'text-textColor-gray'}`}
+                >
+                  {format(addDays(weekStart, idx), 'd')}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           {/* Time rows */}
           {times.map((time, rowIdx) => (
@@ -167,22 +196,33 @@ function AvailabilitySelector({
                 {time}
               </div>
               {days.map((day, colIdx) => {
-                const date = format(addDays(weekStart, colIdx), 'yyyy-MM-dd')
+                const currentDay = addDays(weekStart, colIdx)
+                const isPastDay = isBefore(startOfDay(currentDay), today)
+                const date = format(currentDay, 'yyyy-MM-dd')
                 const isSelected = (value[date] ?? []).includes(time)
+
                 return (
                   <div
                     key={`cell-${rowIdx}-${colIdx}`}
-                    className="relative h-12 cursor-pointer border-l border-t transition-colors hover:bg-bgColor-grayLight/50"
+                    className={`relative h-12 border-l border-t transition-colors ${
+                      isPastDay
+                        ? 'cursor-not-allowed bg-gray-100/50'
+                        : 'cursor-pointer hover:bg-bgColor-grayLight/50'
+                    }`}
                     onClick={() => toggle(colIdx, time)}
                   >
-                    {isSelected && (
+                    {isSelected && !isPastDay && (
                       <div className="absolute inset-2 rounded-md bg-bgColor-brand shadow-sm" />
                     )}
                     {/* Visual feedback for selection */}
-                    {isSelected && (
+                    {isSelected && !isPastDay && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="h-2 w-2 rounded-full bg-textColor-white" />
                       </div>
+                    )}
+                    {/* Gray overlay for past days */}
+                    {isPastDay && (
+                      <div className="absolute inset-0 bg-gray-200/30" />
                     )}
                   </div>
                 )

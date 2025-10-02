@@ -12,12 +12,19 @@
     "host-description": "Que souhaitez-vous enseigner/animer à VVF ?",
     "host-experience": "Merci de partager votre expérience avec nous",
     "host-availability": "Disponibilités",
-    "host-availability-header": "Sélectionnez vos créneaux disponibles pour les 2 prochaines semaines",
+    "host-availability-header": "Sélectionnez vos créneaux disponibles pour les 2 prochaines semaines pour un court rendez-vous pour discuter plus",
     "host-availability-prev": "Semaine précédente",
     "host-availability-next": "Semaine suivante",
     "host-availability-summary": "Récapitulatif des disponibilités",
     "host-availability-summary-empty": " Aucun créneau sélectionné pour le moment",
     "host-submitting": "Envoi en cours ...",
-    "host-submit": "Envoyer la candidature"
+    "host-submit": "Envoyer La Candidature",
+    "becomeHost-description1": "Nous recherchons des hôtes qui peuvent travailler ou nous colaborer à organiser des événements et des ateliers pour la communauté vietnamienne à Vancouver.",
+    "becomeHost-description2": "Lorsque vous rejoignez VVF, vous aurez accès à tous les avantages suivants :",
+    "becomeHost-description3": "Tous les avantages d'un",
+    "becomeHost-description4": "Support avec la promotion et la publicité des événements (en utilisant nos canaux de médias et dans les groupes vietnamiens)",
+    "becomeHost-description5": "Support avec la planification et l'organisation des événements (avec l'aide de coordinateurs d'événements professionnels)",
+    "becomeHost-description6": "Opportunité de collaborer avec d'autres hôtes et organisateurs d'événements",
+    "becomeHost-description7": "Nous sommes impatients de renforcer la communauté vietnamienne à Vancouver avec votre aide. Veuillez postuler en remplissant le formulaire ci-dessous !"
   }
   
