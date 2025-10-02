@@ -21,7 +21,7 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
       <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
         {t('header-benefits')}
       </h1>
-      <Separator className="w-[170%] bg-bgColor-brandDark" />
+      <Separator className="w-[160%] bg-bgColor-brandDark" />
     </div>
 
     {/* Benefits */}

@@ -2,8 +2,8 @@
 import type { Metadata } from 'next'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 
 // Components
 import { Toaster as SonnerToaster } from 'sonner'
@@ -20,7 +20,18 @@ export const metadata: Metadata = {
 }
 
 // namespaces for translations
-const i18nNamespaces = ['homePage', 'common', 'event', 'job', 'profile', 'signIn-signUp', 'membership', 'policy', 'post']
+const i18nNamespaces = [
+  'homePage',
+  'common',
+  'event',
+  'job',
+  'profile',
+  'signIn-signUp',
+  'membership',
+  'policy',
+  'post',
+  'host',
+]
 
 // Main Component
 export default async function RootLayout({
@@ -32,7 +43,7 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params
   const { resources } = await initTranslation(locale, i18nNamespaces)
-  
+
   return (
     <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
       namespaces={i18nNamespaces}
@@ -45,7 +56,7 @@ export default async function RootLayout({
         >
           <main>{children}</main>
           <SonnerToaster />
-          <Analytics/>
+          <Analytics />
           <SpeedInsights />
         </body>
       </html>
