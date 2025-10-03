@@ -18,7 +18,8 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
   })
 
   // console.log('Cookies:', req.cookies.getAll())
-
+  console.log('Token:', token)
+  
   if (!token) return false
 
   if (role) {
