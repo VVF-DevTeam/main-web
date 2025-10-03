@@ -81,7 +81,8 @@ export default {
         token.id = user.id as string
         token.email = user.email as string
         token.name = user.name as string
-        token.role = user.role as Role[]
+        // Set default USER role for new users who don't have roles yet
+        token.role = (user.role && user.role.length > 0) ? user.role as Role[] : ['USER']
       }
       return token
     },
