@@ -49,9 +49,11 @@ const SignInForm = () => {
         description: (
           <div className="flex flex-col gap-1">
             <span>You need to sign in to access the requested page</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
-        )
+        ),
       })
     }
   }, [searchParams])
@@ -79,40 +81,46 @@ const SignInForm = () => {
       if (response.success) {
         toast.success(response.message, {
           description: (
-            <span style={{ color: "var(--muted-foreground)" }}>
+            <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
             </span>
           ),
           style: {
-            color: '#22c55e' // green-500 color
-          }
+            color: '#22c55e', // green-500 color
+          },
         })
 
         setShouldRedirect(true)
       } else {
         toast.error(response.message, {
           description: (
-            <span style={{ color: "var(--muted-foreground)" }}>
+            <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
             </span>
           ),
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     } catch (error) {
       console.log(error)
-      toast.error('Something went wrong', { 
+      toast.error('Something went wrong', {
         description: (
           <div className="flex flex-col gap-1">
-            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span>
+              {error instanceof Error
+                ? error.message
+                : 'Please try again later'}
+            </span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -199,7 +207,13 @@ const SignInForm = () => {
             />
 
             {/* Submit & Other Actions */}
-            <div className="flex-center mt-6 flex-col gap-y-4 self-stretch">
+            <div className="flex-center mt-2 flex-col gap-y-4 self-stretch">
+              <Link
+                href="/forgotPassword"
+                className="place-self-end text-sm text-textColor-brand hover:underline hover:text-textColor-brand/80"
+              >
+                {t('forgotPassword')}
+              </Link>
               <Button
                 type="submit"
                 className="w-full bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"

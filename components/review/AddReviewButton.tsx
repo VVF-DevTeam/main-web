@@ -345,7 +345,6 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
         return
       }
 
-      console.log(data)
       const reviewData = {
         userId: user.id,
         eventId: data.eventId === 'none' ? undefined : data.eventId,

@@ -7,7 +7,6 @@ import { verifyToken } from '@/lib/actions/token/verifyToken'
 
 // Components
 import ClipLoader from 'react-spinners/ClipLoader'
-import Image from 'next/image'
 
 // CSS & CSS Modules
 
@@ -21,7 +20,7 @@ const VerifyAccountPage = () => {
   const token = searchParams.get('token')
 
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const getVerificationToken = async () => {
     if (!token) {
@@ -31,7 +30,6 @@ const VerifyAccountPage = () => {
       return
     }
 
-    setLoading(true)
 
     try {
       const isTokenVerified: VerifyTokenResponse = await verifyToken(token)
@@ -43,27 +41,16 @@ const VerifyAccountPage = () => {
     } catch (err) {
       console.log(err)
       setError('An unexpected error occurred. Please try again later.')
-    } finally {
-      setLoading(false)
     }
   }
 
   useEffect(() => {
     getVerificationToken()
+    setLoading(false)
   }, [])
 
   return (
     <div className="flex-center relative min-h-screen">
-      {/* NextJS Image and Dark Overlay */}
-      <div className="white-overlay"></div>
-      <Image
-        src="https://drive.google.com/thumbnail?id=1K6J4-M-RqxqJU7Z6YL1yxOhZ8h65nIHE&sz=w1000"
-        alt="Intro"
-        className="next-background"
-        fill
-        priority
-      />
-
       <div className="flex-col-center mx-10 my-24 max-w-lg rounded-md bg-white p-8 shadow-lg">
         {loading ? (
           <ClipLoader
