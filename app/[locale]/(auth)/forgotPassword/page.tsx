@@ -194,7 +194,7 @@ const ForgotPasswordPage = () => {
               </form>
             </Form>
 
-            <div className="mt-6 rounded-lg border border-bgColor-brand bg-bgColor-brandLight p-4">
+            <div className="mt-6 rounded-lg border border-bgColor-brand bg-bgColor-brandLighter p-4">
               <div className="flex items-start gap-3">
                 <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brand" />
                 <div>
