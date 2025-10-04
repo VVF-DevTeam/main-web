@@ -124,7 +124,7 @@ const ForgotPasswordPage = () => {
   }
 
   return (
-    <div className="via-bg-white flex-center relative min-h-screen bg-gradient-to-br from-bgColor-brandLight to-bgColor-brand">
+    <div className="flex-center relative min-h-screen bg-bgColor-brandLight">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-brand opacity-20 mix-blend-multiply blur-xl filter"></div>
@@ -161,7 +161,9 @@ const ForgotPasswordPage = () => {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder={t('enter-email-address') || 'Enter email address'}
+                          placeholder={
+                            t('enter-email-address') || 'Enter email address'
+                          }
                           className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand focus:ring-bgColor-brand"
                           {...field}
                         />
@@ -202,9 +204,7 @@ const ForgotPasswordPage = () => {
                   <ul className="space-y-1 text-xs text-textColor-brand">
                     <li>• {t('reset-instructions-description')}</li>
                     <li>• {t('reset-instructions-description-2')}</li>
-                    <li>
-                      • {t('reset-instructions-description-3')}
-                    </li>
+                    <li>• {t('reset-instructions-description-3')}</li>
                   </ul>
                 </div>
               </div>

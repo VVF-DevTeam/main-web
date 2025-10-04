@@ -152,7 +152,7 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="via-bg-white flex-center relative min-h-screen bg-gradient-to-br from-bgColor-brandLight to-bgColor-brand">
+    <div className="flex-center relative min-h-screen bg-bgColor-brandLight">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         {/* <div className="absolute -top-40 -right-40 w-80 h-80 bg-bgColor-brand rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
