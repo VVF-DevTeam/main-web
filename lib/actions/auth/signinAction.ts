@@ -40,6 +40,7 @@ export const signinAction = async (data: {
         firstName: userExists.name!,
         to: userExists.email,
         token: newToken?.id!,
+        type: 'accountVerification',
       })
 
       return {

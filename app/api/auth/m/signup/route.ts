@@ -93,6 +93,7 @@ export const POST = async (request: NextRequest) => {
         firstName: user.name!,
         to: user.email,
         token: verificationToken.token,
+        type: 'accountVerification',
       })
     }
 

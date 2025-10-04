@@ -78,7 +78,19 @@ const ApplicationForm = ({
         }
       )
       if (response.status === 200) {
-        toast.success('Job applied successfully. Thank you for your application! Please wait for our response, we will get back to you soon.')
+        toast.success('Job applied successfully.', {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              Thank you for your application! Please wait for our response, we
+              will get back to you soon.
+              <br />
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e', // green-500 color
+          },
+        })
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -86,50 +98,67 @@ const ApplicationForm = ({
           toast.error('Duplicate Application', {
             description: (
               <div className="flex flex-col gap-1">
-                <span>You have already applied for this job, if you want to add new information, please send an email to the admin</span>
-                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+                <span>
+                  You have already applied for this job, if you want to add new
+                  information, please send an email to the admin
+                </span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
               </div>
             ),
             style: {
-              color: '#ef4444' // red-500 color
-            }
+              color: '#ef4444', // red-500 color
+            },
           })
         } else {
           toast.error('Error making request to database', {
             description: (
               <div className="flex flex-col gap-1">
-                <span>{error.response?.data || 'Something went wrong. Please contact the admin'}</span>
-                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+                <span>
+                  {error.response?.data ||
+                    'Something went wrong. Please contact the admin'}
+                </span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
               </div>
             ),
             style: {
-              color: '#ef4444' // red-500 color
-            }
+              color: '#ef4444', // red-500 color
+            },
           })
         }
       } else if (error instanceof Error) {
-        toast.error(error?.message || 'Something went wrong. Please contact the admin.', {
-          description: (
-            <div className="flex flex-col gap-1">
-              <span>Something went wrong. Please contact the admin.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
-            </div>
-          ),
-          style: {
-            color: '#ef4444' // red-500 color
+        toast.error(
+          error?.message || 'Something went wrong. Please contact the admin.',
+          {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>Something went wrong. Please contact the admin.</span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444', // red-500 color
+            },
           }
-        })
+        )
       } else {
         toast.error('Error', {
           description: (
             <div className="flex flex-col gap-1">
               <span>Something went wrong. Please contact the admin.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
             </div>
           ),
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     }

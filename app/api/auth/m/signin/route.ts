@@ -43,6 +43,7 @@ export const POST = async (req: NextRequest) => {
         firstName: userExists.name!,
         to: userExists.email,
         token: newToken?.id!,
+        type: 'accountVerification',
       })
 
       return NextResponse.json(

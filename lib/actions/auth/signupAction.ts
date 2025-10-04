@@ -90,6 +90,7 @@ export const signupAction = async (formData: signupActionProps) => {
         firstName: user.name!,
         to: user.email,
         token: verificationToken.token,
+        type: 'accountVerification',
       })
     }
 

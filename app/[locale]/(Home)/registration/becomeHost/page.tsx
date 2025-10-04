@@ -13,7 +13,7 @@ const MembershipPage = async ({
   params: Promise<{ locale: string }>
 }) => {
   const { locale } = await params
-  const { t } = await initTranslations(locale, ['host'])
+  const { t } = await initTranslations(locale, ['host', 'common'])
   // Get the current user's id
   const session = await auth()
   const userId = session?.user?.id
@@ -21,12 +21,16 @@ const MembershipPage = async ({
   if (!userId) {
     return (
       <div className="mx-auto flex flex-col items-center justify-center gap-4 pb-4 pt-10 text-center text-2xl">
-        <Link
-          href="/signIn"
-          className="text-4xl font-bold text-textColor-blue underline underline-offset-4 hover:text-textColor-blue/50"
-        >
-          {t('becomehost-notLogin')}
-        </Link>
+        <p className="text-4xl font-bold">
+          {t('becomehost-notLogin1')}{' '}
+          <Link
+            href="/signIn"
+            className="text-textColor-blue underline underline-offset-4 hover:text-textColor-blue/50"
+          >
+            {t('becomehost-notLogin2')}
+          </Link>{' '}
+          {t('becomehost-notLogin3')}
+        </p>
         <Image
           src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000"
           alt="Not Found"

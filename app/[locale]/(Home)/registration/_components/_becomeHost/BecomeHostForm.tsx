@@ -108,7 +108,7 @@ export default function BecomeHostForm({
       )
       if (response.status === 200) {
         toast.success(
-          'Job applied successfully.',
+          'Host application submitted successfully.',
           {
             description: (
               <span style={{ color: 'var(--muted-foreground)' }}>

@@ -9,9 +9,10 @@ const passwordSchema = z.object({
   email: z.string().email({ message: 'Invalid email format' }),
   currentPassword: z.string().optional(), // Allow currentPassword to be omitted
   newPassword: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+  forgotPassword: z.boolean().optional(),
 })
 
-export const changePassword = async (data: { email: string; currentPassword?: string; newPassword: string }) => {
+export const changePassword = async (data: { email: string; currentPassword?: string; newPassword: string; forgotPassword?: boolean }) => {
   try {
     // Validate input
     const parsedData = passwordSchema.safeParse(data)
@@ -23,7 +24,7 @@ export const changePassword = async (data: { email: string; currentPassword?: st
       return { success: false, message: errorMessage }
     }
 
-    const { email, currentPassword, newPassword } = parsedData.data
+    const { email, currentPassword, newPassword, forgotPassword } = parsedData.data
 
     // Fetch user from the database
     const user = await prisma.user.findUnique({
@@ -36,7 +37,7 @@ export const changePassword = async (data: { email: string; currentPassword?: st
     }
 
     // If currentPassword exists in the DB, compare it
-    if (user.password) {
+    if (user.password && !forgotPassword) {
       if (!currentPassword) {
         return { success: false, message: 'Current password is required' }
       }
@@ -58,6 +59,8 @@ export const changePassword = async (data: { email: string; currentPassword?: st
     return { success: true, message: 'Password updated successfully' }
   } catch (error) {
     console.error('Password update error:', error)
-    return { success: false, message: 'Failed to update password' }
+    // Ensure we return a proper error message string
+    const errorMessage = error instanceof Error ? error.message : 'Failed to update password'
+    return { success: false, message: errorMessage }
   }
 }

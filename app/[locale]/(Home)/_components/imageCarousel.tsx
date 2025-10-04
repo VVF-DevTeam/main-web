@@ -42,7 +42,7 @@ const ImageCarousel = ({
     },
     {
       id: '3',
-      url: 'https://drive.google.com/thumbnail?id=1LzN0Kouxwfy1R07qkX0NfxWByIHMtyGJ&sz=w3000',
+      url: 'https://drive.google.com/thumbnail?id=1LzN0Kouxwfy1R07qkX0NfxWByIHMtyGJ&sz=w2000',
       classUrl: `/${locale}/events/class/tennis-camp-2025`,
       description: 'Tennis Camp 2025',
     },

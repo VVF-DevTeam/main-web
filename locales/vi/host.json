@@ -1,5 +1,7 @@
 {
-    "becomehost-notLogin": "Vui lòng đăng nhập để host một sự kiện/ lớp học.",
+    "becomehost-notLogin1": "Vui lòng",
+    "becomehost-notLogin2": "đăng nhập",
+    "becomehost-notLogin3": "để host một sự kiện/ lớp học.",
     "becomeHost-header": "Đơn đăng ký tổ chức sự kiện",
     "becomeHost-description": "Tham gia cộng đồng và chia sẻ kiến thức với mọi người",
     "host-firstname": "Tên",
@@ -25,6 +27,7 @@
     "becomeHost-description4": "Hỗ trợ với việc quảng bá và quảng cáo sự kiện",
     "becomeHost-description5": "Hỗ trợ với việc lập kế hoạch và tổ chức sự kiện",
     "becomeHost-description6": "Cơ hội để hợp tác với những tổ chức và người có cùng đam mê khác",
-    "becomeHost-description7": "Chúng mình rất mong muốn được làm giàu thêm cho cộng đồng người Việt tại Vancouver với sự giúp đỡ của bạn. Hãy apply ngay bằng form ở dưới!"
+    "becomeHost-description7": "Chúng mình rất mong muốn được làm giàu thêm cho cộng đồng người Việt tại Vancouver với sự giúp đỡ của bạn. Hãy apply ngay bằng form ở dưới!",
+    "goHome": "Về trang chủ"
   }
   

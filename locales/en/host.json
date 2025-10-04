@@ -1,5 +1,7 @@
 {
-    "becomehost-notLogin":"Please sign in to apply to become a host.",
+    "becomehost-notLogin1":"Please",
+    "becomehost-notLogin2":"sign in",
+    "becomehost-notLogin3":"to apply to become a host.",
     "becomeHost-header": "Host Application Form",
     "becomeHost-description": "Join our community and share your knowledge with others",
     "host-firstname": "First Name",
@@ -25,5 +27,6 @@
     "becomeHost-description4": "Support with media promotions and advertisements for your events (using our media channels and in Vietnamese groups)",
     "becomeHost-description5": "Support with event planning and organization (with the help of professionals event coordinators)",
     "becomeHost-description6": "Opportunity to collaborate with other hosts and event organizers",
-    "becomeHost-description7": "We are looking forward to enriching the Vietnamese community in Vancouver with your help. Please apply by filling out the form below!"
+    "becomeHost-description7": "We are looking forward to enriching the Vietnamese community in Vancouver with your help. Please apply by filling out the form below!",
+    "goHome": "Go to home"
 }

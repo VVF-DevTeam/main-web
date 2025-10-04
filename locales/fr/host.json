@@ -1,5 +1,7 @@
 {
-    "becomehost-notLogin": "Veuillez vous connecter pour postuler en tant qu’hôte.",
+    "becomehost-notLogin1": "Veuillez vous ",
+    "becomehost-notLogin2": "connecter",
+    "becomehost-notLogin3": "pour postuler en tant qu’hôte.",
     "becomeHost-header": "Formulaire de candidature d’hôte",
     "becomeHost-description": "Rejoignez notre communauté et partagez vos connaissances avec les autres",
     "host-firstname": "Prénom",
@@ -25,6 +27,7 @@
     "becomeHost-description4": "Support avec la promotion et la publicité des événements (en utilisant nos canaux de médias et dans les groupes vietnamiens)",
     "becomeHost-description5": "Support avec la planification et l'organisation des événements (avec l'aide de coordinateurs d'événements professionnels)",
     "becomeHost-description6": "Opportunité de collaborer avec d'autres hôtes et organisateurs d'événements",
-    "becomeHost-description7": "Nous sommes impatients de renforcer la communauté vietnamienne à Vancouver avec votre aide. Veuillez postuler en remplissant le formulaire ci-dessous !"
+    "becomeHost-description7": "Nous sommes impatients de renforcer la communauté vietnamienne à Vancouver avec votre aide. Veuillez postuler en remplissant le formulaire ci-dessous !",
+    "goHome": "Aller à l'accueil"
   }
   
