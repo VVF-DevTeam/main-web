@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 // Components
 
-import { ClipboardList, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
 // Interfaces
@@ -47,25 +47,25 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
     <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
-          'flex items-center justify-center font-semibold transition-all',
+          'flex items-center justify-center transition-all',
           mode === 'desktop'
-            ? `gap-x-[5px] whitespace-nowrap text-sm ${
+            ? `gap-x-[5px] whitespace-nowrap text-xl ${
                 isActive
                   ? 'text-textColor-brand'
                   : 'text-textColor hover:text-textColor-brand hover:underline'
               }`
             : `mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl ${
                 isActive
-                  ? 'text-textColor-brand'
+                  ? 'text-textColor-brandLight'
                   : 'px-5 text-slate-200 hover:bg-bgColor-brand'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <ClipboardList className="h-5 w-5" />
+        {/* <ClipboardList className="h-5 w-5" /> */}
         <span>{t('main-navRegistration')}</span>
         <ChevronDown
-          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-6 w-6 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 

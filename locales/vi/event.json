@@ -36,6 +36,7 @@
   "header-step02": "Đăng Ký",
   "header-step03": "Thanh Toán và Xác Nhận",
   "header-upcomingEvent": "Các Sự Kiện Đang Diễn Ra & Sắp Tới",
+  "header-upcomingEvent-homepage": "Các Sự Kiện Đang Diễn Ra",
   "hostedBy": "Được tổ chức bởi",
   "Jan": "Tháng 1",
   "Jul": "Tháng 7",
@@ -76,5 +77,7 @@
   "tuesday": "T3",
   "wednesday": "T4",
   "Week": "Tuần",
-  "jumpToReviewsSection": "Xem review của sự kiện này"
+  "jumpToReviewsSection": "Xem review của sự kiện này",
+  "read-more": "Xem thêm",
+  "more-events": "Các Sự Kiện Khác"
 }

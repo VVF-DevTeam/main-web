@@ -103,7 +103,7 @@ const PostSummary = ({ post }: PostSummaryProps) => {
           </form>
         </Form>
       ) : !post?.summary ? (
-        <p className="text-sm italic text-textColor-brand">
+        <p className="text-sm italic text-textColor-gray">
           Add a summary for this post.
         </p>
       ) : (

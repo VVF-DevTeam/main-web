@@ -17,9 +17,10 @@ body {
     --background-yellow: 45 100% 50%; /* #FFB800 */
     --background-green: 152 76% 40%; /* #12805D */
     --brand-color-dark: 0 100% 25%; /* #7f0000 */
-    --brand-color: 6 54% 51%; /* #C54B3E */
-    --brand-color-light: 18 71% 79%; /* #EFB9A2 */
-    --brand-color-lighter: 19 73% 96%; /* #FCF1EC */
+    --brand-color: 347 89% 44%; /* #D20C36 */
+    --brand-color-light: 347 69% 61%; /* #E05572 */
+    --brand-color-lighter: 348 58% 82%; /* #ECB8C2 */
+    --brand-color-lightest: 350 59% 88%; /* #F3D0D6 */
     --text-black: 220 3% 20%; /* #323335 */
     --text-white: 0 0% 100%; /* #FFFFFF */
     --text-gray: 240 4% 46%; /* #71717A */

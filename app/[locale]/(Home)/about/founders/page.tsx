@@ -69,7 +69,7 @@ const Founder = async ({ params }: { params: Promise<{ locale: string }> }) => {
         <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
           Founding History
         </h1>
-        <Separator className="bg-bgColor-brandDark w-[170%]" />
+        <Separator className="bg-bgColor-brandDark w-[120%]" />
       </div>
 
       {/* Intro */}

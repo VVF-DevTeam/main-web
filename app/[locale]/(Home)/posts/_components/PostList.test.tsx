@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import PostList from './PostList'
+import PostList from './PostListVertical'
 
 // Mock PostCard component
 vi.mock('./PostCard', () => ({

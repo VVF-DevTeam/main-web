@@ -26,6 +26,9 @@ const JobList = async ({ title, locale }: JobListProps) => {
         mode: 'insensitive',
       },
     },
+    orderBy: {
+      updatedAt: 'desc',
+    },
   })
 
   return (

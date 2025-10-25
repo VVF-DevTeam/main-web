@@ -22,7 +22,7 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
       </SheetTrigger>
       <SheetContent className="flex-col-center w-[300px] overflow-x-hidden bg-bgColor-black">
         <SheetHeader>
-          <SheetTitle className="text-textColor-white">Menu</SheetTitle>
+          <SheetTitle className="text-textColor-white text-2xl font-bold">Menu</SheetTitle>
 
           <NavLinks mode="mobile" locale={locale} />
         </SheetHeader>

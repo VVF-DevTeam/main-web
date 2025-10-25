@@ -15,7 +15,8 @@ import {
   getReviewsPaginated,
   getPublishedEventsForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
-import { ReviewRating } from '@prisma/client'
+import { convertStringToReviewRating } from '@/lib/utils/ratingUtils'
+// import { ReviewRating } from '@prisma/client'
 import ScrollToReviews from './_components/ScrollToReviews'
 interface PostsProps {
   params: Promise<{ locale: string }>
@@ -64,23 +65,6 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   const currentReviewEvent = reviewEvent || ''
   const currentReviewRating = reviewRating || ''
 
-  // Convert rating string to ReviewRating enum
-  const convertToReviewRating = (rating: string): ReviewRating | undefined => {
-    switch (rating) {
-      case '1':
-        return ReviewRating.One
-      case '2':
-        return ReviewRating.Two
-      case '3':
-        return ReviewRating.Three
-      case '4':
-        return ReviewRating.Four
-      case '5':
-        return ReviewRating.Five
-      default:
-        return undefined
-    }
-  }
 
   // Fetch reviews data on server side
   const reviewsResult = await getReviewsPaginated(
@@ -90,7 +74,8 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     currentReviewEvent === 'all' ? undefined : currentReviewEvent || undefined,
     currentReviewRating === 'all'
       ? undefined
-      : convertToReviewRating(currentReviewRating)
+      : convertStringToReviewRating(currentReviewRating),
+    false
   )
 
   // Fetch events for review filtering (latest 15 events)

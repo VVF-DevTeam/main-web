@@ -30,10 +30,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  getPublishedEvents,
-  getAllEventParticipants,
+  getAllPublishedEvents,
   getEventsOfHost,
-} from '@/lib/actions/event/getEventInfo'
+} from '@/lib/actions/event/getEvent'
+import { getAllEventParticipants } from '@/lib/actions/event/getEventParticipant'
 import { getPublishedEventsForReviewsWithSearch } from '@/lib/actions/review/reviewActions'
 import EmailSuggestion from './EmailSuggestion'
 
@@ -94,7 +94,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
       try {
         // get list of events for user
         if (user.role.includes('ADMIN')) {
-          const publishedEvents = await getPublishedEvents()
+          const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
           setFilteredEvents(publishedEvents)
         } else if (user.role.includes('HOST')) {

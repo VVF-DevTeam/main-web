@@ -4,7 +4,7 @@
 import React from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
-import { LogIn } from 'lucide-react'
+// import { LogIn, LogOut } from 'lucide-react'
 
 // Libraries
 import { signOutAction } from '@/lib/actions/auth/signoutAction'
@@ -12,7 +12,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
-
+import Link from 'next/link'
 // Interfaces
 interface AuthButtonProps {
   userExists: boolean
@@ -43,12 +43,14 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
           description: (
             <div className="flex flex-col gap-1">
               <span>{response.message}</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
             </div>
           ),
           style: {
-            color: '#22c55e' // green-500 color
-          }
+            color: '#22c55e', // green-500 color
+          },
         })
       }
       router.refresh()
@@ -58,37 +60,55 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
         description: (
           <div className="flex flex-col gap-1">
             <span>Something went wrong</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
   return (
-    <button
-      onClick={() => handleAuth(userExists ? 'logout' : 'login')}
-      className={cn(
-        'flex items-center justify-center transition-all font-semibold whitespace-nowrap',
-        mode === 'desktop'
-          ? 'text-sm gap-x-[5px]'
-          : 'mt-2 h-full w-full rounded-md p-4 text-xl gap-x-4',
-        isActive
-          ? 'text-textColor-brand'
-          : mode === 'desktop'
-          ? 'text-textColor hover:text-textColor-brand hover:underline'
-          : 'text-slate-200 hover:bg-bgColor-brand'
+    <div className="flex items-center justify-center gap-x-4 lg:ml-[2vw] xl:ml-[5vw]">
+      {!userExists && (
+        <Link href="/signUp">
+          <button
+            className={cn(
+              'hidden items-center justify-center whitespace-nowrap rounded-md px-6 py-[10px] text-xl text-textColor-brand hover:underline  transition-all lg:flex',
+              mode === 'desktop'
+                ? 'gap-x-[5px]'
+                : 'mt-2 h-full w-full gap-x-4 rounded-md p-4'
+            )}
+          >
+            <span>{t('signUp-nav', { ns: 'homePage' })}</span>
+          </button>
+        </Link>
       )}
-    >
-      <LogIn className="h-5 w-5" />
-      <span>
-        {userExists
-          ? t('logout-nav', { ns: 'homePage' })
-          : t('login-nav', { ns: 'homePage' })}
-      </span>
-    </button>
+
+      <button
+        onClick={() => handleAuth(userExists ? 'logout' : 'login')}
+        className={cn(
+          ' items-center justify-center whitespace-nowrap rounded-md w-[120px] h-[28px] py-5 px-12 text-lg text-textColor-white transition-all',
+          mode === 'desktop'
+            ? 'bg-bgColor-brand'
+            : 'mt-2 h-full w-full gap-x-4 rounded-md p-4',
+          isActive
+            ? 'hidden'
+            : mode === 'desktop'
+              ? 'flex hover:bg-bgColor-brand/80'
+              : 'flex hover:bg-bgColor-brand'
+        )}
+      >
+        <span>
+          {userExists
+            ? t('logout-nav', { ns: 'homePage' })
+            : t('login-nav', { ns: 'homePage' })}
+        </span>
+      </button>
+    </div>
   )
 }
 

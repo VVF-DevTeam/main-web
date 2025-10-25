@@ -67,17 +67,17 @@ const SocialPostPagination = ({
       // Always show first page
       pages.push(1)
 
-      if (currentPage <= 3) {
+      if (currentPage <= 2) {
         // Current page is near the beginning
-        for (let i = 2; i <= 4; i++) {
+        for (let i = 2; i <= 3; i++) {
           pages.push(i)
         }
         pages.push('ellipsis-end')
         pages.push(totalPages)
-      } else if (currentPage >= totalPages - 2) {
+      } else if (currentPage >= totalPages - 3) {
         // Current page is near the end
         pages.push('ellipsis-start')
-        for (let i = totalPages - 3; i <= totalPages - 1; i++) {
+        for (let i = totalPages - 4; i <= totalPages - 1; i++) {
           pages.push(i)
         }
         pages.push(totalPages)

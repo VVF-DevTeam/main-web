@@ -13,14 +13,14 @@ import EventButton from './EventButton'
 // Interfaces & Types
 import { Event, EventCategory } from '@prisma/client'
 
-interface EventCardProps {
+interface EventCardVerticalProps {
   event: Event & {
     categories: EventCategory[]
   }
   locale: string
 }
 
-const EventCard = async ({ event, locale }: EventCardProps) => {
+const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   const now = new Date()
@@ -31,14 +31,17 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
     new Date(event.endDate) >= now
 
   return (
-    <div className="group relative flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-slate-100 xl:min-w-[400px]">
-      <Image
-        src={event.imgUrl!}
-        alt="event thumbnail"
-        width={390}
-        height={255}
-        className="hover-opacity-blur z-0 max-h-[300px] w-full basis-1/2 rounded-t-lg object-cover"
-      />
+    <div className="group relative flex w-[calc(100%-3px)] max-w-[400px] flex-col rounded-lg bg-slate-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-slate-100 xl:min-w-[400px]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden">
+        <Image
+          src={event.imgUrl!}
+          alt={`Thumbnail for ${event.title} event`}
+          fill
+          priority={false}
+          sizes="(min-width: 1280px) 400px, (min-width: 1024px) 350px, (min-width: 768px) 300px, 100vw"
+          className="hover-opacity-blur z-0 max-h-[300px] w-full basis-1/2 rounded-t-lg"
+        />
+      </div>
 
       <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg">
         {/* Tags */}
@@ -127,4 +130,4 @@ const EventCard = async ({ event, locale }: EventCardProps) => {
   )
 }
 
-export default EventCard
+export default EventCardVertical

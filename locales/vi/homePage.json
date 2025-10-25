@@ -24,6 +24,7 @@
   "job-navBecomeHost": "Tổ Chức Sự Kiện",
   "login-nav": "Đăng nhập",
   "logout-nav": "Đăng xuất",
+  "signUp-nav": "Đăng ký",
   "main-navRegistration": "Đăng Ký",
   "music-description-introduction": "Với những nghệ sĩ biểu diễn chuyên nghiệp, các buổi dạy và hội thảo của chúng tôi mang đến cho người tham gia cơ hội học hỏi, phát triển và kết nối với nghệ thuật âm nhạc",
   "music-header-introduction": "Các Buổi Học và Hội Thảo về Âm Nhạc",
@@ -49,5 +50,17 @@
   "event-happening-on": "đang diễn ra vào",
   "event-at": "lúc",
   "event-few-spots-left": "chỉ còn vài chỗ trống!",
-  "event-dont-miss-chance": "Đừng bỏ lỡ cơ hội tham gia!"
+  "event-dont-miss-chance": "Đăng ký ngay!",
+  "footer-copyright": "Bản quyền © 2025 Viet Vibe Foundation",
+  "footer-privacyPolicy": "Chính sách quyền riêng tư",
+  "footer-termsOfService": "Điều khoản",
+  "registerDoubleSection-title": "Tham Gia Cộng Đồng",
+  "registerDoubleSection-description": "Tham gia cộng đồng và trải nghiệm các lợi ích và cơ hội độc quyền",
+  "registerDoubleSection-becomeVolunteer": "Trở thành Volunteeer",
+  "registerDoubleSection-becomeVolunteerDescription": "Tham gia và giúp chúng tôi tổ chức các sự kiện và hội thảo cho cộng đồng người Việt tại Vancouver.",
+  "registerDoubleSection-becomeHost": "Trở thành Host",
+  "registerDoubleSection-becomeHostDescription": "Chia sẻ kiến thức và kỹ năng của bạn với người khác bằng cách tổ chức các sự kiện và hội thảo.",
+  "trusted-by-our-members": "Được tin cậy bởi các Thành Viên",
+  "plan-ahead": "Lên kế hoạch sớm và đăng ký ngay các hoạt động thú vị từ VVF!",
+  "learnMore": "Tìm Hiểu Thêm"
 }

@@ -1,6 +1,6 @@
 {
   "apply-button": "Appliquer",
-  "benefits-description1": "Nous recherchons des personnes prêtes à rejoindre notre équipe en tant qu'officier ou bénévole pour nous aider dans notre mission de connecter les Vietnamiens de Vancouver à travers les arts et les cultures.",
+  "benefits-description1": "Nous recherchons des personnes qui aiment la musique et les sports pour rejoindre notre équipe et nous aider dans notre mission de connecter les Vietnamiens de Vancouver à travers les arts et les cultures.",
   "benefits-description2": "En rejoignant VVF, vous aurez l'opportunité de :",
   "benefits-description3": "En tant que membre de l'équipe, vous acquerrez une expérience précieuse, recevrez une certification officielle, bénéficierez d'un accès à des outils premium comme Google Workspace et ChatGPT Plus ainsi que de réductions auprès de nos partenaires comme 15 % de réduction sur Lululemon, et participerez à des événements amusants et à des réductions exclusives, etc. Pour en savoir plus sur ces merveilleuses opportunités, cliquez sur le bouton ci-dessous !",
   "benefits-item1": "Acquérir de l’expérience dans un ou plusieurs domaines d’expertise qui vous intéressent.",
@@ -15,6 +15,7 @@
   "benefits-subitem7": "Réduction pour le personnel lors de la participation à des cours ou événements du VVF.",
   "benefits-subitem8": "Accès à ChatGPT Plus.",
   "benefits-subitem9": "Participez à des événements passionnants tels que la randonnée, le camping, la soirée de jeux de société et plus encore avec nous.",
+  "benefits-subitemMore": "Et encore plus. Cliquez sur le bouton \"Voir plus\" ci-dessous pour voir tous les avantages.",
   "endDate": "Date de fin",
   "header-benefits": "Nos avantages",
   "headerDescription": "Description",
@@ -25,5 +26,7 @@
   "learn-more": "Apprendre encore plus",
   "location": "Emplacement",
   "noJobsOrVolunteersPosition": "Aucun emploi ni poste bénévole trouvé. Veuillez vérifier votre recherche, revenir plus tard ou nous envoyer votre adresse e-mail à hr@vietvibe.org pour postuler au service de votre choix.",
-  "startDate": "Date de début"
+  "startDate": "Date de début",
+  "see-more": "Voir plus",
+  "see-less": "Voir moins"
 }

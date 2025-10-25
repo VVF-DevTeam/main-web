@@ -1,21 +1,85 @@
 // Libraries
 import React from 'react'
 import initTranslation from '@/app/i18n'
-import { navRoutes } from '@/lib/navRoutes'
+import Image from 'next/image'
 
 // Components
+// import Link from 'next/link'
+// import { Separator } from '@radix-ui/react-separator'
+import CustomIcon from '@/app/[locale]/components/CustomIcon'
 import Link from 'next/link'
-import { Separator } from '@radix-ui/react-separator'
-import { SiFacebook, SiInstagram } from 'react-icons/si' // Import Simple Icons
 
 // Main Component
 const Footer = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <footer className="bg-bgColor-black py-6 sm:px-12 md:px-16 lg:px-24 text-slate-300">
-      <div className="grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
-        {/* Column 1 */}
+    <footer className="bg-[#FEFAF4] py-6 pt-10 px-5 sm:px-12 md:px-[60px] lg:px-[120px]">
+      <div className="flex flex-col">
+        <div className="flex w-[179px] gap-x-1 pb-5">
+          <CustomIcon width={30} height={30} className="self-start" />
+          <div className="max-w-[200px] font-bold leading-tight text-textColor-brand">
+            <span className="text-[27px]">VIET VIBE </span>
+            <span className="text-[18px]">FOUNDATION</span>
+          </div>
+        </div>
+
+        <div className="flex gap-x-5 pb-10">
+          <a
+            href="https://www.facebook.com/profile.php?id=61570910920072"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook Page"
+            className="hover:text-textColor-brandLight"
+          >
+            <Image
+              src="https://drive.google.com/thumbnail?id=19ChCw2pQZQcsuZTj3Xqys3FpaiATLhNA&sz=w100"
+              alt="Facebook"
+              width={33}
+              height={33}
+              className="rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]"
+            />
+          </a>
+          <a
+            href="https://www.instagram.com/vietvibe.foundation"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram Page"
+            className="hover:text-textColor-brandLight"
+          >
+            <Image
+              src="https://drive.google.com/thumbnail?id=1izDqs2xBbpcOy5qzl4J2lV-zXhB1mo0V&sz=w100"
+              alt="Instagram"
+              width={33}
+              height={33}
+              className="rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]"
+            />
+          </a>
+        </div>
+
+        <div className="mb-8 md:mb-5 h-[1px] w-full bg-[#2b2b2b]" />
+
+        <div className="flex-col md:flex-row md:justify-between flex items-center text-[16px]">
+          <p className="mb-2 md:mb-0">{t('footer-copyright')}</p>
+          <div className="flex gap-x-5">
+            <Link
+              href="/policy"
+              className="hover:text-textColor-brand hover:underline"
+            >
+              {t('footer-privacyPolicy')}
+            </Link>
+            <Link
+              href="/policy"
+              className="hover:text-textColor-brand hover:underline"
+            >
+              {t('footer-termsOfService')}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Old version */}
+      {/* <div className="grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
         <div className="pl-6">
           <h5 className="text-xl text-textColor-white">
             {t('pageHeader-footer').toUpperCase()}
@@ -39,7 +103,7 @@ const Footer = async ({ locale }: { locale: string }) => {
             </Link>
           </div>
         </div>
-        {/* Column 2 */}
+
         <div>
           <div className="h-full w-full">
             <div className="px-6">
@@ -48,18 +112,17 @@ const Footer = async ({ locale }: { locale: string }) => {
               </h5>
               <Separator className="h-[2px] w-[120px] bg-slate-700" />
               <div className="mt-4 flex flex-col gap-y-2 text-sm">
-                {/* <p className="text-slate-500">
+                <p className="text-slate-500">
                     <span className="text-slate-300">
                       {t('phoneNumber-footer')}
                     </span>
-                  </p> */}
+                  </p>
                 <p>
                   <span>{t('email-footer')}</span>
                 </p>
                 <p>
                   <span>{t('address-footer')}</span>
                 </p>
-                {/* Social Media Links */}
                 <div className="mt-4 flex space-x-4">
                   <a
                     href="https://www.facebook.com/profile.php?id=61570910920072"
@@ -84,7 +147,7 @@ const Footer = async ({ locale }: { locale: string }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </footer>
   )
 }

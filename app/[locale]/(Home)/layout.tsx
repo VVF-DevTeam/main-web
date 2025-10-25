@@ -1,7 +1,7 @@
 import Footer from '@/app/[locale]/(Home)/_components/footer'
 import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
-import Copyright from './_components/copyright'
+// import Copyright from './_components/copyright'
 
 const Layout = async ({
   children,
@@ -20,7 +20,6 @@ const Layout = async ({
       <div className="min-h-[calc(100vh-120px)] content-center">{children}</div>
       <div className="mt-auto">
         <Footer locale={locale} />
-        <Copyright locale={locale} />
       </div>
     </div>
   )

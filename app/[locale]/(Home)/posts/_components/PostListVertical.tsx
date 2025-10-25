@@ -3,11 +3,11 @@ import React from 'react'
 
 // Components
 import { Post, PostLikes, PostVisits } from '@prisma/client'
-import PostCard from './PostCard'
+import PostCardHorizontal from './PostCardHorizontal'
 import PostPagination from './PostPagination'
 
 // Interfaces
-interface PostListProps {
+interface PostListVerticalProps {
   posts: (Pick<Post, 'id' | 'title' | 'createdAt' | 'imgUrl' | 'summary'> & {
     _count: { postLikes: number; postVisits: number }
   } & {
@@ -21,13 +21,13 @@ interface PostListProps {
 }
 
 // Main Component
-const PostList = async ({
+const PostListVertical = async ({
   posts,
   userId,
   currentPage,
   totalPages,
   totalItems,
-}: PostListProps) => {
+}: PostListVerticalProps) => {
 
   return (
     <div className="width-max-default mx-auto flex w-[90%] flex-col gap-y-12 px-2 md:gap-y-16">
@@ -35,7 +35,7 @@ const PostList = async ({
       <div className="flex flex-col gap-y-12 md:gap-y-10">
         {posts &&
           posts.map((post) => (
-            <PostCard
+            <PostCardHorizontal
               key={post.id}
               userId={userId}
               postLikes={post._count.postLikes}
@@ -66,4 +66,4 @@ const PostList = async ({
   )
 }
 
-export default PostList
+export default PostListVertical

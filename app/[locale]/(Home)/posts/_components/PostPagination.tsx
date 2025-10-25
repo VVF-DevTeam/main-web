@@ -67,9 +67,9 @@ const PostPagination = ({
       // Always show first page
       pages.push(1)
 
-      if (currentPage <= 3) {
+      if (currentPage <= 2) {
         // Current page is near the beginning
-        for (let i = 2; i <= 4; i++) {
+        for (let i = 2; i <= 3; i++) {
           pages.push(i)
         }
         pages.push('ellipsis-end')

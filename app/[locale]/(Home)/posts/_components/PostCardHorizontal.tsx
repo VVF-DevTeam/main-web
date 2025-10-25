@@ -9,7 +9,7 @@ import PostStats from './PostStats'
 import Link from 'next/link'
 
 // Interfaces
-interface PostProps {
+interface PostCardHorizontalProps {
   id: string
   title: string
   imageUrl: string
@@ -23,7 +23,7 @@ interface PostProps {
 }
 
 // Main Component
-const PostCard = ({
+const PostCardHorizontal = ({
   title,
   summary,
   imageUrl,
@@ -34,9 +34,9 @@ const PostCard = ({
   hasLiked,
   hasViewed,
   userId,
-}: PostProps) => {
+}: PostCardHorizontalProps) => {
   return (
-    <div className="flex-col-default w-full gap-y-1 overflow-hidden rounded-md border bg-bgColor-brandLighter shadow-lg hover:bg-[#F2E3D5] lg:grid lg:grid-cols-[28%_1fr] lg:gap-x-8 lg:gap-y-6 xl:gap-x-10">
+    <div className="flex flex-col justify-center items-center w-full gap-y-1 overflow-hidden rounded-md border bg-[#FEFAF4] shadow-lg hover:bg-[#F2E3D5] lg:grid lg:grid-cols-[28%_1fr] lg:gap-x-8 lg:gap-y-6 xl:gap-x-10">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -86,6 +86,6 @@ const PostCard = ({
   )
 }
 
-export default PostCard
+export default PostCardHorizontal
 
 // Add author name on post schema.

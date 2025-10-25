@@ -18,10 +18,10 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
     <div className="flex-col-center gap-y-10 px-5 py-20 lg:gap-y-20">
     {/* Header */}
     <div className="flex-col-center">
-      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+      <h1 className="header-sub mb-2 text-center text-textColor-brandDark lg:text-5xl">
         {t('header-benefits')}
       </h1>
-      <Separator className="w-[160%] bg-bgColor-brandDark" />
+      <Separator className="w-[120%] bg-bgColor-brandDark" />
     </div>
 
     {/* Benefits */}
@@ -47,15 +47,38 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
               <li>
                 {t('benefits-subitem3')}
               </li>
-              <li>{t('benefits-subitem4')}</li>
-              <li>{t('benefits-subitem5')}</li>
-              <li>{t('benefits-subitem6')}</li>
               <li>
-              {t('benefits-subitem7')}
+                {t('benefits-subitemMore')}
               </li>
-              <li>{t('benefits-subitem8')}</li>
-              <li>{t('benefits-subitem9')}</li>
             </ul>
+            
+            {/* See More/Less Toggle */}
+            <div className="mt-2">
+              <input type="checkbox" id="see-more-benefits" className="hidden peer" />
+              <div className="peer-checked:hidden">
+                <label htmlFor="see-more-benefits" className="cursor-pointer text-blue-600 hover:text-blue-800 underline text-sm">
+                  {t('see-more')}
+                </label>
+              </div>
+              <div className="hidden peer-checked:block">
+                <label htmlFor="see-more-benefits" className="cursor-pointer text-blue-600 hover:text-blue-800 underline text-sm">
+                  {t('see-less')}
+                </label>
+              </div>
+              
+              <div className="hidden peer-checked:block mt-2">
+                <ul className="list-inside list-disc ml-4">
+                  <li>{t('benefits-subitem4')}</li>
+                  <li>{t('benefits-subitem5')}</li>
+                  <li>{t('benefits-subitem6')}</li>
+                  <li>
+                  {t('benefits-subitem7')}
+                  </li>
+                  <li>{t('benefits-subitem8')}</li>
+                  <li>{t('benefits-subitem9')}</li>
+                </ul>
+              </div>
+            </div>
           </li>
         </ol>
       </div>

@@ -1,5 +1,6 @@
 {
   "allPost": "Tous les articles",
+  "articles": "Articles",
   "description-header": "Restez au courant des dernières nouvelles de Viet Vibe",
   "header": "Fil d'actualité",
   "newPost": "Nouvelle publication",
@@ -34,5 +35,7 @@
   "reviewUpdated": "Avis mis à jour avec succès",
   "reviewUpdateFailed": "Échec de la mise à jour de l'avis",
   "reviewUpdateError": "Erreur lors de la mise à jour de l'avis",
-  "averageRating": "Note moyenne"
+  "averageRating": "Note moyenne",
+  "postHomepageDescription": "Lisez nos expériences amusantes !",
+  "readAllArticles": "Lire tous les articles"
 }

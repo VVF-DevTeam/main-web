@@ -25,6 +25,7 @@ import { ReviewRating } from '@prisma/client'
 import { useTranslation } from 'react-i18next'
 import useDebounce from '@/hooks/useDebounce'
 import Image from 'next/image'
+import { convertReviewRatingToNumber, NUMBER_TO_RATING_MAP } from '@/lib/utils/ratingUtils'
 
 interface ReviewsDisplayProps {
   currentPage: number
@@ -102,22 +103,7 @@ const ReviewsDisplay = ({
   const isInitialRenderRef = useRef(true)
 
   // Helper function to convert ReviewRating enum to number
-  const ratingEnumToNumber = (rating: ReviewRating): number => {
-    switch (rating) {
-      case ReviewRating.One:
-        return 1
-      case ReviewRating.Two:
-        return 2
-      case ReviewRating.Three:
-        return 3
-      case ReviewRating.Four:
-        return 4
-      case ReviewRating.Five:
-        return 5
-      default:
-        return 0
-    }
-  }
+  const ratingEnumToNumber = convertReviewRatingToNumber
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -524,15 +510,8 @@ const ReviewsDisplay = ({
                                   : 'text-gray-300 hover:text-yellow-400'
                               }`}
                               onClick={() => {
-                                const ratingMap = {
-                                  1: ReviewRating.One,
-                                  2: ReviewRating.Two,
-                                  3: ReviewRating.Three,
-                                  4: ReviewRating.Four,
-                                  5: ReviewRating.Five,
-                                }
                                 setEditRating(
-                                  ratingMap[star as keyof typeof ratingMap]
+                                  NUMBER_TO_RATING_MAP[star as keyof typeof NUMBER_TO_RATING_MAP]
                                 )
                               }}
                             />

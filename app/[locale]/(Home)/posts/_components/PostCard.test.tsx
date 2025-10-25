@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import PostCard from './PostCard'
+import PostCard from './PostCardHorizontal'
 
 interface PostStatsProps {
   postLikes: number

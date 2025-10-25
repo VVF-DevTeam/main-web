@@ -35,7 +35,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
     <div
       className={cn(
         mode === 'desktop'
-          ? 'flex-center h-full w-full gap-x-3 lg:gap-x-5'
+          ? 'flex-center h-full w-full gap-x-4 md:gap-x-8 lg:gap-x-[2vw] xl:gap-x-[4vw]'
           : 'flex-col-center h-full w-full gap-y-4'
       )}
     >
@@ -49,7 +49,8 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
         />
       ))}
 
-      {/* TODO: Fix CSS for them */}
+      <NavRegistration mode={mode} />
+
       <NavAbout
         title={t('about-navLink')}
         vision={t('vision-navLink')}
@@ -57,7 +58,6 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
         founders={t('founders-navLink')}
         mode={mode}
       />
-      <NavRegistration mode={mode} />
 
       <AuthButtons userExists={!!session?.user} mode={mode} />
 

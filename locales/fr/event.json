@@ -36,6 +36,7 @@
   "header-step02": "Remplissez le formulaire d'inscription",
   "header-step03": "Payer et recevoir une réservation",
   "header-upcomingEvent": "Événements en cours et à venir",
+  "header-upcomingEvent-homepage": "Événements à venir",
   "hostedBy": "Hébergé par",
   "Jan": "Janvier",
   "Jul": "Juillet",
@@ -76,5 +77,7 @@
   "tuesday": "Mar",
   "wednesday": "Mer",
   "Week": "Semaine",
-  "jumpToReviewsSection": "Voir les avis pour cet événement"
+  "jumpToReviewsSection": "Voir les avis pour cet événement",
+  "read-more": "Lire la suite",
+  "more-events": "Plus d'événements"
 }

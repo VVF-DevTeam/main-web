@@ -36,12 +36,12 @@ const About = async ({ locale }: { locale: string }) => {
 
   return (
     <div className="flex-center">
-      <div className="flex-col-center width-max-default default-gap p-12">
-        <div className="flex-col-center default-gap p-6 pt-0">
-          <h2 className="cursor-default text-5xl font-bold tracking-wider text-textColor-brandDark header-font-default">
+      <div className="flex-col-center width-max-default p-12">
+        <div className="flex-col-center default-gap mb-2 pt-0">
+          <h2 className="cursor-default lg:text-5xl tracking-wider text-textColor-brandDark header-font-default header-sub">
             {t('header-vision-aboutUs')}
           </h2> 
-          <Separator className="w-1/2 bg-bgColor-brandDark" />
+          <Separator className="w-[90%] bg-bgColor-brandDark" />
           <p className="text-xl text-textColor/70">
             {t('description-vision-aboutUs')}
           </p>

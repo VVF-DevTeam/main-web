@@ -104,7 +104,7 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
             {imageUrls.map((_, idx) => (
               <span
                 key={idx}
-                className={`inline-block h-3 w-3 rounded-full ${idx === imageIndex ? 'bg-bgColor-blue' : 'bg-bgColor-gray'}`}
+                className={`inline-block h-3 w-3 rounded-full ${idx === imageIndex ? 'bg-bgColor-brand' : 'bg-bgColor-gray'}`}
               />
             ))}
           </div>

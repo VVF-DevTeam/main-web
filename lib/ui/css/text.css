@@ -1,6 +1,10 @@
 /* Below are some utility functions for text */
 
-/* text position */  
-.text-place-default {
-  @apply text-center md:text-left;
+/* text size */  
+.body-large {
+  @apply text-[20px] leading-[28px];
+}
+
+.button-bold {
+  @apply font-bold text-[16px] leading-[24px];
 }

@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       'lh3.googleusercontent.com',          // Google avatars/images
       'avatars.githubusercontent.com',      // GitHub avatars
       'platform-lookaside.fbsbx.com',       // Facebook avatars
+      'www.facebook.com',
+      'www.instagram.com',
     ],
     remotePatterns: [
       {

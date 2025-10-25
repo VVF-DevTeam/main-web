@@ -36,6 +36,7 @@
   "header-step02": "Fill Registration Form",
   "header-step03": "Pay and Receive Reservation",
   "header-upcomingEvent": "Ongoing and Upcoming Events",
+  "header-upcomingEvent-homepage": "Upcoming Events",
   "hostedBy": "Hosted by",
   "Jan": "January",
   "Jul": "July",
@@ -76,5 +77,7 @@
   "tuesday": "Tue",
   "wednesday": "Wed",
   "Week": "Week",
-  "jumpToReviewsSection": "See reviews for this event"
+  "jumpToReviewsSection": "See reviews for this event",
+  "read-more": "Read more",
+  "more-events": "More Events"
 }

@@ -67,7 +67,7 @@ const MyProfile = async ({
         <div className="grid grid-cols-1 gap-8 pb-8 md:pb-5 lg:grid-cols-4">
           {/* Profile Section */}
           <div className="bg-bgColor-white relative col-span-1 flex flex-col items-center justify-center rounded-lg p-6 shadow-lg lg:items-stretch lg:justify-normal">
-            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand"></div>
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
                 <div className="h-32 w-32 overflow-hidden rounded-full bg-bgColor-gray/20">
@@ -120,7 +120,7 @@ const MyProfile = async ({
 
           {/* Order History Section */}
           <div className="bg-bgColor-white relative col-span-1 flex h-full flex-col rounded-lg p-6 shadow-lg lg:col-span-3">
-            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand"></div>
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
               {t('order-history')}
@@ -229,7 +229,7 @@ const MyProfile = async ({
 
         {/* Wishlist Section */}
         <div className="bg-bgColor-white relative mb-8 rounded-lg p-6 shadow-lg">
-          <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
+          <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand"></div>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
             <FiHeart />
             {t('upcoming-event')}

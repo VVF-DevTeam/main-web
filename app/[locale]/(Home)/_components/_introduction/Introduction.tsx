@@ -2,29 +2,29 @@
 import initTranslation from '@/app/i18n'
 
 // Components
-import IntroCard from './IntroCard'
+// import IntroCard from './IntroCard'
 import Image from 'next/image'
 import Link from 'next/link'
-
+import { Button } from '@/components/ui/button'
 // Actions
 import { getClosestFutureEvent } from '@/lib/actions/event/getClosestEvent'
 
-const introductionData = [
-  {
-    id: 1,
-    description: 'sport-description-introduction',
-    imageUrl:
-      'https://drive.google.com/thumbnail?id=1JLCsSSkUa9T6_dIksI8L3XWu8K0H6gKz&sz=w1000',
-    title: 'sport-header-introduction',
-  },
-  {
-    id: 2,
-    description: 'music-description-introduction',
-    imageUrl:
-      'https://drive.google.com/thumbnail?id=1KZAEFIBNqDXd-HjNB6oLnf6zN6MvCjyj&sz=w1000',
-    title: 'music-header-introduction',
-  },
-]
+// const introductionData = [
+//   {
+//     id: 1,
+//     description: 'sport-description-introduction',
+//     imageUrl:
+//       'https://drive.google.com/thumbnail?id=1JLCsSSkUa9T6_dIksI8L3XWu8K0H6gKz&sz=w1000',
+//     title: 'sport-header-introduction',
+//   },
+//   {
+//     id: 2,
+//     description: 'music-description-introduction',
+//     imageUrl:
+//       'https://drive.google.com/thumbnail?id=1KZAEFIBNqDXd-HjNB6oLnf6zN6MvCjyj&sz=w1000',
+//     title: 'music-header-introduction',
+//   },
+// ]
 
 interface IntroductionProps {
   locale: string
@@ -39,25 +39,61 @@ const Introduction = async ({ locale }: IntroductionProps) => {
 
   return (
     <div>
-      <div className="flex-col-center header-font-white default-gap relative min-h-[60vh] py-5 text-center lg:min-h-[70vh]">
-        {/* NextJS Image and Dark Overlay */}
-        <div className="dark-overlay"></div>
+      {/* Old hero image */}
+      {/* <div className="flex-col-center header-font-white default-gap relative min-h-[60vh] py-5 text-center lg:min-h-[70vh]"> */}
+      {/* NextJS Image and Dark Overlay */}
+      {/* <div className="dark-overlay"></div>
         <Image
           src="https://drive.google.com/thumbnail?id=1ZREcmGQvqVeJGd5GLlk0FF7vjyYHFpkl&sz=w2000"
           alt="Intro image of someone playing a guitar"
           className="next-background"
           fill
           priority
-        />
+        /> */}
 
-        {/* Titles and Descriptions */}
-        <h1 className="text-2xl tracking-wide md:text-3xl">
+      {/* Titles and Descriptions */}
+      {/* <h1 className="text-2xl tracking-wide md:text-3xl">
           Viet Vibe Foundation
         </h1>
         <h2 className="header-sub my-2 max-w-[90vw] leading-normal sm:leading-tight md:leading-normal xl:my-4 xl:text-5xl xl:leading-normal">
           {t('title-small-introduction')}
         </h2>
-        <p className="header-text">{t('title-big-introduction')}</p>
+        <p className="header-text">{t('title-big-introduction')}</p> */}
+      {/* </div> */}
+
+      <div className="flex flex-col md:grid md:grid-cols-2 gap-5 px-2 pt-[60px] pb-10 md:py-[60px] md:px-4 lg:px-8">
+        <div className="col-span-1 mx-auto flex md:max-w-[500px] flex-col gap-y-4">
+          {/* Header Web_H1 */}
+          <h2 className="header-main">{t('title-big-introduction')}</h2>
+          <p className="text-base tracking-wide text-textColor-gray">
+            {t('title-small-introduction')}
+          </p>
+
+          <div className="col-span-1 flex items-center justify-center">
+          <Image
+            src="https://drive.google.com/thumbnail?id=1rUj4-6Up_871Y93zlpjrJW4ivXzYLKgl&sz=w2000"
+            alt="Intro image of someone playing a guitar"
+            width={500}
+            height={500}
+            className="rounded-2xl md:hidden w-full"
+          />
+        </div>
+          <Button
+            variant={'default'}
+            className="h-[52px] max-w-[260px] text-[18px] font-bold"
+          >
+            {t('button-introduction')}
+          </Button>
+        </div>
+        <div className="col-span-1 flex items-center justify-center">
+          <Image
+            src="https://drive.google.com/thumbnail?id=1rUj4-6Up_871Y93zlpjrJW4ivXzYLKgl&sz=w2000"
+            alt="Intro image of someone playing a guitar"
+            width={500}
+            height={500}
+            className="rounded-2xl hidden md:block"
+          />
+        </div>
       </div>
 
       {/* Text for latest events - only show if there's a future event */}
@@ -100,14 +136,15 @@ const Introduction = async ({ locale }: IntroductionProps) => {
         </div>
       )}
 
-      <div className="width-max-default mx-auto flex flex-col gap-y-12 p-6 md:p-12 md:pt-8 lg:gap-y-16 lg:p-16 lg:pt-8">
+      {/* Introduction Cards (old) */}
+      {/* <div className="width-max-default mx-auto flex flex-col gap-y-12 p-6 md:p-12 md:pt-8 lg:gap-y-16 lg:p-16 lg:pt-8">
         {introductionData.map((intro) => (
           <IntroCard key={intro.id} locale={locale} {...intro} />
         ))}
-      </div>
+      </div> */}
 
-      {/* Separator */}
-      <div className="mx-auto mt-12 w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
+      {/* Separator (old)*/}
+      {/* <div className="mx-auto mt-12 w-2/3 border-b border-bgColor-brand md:w-1/2"></div> */}
     </div>
   )
 }

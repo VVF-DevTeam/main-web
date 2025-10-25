@@ -19,7 +19,7 @@ type PostRelations = {
 }
 
 // Combined cached post item
-type CachedPostItem = PostBase & PostCounts & PostRelations
+export type CachedPostItem = PostBase & PostCounts & PostRelations
 
 type PostsCacheEntry = {
   data: CachedPostItem[]

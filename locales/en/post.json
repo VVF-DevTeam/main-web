@@ -1,5 +1,6 @@
 {
   "allPost": "All Posts",
+  "articles": "Articles",
   "description-header": "Stay up to date with the latest news from Viet Vibe",
   "header": "News Feed",
   "newPost": "New Post",
@@ -34,5 +35,7 @@
   "reviewUpdated": "Review updated successfully",
   "reviewUpdateFailed": "Failed to update review",
   "reviewUpdateError": "Error updating review",
-  "averageRating": "Average Rating"
+  "averageRating": "Average Rating",
+  "postHomepageDescription": "Read our fun experiences!",
+  "readAllArticles": "Read All Articles"
 }

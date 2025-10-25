@@ -341,7 +341,7 @@ const ApplicationForm = ({
           {/* Submit Button */}
           <Button
             type="submit"
-            className="col-span-2 max-w-32 bg-bgColor-brand text-textColor-white hover:bg-bgColor-brandLight"
+            variant="default"
           >
             Apply
           </Button>
