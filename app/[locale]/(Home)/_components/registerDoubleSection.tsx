@@ -25,7 +25,7 @@ const RegisterDoubleSection = async ({
       <div className="flex pt-5">
         <div className="group relative h-96 w-1/2">
           <Image
-            src="https://drive.google.com/thumbnail?id=1a75ZM7UwXhXp43MjDt6WgYjtyccVWyQU&sz=w1000"
+            src="https://drive.google.com/thumbnail?id=1v9YmMiBjwuGXpmIDRDmDpraDuQQrr8b6&sz=w1000"
             alt="Membership Benefits 1"
             fill
             className="z-0 object-cover brightness-[0.4] transition-all duration-300 group-hover:z-10 group-hover:scale-x-[1.15] group-hover:scale-y-[1.1]"
