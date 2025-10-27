@@ -18,7 +18,7 @@ const backButtonVariants = cva(
         default: // default location is the top left corner of the screen
           'absolute left-3 top-[170px] bg-bgColor-brand text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand/90 shadow',
         responsive:
-          'mt-6 top-[170px] bg-bgColor-brand text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand/90 shadow',
+          'mt-6 ml-3 top-[170px] bg-bgColor-brand text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand/90 shadow',
       },
       size: {
         default: 'h-9 px-4 py-2',

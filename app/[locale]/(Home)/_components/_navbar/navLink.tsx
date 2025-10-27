@@ -21,13 +21,11 @@ type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
   label: string
   path: string
-  logo: string
   mode: screenSize
 }
 
 // Main Component
-const NavLink = ({ label, path, logo, mode }: NavLinkProps) => {
-  console.log(logo)
+const NavLink = ({ label, path, mode }: NavLinkProps) => {
   // const Icon = navLogos[logo]
   const pathname = usePathname()
   const isActive =

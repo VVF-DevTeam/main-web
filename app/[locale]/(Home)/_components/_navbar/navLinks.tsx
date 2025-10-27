@@ -44,7 +44,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
           key={route.label}
           label={t(route.label.toLowerCase() + '-navLink')}
           path={route.path}
-          logo={route.logo}
+          // logo={route.logo}
           mode={mode}
         />
       ))}

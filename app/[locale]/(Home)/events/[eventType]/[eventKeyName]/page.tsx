@@ -4,7 +4,6 @@ import ClassDescription from '../_component/_class/ClassDescription'
 import BackButton from '@/components/ui/back-button'
 import ConcertDescriptions from '../_component/_concert/ConcertDescriptions'
 import ConcertHeaders from '../_component/_concert/ConcertHeaders'
-import EventGalleryCarousel from '../_component/EventGalleryCarousel'
 
 // Libraries
 import { Metadata } from 'next'
@@ -71,10 +70,11 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   }
 
   // Check if gallery carousel should be rendered
-  const shouldShowGallery =
+  const shouldShowGallery = !!(
     publishedClass.imgUrls &&
     Array.isArray(publishedClass.imgUrls as string[]) &&
     (publishedClass.imgUrls as string[]).length > 0
+  )
 
   return (
     <>
@@ -82,7 +82,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         <div className="w-full overflow-hidden">
           {/* Event Headers */}
           <ConcertHeaders event={publishedClass} />
-          <ConcertDescriptions event={publishedClass} locale={locale} />
+          <ConcertDescriptions event={{ ...publishedClass, imgUrls: (publishedClass.imgUrls as string[]) || [] }} locale={locale} shouldShowGallery={shouldShowGallery as boolean} />
         </div>
       ) : (
         <div>
@@ -121,13 +121,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             title={publishedClass.title}
             fullCourseDiscount={publishedClass.fullCourseDiscount || 0}
             eventType={publishedClass.eventType}
-          />
-        </div>
-      )}
-      {/* Gallery Carousel at the bottom */}
-      {shouldShowGallery && (
-        <div className="my-8">
-          <EventGalleryCarousel
+            shouldShowGallery={shouldShowGallery as boolean}
             imageUrls={publishedClass.imgUrls as string[]}
           />
         </div>

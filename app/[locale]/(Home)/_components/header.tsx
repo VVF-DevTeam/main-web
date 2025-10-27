@@ -26,7 +26,7 @@ const Header = () => {
   // }
 
   return (
-    <div className="flex h-[48px] w-full items-center justify-end bg-bgColor-brand text-textColor-white sm:px-3 md:px-8">
+    <div className="flex h-[48px] w-full items-center justify-end bg-bgColor-brandDark text-textColor-white sm:px-3 md:px-8">
       {/* Tooltip for email */}
       {/* <div className="flex gap-x-2">
         <TooltipProvider>

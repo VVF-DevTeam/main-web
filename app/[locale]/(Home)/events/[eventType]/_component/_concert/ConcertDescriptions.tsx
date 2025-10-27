@@ -1,4 +1,3 @@
-
 import React from 'react'
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
@@ -7,6 +6,7 @@ import { EventSchedule } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
+import EventGalleryCarousel from '../EventGalleryCarousel'
 
 type EventWithRelations = {
   id: string
@@ -29,11 +29,13 @@ type EventWithRelations = {
   hosts: { name: string | null }[]
   schedules: EventSchedule[]
   eventType: string
+  imgUrls: string[]
 }
 
 interface ConcertDescriptionsProps {
   event: EventWithRelations
   locale: string
+  shouldShowGallery?: boolean
 }
 
 const typeMap = {
@@ -43,7 +45,11 @@ const typeMap = {
   EVENT: 'Event',
 }
 
-const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) => {
+const ConcertDescriptions = async ({
+  event,
+  locale,
+  shouldShowGallery = true,
+}: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   // Get the current user's id
@@ -61,7 +67,7 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
     : null
 
   return (
-    <div className="w-full bg-[#620BC4] py-16 text-white">
+    <div className="w-full bg-bgColor-brandDark py-16 text-white">
       <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
         {/* Event Info Section */}
         <div className="grid w-full gap-8 md:grid-cols-2">
@@ -98,6 +104,10 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">{t('location')}:</span>
                   {event.location}
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="font-semibold">{t('slot')}:</span>
+                  {event.capacity}
                 </p>
               </div>
             </div>
@@ -181,6 +191,13 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
           </div>
         ) : (
           <p className="italic text-white/80">{t('loginToMakePayment')}</p>
+        )}
+
+        {/* Gallery Carousel at the bottom */}
+        {shouldShowGallery && (
+          <div className="my-8">
+            <EventGalleryCarousel imageUrls={event.imgUrls as string[]} />
+          </div>
         )}
       </div>
     </div>

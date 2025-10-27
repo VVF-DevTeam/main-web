@@ -60,7 +60,7 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
   return (
     <div>
       {/* Header & Separator */}
-      <div className="mx-auto w-full max-w-[1100px] px-6 md:px-12">
+      <div className="mx-auto w-full max-w-[1100px]">
         <h1 className="mb-2 text-left text-xl font-bold md:text-3xl lg:text-4xl">
           {t('headerGallery')}
         </h1>

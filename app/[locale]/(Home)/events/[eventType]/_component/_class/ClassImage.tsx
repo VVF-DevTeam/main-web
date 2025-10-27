@@ -37,7 +37,7 @@ const ClassImage = async ({
 
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="grid-all-cols-2 mx-auto flex w-full flex-col p-6 pt-20 md:grid">
+      <div className="grid-all-cols-2 mx-auto flex w-full flex-col p-6 pt-10 md:grid">
         {/* Left Image */}
         <div className="relative aspect-video w-full basis-1/2 md:h-[35vh] lg:h-[50vh]">
           <Image

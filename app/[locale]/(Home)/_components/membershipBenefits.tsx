@@ -31,7 +31,7 @@ const MembershipBenefits = async ({ locale }: MembershipBenefitsProps) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <Image
-                src="https://drive.google.com/thumbnail?id=1a-Qg9wysoBE7isCJzuJbKxHoj6bu-yWJ&sz=w100"
+                src="https://drive.google.com/thumbnail?id=1vsJ3EA4HUbiFjdyqaAgg9RduNN2staec&sz=w100"
                 alt="bullet point"
                 width={20}
                 height={20}
@@ -46,7 +46,7 @@ const MembershipBenefits = async ({ locale }: MembershipBenefitsProps) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <Image
-                src="https://drive.google.com/thumbnail?id=1YXenDbJ3qI94bypXneId23WiyOcnv016&sz=w100"
+                src="https://drive.google.com/thumbnail?id=1Ee7WcmpXhrobD1hV2VURGtjkRrxh9Oxt&sz=w100"
                 alt="bullet point"
                 width={20}
                 height={20}
@@ -61,7 +61,7 @@ const MembershipBenefits = async ({ locale }: MembershipBenefitsProps) => {
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <Image
-                src="https://drive.google.com/thumbnail?id=1Y5a02Gsj46mulIzPleNVTLyHOZ3w67x7&sz=w100"
+                src="https://drive.google.com/thumbnail?id=1WvFAzDkYu1HjKP4nPUgCDxyWzylpgilu&sz=w100"
                 alt="bullet point"
                 width={20}
                 height={20}

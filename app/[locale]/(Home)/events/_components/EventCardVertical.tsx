@@ -4,11 +4,11 @@
 // Libraries
 import { cn } from '@/lib/utils'
 import initTranslation from '@/app/i18n'
-
+import Link from 'next/link'
 // Components
 import Image from 'next/image'
-import { Tag, MapPin, Ticket, CalendarDays } from 'lucide-react'
-import EventButton from './EventButton'
+import { MapPin, Ticket, CalendarDays, CalendarClock } from 'lucide-react'
+// import EventButton from './EventButton'
 
 // Interfaces & Types
 import { Event, EventCategory } from '@prisma/client'
@@ -31,75 +31,101 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
     new Date(event.endDate) >= now
 
   return (
-    <div className="group relative flex w-[calc(100%-3px)] max-w-[400px] flex-col rounded-lg bg-slate-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-slate-100 xl:min-w-[400px]">
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
-        <Image
-          src={event.imgUrl!}
-          alt={`Thumbnail for ${event.title} event`}
-          fill
-          priority={false}
-          sizes="(min-width: 1280px) 400px, (min-width: 1024px) 350px, (min-width: 768px) 300px, 100vw"
-          className="hover-opacity-blur z-0 max-h-[300px] w-full basis-1/2 rounded-t-lg"
-        />
-      </div>
-
-      <div className="flex basis-1/2 flex-col gap-y-6 p-4 text-base md:text-lg">
-        {/* Tags */}
-        <div className="absolute left-3 top-2 flex flex-wrap gap-2">
-          {event.categories
-            ?.sort((a) => (a.type.toLowerCase() === 'primary' ? -1 : 1))
-            .map((category) => (
-              <div
-                key={category.id}
-                className={cn(
-                  'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
-                  category.isBold && 'font-bold',
-                  category.isItalic && 'italic'
-                )}
-                style={{
-                  backgroundColor: category.bgColor,
-                  color: category.textColor,
-                }}
-              >
-                {category.title}
-              </div>
-            ))}
+    <div className="group relative mx-auto flex w-full max-w-[360px] flex-col rounded-2xl bg-slate-50 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:scale-105 hover:bg-slate-100 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
+      <Link href={`/events/${event.eventType.toLowerCase()}/${event.keyName}`}>
+        <div className="aspect-[4/3] w-full p-5">
+          <div className="relative h-full w-full overflow-hidden rounded-lg">
+            <Image
+              src={event.imgUrl!}
+              alt={`Thumbnail for ${event.title} event`}
+              fill
+              priority={false}
+              sizes="(min-width: 1280px) 400px, (min-width: 1024px) 350px, (min-width: 768px) 300px, 100vw"
+              className="hover-opacity-blur z-0 object-cover"
+            />
+          </div>
         </div>
 
-        {/* Title */}
-        <h2 className="mb-4 text-center text-2xl font-bold">
-          {event.title} {hasStartedAndNotEnded && <span>(Started)</span>}
-        </h2>
+        <div className="flex basis-1/2 flex-col gap-y-3 p-4 pt-0 text-base md:text-lg">
+          {/* Tags */}
+          <div className="absolute left-7 top-7 flex flex-wrap gap-2">
+            {event.categories
+              ?.sort((a) => (a.type.toLowerCase() === 'primary' ? -1 : 1))
+              .map((category) => (
+                <div
+                  key={category.id}
+                  className={cn(
+                    'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
+                    category.isBold && 'font-bold',
+                    category.isItalic && 'italic'
+                  )}
+                  style={{
+                    backgroundColor: category.bgColor,
+                    color: category.textColor,
+                  }}
+                >
+                  {category.title}
+                </div>
+              ))}
+          </div>
 
-        {/* Price and availability */}
-        <div className="flex-between">
-          <span className="flex items-center gap-x-2">
-            <Tag className="h-5 w-5" />${event.price?.toString()}
-            {event.priceMember ? '/$' + event.priceMember : null}
-          </span>
-          <span className="flex-center gap-x-2">
+          {/* Title */}
+          <h2 className="mb-4 text-2xl font-bold">
+            {event.title} {hasStartedAndNotEnded && <span>(Started)</span>}
+          </h2>
+
+          {/* Date */}
+          <div className="flex items-center gap-x-2">
+            <CalendarDays className="h-4 w-4 text-bgColor-brand md:h-5 md:w-5" />
+            <span className="text-base">
+              {event.startDate.toLocaleDateString('en-GB')} -{' '}
+              {event.endDate.toLocaleDateString('en-GB')}
+            </span>
+          </div>
+
+          {/* Time  */}
+          <div className="flex items-center gap-x-2 text-base">
+            <CalendarClock className="h-4 w-4 text-bgColor-brand md:h-5 md:w-5" />
+            <span>
+              {event?.days?.map((day) => (
+                <span key={day}>{t(day.toLowerCase())}, </span>
+              ))}
+            </span>
+            <span className="-ml-1">
+              at {event.startTime.toLocaleString().substring(0, 5)}
+            </span>
+          </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-x-2 text-base">
+            <span className="flex items-center gap-x-2">
+              <MapPin className="h-4 w-4 shrink-0 text-bgColor-brand md:h-5 md:w-5" />
+              {event.location}
+            </span>
+            {/* <EventButton
+            eventKeyName={event.keyName}
+            eventType={event.eventType}
+          /> */}
+          </div>
+
+          {/* Price and availability */}
+          <div className="flex items-center gap-x-2 text-base">
+            <span className="flex items-center gap-x-2">
+              <Ticket className="h-4 w-4 rotate-[135deg] text-bgColor-brand md:h-5 md:w-5" />
+              ${event.price === 0 ? 'Free' : event.price?.toString()}
+              {/* {event.priceMember ? '/$' + event.priceMember : null} */}
+            </span>
+            {/* <span className="flex-center gap-x-2">
             <Ticket className="h-5 w-5 rotate-45" />
             {event.capacity! - event.ticketsSold! === 0
               ? 'Sold Out'
               : event.capacity! - event.ticketsSold!}{' '}
             {t('slot-event')}
-          </span>
-        </div>
+          </span> */}
+          </div>
 
-        {/* Location */}
-        <div className="flex-between gap-x-2">
-          <span className="flex items-center gap-x-2 text-xl text-muted-foreground">
-            <MapPin className="h-5 w-5" />
-            {event.location}
-          </span>
-          <EventButton
-            eventKeyName={event.keyName}
-            eventType={event.eventType}
-          />
-        </div>
-
-        {/* Timings */}
-        <div className="flex-between rounded-lg bg-bgColor-brand/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand/30">
+          {/* Timings */}
+          {/* <div className="flex-between rounded-lg bg-bgColor-brand/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand/30">
           <span className="flex items-center gap-x-2 text-sm md:text-lg">
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
             <div>
@@ -124,8 +150,9 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
               at {event.startTime.toLocaleString().substring(0, 5)}
             </span>
           </div>
+        </div> */}
         </div>
-      </div>
+      </Link>
     </div>
   )
 }

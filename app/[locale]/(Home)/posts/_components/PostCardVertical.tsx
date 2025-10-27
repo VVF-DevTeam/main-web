@@ -41,9 +41,9 @@ const PostCardVertical = ({
   showStats = false,
 }: PostCardVerticalProps) => {
   return (
-    <div className="group relative flex w-[calc(100%-3px)] max-w-[400px] flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:scale-105">
+    <div className="group relative mx-auto flex w-full max-w-[310px] flex-col rounded-2xl bg-slate-50 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:scale-105 hover:bg-slate-100 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
       {/* Image Section */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-lg">
         <Image
           src={imageUrl}
           alt={`Thumbnail for ${title} post`}
@@ -52,12 +52,12 @@ const PostCardVertical = ({
           sizes="(min-width: 1280px) 400px, (min-width: 1024px) 350px, (min-width: 768px) 300px, 100vw"
           className="hover-focus-zoomIn object-cover"
         />
-        
+
         {/* New Badge */}
         {isNew && (
           <div className="absolute left-3 top-3">
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className="bg-white px-3 py-1 text-sm font-semibold shadow-md"
             >
               New
@@ -88,24 +88,29 @@ const PostCardVertical = ({
         </p>
 
         {/* Post Stats */}
-        {showStats && postLikes && postViews && hasLiked && hasViewed && userId && (
-        <div className="mb-2">
-          <PostStats
-            postLikes={postLikes}
-            hasLiked={hasLiked}
-            postId={id}
-            userId={userId}
-            postViews={postViews}
-            hasViewed={hasViewed}
-          />
-        </div>
-        )}
+        {showStats &&
+          postLikes &&
+          postViews &&
+          hasLiked &&
+          hasViewed &&
+          userId && (
+            <div className="mb-2">
+              <PostStats
+                postLikes={postLikes}
+                hasLiked={hasLiked}
+                postId={id}
+                userId={userId}
+                postViews={postViews}
+                hasViewed={hasViewed}
+              />
+            </div>
+          )}
 
         {/* Read More Link */}
         <Link href={`posts/${id}`} className="mt-auto">
           <Button
             variant={'ghost'}
-            className="group/link flex items-center gap-x-2 p-0 text-[#C41E3A] hover:text-[#A01829] place-self-end"
+            className="group/link flex items-center gap-x-2 place-self-end p-0 text-[#C41E3A] hover:text-[#A01829]"
           >
             <span className="button-bold">Read More</span>
             <ArrowUpRight className="h-4 w-4 transition-transform duration-200 ease-in group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
@@ -117,5 +122,3 @@ const PostCardVertical = ({
 }
 
 export default PostCardVertical
-
-

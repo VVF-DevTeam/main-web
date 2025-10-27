@@ -50,7 +50,7 @@ const EventListHorizontal = async ({
         </h2>
       )}
       {events.length > 0 ? (
-        <div className="mx-auto flex flex-col gap-x-8 gap-y-6 p-6 pb-4 md:grid md:grid-cols-2 md:gap-y-12 lg:grid-cols-3">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-x-12 gap-y-6 p-6 pb-4 md:grid md:grid-cols-2 md:gap-y-12 lg:grid-cols-3 lg:justify-items-center">
           {events.map((event) => (
             <EventCardVertical key={event.id} event={event} locale={locale} />
           ))}

@@ -39,7 +39,7 @@ const EventListVertical = async ({
 
       {/* Event Cards */}
       {events.length > 0 ? (
-        <div className="mx-auto max-w-7xl px-6 pt-5">
+        <div className="w-full md:mx-auto max-w-7xl px-6 pt-5">
           {/* Mobile: Vertical Cards */}
           <div className="flex flex-col mx-auto gap-6 md:hidden">
             {events.map((event) => (

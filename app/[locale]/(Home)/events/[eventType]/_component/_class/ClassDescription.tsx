@@ -10,6 +10,7 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
+import EventGalleryCarousel from '../EventGalleryCarousel'
 interface ClassDescriptionProps {
   description: string
   startDate: Date
@@ -32,6 +33,8 @@ interface ClassDescriptionProps {
   stripeSubscribedPriceId: string
   fullCourseDiscount?: number
   eventType: string
+  shouldShowGallery?: boolean
+  imageUrls: string[]
 }
 
 const typeMap = {
@@ -62,6 +65,9 @@ const ClassDescription = async ({
   price,
   fullCourseDiscount,
   eventType,
+  capacity,
+  shouldShowGallery = true,
+  imageUrls,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -115,8 +121,15 @@ const ClassDescription = async ({
             {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
             {t('everyWeek')}, {startTime} - {endTime}
           </p>
+
+          {/* Location */}
           <p>
             {t('location')}: {location}
+          </p>
+
+          {/* Slot */}
+          <p>
+            {t('slot')}: {capacity}
           </p>
         </div>
 
@@ -197,6 +210,15 @@ const ClassDescription = async ({
         </>
       ) : (
         <p className="italic">{t('loginToMakePayment')}.</p>
+      )}
+
+      {/* Gallery Carousel at the bottom */}
+      {shouldShowGallery && (
+        <div className="my-8">
+          <EventGalleryCarousel
+            imageUrls={imageUrls}
+          />
+        </div>
       )}
     </div>
   )

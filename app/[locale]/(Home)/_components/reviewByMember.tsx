@@ -43,7 +43,7 @@ const ReviewCard: React.FC<{
   const commentTooLong = comment && comment.length > 230
 
   return (
-    <div className="max-w-[360px] h-[230px] rounded-2xl bg-[#FAECEF] px-10 py-4 text-[#486284] shadow-sm overflow-hidden">
+    <div className="w-[350px] md:w-auto md:max-w-[360px] h-[230px] rounded-2xl bg-[#FAECEF] px-10 py-4 text-[#486284] shadow-sm overflow-hidden">
       <div className="flex items-center gap-3">
         <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-white/70">
           <Image
