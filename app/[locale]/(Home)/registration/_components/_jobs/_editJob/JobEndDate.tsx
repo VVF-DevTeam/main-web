@@ -44,19 +44,20 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
   const { isValid, isSubmitting } = form.formState
 
   const onSubmit = async (data: z.infer<typeof JobEndDateSchema>) => {
-
-    // If 'noEndDate' is active, overwrite with null													
+    // If 'noEndDate' is active, overwrite with null
     const endDate = noEndDate ? null : data.endDate
-    const startDate = job.startDate
-      ? new Date(job.startDate).getTime()
-      : null
+    const startDate = job.startDate ? new Date(job.startDate).getTime() : null
 
-    if (startDate !== null && endDate && new Date(endDate).getTime() < startDate) {
+    if (
+      startDate !== null &&
+      endDate &&
+      new Date(endDate).getTime() < startDate
+    ) {
       toast.error('Error', {
         description: 'End Date cannot be before the Start Date',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
       return
     }
@@ -69,8 +70,8 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
       toast.success('Success', {
         description: 'Job End Date updated successfully',
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       setIsEditing(false)
       router.refresh()
@@ -79,8 +80,8 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
       toast.error('Error', {
         description: 'Something went wrong',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -168,7 +169,11 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {new Date(job.endDate).toLocaleDateString('en-US')}
+            {new Date(job.endDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
           </p>
         )}
       </div>

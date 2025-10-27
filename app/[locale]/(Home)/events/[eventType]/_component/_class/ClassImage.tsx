@@ -52,7 +52,12 @@ const ClassImage = async ({
         {/* Right Content */}
         <div className="flex-col-center gap-y-4 rounded-b-sm bg-bgColor-black px-4 py-10 text-left text-textColor-white md:h-[35vh] md:gap-y-6 md:rounded-r-sm md:rounded-bl-none lg:h-[50vh] lg:pl-8 lg:pt-2">
           <span className="text-sm text-muted">
-            {startDate.toLocaleDateString()} | {location}
+            {startDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}{' '}
+            | {location}
           </span>
           <h2 className="-mt-3 mb-1 text-center text-4xl font-extrabold">
             {t(title)}
@@ -87,7 +92,7 @@ const ClassImage = async ({
         </div>
       </div>
 
-      <div className="place-self-end pr-6 flex flex-col items-end gap-2">
+      <div className="flex flex-col items-end gap-2 place-self-end pr-6">
         <Link
           href={`/posts?reviewEvent=${eventId}&reviewPage=1&redirectToReviewsSection=true`}
           className="group inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline"

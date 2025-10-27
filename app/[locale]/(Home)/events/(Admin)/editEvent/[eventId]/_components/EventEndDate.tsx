@@ -53,13 +53,13 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
     if (startDate !== null && endDate < startDate) {
       toast.error('End Date cannot be before the Start Date', {
         description: (
-          <span style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: 'var(--muted-foreground)' }}>
             {currentDateTime}
           </span>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
       return
     }
@@ -73,28 +73,34 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
       console.log(response)
       toast.success('Event End Date updated successfully', {
         description: (
-          <span style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: 'var(--muted-foreground)' }}>
             {currentDateTime}
           </span>
         ),
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       setIsEditing(false)
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast.error('Something went wrong', { 
+      toast.error('Something went wrong', {
         description: (
           <div className="flex flex-col gap-1">
-            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span>
+              {error instanceof Error
+                ? error.message
+                : 'Please try again later'}
+            </span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -162,7 +168,11 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {event.endDate.toLocaleDateString('en-US')}
+            {event.endDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
           </p>
         )}
       </div>

@@ -32,7 +32,7 @@ const EventCardHorizontal = async ({
     new Date(event.startDate) <= now &&
     new Date(event.endDate) >= now
 
-    return (
+  return (
     <div className="group relative flex h-[165px] w-full flex-col gap-4 rounded-3xl bg-white p-4 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)] md:flex-row md:items-center md:gap-6 md:p-6">
       {/* Event Image */}
       <div className="relative h-40 w-full flex-shrink-0 overflow-hidden rounded-lg md:h-24 md:w-32 lg:h-32 lg:w-40">
@@ -62,7 +62,12 @@ const EventCardHorizontal = async ({
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 flex-shrink-0 text-bgColor-brand md:h-5 md:w-5" />
           <span className="line-clamp-1">
-            {event.startDate?.toLocaleDateString()} at{' '}
+            {event.startDate?.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}{' '}
+            at{' '}
             {event.startDate?.toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
@@ -80,7 +85,9 @@ const EventCardHorizontal = async ({
         <div className="flex items-center gap-2">
           <Ticket className="h-4 w-4 flex-shrink-0 rotate-45 text-bgColor-brand md:h-5 md:w-5" />
           <span>
-            {String(event.price) === '0' ? 'Free' : '$' + event.price?.toString()} 
+            {String(event.price) === '0'
+              ? 'Free'
+              : '$' + event.price?.toString()}
             {/* {event.priceMember ? '/$' + event.priceMember : null} */}
           </span>
         </div>

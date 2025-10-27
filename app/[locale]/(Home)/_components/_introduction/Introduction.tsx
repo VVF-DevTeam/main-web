@@ -111,7 +111,11 @@ const Introduction = async ({ locale }: IntroductionProps) => {
               {t('event-hot-text')} <strong>{closestEvent.title}</strong>,{' '}
               {t('event-happening-on')}{' '}
               {closestEvent.startDate &&
-                new Date(closestEvent.startDate).toLocaleDateString(locale)}
+                  new Date(closestEvent.startDate).toLocaleDateString(locale, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
               {closestEvent.startTime &&
                 ` ${t('event-at')} ${closestEvent.startTime}`}
               {/* {closestEvent.endDate &&

@@ -78,8 +78,17 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           <div className="flex items-center gap-x-2">
             <CalendarDays className="h-4 w-4 text-bgColor-brand md:h-5 md:w-5" />
             <span className="text-base">
-              {event.startDate.toLocaleDateString('en-GB')} -{' '}
-              {event.endDate.toLocaleDateString('en-GB')}
+              {event.startDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}{' '}
+              -{' '}
+              {event.endDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
             </span>
           </div>
 

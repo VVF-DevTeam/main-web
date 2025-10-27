@@ -97,9 +97,10 @@ const ClassDescription = async ({
           {/* Date */}
           <p>
             {t('dateHeader')}:{' '}
-            {startDate.toLocaleDateString('en-GB', {
-              day: 'numeric',
+            {startDate.toLocaleDateString('en-US', {
+              year: 'numeric',
               month: 'short',
+              day: 'numeric',
             })}{' '}
             {/* If the start date and end date are the same, don't show the end date */}
             {startDate.getTime() === endDate.getTime() ? (
@@ -107,9 +108,10 @@ const ClassDescription = async ({
             ) : (
               <>
                 -{' '}
-                {endDate.toLocaleDateString('en-GB', {
-                  day: 'numeric',
+                {endDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
                   month: 'short',
+                  day: 'numeric',
                 })}
               </>
             )}
@@ -215,9 +217,7 @@ const ClassDescription = async ({
       {/* Gallery Carousel at the bottom */}
       {shouldShowGallery && (
         <div className="my-8">
-          <EventGalleryCarousel
-            imageUrls={imageUrls}
-          />
+          <EventGalleryCarousel imageUrls={imageUrls} />
         </div>
       )}
     </div>

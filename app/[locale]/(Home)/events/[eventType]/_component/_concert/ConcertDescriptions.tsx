@@ -80,9 +80,10 @@ const ConcertDescriptions = async ({
               <div className="space-y-2 text-lg">
                 <p className="flex items-center gap-2">
                   <span className="font-semibold">{t('dateHeader')}:</span>
-                  {event.startDate?.toLocaleDateString('en-GB', {
-                    day: 'numeric',
+                  {event.startDate?.toLocaleDateString('en-US', {
+                    year: 'numeric',
                     month: 'short',
+                    day: 'numeric',
                   })}{' '}
                   {/* If the start date and end date are the same, don't show the end date */}
                   {event.startDate?.getTime() === event.endDate?.getTime() ? (
@@ -90,9 +91,10 @@ const ConcertDescriptions = async ({
                   ) : (
                     <>
                       -{' '}
-                      {event.endDate?.toLocaleDateString('en-GB', {
-                        day: 'numeric',
+                      {event.endDate?.toLocaleDateString('en-US', {
+                        year: 'numeric',
                         month: 'short',
+                        day: 'numeric',
                       })}
                     </>
                   )}

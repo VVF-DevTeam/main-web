@@ -33,11 +33,11 @@ export default async function PaymentManagement({
   }
 
   // Get paginated payments with caching
-  const {
-    payments,
-    totalCount,
-    totalPages,
-  } = await getPaginatedPayments(user, page, pageSize)
+  const { payments, totalCount, totalPages } = await getPaginatedPayments(
+    user,
+    page,
+    pageSize
+  )
 
   if (!payments) {
     return <div>Error loading payments</div>
@@ -102,10 +102,18 @@ export default async function PaymentManagement({
                         {payment.user?.name || payment.user?.email || '-'}
                       </td>
                       <td className="px-4 py-3">
-                        {startDate.toLocaleDateString('en-GB')}
+                        {startDate.toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
                       </td>
                       <td className="px-4 py-3">
-                        {endDate.toLocaleDateString('en-GB')}
+                        {endDate.toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
                       </td>
                       <td className="px-4 py-3">
                         {payment.type === 'Membership'

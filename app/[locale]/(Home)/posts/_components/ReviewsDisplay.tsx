@@ -10,7 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Star, Search, Filter, Trash2, Edit, Image as ImageIcon } from 'lucide-react'
+import {
+  Star,
+  Search,
+  Filter,
+  Trash2,
+  Edit,
+  Image as ImageIcon,
+} from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { FiEdit2 } from 'react-icons/fi'
 import axios from 'axios'
@@ -25,7 +32,10 @@ import { ReviewRating } from '@prisma/client'
 import { useTranslation } from 'react-i18next'
 import useDebounce from '@/hooks/useDebounce'
 import Image from 'next/image'
-import { convertReviewRatingToNumber, NUMBER_TO_RATING_MAP } from '@/lib/utils/ratingUtils'
+import {
+  convertReviewRatingToNumber,
+  NUMBER_TO_RATING_MAP,
+} from '@/lib/utils/ratingUtils'
 
 interface ReviewsDisplayProps {
   currentPage: number
@@ -47,18 +57,18 @@ interface Event {
 
 const generateRandomNumber = (id: string) => {
   // Create a simple hash from the ID string
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < id.length; i++) {
-    const char = id.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    const char = id.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
   }
-  
+
   // Convert to positive number and get 4 digits (1000-9999)
-  const positiveHash = Math.abs(hash);
-  const fourDigitNumber = (positiveHash % 9000) + 1000;
-  
-  return fourDigitNumber.toString();
+  const positiveHash = Math.abs(hash)
+  const fourDigitNumber = (positiveHash % 9000) + 1000
+
+  return fourDigitNumber.toString()
 }
 
 const ReviewsDisplay = ({
@@ -464,10 +474,12 @@ const ReviewsDisplay = ({
             <span className="ml-2">{t('filteredResults')} </span>
             <span className="ml-2 font-semibold">
               {t('averageRating')}:{' '}
-              {(reviews.reduce(
-                (acc, review) => acc + ratingEnumToNumber(review.rating),
-                0
-              ) / reviews.length).toFixed(1)}
+              {(
+                reviews.reduce(
+                  (acc, review) => acc + ratingEnumToNumber(review.rating),
+                  0
+                ) / reviews.length
+              ).toFixed(1)}
             </span>
           </>
         )}
@@ -511,7 +523,9 @@ const ReviewsDisplay = ({
                               }`}
                               onClick={() => {
                                 setEditRating(
-                                  NUMBER_TO_RATING_MAP[star as keyof typeof NUMBER_TO_RATING_MAP]
+                                  NUMBER_TO_RATING_MAP[
+                                    star as keyof typeof NUMBER_TO_RATING_MAP
+                                  ]
                                 )
                               }}
                             />
@@ -545,7 +559,9 @@ const ReviewsDisplay = ({
 
                       {/* Image Upload/Remove */}
                       <div className="space-y-2">
-                        <span className="text-sm font-medium">Image (Optional)</span>
+                        <span className="text-sm font-medium">
+                          Image (Optional)
+                        </span>
                         <div className="flex flex-col items-center">
                           <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
                             {editImagePreview ? (
@@ -573,7 +589,9 @@ const ReviewsDisplay = ({
                                 <p className="text-sm font-medium text-gray-600">
                                   Add Photo
                                 </p>
-                                <p className="text-xs text-gray-500">Optional</p>
+                                <p className="text-xs text-gray-500">
+                                  Optional
+                                </p>
                               </div>
                             )}
                             <input
@@ -585,7 +603,9 @@ const ReviewsDisplay = ({
                             />
                           </label>
                           {isEditImageLoading && (
-                            <p className="mt-2 text-sm text-blue-500">Uploading...</p>
+                            <p className="mt-2 text-sm text-blue-500">
+                              Uploading...
+                            </p>
                           )}
                           {editImagePreview && (
                             <Button
@@ -641,8 +661,8 @@ const ReviewsDisplay = ({
                       {/* Review Image */}
                       {review.imageLink && (
                         <div className="mb-3 flex justify-center">
-                          <div 
-                            className="relative h-48 w-full max-w-sm overflow-hidden rounded-lg border border-gray-200 cursor-pointer transition-transform hover:scale-105"
+                          <div
+                            className="relative h-48 w-full max-w-sm cursor-pointer overflow-hidden rounded-lg border border-gray-200 transition-transform hover:scale-105"
                             onClick={() => openImageModal(review.imageLink!)}
                           >
                             <Image
@@ -653,8 +673,8 @@ const ReviewsDisplay = ({
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
                             {/* Click indicator overlay */}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
-                              <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-2">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 hover:bg-opacity-10">
+                              <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 hover:opacity-100">
                                 <Search className="h-5 w-5 text-gray-700" />
                               </div>
                             </div>
@@ -664,7 +684,15 @@ const ReviewsDisplay = ({
 
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
-                          {t('by')} {review.anonymous ? t('anonymous') + ' ' + generateRandomNumber(review.id) : review.user?.name || t('anonymous') + ' ' + generateRandomNumber(review.id)} 
+                          {t('by')}{' '}
+                          {review.anonymous
+                            ? t('anonymous') +
+                              ' ' +
+                              generateRandomNumber(review.id)
+                            : review.user?.name ||
+                              t('anonymous') +
+                                ' ' +
+                                generateRandomNumber(review.id)}
                         </span>
                         <div className="flex items-center gap-2">
                           <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-gray-200">
@@ -690,7 +718,14 @@ const ReviewsDisplay = ({
                           </div>
                         </div>
                         <span>
-                          {new Date(review.updatedAt).toLocaleDateString()}
+                          {new Date(review.updatedAt).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            }
+                          )}
                         </span>
                       </div>
                     </>
@@ -753,23 +788,23 @@ const ReviewsDisplay = ({
 
       {/* Image Modal */}
       {modalImageUrl && (
-          <div
-            className="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-0 m-0 [margin-top:0!important]"
-            onClick={handleModalOverlayClick}
-          >
+        <div
+          className="fixed inset-0 z-[90] m-0 flex items-center justify-center bg-black/80 p-0 [margin-top:0!important]"
+          onClick={handleModalOverlayClick}
+        >
           <div className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-lg">
             <Image
               src={modalImageUrl}
               alt="Review image full size"
               width={800}
               height={600}
-              className="h-auto w-auto max-h-[90vh] max-w-[90vw] object-contain"
+              className="h-auto max-h-[90vh] w-auto max-w-[90vw] object-contain"
               sizes="90vw"
             />
             {/* Close button */}
             <button
               onClick={closeImageModal}
-              className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 hover:bg-opacity-100 transition-all duration-200"
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 transition-all duration-200 hover:bg-opacity-100"
             >
               ✕
             </button>

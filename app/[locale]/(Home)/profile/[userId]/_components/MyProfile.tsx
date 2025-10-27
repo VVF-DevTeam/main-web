@@ -14,7 +14,6 @@ import {
 import SmsOtpVerificationPopover from './SmsOtpVerificationPopover'
 import { UserInfoProps } from '@/lib/types/userInfo'
 
-
 type PaymentHistoryItem = {
   id: string
   pricePaid: Decimal
@@ -57,7 +56,6 @@ const MyProfile = async ({
   const { t } = await initTranslation(locale, ['profile'])
 
   return (
-    
     <div className="min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
@@ -103,10 +101,13 @@ const MyProfile = async ({
                   {user.phone || 'N/A'}
                 </span>
                 <span>
-                  {user.phone &&
-                    (!user.phoneVerified && (
-                      <SmsOtpVerificationPopover phoneNumber={user.phone} userId={user.id}/>
-                    )) || null}
+                  {(user.phone && !user.phoneVerified && (
+                    <SmsOtpVerificationPopover
+                      phoneNumber={user.phone}
+                      userId={user.id}
+                    />
+                  )) ||
+                    null}
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -182,10 +183,18 @@ const MyProfile = async ({
                                 )}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                {startDate.toLocaleDateString('en-GB')}
+                                {startDate.toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                {endDate.toLocaleDateString('en-GB')}
+                                {endDate.toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {payment.type === 'Membership'
