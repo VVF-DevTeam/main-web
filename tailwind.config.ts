@@ -100,6 +100,7 @@ export default {
           brand: 'hsl(var(--brand-color))',
           brandLight: 'hsl(var(--brand-color-light))',
           brandLighter: 'hsl(var(--brand-color-lighter))',
+          brandLightest: 'hsl(var(--brand-color-lightest))',
           brandDark: 'hsl(var(--brand-color-dark))',
           gray: 'hsl(var(--background-gray))',
           grayLight: 'hsl(var(--background-gray-light))',
