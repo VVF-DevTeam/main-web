@@ -93,21 +93,18 @@ export default function PaymentPagination({
     return pages
   }, [currentPage, totalPages])
 
-  const hoverClasses = useMemo(() => {
-    return 'hover:bg-bgColor-brandLighter transition-colors duration-200'
-  }, [])
-
   if (totalPages <= 1) return null
 
   return (
     <div className="flex flex-col items-center gap-4">
       {showPageInfo && totalItems != null && (
         <div className="text-sm text-muted-foreground">
-          Showing page {currentPage} of {totalPages} ({totalItems} total records)
+          Showing page {currentPage} of {totalPages} ({totalItems} total
+          records)
         </div>
       )}
 
-      <Pagination className={cn(isPending && 'opacity-50 pointer-events-none')}>
+      <Pagination className={cn(isPending && 'pointer-events-none opacity-50')}>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
@@ -117,8 +114,9 @@ export default function PaymentPagination({
                 if (!isFirstPage) handlePageChange(currentPage - 1)
               }}
               className={cn(
-                hoverClasses,
-                isFirstPage && 'opacity-50 cursor-not-allowed pointer-events-none'
+                'hover:bg-bgColor-brand400 transition-colors duration-200',
+                isFirstPage &&
+                  'pointer-events-none cursor-not-allowed opacity-50'
               )}
               aria-disabled={isFirstPage}
               aria-label={`Go to page ${currentPage - 1}`}
@@ -146,7 +144,10 @@ export default function PaymentPagination({
                     e.preventDefault()
                     handlePageChange(pageNum)
                   }}
-                  className={cn(hoverClasses, isActive && 'cursor-default')}
+                  className={cn(
+                    'hover:bg-bgColor-brand400 transition-colors duration-200',
+                    isActive && 'cursor-default'
+                  )}
                   aria-label={`Go to page ${pageNum}`}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -164,8 +165,9 @@ export default function PaymentPagination({
                 if (!isLastPage) handlePageChange(currentPage + 1)
               }}
               className={cn(
-                hoverClasses,
-                isLastPage && 'opacity-50 cursor-not-allowed pointer-events-none'
+                'hover:bg-bgColor-brand400 transition-colors duration-200',
+                isLastPage &&
+                  'pointer-events-none cursor-not-allowed opacity-50'
               )}
               aria-disabled={isLastPage}
               aria-label={`Go to page ${currentPage + 1}`}
@@ -176,5 +178,3 @@ export default function PaymentPagination({
     </div>
   )
 }
-
-

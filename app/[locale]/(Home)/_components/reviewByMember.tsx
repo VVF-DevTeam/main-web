@@ -14,7 +14,7 @@ interface ReviewByMemberProps {
 }
 
 const AVATAR_PLACEHOLDER =
-  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab&sz=w2000'
+  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab'
 
 const ReviewCard: React.FC<{
   name?: string | null
@@ -43,15 +43,16 @@ const ReviewCard: React.FC<{
   const commentTooLong = comment && comment.length > 230
 
   return (
-    <div className="w-[350px] md:w-auto md:max-w-[360px] h-[230px] rounded-2xl bg-[#FAECEF] px-10 py-4 text-[#486284] shadow-sm overflow-hidden">
+    <div className="h-[230px] w-[350px] overflow-hidden rounded-2xl bg-bgColor-secondary400 px-10 py-4 text-textColor-black shadow-sm md:w-auto md:max-w-[360px]">
       <div className="flex items-center gap-3">
-        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-white/70">
+        <div className="relative shrink-0 overflow-hidden rounded-full">
           <Image
             src={avatarUrl || AVATAR_PLACEHOLDER}
             alt={`${name}'s avatar`}
-            fill
-            sizes="36px"
-            className="object-cover"
+            width={36}
+            height={36}
+            className="h-9 w-9 object-cover rounded-full"
+            loading="lazy"
           />
         </div>
 
@@ -70,9 +71,13 @@ const ReviewCard: React.FC<{
       <p className="mt-4 text-base">
         {commentTooLong ? comment.slice(0, 210) + '...' : comment}
         {commentTooLong && (
-          <Link href={`/posts?redirectToReviewsSection=true`} rel="noopener noreferrer" target="_blank">
+          <Link
+            href={`/posts?redirectToReviewsSection=true`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             (
-            <span className="underline hover:text-bgColor-brand">
+            <span className="underline hover:text-bgColor-brand900">
               Read more
             </span>
             )
@@ -95,21 +100,17 @@ const ReviewByMember = ({ locale, reviews }: ReviewByMemberProps) => {
 
   return (
     <div className="flex flex-col gap-y-5">
-      <h2 className="header-main text-center font-bold">
+      <h2 className="web_h1 text-center">
         {t('trusted-by-our-members')}
       </h2>
-      <h3 className="body-large text-center">
-        {t('plan-ahead')}
-      </h3>
-      <div className="flex flex-col gap-y-3 md:mx-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-10 pt-5 justify-center items-center">
+      <h3 className="web-body-regular text-center">{t('review-motto')}</h3>
+      <div className="flex flex-col items-center justify-center gap-10 gap-y-3 pt-5 md:mx-auto md:grid md:grid-cols-2 lg:grid-cols-3">
         {currentReviews.map((review) => (
           <ReviewCard
             key={review.id}
             name={review.user?.name}
             // try event date, createdAt, or updatedAt for display
-            date={
-              review.createdAt || review.updatedAt || null
-            }
+            date={review.createdAt || review.updatedAt || null}
             comment={review.comment}
             // if you store user avatar, use it; otherwise placeholder stays
             avatarUrl={review.user?.image || null}
@@ -126,7 +127,7 @@ const ReviewByMember = ({ locale, reviews }: ReviewByMemberProps) => {
             disabled={pageNumber === i + 1}
           >
             <div
-              className={`h-[18px] w-[18px] rounded-full ${pageNumber === i + 1 ? 'bg-bgColor-brand' : 'bg-gray-300'}`}
+              className={`h-[18px] w-[18px] rounded-full ${pageNumber === i + 1 ? 'bg-bgColor-brand900' : 'bg-gray-300'}`}
             />
           </button>
         ))}

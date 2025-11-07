@@ -13,7 +13,7 @@ const directors = [
     description: 'description-TrongNguyen',
     bio: 'bio-TrongNguyen',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u&sz=w1000',
+      'https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u',
     name: 'Trong Nguyen',
     title: 'Founder/CEO',
   },
@@ -22,7 +22,7 @@ const directors = [
     description: 'description-EattleNguyen',
     bio: 'bio-EattleNguyen',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1gwyOUEkQwoHVOk-pPt1WiV_rHKhirFRT&sz=w1000',
+      'https://drive.google.com/thumbnail?id=1gwyOUEkQwoHVOk-pPt1WiV_rHKhirFRT',
     name: 'Eattle Nguyen',
     title: 'Co-Founder/CMO',
   },
@@ -31,7 +31,7 @@ const directors = [
     description: 'description-DaoNguyen',
     bio: 'bio-DaoNguyen',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1d_6JXNRDej68-yl_4piUdXe47jTlD71p&sz=w1000',
+      'https://drive.google.com/thumbnail?id=1d_6JXNRDej68-yl_4piUdXe47jTlD71p',
     name: 'Dao Nguyen',
     title: 'CPO',
   },
@@ -40,7 +40,7 @@ const directors = [
     description: 'description-KhaiHung',
     bio: 'bio-KhaiHung',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1mmoqu-ALmc7mJ1ZmY9_Srfcb1AZD-0eh&sz=w1000',
+      'https://drive.google.com/thumbnail?id=1mmoqu-ALmc7mJ1ZmY9_Srfcb1AZD-0eh',
     name: 'Khai Hung Luong',
     title: 'CTO',
   },
@@ -49,7 +49,7 @@ const directors = [
     description: 'description-LunaNguyen',
     bio: 'bio-LunaNguyen',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn&sz=w1000',
+      'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn',
     name: 'Luna Nguyen',
     title: 'CHRO',
   },
@@ -61,7 +61,7 @@ const honoraryMembers = [
     description: 'description-AndyNguyen',
     bio: 'bio-AndyNguyen',
     imageUrl:
-      'https://drive.google.com/thumbnail?id=1sx23QaUry-Ed6yJ-whOrOKd4H3_rb0MJ&sz=w1000',
+      'https://drive.google.com/thumbnail?id=1sx23QaUry-Ed6yJ-whOrOKd4H3_rb0MJ',
     name: 'Andy Nguyen',
     title: 'Supervisor',
   },
@@ -80,10 +80,10 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
   return (
     <div className="flex-col-center py-20">
       {/* Header */}
-      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+      <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
         {t('header-directors-aboutUs')}
       </h1>
-      <Separator className="mb-10 w-2/3 bg-bgColor-brandDark lg:w-1/2" />
+      <Separator className="mb-10 w-2/3 bg-bgColor-brandDark900 lg:w-1/2" />
 
       {/* Directors */}
       <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
@@ -94,9 +94,9 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
       {/* Honorary Members */}
       <div className="flex-center px-6 py-14">
-        <h1 className="header-sub header-font-default mb-10 text-3xl italic text-textColor-brandDark lg:text-5xl">
+        <h1 className="header-sub header-font-default mb-10 text-3xl italic text-textColor-brandDark900 lg:text-5xl">
           {t('header-honorableMention-aboutUs')}
-          <Separator className="mt-2 bg-bgColor-brandDark" />
+          <Separator className="mt-2 bg-bgColor-brandDark900" />
         </h1>
       </div>
       <div className="width-max-default mx-auto flex flex-col gap-y-20 p-6 md:p-12 lg:gap-y-32 lg:p-16">
@@ -111,7 +111,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
       {/* All other members */}
       <div className="flex-col-center px-6 py-14 md:w-2/3">
-        <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark">
+        <p className="pb-5 text-center text-3xl font-bold italic text-textColor-brandDark900">
           {t('header-allmembers')}
         </p>
 

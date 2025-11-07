@@ -19,7 +19,7 @@ const EventCalendar = async ({ events, locale }: EventCalendarProps) => {
 
   return (
     <div className="my-10 flex w-full flex-col items-center gap-y-6 xl:mt-20 xl:gap-y-12">
-      <h2 className="header-main text-center">
+      <h2 className="web_h1 text-center">
         {t('event-calendar')}
       </h2>
       <ViewSelector

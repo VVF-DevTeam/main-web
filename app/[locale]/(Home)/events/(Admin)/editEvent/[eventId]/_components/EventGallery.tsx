@@ -30,12 +30,12 @@ function getValidImageUrl(url: string): string | null {
     // File link
     const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
     if (fileMatch && fileMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}&sz=w2000`
+      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}`
     }
     // Thumbnail link
     const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
     if (idMatch && idMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w2000`
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}`
     }
     // Folder link (not supported)
     if (url.includes('/folders/')) {
@@ -126,7 +126,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-bgColor-grayLight px-4 py-6">
+    <div className="flex flex-col gap-y-4 rounded-md bg-bgColor-gray300 px-4 py-6">
       <div className="flex flex-col gap-y-4">
         {/* Notification for Google Drive only */}
         <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">
@@ -136,7 +136,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
           <span className="font-mono text-xs">
             https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
             <br/> 
-            https://drive.google.com/thumbnail?id=FILE_ID&sz=w1000 (refer above)
+            https://drive.google.com/thumbnail?id=FILE_ID (refer above)
           </span>
         </div>
         {galleryImages.map((imageUrl, index) => (
@@ -173,7 +173,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
                 return (
                   <div
                     key={index}
-                    className="relative flex aspect-square items-center justify-center rounded-md bg-bgColor-grayLight"
+                    className="relative flex aspect-square items-center justify-center rounded-md bg-bgColor-gray300"
                   >
                     {validUrl ? (
                       <Image

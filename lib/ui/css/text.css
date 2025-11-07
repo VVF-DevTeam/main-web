@@ -1,10 +1,58 @@
 /* Below are some utility functions for text */
 
-/* text size */  
-.body-large {
+/* text size */
+/* header */
+
+/* Headers (Lato) */
+.web_h1 {
+  /* font-family: var(--font-lato); */
+  @apply text-[36px] font-[900] leading-[40px] sm:text-[48px] sm:leading-[56px];
+}
+
+.web_h2 {
+  /* font-family: var(--font-lato); */
+  @apply sm:text-[36px] text-[28px] font-bold sm:leading-[44px] leading-[36px];
+}
+
+.web_h3 {
+  /* font-family: var(--font-lato); */
+  @apply sm:text-[28px] text-[24px] font-bold sm:leading-[36px] leading-[32px];
+}
+
+.web_h4 {
+  /* font-family: var(--font-lato); */
+  @apply sm:text-[24px] text-[20px] font-semibold sm:leading-[32px] leading-[28px];
+}
+
+.web_h5 {
+  /* font-family: var(--font-lato); */
+  @apply sm:text-[20px] text-[16px] font-semibold sm:leading-[28px] leading-[24px];
+}
+
+.web_h6 {
+  /* font-family: var(--font-lato); */
+  @apply text-[16px] font-semibold leading-[24px];
+}
+
+/* Body & Links (Be Vietnam Pro) */
+
+.web-body-large {
   @apply text-[20px] leading-[28px];
 }
 
-.button-bold {
-  @apply font-bold text-[16px] leading-[24px];
+.web-body-regular {
+  @apply text-[16px] leading-[24px];
+}
+
+.web-body-small {
+  @apply text-[14px] leading-[20px];
+}
+
+.web-button-bold {
+  font-family: var(--font-lato);
+  @apply text-[16px] font-bold leading-[24px];
+}
+
+.web-link-1 {
+  @apply text-[12px] leading-[18px];
 }

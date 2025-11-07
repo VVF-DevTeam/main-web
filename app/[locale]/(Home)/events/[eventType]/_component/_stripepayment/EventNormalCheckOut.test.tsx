@@ -418,7 +418,7 @@ describe('EventNormalCheckOut', () => {
 
     const membershipLink = screen.getByText('membership')
     expect(membershipLink).toHaveAttribute('href', '/registration/membership')
-    expect(membershipLink).toHaveClass('text-blue-500', 'hover:underline')
+    expect(membershipLink).toHaveClass('text-textColor-blue', 'hover:underline')
   })
 
   test('renders correctly for Concert type events', async () => {

@@ -53,10 +53,10 @@ const ViewSelector = ({ events, locale }: ViewSelectorProps) => {
             <button
               key={v}
               onClick={() => setView(v as 'Day' | 'Week' | 'Month')}
-              className={`border px-4 py-2 transition ${
+              className={`border px-4 py-2 transition rounded-s ${
                 view === v
-                  ? 'bg-bgColor-brand text-textColor-white'
-                  : 'bg-bgColor-white text-textColor-gray hover:bg-bgColor-gray/20'
+                  ? 'bg-bgColor-brand900 text-textColor-white'
+                  : 'bg-bgColor-white hover:bg-bgColor-gray500'
               }`}
             >
               {t(v)}

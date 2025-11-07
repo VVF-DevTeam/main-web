@@ -67,7 +67,7 @@ const ConcertDescriptions = async ({
     : null
 
   return (
-    <div className="w-full bg-bgColor-brandDark py-16 text-white">
+    <div className="w-full bg-bgColor-brandDark900 py-16 text-white">
       <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
         {/* Event Info Section */}
         <div className="grid w-full gap-8 md:grid-cols-2">

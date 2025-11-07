@@ -50,11 +50,10 @@ const PostListHorizontal = async ({
     return daysDiff <= 30
   }
 
-
   return (
     <div
-      className={`flex w-full flex-col items-center gap-y-5 py-10 xl:pt-20 ${
-        fromHomePage ? '-mt-12 bg-[#FEFAF4]' : ''
+      className={`flex w-full flex-col items-center gap-y-5 py-10 md:py-[60px] ${
+        fromHomePage ? '-mt-12' : ''
       }`}
     >
       {/* Top Border - 80% width */}
@@ -64,10 +63,12 @@ const PostListHorizontal = async ({
 
       {/* Header */}
       {fromHomePage && (
-        <div className="text-center">
-          <h2 className="header-main mb-2">{t('articles')}</h2>
-          <p className="text-base md:text-lg">{t('postHomepageDescription')}</p>
-        </div>
+        <>
+          <h2 className="web_h1 text-center">{t('articles')}</h2>
+          <p className="web-body-regular text-center">
+            {t('postHomepageDescription')}
+          </p>
+        </>
       )}
 
       {/* Posts Grid */}
@@ -97,7 +98,7 @@ const PostListHorizontal = async ({
         <div className="mx-auto p-4">
           <div className="flex items-center gap-x-2">
             <Image
-              src="https://drive.google.com/thumbnail?id=1KOA45MZfxUJyqGmNMO7x00U-bYXHJmaU&sz=w1000"
+              src="https://drive.google.com/thumbnail?id=1KOA45MZfxUJyqGmNMO7x00U-bYXHJmaU"
               alt="Penguin icon"
               width={50}
               height={50}

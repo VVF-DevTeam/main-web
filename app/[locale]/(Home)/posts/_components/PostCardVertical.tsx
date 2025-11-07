@@ -69,17 +69,17 @@ const PostCardVertical = ({
       {/* Content Section */}
       <div className="flex flex-1 flex-col gap-y-3 px-6 py-5">
         {/* Title */}
-        <h2 className="line-clamp-2 h-[3.5rem] text-xl font-semibold tracking-wide">
+        <h2 className="web_h5 line-clamp-2 h-[3.5rem]">
           {title}
         </h2>
 
         {/* Summary */}
-        <p className="line-clamp-2 flex-1 text-sm text-textColor-gray md:text-base">
+        <p className="web-body-regular line-clamp-2 flex-1 text-[#676767]">
           {summary}
         </p>
 
         {/* Date */}
-        <p className="text-xs text-muted-foreground md:text-sm">
+        <p className="web-body-small text-[#666667]">
           {createdAt.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -110,9 +110,9 @@ const PostCardVertical = ({
         <Link href={`posts/${id}`} className="mt-auto">
           <Button
             variant={'ghost'}
-            className="group/link flex items-center gap-x-2 place-self-end p-0 text-[#C41E3A] hover:text-[#A01829]"
+            className="group/link flex items-center gap-x-2 place-self-end p-0 text-textColor-brand900 hover:text-[#A01829]"
           >
-            <span className="button-bold">Read More</span>
+            <span className="web-button-bold">Read More</span>
             <ArrowUpRight className="h-4 w-4 transition-transform duration-200 ease-in group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
           </Button>
         </Link>

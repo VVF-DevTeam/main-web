@@ -21,7 +21,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
       {/* <div className="white-overlay"></div>
       <Image
-        src="https://drive.google.com/thumbnail?id=18KrAvZmI1kaoe16AjXSp_6cKC3GZXl4v&sz=w1000"
+        src="https://drive.google.com/thumbnail?id=18KrAvZmI1kaoe16AjXSp_6cKC3GZXl4v"
         alt="Intro"
         className="next-background object-top"
         fill
@@ -40,7 +40,7 @@ const Navbar = async ({ locale }: { locale: string }) => {
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="flex-center gap-x-[5px] text-textColor transition-all hover:text-textColor-brand"
+              className="flex-center gap-x-[5px] text-textColor transition-all hover:text-textColor-brand900"
               href={`/profile/${session?.user?.name}`}
               aria-label="Go to user profile"
             >

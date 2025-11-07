@@ -62,7 +62,7 @@ const JobDescription = ({ job }: JobDescriptionProps) => {
           onClick={() => setEditing(!editing)}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-textColor-brand hover:text-slate-700'
+            !editing && 'text-textColor-brand900 hover:text-slate-700'
           )}
         >
           {editing ? (

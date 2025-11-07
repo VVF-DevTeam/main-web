@@ -59,7 +59,7 @@ export default function SubscriptionInfo({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b pb-4">
-            <span className="text-textColor-gray">{t('current-plan')}</span>
+            <span className="text-textColor-gray500">{t('current-plan')}</span>
             <span className="font-medium">
               {activeSubscription ? (
                 <p className="text-textColor-green">{t('active')}</p>
@@ -72,7 +72,7 @@ export default function SubscriptionInfo({
           {activeSubscription && (
             <>
               <div className="flex items-center justify-between border-b pb-4">
-                <span className="text-textColor-gray">{t('expires-at')}</span>
+                <span className="text-textColor-gray500">{t('expires-at')}</span>
                 <span className="font-medium">
                   {format(
                     new Date(activeSubscription.expiresAt as Date),
@@ -81,7 +81,7 @@ export default function SubscriptionInfo({
                 </span>
               </div>
               <div className="flex items-center justify-between border-b pb-4">
-                <span className="text-textColor-gray">{t('plan-type')}</span>
+                <span className="text-textColor-gray500">{t('plan-type')}</span>
                 <span className="font-medium">
                   {activeSubscription &&
                     getSubscriptionType(
@@ -93,7 +93,7 @@ export default function SubscriptionInfo({
               <CancelSubscriptionButton
                 subscriptionId={user.stripeSubscriptionId}
               />
-              <p className="text-textColor-gray italic text-sm">
+              <p className="text-textColor-gray500 italic text-sm">
                 *{t('cancel-subscription-description')}
               </p>
             </>
@@ -113,16 +113,16 @@ export default function SubscriptionInfo({
                 className="flex items-center justify-between border-b pb-4 last:border-0"
               >
                 <div>
-                  <p className="text-sm text-textColor-gray">
+                  <p className="text-sm text-textColor-gray500">
                     {format(new Date(payment.createdAt), 'PPP')}
                   </p>
-                  <p className="text-sm text-textColor-gray">
+                  <p className="text-sm text-textColor-gray500">
                     - {format(new Date(payment.expiresAt as Date), 'PPP')}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">${payment.pricePaid.toString()}</p>
-                  <p className="text-sm text-textColor-gray">{payment.type}</p>
+                  <p className="text-sm text-textColor-gray500">{payment.type}</p>
                 </div>
               </div>
             ) : null

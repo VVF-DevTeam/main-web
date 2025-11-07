@@ -121,7 +121,7 @@ function AvailabilitySelector({
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="text-xs text-textColor-gray sm:text-sm">
+      <div className="text-xs text-textColor-gray500 sm:text-sm">
         {t('host-availability-header')}
       </div>
 
@@ -133,7 +133,7 @@ function AvailabilitySelector({
           disabled={!canGoPrev}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
             canGoPrev
-              ? 'border-gray-300 text-textColor-gray hover:bg-bgColor-grayLight/50'
+              ? 'border-gray-300 text-textColor-gray500 hover:bg-bgColor-gray100'
               : 'cursor-not-allowed border-gray-200 text-textColor-gray/50'
           }`}
         >
@@ -151,7 +151,7 @@ function AvailabilitySelector({
           disabled={!canGoNext}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
             canGoNext
-              ? 'border-gray-300 text-textColor-gray hover:bg-bgColor-grayLight/50'
+              ? 'border-gray-300 text-textColor-gray500 hover:bg-bgColor-gray100'
               : 'cursor-not-allowed border-gray-200 text-textColor-gray/50'
           }`}
         >
@@ -163,7 +163,7 @@ function AvailabilitySelector({
       <div className="overflow-x-auto">
         <div className="bg-bgColor-white relative grid min-w-[800px] grid-cols-[100px_repeat(7,_1fr)] rounded-lg border border-gray-300">
           {/* Header Row */}
-          <div className="text-textColor-black border-r bg-bgColor-grayLight py-3 text-center text-sm font-bold">
+          <div className="text-textColor-black border-r bg-bgColor-gray300 py-3 text-center text-sm font-bold">
             {t('time', { ns: 'event' })}
           </div>
           {days.map((day, idx) => {
@@ -176,12 +176,12 @@ function AvailabilitySelector({
                 className={`border-l py-3 text-center text-sm font-bold ${
                   isPastDay
                     ? 'bg-gray-100/70 text-gray-400'
-                    : 'text-textColor-black bg-bgColor-grayLight'
+                    : 'text-textColor-black bg-bgColor-gray300'
                 }`}
               >
                 <div>{t(day, { ns: 'event' })}</div>
                 <div
-                  className={`text-xs ${isPastDay ? 'text-gray-400' : 'text-textColor-gray'}`}
+                  className={`text-xs ${isPastDay ? 'text-gray-400' : 'text-textColor-gray500'}`}
                 >
                   {format(addDays(weekStart, idx), 'd')}
                 </div>
@@ -192,7 +192,7 @@ function AvailabilitySelector({
           {/* Time rows */}
           {times.map((time, rowIdx) => (
             <React.Fragment key={`time-row-${rowIdx}`}>
-              <div className="flex h-12 items-center border-r border-t p-2 text-right text-sm text-textColor-gray">
+              <div className="flex h-12 items-center border-r border-t p-2 text-right text-sm text-textColor-gray500">
                 {time}
               </div>
               {days.map((day, colIdx) => {
@@ -207,12 +207,12 @@ function AvailabilitySelector({
                     className={`relative h-12 border-l border-t transition-colors ${
                       isPastDay
                         ? 'cursor-not-allowed bg-gray-100/50'
-                        : 'cursor-pointer hover:bg-bgColor-grayLight/50'
+                        : 'cursor-pointer hover:bg-bgColor-gray100'
                     }`}
                     onClick={() => toggle(colIdx, time)}
                   >
                     {isSelected && !isPastDay && (
-                      <div className="absolute inset-2 rounded-md bg-bgColor-brand shadow-sm" />
+                      <div className="absolute inset-2 rounded-md bg-bgColor-brand900 shadow-sm" />
                     )}
                     {/* Visual feedback for selection */}
                     {isSelected && !isPastDay && (
@@ -234,7 +234,7 @@ function AvailabilitySelector({
 
       {/* Selected Availability Summary */}
       {Object.keys(value).length > 0 && (
-        <div className="mt-6 rounded-lg bg-bgColor-grayLight/30 p-4">
+        <div className="mt-6 rounded-lg bg-bgColor-gray100 p-4">
           <h3 className="text-textColor-black mb-3 text-sm font-semibold">
             {t('host-availability-summary')}
           </h3>
@@ -249,7 +249,7 @@ function AvailabilitySelector({
                 }).format(date)
                 const formattedDate = format(date, 'MM-dd-yyyy')
                 return (
-                  <div key={dateStr} className="text-sm text-textColor-gray">
+                  <div key={dateStr} className="text-sm text-textColor-gray500">
                     <span className="text-textColor-black font-medium capitalize">
                       {t(dayName)} ({formattedDate}):
                     </span>{' '}
@@ -258,7 +258,7 @@ function AvailabilitySelector({
                 )
               })}
             {Object.values(value).every((slots) => slots.length === 0) && (
-              <p className="text-sm italic text-textColor-gray">
+              <p className="text-sm italic text-textColor-gray500">
                 {t('host-availability-summary-empty')}
               </p>
             )}

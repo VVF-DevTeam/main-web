@@ -236,7 +236,7 @@ const EditEventPage = async ({
               <Link
                 href="/events/createEventCategory"
                 target="_blank"
-                className="text-blue-700 underline"
+                className="text-textColor-blue underline"
               >
                 here
               </Link>

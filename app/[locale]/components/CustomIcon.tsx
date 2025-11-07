@@ -23,6 +23,7 @@ const CustomIcon = ({
       height={width}
       priority
       className={`${color === 'white' ? 'invert' : ''} duration-300 transition-all hover:brightness-110 hover:contrast-125 hover:drop-shadow-lg hover:scale-110 ${className}`}
+      unoptimized
     />
   )
 }

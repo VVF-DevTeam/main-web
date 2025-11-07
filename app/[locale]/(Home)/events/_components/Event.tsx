@@ -38,7 +38,7 @@ const Event = ({ day, location, thumbnail, end }: EventProps) => {
           {Boolean(end) ? 'Sold Out' : 'Buy Tickets'}
         </button>
       </div>
-      <Separator className="my-4 bg-bgColor-brandLight" />
+      <Separator className="my-4 bg-bgColor-brand600" />
     </div>
   )
 }

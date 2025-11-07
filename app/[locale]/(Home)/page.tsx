@@ -22,7 +22,7 @@ import { CachedPostItem } from '@/lib/actions/post/getPosts'
 
 // Actions
 import { getReviewsPaginated } from '@/lib/actions/review/reviewActions'
-import { convertStringToReviewRating } from '@/lib/utils/ratingUtils'
+import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 import { getPublishedEventsWithFilters } from '@/lib/actions/event/getEvent'
 import { getPublishedPostsByTitlePaginated } from '@/lib/actions/post/getPosts'
 
@@ -193,8 +193,6 @@ export default async function Home({
         title="header-finishedEvent"
         fromHomePage={true}
       />
-      <MembershipBenefits locale={locale} />
-
       <PostListHorizontal
         posts={posts}
         totalItems={posts.length}
@@ -202,6 +200,8 @@ export default async function Home({
         showStats={false}
         locale={locale}
       />
+
+      <MembershipBenefits locale={locale} />
 
       <RegisterDoubleSection locale={locale} />
       {/* <ImageCarousel autoSlide={true} locale={locale} /> */}

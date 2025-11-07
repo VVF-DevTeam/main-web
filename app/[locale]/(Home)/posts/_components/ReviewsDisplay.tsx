@@ -35,7 +35,7 @@ import Image from 'next/image'
 import {
   convertReviewRatingToNumber,
   NUMBER_TO_RATING_MAP,
-} from '@/lib/utils/ratingUtils'
+} from '@/lib/utilFunctions/ratingUtils'
 
 interface ReviewsDisplayProps {
   currentPage: number
@@ -398,7 +398,7 @@ const ReviewsDisplay = ({
               {t('filterByEvent')}
             </label>
             <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-              <SelectTrigger>
+              <SelectTrigger className="border border-input shadow-sm">
                 <SelectValue placeholder={t('allEvents') || ''} />
               </SelectTrigger>
               <SelectContent>
@@ -435,7 +435,7 @@ const ReviewsDisplay = ({
               {t('filterByRating')}
             </label>
             <Select value={selectedRating} onValueChange={setSelectedRating}>
-              <SelectTrigger>
+              <SelectTrigger className="border border-input shadow-sm">
                 <SelectValue placeholder={t('allRatings') || ''} />
               </SelectTrigger>
               <SelectContent>
@@ -603,7 +603,7 @@ const ReviewsDisplay = ({
                             />
                           </label>
                           {isEditImageLoading && (
-                            <p className="mt-2 text-sm text-blue-500">
+                            <p className="mt-2 text-sm text-textColor-blue">
                               Uploading...
                             </p>
                           )}
@@ -707,7 +707,7 @@ const ReviewsDisplay = ({
                             ) : (
                               <Image
                                 src={
-                                  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab&sz=w2000'
+                                  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab'
                                 }
                                 alt={review.user?.name || 'User'}
                                 className="h-full w-full object-cover"
@@ -739,7 +739,7 @@ const ReviewsDisplay = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditReview(review)}
-                        className="text-blue-600 hover:bg-blue-50 hover:text-blue-800"
+                        className="text-textColor-blue hover:bg-blue-50 hover:text-blue-800"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

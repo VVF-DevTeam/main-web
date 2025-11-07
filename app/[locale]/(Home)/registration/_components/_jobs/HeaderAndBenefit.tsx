@@ -18,10 +18,10 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
     <div className="flex-col-center gap-y-10 px-5 py-20 lg:gap-y-20">
     {/* Header */}
     <div className="flex-col-center">
-      <h1 className="header-sub mb-2 text-center text-textColor-brandDark lg:text-5xl">
+      <h1 className="header-sub mb-2 text-center text-textColor-brandDark900 lg:text-5xl">
         {t('header-benefits')}
       </h1>
-      <Separator className="w-[120%] bg-bgColor-brandDark" />
+      <Separator className="w-[120%] bg-bgColor-brandDark900" />
     </div>
 
     {/* Benefits */}
@@ -56,12 +56,12 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
             <div className="mt-2">
               <input type="checkbox" id="see-more-benefits" className="hidden peer" />
               <div className="peer-checked:hidden">
-                <label htmlFor="see-more-benefits" className="cursor-pointer text-blue-600 hover:text-blue-800 underline text-sm">
+                <label htmlFor="see-more-benefits" className="cursor-pointer text-textColor-blue hover:text-blue-800 underline text-sm">
                   {t('see-more')}
                 </label>
               </div>
               <div className="hidden peer-checked:block">
-                <label htmlFor="see-more-benefits" className="cursor-pointer text-blue-600 hover:text-blue-800 underline text-sm">
+                <label htmlFor="see-more-benefits" className="cursor-pointer text-textColor-blue hover:text-blue-800 underline text-sm">
                   {t('see-less')}
                 </label>
               </div>

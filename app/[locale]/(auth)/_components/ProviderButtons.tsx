@@ -16,6 +16,7 @@ const providers: { id: authType; icon: React.ReactNode }[] = [
         alt="Facebook"
         width={24}
         height={24}
+        unoptimized
       />
     ),
   },
@@ -37,7 +38,7 @@ const ProviderButtons = () => {
         <button
           key={id}
           type="button"
-          className="flex-center rounded-xl border-2 border-bgColor-brand/20 px-8 py-2 transition-colors duration-200 hover:border-bgColor-brand/60 hover:bg-bgColor-black/10 xl:px-10"
+          className="flex-center rounded-xl border-2 border-bgColor-gray300 px-8 py-2 transition-colors duration-200 hover:border-bgColor-gray100 hover:bg-bgColor-gray100 xl:px-10"
           onClick={() => onSubmit(id)}
           aria-label={`Sign in with ${id}`}
         >

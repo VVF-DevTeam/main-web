@@ -15,7 +15,7 @@ import {
   getReviewsPaginated,
   getPublishedEventsForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
-import { convertStringToReviewRating } from '@/lib/utils/ratingUtils'
+import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 // import { ReviewRating } from '@prisma/client'
 import ScrollToReviews from './_components/ScrollToReviews'
 interface PostsProps {
@@ -102,7 +102,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
           <div>
             <a
               href="#reviews-section"
-              className="inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline group"
+              className="inline-flex items-center gap-1 text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline group"
             >
               <span>Go to Reviews</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -141,12 +141,12 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/*Separator */}
-        <div className="h-px w-full bg-bgColor-gray/15" />
+        <div className="h-px w-full bg-bgColor-gray300" />
 
         {/* Posts */}
         <div className="flex-col-default md:grid md:grid-cols-[55%_45%]">
           {/* Posts */}
-          <div className="flex flex-col border-b border-bgColor-gray/15 md:border-b-0 md:border-r">
+          <div className="flex flex-col border-b border-bgColor-gray300 md:border-b-0 md:border-r">
             <Suspense
               key={`${title}-${currentPage}`}
               fallback={<PostsSkeleton />}
@@ -165,9 +165,9 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
                 <Link href="/posts/allPosts" className="group mb-2 py-6">
                   <Button
                     variant={'ghost'}
-                    className="flex-center gap-x-2 bg-bgColor-gray/15 p-6 text-textColor hover:bg-bgColor-gray/25 hover:text-textColor/90"
+                    className="flex-center gap-x-2 bg-bgColor-gray300 p-6 text-textColor-black hover:bg-bgColor-gray500"
                   >
-                    <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
+                    <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-x-[2px]" />
                     <span className="text-xl">{t('allPost')}</span>
                   </Button>
                 </Link>
@@ -200,7 +200,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/*Separator */}
-        <div className="h-px w-full bg-bgColor-gray/15" />
+        <div className="h-px w-full bg-bgColor-gray300" />
 
         {/* Reviews */}
         <div

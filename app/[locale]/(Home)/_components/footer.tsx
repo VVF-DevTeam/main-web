@@ -18,7 +18,7 @@ const Footer = async ({ locale }: { locale: string }) => {
       <div className="flex flex-col">
         <div className="flex w-[179px] gap-x-1 pb-5">
           <CustomIcon width={30} height={30} className="self-start" />
-          <div className="max-w-[200px] font-bold leading-tight text-textColor-brand">
+          <div className="max-w-[200px] font-bold leading-tight text-textColor-brand900">
             <span className="text-[27px]">VIET VIBE </span>
             <span className="text-[18px]">FOUNDATION</span>
           </div>
@@ -30,14 +30,15 @@ const Footer = async ({ locale }: { locale: string }) => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook Page"
-            className="hover:text-textColor-brandLight"
+            className="hover:text-textColor-brand600"
           >
             <Image
-              src="https://drive.google.com/thumbnail?id=19ChCw2pQZQcsuZTj3Xqys3FpaiATLhNA&sz=w100"
+              src="/icons/facebook-footer.png"
               alt="Facebook"
               width={33}
               height={33}
               className="rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]"
+              unoptimized
             />
           </a>
           <a
@@ -45,14 +46,15 @@ const Footer = async ({ locale }: { locale: string }) => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram Page"
-            className="hover:text-textColor-brandLight"
+            className="hover:text-textColor-brand600"
           >
             <Image
-              src="https://drive.google.com/thumbnail?id=1izDqs2xBbpcOy5qzl4J2lV-zXhB1mo0V&sz=w100"
+              src="/icons/instagram-footer.png"
               alt="Instagram"
               width={33}
               height={33}
               className="rounded-full shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]"
+              unoptimized
             />
           </a>
         </div>
@@ -64,13 +66,13 @@ const Footer = async ({ locale }: { locale: string }) => {
           <div className="flex gap-x-5">
             <Link
               href="/policy"
-              className="hover:text-textColor-brand hover:underline"
+              className="hover:text-textColor-brand900 hover:underline"
             >
               {t('footer-privacyPolicy')}
             </Link>
             <Link
               href="/policy"
-              className="hover:text-textColor-brand hover:underline"
+              className="hover:text-textColor-brand900 hover:underline"
             >
               {t('footer-termsOfService')}
             </Link>
@@ -90,14 +92,14 @@ const Footer = async ({ locale }: { locale: string }) => {
               <Link
                 key={index}
                 href={route.path}
-                className="hover:text-textColor-brandLight hover:underline"
+                className="hover:text-textColor-brand600 hover:underline"
               >
                 {t(route.label.toLowerCase() + '-footer')}
               </Link>
             ))}
             <Link
               href="/policy"
-              className="hover:text-textColor-brandLight hover:underline"
+              className="hover:text-textColor-brand600 hover:underline"
             >
               {t('policy-footer')}
             </Link>
@@ -129,7 +131,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook Page"
-                    className="hover:text-textColor-brandLight"
+                    className="hover:text-textColor-brand600"
                   >
                     <SiFacebook className="h-6 w-6" />
                   </a>
@@ -138,7 +140,7 @@ const Footer = async ({ locale }: { locale: string }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram Page"
-                    className="hover:text-textColor-brandLight"
+                    className="hover:text-textColor-brand600"
                   >
                     <SiInstagram className="h-6 w-6" />
                   </a>

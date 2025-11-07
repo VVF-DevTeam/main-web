@@ -39,7 +39,7 @@ export default function LanguageChanger() {
 
   return (
     <Select onValueChange={handleChange} value={currentLocale}>
-      <SelectTrigger>
+      <SelectTrigger className="hover:text-textColor-brand900">
         <SelectValue placeholder="Select a language" />
       </SelectTrigger>
       <SelectContent>

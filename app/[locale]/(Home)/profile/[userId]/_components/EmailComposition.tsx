@@ -411,7 +411,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
               <Button
                 type="submit"
                 disabled={loading}
-                className={loading ? 'bg-bgColor-brand' : ''}
+                className={loading ? 'bg-bgColor-brand900' : ''}
               >
                 {loading ? t('email-sending') : t('email-send')}
               </Button>

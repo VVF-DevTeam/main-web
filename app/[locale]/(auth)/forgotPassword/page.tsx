@@ -124,23 +124,23 @@ const ForgotPasswordPage = () => {
   }
 
   return (
-    <div className="flex-center relative min-h-screen bg-bgColor-brandLight">
+    <div className="flex-center relative min-h-screen bg-bgColor-brand600">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-brand opacity-20 mix-blend-multiply blur-xl filter"></div>
+        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-brand900 opacity-20 mix-blend-multiply blur-xl filter"></div>
       </div>
 
       <div className="relative mx-4 w-full max-w-md">
         <div className="border-bg-white/20 overflow-hidden rounded-2xl border bg-white/80 shadow-2xl backdrop-blur-sm">
           <div className="p-8">
             <div className="mb-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brandLight">
-                <KeyRound className="mx-auto h-8 w-8 text-textColor-brandDark" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brand600">
+                <KeyRound className="mx-auto h-8 w-8 text-textColor-brandDark900" />
               </div>
-              <h1 className="mb-2 text-2xl font-bold text-textColor-brandDark">
+              <h1 className="mb-2 text-2xl font-bold text-textColor-brandDark900">
                 {t('forgotPassword')}
               </h1>
-              <p className="text-textColor-brand">
+              <p className="text-textColor-brand900">
                 {t('forgotPassword-description')}
               </p>
             </div>
@@ -155,7 +155,7 @@ const ForgotPasswordPage = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark">
+                      <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900">
                         {t('email')}
                       </FormLabel>
                       <FormControl>
@@ -164,7 +164,7 @@ const ForgotPasswordPage = () => {
                           placeholder={
                             t('enter-email-address') || 'Enter email address'
                           }
-                          className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand focus:ring-bgColor-brand"
+                          className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900"
                           {...field}
                         />
                       </FormControl>
@@ -194,14 +194,14 @@ const ForgotPasswordPage = () => {
               </form>
             </Form>
 
-            <div className="mt-6 rounded-lg border border-bgColor-brand bg-bgColor-brandLighter p-4">
+            <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-brand200 p-4">
               <div className="flex items-start gap-3">
-                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brand" />
+                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brandDark900" />
                 <div>
-                  <p className="mb-1 text-sm font-medium text-textColor-brandDark">
+                  <p className="mb-1 text-sm font-medium text-textColor-brandDark900">
                     {t('reset-instructions-title')}
                   </p>
-                  <ul className="space-y-1 text-xs text-textColor-brand">
+                  <ul className="space-y-1 text-xs text-textColor-brandDark900">
                     <li>• {t('reset-instructions-description')}</li>
                     <li>• {t('reset-instructions-description-2')}</li>
                     <li>• {t('reset-instructions-description-3')}</li>

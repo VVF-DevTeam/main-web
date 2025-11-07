@@ -46,21 +46,19 @@ const EventCardHorizontal = async ({
 
       {/* Event Title */}
       <div className="flex w-[20vw] max-w-[400px] flex-col justify-center gap-2">
-        <h3 className="text-xl font-bold text-gray-900 md:text-2xl lg:text-3xl">
-          {event.title}
-        </h3>
+        <h3 className="web_h3">{event.title}</h3>
         {hasStartedAndNotEnded && (
-          <span className="text-sm font-medium text-bgColor-brand">
+          <span className="text-sm font-medium text-bgColor-brand900">
             (Started)
           </span>
         )}
       </div>
 
       {/* Event Details */}
-      <div className="flex flex-1 flex-col gap-2 text-sm text-gray-700 md:gap-3 md:text-base lg:text-lg">
+      <div className="web-body-regular flex flex-1 flex-col gap-2 md:gap-3">
         {/* Date */}
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-4 w-4 flex-shrink-0 text-bgColor-brand md:h-5 md:w-5" />
+          <CalendarDays className="h-4 w-4 flex-shrink-0 text-bgColor-brand900 md:h-5 md:w-5" />
           <span className="line-clamp-1">
             {event.startDate?.toLocaleDateString('en-US', {
               year: 'numeric',
@@ -77,13 +75,13 @@ const EventCardHorizontal = async ({
 
         {/* Location */}
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 flex-shrink-0 text-bgColor-brand md:h-5 md:w-5" />
+          <MapPin className="h-4 w-4 flex-shrink-0 text-bgColor-brand900 md:h-5 md:w-5" />
           <span className="line-clamp-1">{event.location}</span>
         </div>
 
         {/* Price */}
         <div className="flex items-center gap-2">
-          <Ticket className="h-4 w-4 flex-shrink-0 rotate-45 text-bgColor-brand md:h-5 md:w-5" />
+          <Ticket className="h-4 w-4 flex-shrink-0 rotate-45 text-bgColor-brand900 md:h-5 md:w-5" />
           <span>
             {String(event.price) === '0'
               ? 'Free'
@@ -96,7 +94,7 @@ const EventCardHorizontal = async ({
       {/* Read More Link */}
       <Link
         href={`/events/${event.keyName}`}
-        className="group/link flex-shrink-0 self-start text-base font-semibold text-bgColor-brand transition-all duration-300 hover:text-bgColor-brand/80 md:self-center md:text-lg"
+        className="group/link web-button-bold flex-shrink-0 self-start text-bgColor-brand900 transition-all duration-300 hover:text-bgColor-brand600 md:self-center"
       >
         <div className="flex items-center gap-2">
           <span>{t('read-more')}</span>

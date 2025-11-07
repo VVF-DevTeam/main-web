@@ -16,7 +16,7 @@ $textWhite: #fff7f7;
 }
 
 .header-main {
-  @apply font-bold sm:text-5xl md:leading-[56px] text-4xl leading-[40px];
+  @apply font-bold sm:text-[70px] md:leading-[56px] text-4xl leading-[40px];
 }
 
 .header-sub {

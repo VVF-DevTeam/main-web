@@ -100,8 +100,8 @@ const EventPagination = ({
   // CSS classes for hover states based on page type
   const hoverClasses = useMemo(() => {
     return pageType === 'upcoming' 
-      ? 'hover:bg-bgColor-brandLighter transition-colors duration-200' 
-      : 'hover:bg-bgColor-brandLight transition-colors duration-200'
+      ? 'hover:bg-bgColor-brand400 transition-colors duration-200' 
+      : 'hover:bg-bgColor-brand600 transition-colors duration-200'
   }, [pageType])
 
   // Don't render pagination if there's only one page or no pages

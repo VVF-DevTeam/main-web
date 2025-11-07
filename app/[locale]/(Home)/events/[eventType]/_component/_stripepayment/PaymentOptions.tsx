@@ -142,7 +142,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                       href="https://www.facebook.com/people/VIET-VIBE/61570910920072/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600"
+                      className="text-textColor-blue hover:text-textColor-blue"
                     >
                       Facebook
                     </Link>
@@ -151,7 +151,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                       href="https://www.instagram.com/vietvibe.foundation/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600"
+                      className="text-textColor-blue hover:text-textColor-blue"
                     >
                       Instagram
                     </Link>{' '}

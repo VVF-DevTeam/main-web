@@ -17,12 +17,12 @@ const MobileSidebar = ({ locale }: { locale: string }) => {
     <Sheet>
       <SheetTrigger asChild>
         <button className="flex-center" aria-label="Open mobile menu">
-          <Menu className="h-8 w-8 text-textColor transition-all hover:text-textColor-brand" />
+          <Menu className="h-8 w-8 text-textColor transition-all hover:text-textColor-brand900" />
         </button>
       </SheetTrigger>
       <SheetContent className="flex-col-center w-[300px] overflow-x-hidden bg-bgColor-black">
         <SheetHeader>
-          <SheetTitle className="text-textColor-white text-2xl font-bold">Menu</SheetTitle>
+          <SheetTitle className="text-textColor-white text-2xl font-bold text-center">Menu</SheetTitle>
 
           <NavLinks mode="mobile" locale={locale} />
         </SheetHeader>

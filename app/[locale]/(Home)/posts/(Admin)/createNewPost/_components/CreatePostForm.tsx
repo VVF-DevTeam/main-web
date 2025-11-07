@@ -92,7 +92,7 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Post Title
                 </FormLabel>
                 <FormControl>

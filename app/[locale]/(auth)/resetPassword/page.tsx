@@ -152,12 +152,10 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="flex-center relative min-h-screen bg-bgColor-brandLight">
+    <div className="flex-center relative min-h-screen bg-bgColor-secondary600">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* <div className="absolute -top-40 -right-40 w-80 h-80 bg-bgColor-brand rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-bgColor-brandDark rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div> */}
-        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-brand opacity-20 mix-blend-multiply blur-xl filter"></div>
+        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>
       </div>
 
       <div className="relative mx-4 w-full max-w-md">
@@ -170,7 +168,7 @@ const ResetPasswordPage = () => {
               data-testid="loader"
               color="#C54B3E"
             />
-            <p className="mt-4 font-medium text-textColor-brand">
+            <p className="mt-4 font-medium text-textColor-brand900">
               {t('verifying-token')}
             </p>
           </div>
@@ -178,15 +176,15 @@ const ResetPasswordPage = () => {
           <div className="border-bg-white/20 overflow-hidden rounded-2xl border bg-white/80 shadow-2xl backdrop-blur-sm">
             {error ? (
               <div className="p-8 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brandLight">
-                  <TriangleAlert className="h-8 w-8 text-textColor-brandDark" />
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brand600">
+                  <TriangleAlert className="h-8 w-8 text-textColor-brandDark900" />
                 </div>
-                <h2 className="mb-2 text-xl font-bold text-textColor-brandDark">
+                <h2 className="mb-2 text-xl font-bold text-textColor-brandDark900">
                   {t('verification-failed')}
                 </h2>
-                <p className="leading-relaxed text-textColor-brand">{error}</p>
-                <div className="mt-6 rounded-lg border border-bgColor-brand bg-bgColor-brandLight p-4">
-                  <p className="text-sm text-textColor-brandDark">
+                <p className="leading-relaxed text-textColor-brand900">{error}</p>
+                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-brand600 p-4">
+                  <p className="text-sm text-textColor-brandDark900">
                       {t('verification-failed-description')}
                   </p>
                 </div>
@@ -194,13 +192,13 @@ const ResetPasswordPage = () => {
             ) : (
               <div className="p-8">
                 <div className="mb-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brandLight">
-                    <KeyRound className="h-8 w-8 text-textColor-brand" />
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brand600">
+                    <KeyRound className="h-8 w-8 text-textColor-brand900" />
                   </div>
-                  <h1 className="mb-2 text-2xl font-bold text-textColor-brandDark">
+                  <h1 className="mb-2 text-2xl font-bold text-textColor-brandDark900">
                     {t('reset-your-password')}
                   </h1>
-                  <p className="text-textColor-brand">
+                  <p className="text-textColor-brand900">
                     {t('reset-your-password-description')}
                   </p>
                 </div>
@@ -215,8 +213,8 @@ const ResetPasswordPage = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark">
-                            <Lock className="h-4 w-4 text-textColor-brand" />
+                          <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900">
+                            <Lock className="h-4 w-4 text-textColor-brand900" />
                             {t('new-password')}
                           </FormLabel>
                           <FormControl>
@@ -224,7 +222,7 @@ const ResetPasswordPage = () => {
                               <Input
                                 type={reviewPassword ? "text" : "password"}
                                 placeholder={t('new-password-placeholder') || 'Enter your new password'}
-                                className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand focus:ring-bgColor-brand pr-12"
+                                className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900 pr-12"
                                 {...field}
                               />
                               <Button
@@ -247,8 +245,8 @@ const ResetPasswordPage = () => {
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark">
-                            <CircleCheck className="h-4 w-4 text-textColor-brand" />
+                          <FormLabel className="flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900">
+                            <CircleCheck className="h-4 w-4 text-textColor-brand900" />
                             {t('confirm-password')}
                           </FormLabel>
                           <FormControl>
@@ -256,7 +254,7 @@ const ResetPasswordPage = () => {
                               <Input
                                 type={reviewPassword ? "text" : "password"}
                                 placeholder={t('confirm-password-placeholder') || 'Confirm your new password'}
-                                className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand focus:ring-bgColor-brand pr-12"
+                                className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900 pr-12"
                                 {...field}
                               />
                               <Button
@@ -295,14 +293,14 @@ const ResetPasswordPage = () => {
                   </form>
                 </Form>
 
-                <div className="mt-6 rounded-lg border border-bgColor-brand bg-bgColor-brandLighter p-4">
+                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-brand600 p-4">
                   <div className="flex items-start gap-3">
-                    <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brand" />
+                    <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brand900" />
                     <div>
-                      <p className="mb-1 text-sm font-medium text-textColor-brandDark">
+                      <p className="mb-1 text-sm font-medium text-textColor-brandDark900">
                         {t('password-requirements')}
                       </p>
-                      <ul className="space-y-1 text-xs text-textColor-brand">
+                      <ul className="space-y-1 text-xs text-textColor-brand900">
                         <li>• {t('password-requirements-description-1')}</li>
                         <li>• {t('password-requirements-description-2')}</li>
                       </ul>

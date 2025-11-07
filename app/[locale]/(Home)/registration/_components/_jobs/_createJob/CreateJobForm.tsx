@@ -171,7 +171,7 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Job Title
                 </FormLabel>
                 <FormControl>
@@ -191,7 +191,7 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
             name="jobType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="mr-2 text-textColor-brand">
+                <FormLabel className="mr-2 text-textColor-brand900">
                   Job Department:
                 </FormLabel>
                 <FormControl>
@@ -238,7 +238,7 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-bgColor-brand font-bold text-textColor-white hover:bg-bgColor-brand/90 hover:text-textColor-white/90"
+              className="text-md max-w-fit bg-bgColor-brand900 font-bold text-textColor-white hover:bg-bgColor-brand600 hover:text-textColor-white"
               type="submit"
             >
               Create Job

@@ -16,11 +16,11 @@ interface EventSocialMediaProps {
 }
 
 const socialMediaOptions = [
-  { value: 'facebook', label: 'Facebook', icon: '/icons/facebook-icon.svg' },
-  { value: 'instagram', label: 'Instagram', icon: '/icons/instagram-icon.svg' },
-  { value: 'twitter', label: 'Twitter', icon: '/icons/twitter-icon.svg' },
-  { value: 'youtube', label: 'YouTube', icon: '/icons/youtube-icon.svg' },
-  { value: 'tiktok', label: 'TikTok', icon: '/icons/tiktok-icon.svg' },
+  { value: 'facebook', label: 'Facebook', icon: '/icons/facebook-icon-event.svg' },
+  { value: 'instagram', label: 'Instagram', icon: '/icons/instagram-icon-event.svg' },
+  { value: 'twitter', label: 'Twitter', icon: '/icons/twitter-icon-event.svg' },
+  { value: 'youtube', label: 'YouTube', icon: '/icons/youtube-icon-event.svg' },
+  { value: 'tiktok', label: 'TikTok', icon: '/icons/tiktok-icon-event.svg' },
 ]
 
 const EventSocialMedia = ({ event }: EventSocialMediaProps) => {

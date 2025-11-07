@@ -3,7 +3,6 @@ import i18nConfig from '@/i18nConfig'
 import initTranslations from '@/app/i18n'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import Image from 'next/image'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
     description: 'The page you are looking for does not exist.',
     images: [
       {
-        url: 'https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000',
+        url: 'https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w1200',
         width: 1200,
         height: 630,
         alt: 'Not Found',
@@ -40,15 +39,15 @@ export default async function NotFound() {
     <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-10 text-center text-2xl pb-4">
       <h1 className="text-4xl font-bold">{t('notFound')}</h1>
       <p className="text-lg">{t('notFoundDescription')}</p>
-      <Image
-        src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000"
+      <img
+        src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w450"
         alt="Not Found"
         width={450}
         height={450}
       />
       <Link
         href="/"
-        className="group flex items-center gap-2 text-blue-500 transition-colors duration-300 hover:text-blue-600"
+        className="group flex items-center gap-2 text-textColor-brand600 transition-colors duration-300 hover:text-textColor-brand900"
       >
         <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-2" />
         {t('goHome')}

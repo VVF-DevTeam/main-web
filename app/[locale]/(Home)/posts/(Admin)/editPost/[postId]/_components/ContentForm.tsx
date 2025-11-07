@@ -65,14 +65,14 @@ const PostContent = ({ post }: PostContentProps) => {
   }
 
   return (
-    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray/10 px-4 py-6">
+    <div className="flex-col-default mt-4 w-full rounded-md bg-bgColor-gray100 px-4 py-6">
       <div className="flex-between">
         <h1 className="text-xl font-semibold">Post Content</h1>
         <button
           onClick={() => setEditing(!editing)}
           className={cn(
-            'text-sm font-semibold text-textColor-gray transition-all hover:text-textColor-brand',
-            !editing && 'text-textColor-brand hover:text-textColor-gray'
+            'text-sm font-semibold text-textColor-gray500 transition-all hover:text-textColor-brand900',
+            !editing && 'text-textColor-brand900 hover:text-textColor-gray500'
           )}
         >
           {editing ? (
@@ -106,7 +106,7 @@ const PostContent = ({ post }: PostContentProps) => {
           </form>
         </Form>
       ) : !post?.content ? (
-        <p className="text-sm italic text-textColor-gray">
+        <p className="text-sm italic text-textColor-gray500">
           Add content for this post.
         </p>
       ) : (

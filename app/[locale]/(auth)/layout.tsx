@@ -13,7 +13,7 @@ const Layout = async ({
   const { locale } = await params
 
   return (
-    <div className="relative h-full min-h-fit w-full min-w-full bg-bgColor-brandLightest bg-cover bg-center bg-no-repeat">
+    <div className="relative h-full min-h-fit w-full min-w-full bg-bgColor-secondary200 bg-cover bg-center bg-no-repeat">
       <Header />
       <Navbar locale={locale} />
       <div className="min-h-[calc(100vh-120px)] content-center">{children}</div>

@@ -109,7 +109,7 @@ export default function EventNormalCheckOut({
                   {t('payment-membershipIntro')}{' '}
                   <Link
                     href="/registration/membership"
-                    className="text-blue-500 hover:underline"
+                    className="text-textColor-blue hover:underline"
                   >
                     membership
                   </Link>

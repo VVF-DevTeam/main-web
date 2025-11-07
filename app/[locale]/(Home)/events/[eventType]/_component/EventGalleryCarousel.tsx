@@ -67,8 +67,8 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="mx-auto w-[90vw] max-w-[1000px] overflow-hidden rounded-sm bg-bgColor-black md:w-[75vw]">
-        <div className="bg-bgColor-white relative h-[50vh] w-full rounded-lg md:h-[60vh]">
+      <div className="mx-auto w-[90vw] max-w-[1000px] overflow-hidden rounded-sm bg-black md:w-[75vw]">
+        <div className="relative h-[50vh] w-full rounded-lg md:h-[60vh]">
           <div
             className="flex h-full w-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${imageIndex * 100}%)` }}
@@ -89,13 +89,13 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
           <div className="flex-between absolute inset-0 top-[10%] z-20 h-[80%] max-w-[90vw] px-4 md:max-w-[75vw]">
             <button aria-label="prev-image">
               <ArrowLeft
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand opacity-75 transition-all hover:bg-bgColor-brandLight"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand900 opacity-75 transition-all hover:bg-bgColor-brand400"
                 onClick={() => changeImage('left')}
               />
             </button>
             <button aria-label="next-image">
               <ArrowRight
-                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand opacity-75 transition-all hover:bg-bgColor-brandLight"
+                className="h-11 w-11 rounded-full bg-bgColor-black p-2 text-textColor-brand900 opacity-75 transition-all hover:bg-bgColor-brand400"
                 onClick={() => changeImage('right')}
               />
             </button>
@@ -104,7 +104,7 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
             {imageUrls.map((_, idx) => (
               <span
                 key={idx}
-                className={`inline-block h-3 w-3 rounded-full ${idx === imageIndex ? 'bg-bgColor-brand' : 'bg-bgColor-gray'}`}
+                className={`inline-block h-3 w-3 rounded-full ${idx === imageIndex ? 'bg-bgColor-brand900' : 'bg-bgColor-gray500'}`}
               />
             ))}
           </div>

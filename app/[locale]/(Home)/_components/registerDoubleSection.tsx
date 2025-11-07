@@ -18,14 +18,14 @@ const RegisterDoubleSection = async ({
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-y-5 px-5 pb-10">
-      <h2 className="header-main text-center">
+      <h2 className="web_h1 text-center">
         {t('registerDoubleSection-title')}
       </h2>
-      <h3 className="text-center">{t('registerDoubleSection-description')}</h3>
+      <h3 className="web-body-regular text-center">{t('registerDoubleSection-description')}</h3>
       <div className="flex pt-5">
         <div className="group relative h-96 w-1/2">
           <Image
-            src="https://drive.google.com/thumbnail?id=1v9YmMiBjwuGXpmIDRDmDpraDuQQrr8b6&sz=w1000"
+            src="https://drive.google.com/thumbnail?id=1v9YmMiBjwuGXpmIDRDmDpraDuQQrr8b6"
             alt="Membership Benefits 1"
             fill
             className="z-0 object-cover brightness-[0.4] transition-all duration-300 group-hover:z-10 group-hover:scale-x-[1.15] group-hover:scale-y-[1.1]"
@@ -51,7 +51,7 @@ const RegisterDoubleSection = async ({
         </div>
         <div className="group relative h-96 w-1/2 overflow-visible">
           <Image
-            src="https://drive.google.com/thumbnail?id=1AqJvPcGUzuZM5pTnLWI_TPR0iZhIu27M&sz=w1000"
+            src="https://drive.google.com/thumbnail?id=1AqJvPcGUzuZM5pTnLWI_TPR0iZhIu27M"
             alt="Membership Benefits 1"
             fill
             className="z-0 object-cover brightness-[0.4] transition-all duration-300 group-hover:z-10 group-hover:scale-x-[1.15] group-hover:scale-y-[1.1]"

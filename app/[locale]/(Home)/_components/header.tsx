@@ -26,7 +26,7 @@ const Header = () => {
   // }
 
   return (
-    <div className="flex h-[48px] w-full items-center justify-end bg-bgColor-brandDark text-textColor-white sm:px-3 md:px-8">
+    <div className="flex h-[48px] w-full items-center justify-end bg-bgColor-secondary900 sm:px-3 md:px-8">
       {/* Tooltip for email */}
       {/* <div className="flex gap-x-2">
         <TooltipProvider>
@@ -43,7 +43,7 @@ const Header = () => {
               </button>
             </TooltipTrigger>
         <TooltipContent>
-              <p className="flex gap-x-2 text-sm text-textColor-brand">
+              <p className="flex gap-x-2 text-sm text-textColor-brand900">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
@@ -56,7 +56,7 @@ const Header = () => {
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="flex-center gap-x-2 rounded-md p-1 text-sm hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2 md:text-base"
+                className="flex-center gap-x-2 rounded-md p-1 text-sm hover:text-textColor-brand600 focus:outline-none focus:ring-2 focus:ring-offset-2 md:text-base"
                 onClick={() => handleClick('media@vietvibe.org')}
                 aria-label="Copy email address to clipboard"
                 aria-live="polite"
@@ -65,7 +65,7 @@ const Header = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent className="bg-bgColor-black">
-              <p className="flex gap-x-2 text-sm text-textColor-brandLight">
+              <p className="flex gap-x-2 text-sm text-textColor-brand600">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
@@ -83,7 +83,7 @@ const Header = () => {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="rounded-md p-1 hover:text-textColor-brandLightest focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="rounded-md p-1 hover:text-textColor-brand900 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download Android app"
                 >
                   <Link
@@ -104,7 +104,7 @@ const Header = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download Android App
                 </p>
               </TooltipContent>
@@ -117,7 +117,7 @@ const Header = () => {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brandLightest focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brand900 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download iOS app"
                 >
                   <Link
@@ -138,7 +138,7 @@ const Header = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download iOS App
                 </p>
               </TooltipContent>
@@ -149,11 +149,12 @@ const Header = () => {
         {/* LanguageChanger: Top-Right Corner */}
         <div className="flex-center pl-7">
           <Image
-            src="https://drive.google.com/thumbnail?id=1k8MpRQpBK7Tcm18Zp4UiDIPcwjomzOgS&sz=w500"
+            src="/icons/solar-globe.png"
             alt="Globe"
             width={24}
             height={24}
-            className="h-6 w-6 flex-shrink-0"
+            className="flex-shrink-0 invert"
+            unoptimized
           />
           <LanguageChanger />
         </div>

@@ -50,7 +50,6 @@ const createEventSchema = z.object({
 
 // Main Component
 const CreateEventForm = ({ author }: CreateEventFormProps) => {
-
   // TODO: Add author field for event
   console.log(author)
   const router = useRouter()
@@ -99,9 +98,12 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
           })
         }
       } else if (error instanceof Error) {
-        toast.error(error?.message || 'Something went wrong. Please contact the admin.', {
-          description: 'Error'
-        })
+        toast.error(
+          error?.message || 'Something went wrong. Please contact the admin.',
+          {
+            description: 'Error',
+          }
+        )
       } else {
         toast.error('Error', {
           description: 'Something went wrong. Please contact the admin.',
@@ -132,10 +134,13 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Event Title
                 </FormLabel>
-                <FormDescription className='text-[11px]'>(This will be the keyname in URL path. To change, please create a new event or ask dev team to update)</FormDescription>    
+                <FormDescription className="text-[11px]">
+                  (This will be the keyname in URL path. To change, please
+                  create a new event or ask dev team to update)
+                </FormDescription>
                 <FormControl>
                   <Input
                     placeholder="eg: My first post"
@@ -152,10 +157,13 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             name="eventType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="mr-2 text-textColor-brand">
+                <FormLabel className="text-textColor-brand900 mr-2">
                   Event Type:
                 </FormLabel>
-                <FormDescription className='text-[11px]'>(For other event types, use &quot;Event&quot; or ask dev team to add)</FormDescription>
+                <FormDescription className="text-[11px]">
+                  (For other event types, use &quot;Event&quot; or ask dev team
+                  to add)
+                </FormDescription>
                 <FormControl>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -195,7 +203,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
               variant={'outline'}
               size={'lg'}
               disabled={!isValid || isLoading}
-              className="text-md max-w-fit bg-bgColor-brand font-bold text-textColor-white hover:bg-bgColor-brand/90 hover:text-textColor-white/90"
+              className="text-md max-w-fit bg-bgColor-brand900 font-bold text-textColor-white hover:bg-bgColor-brand400 hover:text-textColor-white/90"
               type="submit"
             >
               Create Event

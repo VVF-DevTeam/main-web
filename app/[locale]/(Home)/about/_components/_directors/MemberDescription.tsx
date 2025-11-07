@@ -25,7 +25,7 @@ const MemberDescription = async ({
     <div className="flex-col-center my-auto gap-y-8">
       <h1 className="header-text header-font-black font-bold">{name} ({title})</h1>
       <div className="flex-col-center gap-y-6 text-center tracking-wide text-textColor lg:text-pretty">
-        <p className='text-textColor-brand'>
+        <p className='text-textColor-brand900'>
         {t(description)}
         </p>
         <p>

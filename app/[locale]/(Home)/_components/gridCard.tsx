@@ -16,12 +16,12 @@ interface GridCardProps {
 const GridCard = ({ name, desc, logo: Logo }: GridCardProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-y-2 p-2 md:p-4 md:gap-y-4">
-      {Logo && <Logo className="h-12 w-12 text-textColor-brandDark/70" />}
+      {Logo && <Logo className="h-12 w-12 text-textColor-black/70" />}
       <h2
         className={cn(
           !Logo
-            ? 'text-start md:self-start text-xl uppercase font-bold text-textColor/80 xl:text-2xl'
-            : 'text-center text-3xl font-bold text-textColor/80'
+            ? 'text-start md:self-start text-xl uppercase font-bold text-textColor-black/80 xl:text-2xl'
+            : 'text-center text-3xl font-bold text-textColor-black/80'
         )}
       >
         {name}
@@ -29,8 +29,8 @@ const GridCard = ({ name, desc, logo: Logo }: GridCardProps) => {
       <p
         className={cn(
           !Logo
-            ? 'text-sm font-extralight text-pretty text-textColor-gray lg:text-base'
-            : 'text-muted-foreground'
+            ? 'text-sm font-extralight text-pretty lg:text-base'
+            : 'text-textColor-gray500'
         )}
       >
         {desc}

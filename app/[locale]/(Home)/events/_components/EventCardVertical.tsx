@@ -55,7 +55,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
                 <div
                   key={category.id}
                   className={cn(
-                    'rounded-xl px-2 py-1 text-center text-base font-semibold text-textColor-white opacity-100 transition-all duration-100',
+                    'rounded-xl px-3 text-center text-[14px] text-textColor-white opacity-100 transition-all duration-100',
                     category.isBold && 'font-bold',
                     category.isItalic && 'italic'
                   )}
@@ -70,13 +70,13 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           </div>
 
           {/* Title */}
-          <h2 className="mb-4 text-2xl font-bold">
+          <h2 className="mb-4 text-2xl font-[900]" style={{ fontFamily: 'var(--font-lato)' }}>
             {event.title} {hasStartedAndNotEnded && <span>(Started)</span>}
           </h2>
 
           {/* Date */}
           <div className="flex items-center gap-x-2">
-            <CalendarDays className="h-4 w-4 text-bgColor-brand md:h-5 md:w-5" />
+            <CalendarDays className="h-4 w-4 text-bgColor-brand900 md:h-5 md:w-5" />
             <span className="text-base">
               {event.startDate.toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -94,7 +94,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
 
           {/* Time  */}
           <div className="flex items-center gap-x-2 text-base">
-            <CalendarClock className="h-4 w-4 text-bgColor-brand md:h-5 md:w-5" />
+            <CalendarClock className="h-4 w-4 text-bgColor-brand900 md:h-5 md:w-5" />
             <span>
               {event?.days?.map((day) => (
                 <span key={day}>{t(day.toLowerCase())}, </span>
@@ -108,7 +108,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           {/* Location */}
           <div className="flex items-center gap-x-2 text-base">
             <span className="flex items-center gap-x-2">
-              <MapPin className="h-4 w-4 shrink-0 text-bgColor-brand md:h-5 md:w-5" />
+              <MapPin className="h-4 w-4 shrink-0 text-bgColor-brand900 md:h-5 md:w-5" />
               {event.location}
             </span>
             {/* <EventButton
@@ -120,7 +120,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           {/* Price and availability */}
           <div className="flex items-center gap-x-2 text-base">
             <span className="flex items-center gap-x-2">
-              <Ticket className="h-4 w-4 rotate-[135deg] text-bgColor-brand md:h-5 md:w-5" />
+              <Ticket className="h-4 w-4 rotate-[135deg] text-bgColor-brand900 md:h-5 md:w-5" />
               ${event.price === 0 ? 'Free' : event.price?.toString()}
               {/* {event.priceMember ? '/$' + event.priceMember : null} */}
             </span>
@@ -134,7 +134,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           </div>
 
           {/* Timings */}
-          {/* <div className="flex-between rounded-lg bg-bgColor-brand/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand/30">
+          {/* <div className="flex-between rounded-lg bg-bgColor-brand600/20 p-4 transition-all duration-100 group-hover:bg-bgColor-brand400">
           <span className="flex items-center gap-x-2 text-sm md:text-lg">
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
             <div>

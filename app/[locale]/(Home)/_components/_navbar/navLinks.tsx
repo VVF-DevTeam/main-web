@@ -70,7 +70,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="rounded-md p-1 hover:text-textColor-brand600 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download Android app"
                 >
                   <Link
@@ -91,7 +91,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download Android App
                 </p>
               </TooltipContent>
@@ -106,7 +106,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brand600 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download iOS app"
                 >
                   <Link
@@ -127,7 +127,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download iOS App
                 </p>
               </TooltipContent>

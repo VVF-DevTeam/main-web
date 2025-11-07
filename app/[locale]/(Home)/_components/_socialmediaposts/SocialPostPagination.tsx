@@ -30,24 +30,30 @@ const SocialPostPagination = ({
   const [isPending, startTransition] = useTransition()
 
   // Memoize the page URL creation
-  const createPageUrl = useCallback((page: number) => {
-    if (page < 1 || page > totalPages) return ''
+  const createPageUrl = useCallback(
+    (page: number) => {
+      if (page < 1 || page > totalPages) return ''
 
-    const params = new URLSearchParams(searchParams)
-    params.set('socialPage', page.toString())
-    return `?${params.toString()}`
-  }, [searchParams, totalPages])
-
-  // Optimized page change handler with loading state
-  const handlePageChange = useCallback((page: number) => {
-    if (page < 1 || page > totalPages || page === currentPage) return
-
-    startTransition(() => {
       const params = new URLSearchParams(searchParams)
       params.set('socialPage', page.toString())
-      router.push(`?${params.toString()}`, { scroll: false })
-    })
-  }, [router, searchParams, totalPages, currentPage])
+      return `?${params.toString()}`
+    },
+    [searchParams, totalPages]
+  )
+
+  // Optimized page change handler with loading state
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page < 1 || page > totalPages || page === currentPage) return
+
+      startTransition(() => {
+        const params = new URLSearchParams(searchParams)
+        params.set('socialPage', page.toString())
+        router.push(`?${params.toString()}`, { scroll: false })
+      })
+    },
+    [router, searchParams, totalPages, currentPage]
+  )
 
   // Check if we're at boundaries
   const isFirstPage = currentPage === 1
@@ -95,11 +101,6 @@ const SocialPostPagination = ({
     return pages
   }, [currentPage, totalPages])
 
-  // CSS classes for hover states
-  const hoverClasses = useMemo(() => {
-    return 'hover:bg-bgColor-brandLighter transition-colors duration-200'
-  }, [])
-
   // Don't render pagination if there's only one page or no pages
   if (totalPages <= 1) return null
 
@@ -108,12 +109,13 @@ const SocialPostPagination = ({
       {/* Page Information Display */}
       {showPageInfo && totalItems && (
         <div className="text-sm text-muted-foreground">
-          Showing page {currentPage} of {totalPages} ({totalItems} total social posts)
+          Showing page {currentPage} of {totalPages} ({totalItems} total social
+          posts)
         </div>
       )}
 
       {/* Main Pagination */}
-      <Pagination className={cn(isPending && "opacity-50 pointer-events-none")}>
+      <Pagination className={cn(isPending && 'pointer-events-none opacity-50')}>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
@@ -123,8 +125,9 @@ const SocialPostPagination = ({
                 if (!isFirstPage) handlePageChange(currentPage - 1)
               }}
               className={cn(
-                hoverClasses,
-                isFirstPage && "opacity-50 cursor-not-allowed pointer-events-none"
+                'transition-colors duration-200 hover:bg-bgColor-brand400',
+                isFirstPage &&
+                  'pointer-events-none cursor-not-allowed opacity-50'
               )}
               aria-disabled={isFirstPage}
               aria-label={`Go to page ${currentPage - 1}`}
@@ -153,11 +156,11 @@ const SocialPostPagination = ({
                     handlePageChange(pageNum)
                   }}
                   className={cn(
-                    hoverClasses,
-                    isActive && "cursor-default"
+                    'transition-colors duration-200 hover:bg-bgColor-brand400',
+                    isActive && 'cursor-default'
                   )}
                   aria-label={`Go to page ${pageNum}`}
-                  aria-current={isActive ? "page" : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                 >
                   {pageNum}
                 </PaginationLink>
@@ -173,8 +176,9 @@ const SocialPostPagination = ({
                 if (!isLastPage) handlePageChange(currentPage + 1)
               }}
               className={cn(
-                hoverClasses,
-                isLastPage && "opacity-50 cursor-not-allowed pointer-events-none"
+                'transition-colors duration-200 hover:bg-bgColor-brand400',
+                isLastPage &&
+                  'pointer-events-none cursor-not-allowed opacity-50'
               )}
               aria-disabled={isLastPage}
               aria-label={`Go to page ${currentPage + 1}`}

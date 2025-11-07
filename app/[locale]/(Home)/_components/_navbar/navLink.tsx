@@ -38,12 +38,12 @@ const NavLink = ({ label, path, mode }: NavLinkProps) => {
     'flex-center whitespace-nowrap transition-all tracking-wide'
   const inactiveColor =
     mode === 'desktop'
-      ? 'text-textColor hover:text-textColor-brand hover:underline'
-      : 'text-textColor-white hover:bg-bgColor-brand'
+      ? 'text-textColor hover:text-textColor-brand900 hover:underline'
+      : 'text-textColor-white hover:bg-bgColor-brand900'
   const layoutClasses =
     mode === 'desktop'
-      ? 'gap-x-[5px] text-xl'
-      : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl'
+      ? 'gap-x-[5px] text-lg xl:text-xl'
+      : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-lg xl:text-xl'
 
   return (
     <Link
@@ -51,7 +51,7 @@ const NavLink = ({ label, path, mode }: NavLinkProps) => {
       className={cn(
         baseClasses,
         layoutClasses,
-        isActive ? mode === 'desktop' ? 'font-semibold' : 'text-textColor-brandLight' : inactiveColor
+        isActive ? mode === 'desktop' ? 'font-semibold' : 'text-textColor-brand600' : inactiveColor
       )}
       aria-current={isActive ? 'page' : undefined}
     >

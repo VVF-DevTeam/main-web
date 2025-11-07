@@ -112,7 +112,7 @@ const PostStats = ({
         onClick={() => updateLikes(localHasLiked ? 'unlike' : 'like')}
         disabled={isLoading}
         className={cn(
-          "flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray/10 p-[9px] text-sm text-muted-foreground lg:gap-x-2 transition-opacity",
+          "flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray100 p-[9px] text-sm text-muted-foreground lg:gap-x-2 transition-opacity",
           isLoading && "opacity-50 cursor-not-allowed"
         )}
         aria-label={localHasLiked ? 'Unlike post' : 'Like post'}
@@ -131,7 +131,7 @@ const PostStats = ({
       </button>
 
       <div
-        className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray/10 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
+        className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray100 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
         aria-label="Post views"
       >
         <ChartNoAxesColumn

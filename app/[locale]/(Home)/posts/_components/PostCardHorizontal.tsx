@@ -57,7 +57,7 @@ const PostCardHorizontal = ({
         <p className="text-sm text-muted-foreground">
           {createdAt.toLocaleString()}
         </p>
-        <p className="mt-1 text-wrap break-words text-textColor-gray md:mt-2 md:max-w-[90%]">
+        <p className="mt-1 text-wrap break-words text-textColor-gray500 md:mt-2 md:max-w-[90%]">
           {summary}
         </p>
         <div className="flex-between">

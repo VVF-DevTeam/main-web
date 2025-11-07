@@ -77,7 +77,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
         <Link href="/signUp">
           <button
             className={cn(
-              'hidden items-center justify-center whitespace-nowrap rounded-md px-6 py-[10px] text-xl text-textColor-brand hover:underline  transition-all lg:flex',
+              'hidden items-center justify-center whitespace-nowrap rounded-md px-6 py-[10px] text-xl text-textColor-brand900 hover:underline  transition-all lg:flex',
               mode === 'desktop'
                 ? 'gap-x-[5px]'
                 : 'mt-2 h-full w-full gap-x-4 rounded-md p-4'
@@ -93,13 +93,13 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
         className={cn(
           ' items-center justify-center whitespace-nowrap rounded-md w-[120px] h-[28px] py-5 px-12 text-lg text-textColor-white transition-all',
           mode === 'desktop'
-            ? 'bg-bgColor-brand'
+            ? 'bg-bgColor-brand900'
             : 'mt-2 h-full w-full gap-x-4 rounded-md p-4',
           isActive
             ? 'hidden'
             : mode === 'desktop'
-              ? 'flex hover:bg-bgColor-brand/80'
-              : 'flex hover:bg-bgColor-brand'
+              ? 'flex hover:bg-bgColor-brand900/80'
+              : 'flex hover:bg-bgColor-brand900'
         )}
       >
         <span>

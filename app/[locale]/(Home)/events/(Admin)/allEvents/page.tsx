@@ -33,7 +33,7 @@ const AllEvents = async () => {
       <h1 className="header-sub">All Events</h1>
       <p className="mb-12 text-sm text-muted-foreground">
         All published and unpublished events appear here. Click on the
-        <span className="font-semibold text-textColor-brand transition-all hover:text-textColor-brand/70">
+        <span className="font-semibold text-textColor-brand900 transition-all hover:text-textColor-brand/70">
           {' '}
           &quot;Edit&quot;
         </span>{' '}
