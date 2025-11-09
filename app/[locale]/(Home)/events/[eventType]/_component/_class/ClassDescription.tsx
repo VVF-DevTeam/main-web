@@ -11,8 +11,11 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 // Interfaces & Types
 import { EventSchedule } from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
+import Image from 'next/image'
+import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
 interface ClassDescriptionProps {
   description: string
+  imageUrl: string
   startDate: Date
   endDate: Date
   endTime: string
@@ -46,6 +49,7 @@ const typeMap = {
 
 // Main Code
 const ClassDescription = async ({
+  imageUrl,
   title,
   description,
   startDate,
@@ -70,6 +74,7 @@ const ClassDescription = async ({
   imageUrls,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+  console.log(imageUrl)
 
   // Get the current user's id
   const session = await auth()
@@ -86,79 +91,144 @@ const ClassDescription = async ({
     : null
 
   return (
-    <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
-      {/* Time and Location */}
-      <div className="grid w-full justify-between gap-x-4 gap-y-4 md:flex">
-        <div className="flex flex-col gap-y-2">
-          <h1 className="mb-2 text-xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerInfo')}
-          </h1>
+    <div className="mx-auto mt-5 flex max-w-[1280px] flex-col items-start gap-y-8 p-2 md:mt-10 lg:gap-y-8">
+      {/* Event Info Section */}
+      <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
+        {/* Event Description */}
+        <div className="">
+          {/* <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+            {t('headerAbout')}
+          </h1> */}
 
-          {/* Date */}
-          <p>
-            {t('dateHeader')}:{' '}
-            {startDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}{' '}
-            {/* If the start date and end date are the same, don't show the end date */}
-            {startDate.getTime() === endDate.getTime() ? (
-              <p></p>
-            ) : (
-              <>
-                -{' '}
-                {endDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </>
-            )}
-          </p>
-
-          {/* Time */}
-          <p>
-            {t('timeHeader')}:{' '}
-            {days.map((day) => t(day.toLowerCase())).join(', ')}{' '}
-            {t('everyWeek')}, {startTime} - {endTime}
-          </p>
-
-          {/* Location */}
-          <p>
-            {t('location')}: {location}
-          </p>
-
-          {/* Slot */}
-          <p>
-            {t('slot')}: {capacity}
-          </p>
-        </div>
-
-        {/* Map */}
-        <div>
-          <iframe
-            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
-            title="Class Location"
-            width="300"
-            height="250"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </div>
-
-      {/* Event Description */}
-      <div>
-        <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
-          {t('headerAbout')}
-        </h1>
-        <div className="mt-4 w-full text-pretty">
-          <TextPreview value={description} />
-        </div>
-        {/* <p className="mt-2 text-muted-foreground">
+          <div className="relative aspect-video w-full">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="rounded-lg object-cover"
+            />
+          </div>
+          <div className="mt-4 w-full text-pretty">
+            <TextPreview value={description} />
+          </div>
+          {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
           the reserve button below)
         </p> */}
+        </div>
+
+        {/* Info Section */}
+        <div className="md:pl-[clamp(20px,4vw,100px)]">
+          <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
+            {t('headerInfo')}
+          </h1>
+          <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[800px] flex-col gap-y-10 overflow-y-auto px-[15px] pt-5 md:px-[20px]">
+            <div className="flex flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
+              {/* Date Row */}
+              <div className="relative p-4">
+                <div className="flex items-center gap-x-3">
+                  <CalendarDays className="h-5 w-5 shrink-0 text-red-600" />
+                  <span className="text-base">
+                    {startDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                    {startDate.getTime() !== endDate.getTime() && (
+                      <>
+                        {' - '}
+                        {endDate.toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </>
+                    )}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+              </div>
+
+              {/* Time Row */}
+              <div className="relative p-4">
+                <div className="flex items-center gap-x-3">
+                  <Clock className="h-5 w-5 shrink-0 text-red-600" />
+                  <span className="text-base">
+                    {days.map((day) => {
+                      const translated = t(day)
+                      return translated.charAt(0).toUpperCase() + translated.slice(1).toLowerCase()
+                    }).join(', ')} at {startTime} -{' '}
+                    {endTime}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+              </div>
+
+              {/* Price Row */}
+              <div className="relative p-4">
+                <div className="flex items-center gap-x-3">
+                  <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
+                  <span className="text-base">
+                    {price === 0 ? 'Free' : `$${price.toString()}`}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+              </div>
+
+              {/* Spots Left Row */}
+              <div className="relative p-4">
+                <div className="flex items-center justify-between gap-x-3">
+                  <div className="flex items-center gap-x-3">
+                    <Users className="h-5 w-5 shrink-0 text-red-600" />
+                    <span className="text-base">
+                      {capacity} spots available
+                    </span>
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+              </div>
+
+              {/* Location Row */}
+              <div className="flex items-start gap-x-3 p-4">
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                <div className="flex flex-col">
+                  <span className="text-base">{location}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Map */}
+            <div>
+              <iframe
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
+                title="Class Location"
+                className="h-[300px] w-full rounded-2xl"
+                allowFullScreen
+              ></iframe>
+            </div>
+
+            {/* Payment Options */}
+            <PaymentOptions
+              stripePriceId={stripePriceId}
+              stripeProductId={stripeProductId}
+              stripeSubscribedPriceId={stripeSubscribedPriceId}
+              formLink={formLink}
+              eventKeyName={keyName}
+              price={price}
+              eventId={classId}
+              title={title}
+              userId={author}
+              fullCourseDiscount={fullCourseDiscount}
+              email={email}
+              type={typeMap[eventType as keyof typeof typeMap]}
+              loggedIn={author ? true : false}
+            />
+
+            {existingPayment && existingPayment.length > 0 && (
+              <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Schedule */}
@@ -187,32 +257,6 @@ const ClassDescription = async ({
             )}
         </div>
       </div>
-
-      {/* Payment Options */}
-      {author ? (
-        <>
-          <PaymentOptions
-            stripePriceId={stripePriceId}
-            stripeProductId={stripeProductId}
-            stripeSubscribedPriceId={stripeSubscribedPriceId}
-            formLink={formLink}
-            eventKeyName={keyName}
-            price={price}
-            eventId={classId}
-            title={title}
-            userId={author}
-            fullCourseDiscount={fullCourseDiscount}
-            email={email}
-            type={typeMap[eventType as keyof typeof typeMap]}
-          />
-
-          {existingPayment && existingPayment.length > 0 && (
-            <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
-          )}
-        </>
-      ) : (
-        <p className="italic">{t('loginToMakePayment')}.</p>
-      )}
 
       {/* Gallery Carousel at the bottom */}
       {shouldShowGallery && (

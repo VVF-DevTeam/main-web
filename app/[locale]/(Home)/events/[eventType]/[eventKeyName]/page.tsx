@@ -60,6 +60,12 @@ const ClassPage = async ({ params }: ClassPageProps) => {
       hosts: {
         select: {
           name: true,
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          Review: true
         },
       },
     },
@@ -82,25 +88,35 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         <div className="w-full overflow-hidden">
           {/* Event Headers */}
           <ConcertHeaders event={publishedClass} />
-          <ConcertDescriptions event={{ ...publishedClass, imgUrls: (publishedClass.imgUrls as string[]) || [] }} locale={locale} shouldShowGallery={shouldShowGallery as boolean} />
+          <ConcertDescriptions
+            event={{
+              ...publishedClass,
+              imgUrls: (publishedClass.imgUrls as string[]) || [],
+            }}
+            locale={locale}
+            shouldShowGallery={shouldShowGallery as boolean}
+          />
         </div>
       ) : (
         <div>
-          <div className="width-max-default mx-auto">
-            <BackButton variant={'responsive'} />
+          <div className="width-max-default relative mx-auto pt-[92px]">
+            <BackButton variant={'default'} className="top-[30px]" />
             <ClassImage
               eventId={publishedClass.id}
-              imageUrl={publishedClass.imgUrl!}
-              location={publishedClass.location!}
-              startDate={publishedClass.startDate!}
               hosts={publishedClass.hosts}
               title={publishedClass.title}
               locale={locale}
-              socialLinks={publishedClass.socialLinks as { platform: string; url: string }[] | null}
+              socialLinks={
+                publishedClass.socialLinks as
+                  | { platform: string; url: string }[]
+                  | null
+              }
+              reviewsCount={publishedClass._count.Review}
             />
           </div>
           <ClassDescription
             description={publishedClass.description!}
+            imageUrl={publishedClass.imgUrl!}
             startDate={publishedClass.startDate!}
             endDate={publishedClass.endDate}
             startTime={publishedClass.startTime!}

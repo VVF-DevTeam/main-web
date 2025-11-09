@@ -5,7 +5,7 @@ import { roleCheck } from '@/lib/actions/user/roleCheck'
 // Components
 import EventListHorizontal from './_components/EventListHorizontal'
 import EventAdminButtons from './_components/EventAdminButtons'
-import EventHeroImage from './_components/EventHeroImage'
+// import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
@@ -44,8 +44,11 @@ const EventsPage = async ({
 
   // Get all events with caching
   const nowTimestamp = Date.now()
-  const isCacheValid = eventsCache && eventsCache.locale === locale && nowTimestamp - eventsCache.timestamp < CACHE_DURATION
-  
+  const isCacheValid =
+    eventsCache &&
+    eventsCache.locale === locale &&
+    nowTimestamp - eventsCache.timestamp < CACHE_DURATION
+
   let allEvents
   if (isCacheValid) {
     allEvents = eventsCache!.data
@@ -61,7 +64,7 @@ const EventsPage = async ({
         categories: true,
       },
     })
-    
+
     // Update cache
     eventsCache = {
       data: allEvents,
@@ -108,8 +111,8 @@ const EventsPage = async ({
   )
 
   return (
-    <div className="flex flex-col gap-y-6">
-      <EventHeroImage locale={locale} />
+    <div className="flex flex-col">
+      {/* <EventHeroImage locale={locale} /> */}
       <EventListHorizontal
         events={paginatedUpcomingEvents}
         locale={locale}
@@ -118,7 +121,6 @@ const EventsPage = async ({
         totalItems={upcomingEvents.length}
       />
       {(isAdmin || isHost) && <EventAdminButtons />}
-      <EventInstruction locale={locale} />
       <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
         <EventListHorizontal
@@ -130,6 +132,7 @@ const EventsPage = async ({
           totalItems={finishedEvents.length}
         />
       )}
+      <EventInstruction locale={locale} />
     </div>
   )
 }

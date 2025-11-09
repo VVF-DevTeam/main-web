@@ -7,6 +7,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import EventGalleryCarousel from '../EventGalleryCarousel'
+import { CalendarDays, Ticket, Users, MapPin } from 'lucide-react'
 
 type EventWithRelations = {
   id: string
@@ -67,74 +68,102 @@ const ConcertDescriptions = async ({
     : null
 
   return (
-    <div className="w-full bg-bgColor-brandDark900 py-16 text-white">
-      <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
+    <div className="w-full bg-bgColor-secondary200 py-16">
+      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
         {/* Event Info Section */}
-        <div className="grid w-full gap-8 md:grid-cols-2">
-          {/* Left Column - Event Details */}
-          <div className="flex flex-col gap-y-6">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl">
-                {t('headerInfo')}
-              </h2>
-              <div className="space-y-2 text-lg">
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('dateHeader')}:</span>
-                  {event.startDate?.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}{' '}
-                  {/* If the start date and end date are the same, don't show the end date */}
-                  {event.startDate?.getTime() === event.endDate?.getTime() ? (
-                    <p></p>
-                  ) : (
-                    <>
-                      -{' '}
-                      {event.endDate?.toLocaleDateString('en-US', {
+        <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
+          {/* Event Description */}
+          <div className="">
+            {/* <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+            {t('headerAbout')}
+          </h1> */}
+
+            <div className="w-full text-pretty">
+              <TextPreview value={event.description || ''} />
+            </div>
+            {/* <p className="mt-2 text-muted-foreground">
+          (To become a VVF member, please refer to the registration form using
+          the reserve button below)
+        </p> */}
+          </div>
+
+          {/* Info Section */}
+          <div className="md:pl-[clamp(20px,4vw,100px)]">
+            <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
+              {t('headerInfo')}
+            </h1>
+            <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[800px] flex-col gap-y-10 overflow-y-auto px-[15px] pt-5 md:px-[20px]">
+              <div className="flex flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
+                {/* Date and Time Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <CalendarDays className="h-5 w-5 shrink-0 text-red-600" />
+                    <span className="text-base">
+                      {event.startDate?.toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
-                    </>
-                  )}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('timeHeader')}:</span>
-                  {event.startTime} - {event.endTime}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('location')}:</span>
-                  {event.location}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('slot')}:</span>
-                  {event.capacity}
-                </p>
+                      {event.startDate?.getTime() !== event.endDate?.getTime() && (
+                        <>
+                          {' - '}
+                          {event.endDate?.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </>
+                      )}{' '}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Price Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
+                    <span className="text-base">
+                      {event.price?.toNumber() === 0 ? 'Free' : `$${event.price?.toNumber().toString()}`}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Spots Left Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center justify-between gap-x-3">
+                    <div className="flex items-center gap-x-3">
+                      <Users className="h-5 w-5 shrink-0 text-red-600" />
+                      <span className="text-base">{event.capacity} spots left</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Location Row */}
+                <div className="flex items-start gap-x-3 p-4">
+                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                  <div className="flex flex-col">
+                    <span className="text-base">{event.location}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Map */}
+              <div>
+                <iframe
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
+                  title="Class Location"
+                  className="h-[300px] w-full rounded-2xl"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              {existingPayment && existingPayment.length > 0 && (
+                <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
+              )}
             </div>
-          </div>
-
-          {/* Right Column - Map */}
-          <div className="h-[300px] w-full overflow-hidden rounded-lg">
-            <iframe
-              src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
-              title="Event Location"
-              width="100%"
-              height="100%"
-              allowFullScreen
-              className="rounded-lg"
-            ></iframe>
-          </div>
-        </div>
-
-        {/* Description Section */}
-        <div className="w-full space-y-6">
-          <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerAbout')}
-          </h2>
-          <div className="prose prose-invert max-w-none">
-            <TextPreview value={event.description || ''} />
           </div>
         </div>
 
@@ -154,7 +183,7 @@ const ConcertDescriptions = async ({
                     schedule.description && (
                       <div
                         key={schedule.id}
-                        className="rounded-lg bg-white/10 p-4 backdrop-blur-sm"
+                        className="rounded-lg bg-bgColor-brand900 p-4 shadow-[0_0_15px_rgba(0,0,0,0.1)]"
                       >
                         <div className="mb-2 text-sm font-medium text-white/80">
                           {schedule.startTime} - {schedule.endTime}
@@ -183,6 +212,7 @@ const ConcertDescriptions = async ({
               fullCourseDiscount={event.fullCourseDiscount || 0}
               email={email}
               type={typeMap[event.eventType as keyof typeof typeMap]}
+              loggedIn={author ? true : false}
             />
 
             {existingPayment && existingPayment.length > 0 && (

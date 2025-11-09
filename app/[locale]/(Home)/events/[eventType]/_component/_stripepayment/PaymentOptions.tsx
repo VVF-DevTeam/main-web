@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import EventNormalCheckOut from './EventNormalCheckOut'
 import EventQuickCheckout from './EventQuickCheckout'
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,7 @@ interface PaymentOptionsProps {
   fullCourseDiscount?: number
   email: string
   type: string
+  loggedIn: boolean
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -38,32 +40,88 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   fullCourseDiscount,
   email,
   type,
+  loggedIn,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
-
+  const router = useRouter()
   const [selected, setSelected] = useState<OptionType>('checkout')
   const [showOptions, setShowOptions] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const prevShowOptionsRef = useRef(false)
+
+  // Scroll to bottom when options are opened (transition from false to true)
+  useEffect(() => {
+    if (showOptions && !prevShowOptionsRef.current && containerRef.current) {
+      // Find the closest scrollable parent
+      let element: HTMLElement | null = containerRef.current
+      let scrollableParent: HTMLElement | null = null
+
+      while (element && !scrollableParent) {
+        const { overflowY } = window.getComputedStyle(element)
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          scrollableParent = element
+          break
+        }
+        element = element.parentElement
+      }
+
+      // Scroll to bottom after animation
+      const timeoutId = setTimeout(() => {
+        if (scrollableParent) {
+          scrollableParent.scrollTo({
+            top: scrollableParent.scrollHeight,
+            behavior: 'smooth',
+          })
+        }
+      }, 500) // Wait for animation to complete (400ms animation + 100ms buffer)
+
+      prevShowOptionsRef.current = showOptions
+      return () => clearTimeout(timeoutId)
+    }
+    prevShowOptionsRef.current = showOptions
+  }, [showOptions])
 
   const options: { id: OptionType; label: string }[] = [
     { id: 'checkout', label: 'normal-checkout' },
     // only show quick checkout if not using formLink
-    ...(!formLink ? [{ id: 'quick' as OptionType, label: type === 'CLASS' ? 'quick-checkout-class' : 'quick-checkout' }] : []),
+    ...(!formLink
+      ? [
+          {
+            id: 'quick' as OptionType,
+            label: type === 'CLASS' ? 'quick-checkout-class' : 'quick-checkout',
+          },
+        ]
+      : []),
     { id: 'etransfer', label: 'E-transfer' },
   ]
 
   return (
-    <div className="w-full text-bgColor-black">
-      <Button
-        variant="default"
-        onClick={() => setShowOptions((prev) => !prev)}
-        className="mb-4 font-semibold"
-      >
-        {t('reserve-here')}
-        <ChevronRight
-          className={`ml-2 h-5 w-5 transition-transform duration-300 ${showOptions ? 'rotate-90' : 'rotate-0'}`}
-        />
-      </Button>
+    <div ref={containerRef} className="w-full text-bgColor-black">
+      {loggedIn ? (
+        <Button
+          variant="default"
+          onClick={() => {
+            const willOpen = !showOptions
+            setShowOptions(willOpen)
+            // Scroll is handled in useEffect when showOptions transitions to true
+          }}
+          className="mb-4 font-semibold w-full"
+        >
+          {t('reserve-here')}
+          <ChevronRight
+            className={`ml-2 h-5 w-5 transition-transform duration-300 ${showOptions ? 'rotate-90' : 'rotate-0'}`}
+          />
+        </Button>
+      ) : (
+        <Button
+          variant="default"
+          onClick={() => router.push('/signIn')}
+          className="mb-4 font-semibold"
+        >
+          {t('login-to-reserve')}
+        </Button>
+      )}
 
       <AnimatePresence>
         {showOptions && (
@@ -130,11 +188,14 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     <strong>finance@vietvibe.org</strong>
                   </li>
                   <li>
-                    {t('etransfer-description-2')} <em>&quot;What is the event name?&quot;</em>,{' '}
-                    {t('etransfer-description-6')}: <em>&quot;{eventKeyName}&quot;</em>
+                    {t('etransfer-description-2')}{' '}
+                    <em>&quot;What is the event name?&quot;</em>,{' '}
+                    {t('etransfer-description-6')}:{' '}
+                    <em>&quot;{eventKeyName}&quot;</em>
                   </li>
                   <li>
-                    {t('etransfer-description-3')}: <strong>{title}</strong>, {t('etransfer-description-3_5')}
+                    {t('etransfer-description-3')}: <strong>{title}</strong>,{' '}
+                    {t('etransfer-description-3_5')}
                   </li>
                   <li>
                     {t('etransfer-description-4')}{' '}
@@ -158,7 +219,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     {t('etransfer-description-5')}
                   </li>
                 </ul>
-                <p className="italic pt-2 text-xs">*{t('etransfer-description-7')}</p>
+                <p className="pt-2 text-xs italic">
+                  *{t('etransfer-description-7')}
+                </p>
               </div>
             )}
           </motion.div>

@@ -24,7 +24,7 @@ const ConcertHeaders = ({ event }: ConcertHeadersProps) => {
             iconList={event.socialLinks ? JSON.parse(JSON.stringify(event.socialLinks)).map((link: { platform: string; url: string }, index: number) => ({
               id: String(index + 1),
               name: link.platform,
-              icon: `/icons/${link.platform.toLowerCase()}-icon.svg`,
+              icon: `/icons/${link.platform.toLowerCase()}-icon-event.svg`,
               url: link.url
             })) : []} 
             isLink={true} 

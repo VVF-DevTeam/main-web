@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export const PUT = async (
   request: Request,
@@ -50,6 +51,12 @@ export const PUT = async (
     return NextResponse.json(updatedEvent)
   } catch (error) {
     console.log('[EDIT EVENT ERROR]', error)
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        // Duplicate entry
+        return new NextResponse('There is already an event with the same title or keyName.', { status: 409 })
+      }
+    }     
     return new NextResponse('Internal server error', { status: 500 })
   }
 }

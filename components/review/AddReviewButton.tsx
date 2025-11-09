@@ -32,6 +32,12 @@ import Image from 'next/image'
 import { ImageIcon } from 'lucide-react'
 import { FiEdit2 } from 'react-icons/fi'
 import axios from 'axios'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 const addReviewSchema = z.object({
   eventId: z.string().optional(),
@@ -414,9 +420,29 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
 
   return (
     <>
-      <Button onClick={openAddReviewModal} disabled={events.length === 0}>
-        Add Review
-      </Button>
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className="group p-1"
+              onClick={openAddReviewModal}
+              disabled={events.length === 0}
+            >
+              <Image
+                src="/icons/edit-review-icon.svg"
+                alt="Edit Review"
+                width={20}
+                height={20}
+                className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
+              />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="bg-bgColor-black">
+            <p className="text-sm text-textColor-brand600">Add Review</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {showAddReviewModal && (
         <AddReviewModal
           form={form}

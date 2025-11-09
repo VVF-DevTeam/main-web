@@ -91,7 +91,7 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
       <button
         onClick={() => handleAuth(userExists ? 'logout' : 'login')}
         className={cn(
-          ' items-center justify-center whitespace-nowrap rounded-md w-[120px] h-[28px] py-5 px-12 text-lg text-textColor-white transition-all',
+          ' items-center justify-center whitespace-nowrap rounded-md max-w-[120px] h-[28px] py-5 px-4 lg:px-12 text-lg text-textColor-white transition-all',
           mode === 'desktop'
             ? 'bg-bgColor-brand900'
             : 'mt-2 h-full w-full gap-x-4 rounded-md p-4',

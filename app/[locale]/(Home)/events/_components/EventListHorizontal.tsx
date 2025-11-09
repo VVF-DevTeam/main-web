@@ -44,7 +44,7 @@ const EventListHorizontal = async ({
 
   return (
     <div
-      className={`flex w-full flex-col items-center gap-y-5 py-10 xl:pt-10 ${fromHomePage ? 'bg-bgColor-secondary100' : finished ? 'bg-gray-100' : ''}`}
+      className={`flex w-full flex-col items-center gap-y-5 py-10 xl:pt-10 bg-bgColor-secondary100`}
     >
       {finished ? (
         <h2 className="web_h1 text-center">{t('header-finishedEvent')}</h2>
