@@ -31,7 +31,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
   }
 
   return (
-    <div className="relative w-full bg-bgColor-grayLight p-4 md:w-64 md:p-6">
+    <div className="relative w-full bg-bgColor-gray300 p-4 md:w-64 md:p-6">
       {/* Desktop Navigation */}
       <div className="hidden md:block">
         <h2 className="text-textColor-black mb-4 text-xl font-semibold">

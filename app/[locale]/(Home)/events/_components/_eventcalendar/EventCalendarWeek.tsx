@@ -57,10 +57,10 @@ const EventCalendarWeek = ({
       {/* Header Navigation */}
       <div className="mb-4 flex items-center gap-4 text-xl font-semibold">
         <button aria-label="previous-month" onClick={handlePrev}>
-          <ArrowLeft className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
+          <ArrowLeft className="h-5 w-5 cursor-pointer hover:text-textColor-brand900" />
         </button>
         <button aria-label="next-month" onClick={handleNext}>
-          <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
+          <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand900" />
         </button>
         <span className="ml-2">{weekDisplay}</span>
       </div>
@@ -90,7 +90,7 @@ const EventCalendarWeek = ({
                 className="relative h-24 border-l border-t"
               >
                 {/* half-hour divider line */}
-                <div className="absolute left-0 right-0 top-1/2 h-px bg-bgColor-gray/10" />
+                <div className="absolute left-0 right-0 top-1/2 h-px bg-bgColor-gray100" />
               </div>
             ))}
           </React.Fragment>
@@ -130,7 +130,7 @@ const EventCalendarWeek = ({
                   <Link
                     key={event.id}
                     href={eventUrl}
-                    className="absolute left-1 right-1 z-10 cursor-pointer rounded bg-bgColor-brand p-2 text-xs text-textColor-white shadow-md hover:bg-bgColor-brandLight overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400"
+                    className="absolute left-1 right-1 z-10 cursor-pointer rounded bg-bgColor-brandDark900 p-2 text-xs text-textColor-white shadow-md hover:bg-bgColor-brandDark600 overflow-y-scroll scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-gray-400"
                     style={{ top: `${top}rem`, height: `${height}rem` }}
                   >
                     <strong>{event.title}</strong>

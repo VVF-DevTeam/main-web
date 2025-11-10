@@ -52,10 +52,10 @@ const EventCalendarMonth = ({
       {/* Header Navigation */}
       <div className="mb-4 flex items-center gap-4 text-xl font-semibold">
         <button aria-label="previous-month" onClick={handlePrev}>
-          <ArrowLeft className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
+          <ArrowLeft className="h-5 w-5 cursor-pointer hover:text-textColor-brand900" />
         </button>
         <button aria-label="next-month" onClick={handleNext}>
-          <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand" />
+          <ArrowRight className="h-5 w-5 cursor-pointer hover:text-textColor-brand900" />
         </button>
         <span className="ml-2">
           {formattedMonth + format(currentDate, ' yyyy')}
@@ -92,12 +92,12 @@ const EventCalendarMonth = ({
               className={`min-h-[120px] border p-2 text-sm ${
                 isCurrentMonth
                   ? 'bg-bgColor-white'
-                  : 'text-textColor-grayLight bg-bgColor-grayLight'
+                  : 'text-textColor-gray500 bg-bgColor-gray100'
               }`}
             >
               <div
                 className={`mx-auto mt-1 flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                  isToday ? 'bg-bgColor-brand text-textColor-white' : ''
+                  isToday ? 'bg-bgColor-brandDark900 text-textColor-white' : ''
                 }`}
               >
                 {format(date, 'd')}
@@ -114,7 +114,7 @@ const EventCalendarMonth = ({
                     <Link
                       key={event.id}
                       href={eventUrl}
-                      className="block rounded bg-bgColor-brand px-2 py-1 text-xs text-textColor-white shadow-sm hover:bg-bgColor-brandLight"
+                      className="block rounded bg-bgColor-brandDark900 px-2 py-1 text-xs text-textColor-white shadow-sm hover:bg-bgColor-brandDark600"
                     >
                       <strong>{event.title}</strong>
                       <div className="mt-1 flex items-center gap-x-2 text-xs">

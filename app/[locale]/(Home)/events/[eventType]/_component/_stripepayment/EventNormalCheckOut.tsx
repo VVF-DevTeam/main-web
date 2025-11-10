@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getRemainSessions } from '@/lib/actions/event/getRemainSessions'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
@@ -49,7 +49,10 @@ export default function EventNormalCheckOut({
   const [remainSessions, setRemainSessions] = useState(0)
   const [fullCoursePrice, setFullCoursePrice] = useState(0)
   const [showForm, setShowForm] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const prevShowFormRef = useRef(false)
   const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 1
+
   // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
     const checkSubAndSessions = async () => {
@@ -70,6 +73,38 @@ export default function EventNormalCheckOut({
     checkSubAndSessions()
   }, [userId, eventId, price])
 
+  // Scroll to bottom when form is opened (transition from false to true)
+  useEffect(() => {
+    if (showForm && !prevShowFormRef.current && containerRef.current) {
+      // Find the closest scrollable parent
+      let element: HTMLElement | null = containerRef.current
+      let scrollableParent: HTMLElement | null = null
+
+      while (element && !scrollableParent) {
+        const { overflowY } = window.getComputedStyle(element)
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          scrollableParent = element
+          break
+        }
+        element = element.parentElement
+      }
+
+      // Scroll to bottom after a short delay to ensure iframe is rendered
+      const timeoutId = setTimeout(() => {
+        if (scrollableParent) {
+          scrollableParent.scrollTo({
+            top: scrollableParent.scrollHeight,
+            behavior: 'smooth',
+          })
+        }
+      }, 300) // Small delay for iframe to start rendering
+
+      prevShowFormRef.current = showForm
+      return () => clearTimeout(timeoutId)
+    }
+    prevShowFormRef.current = showForm
+  }, [showForm])
+
   return (
     // Edit classname if needed
     <>
@@ -80,7 +115,7 @@ export default function EventNormalCheckOut({
         //     {t('reserve-button')} <ArrowRight className="h-4 w-4" />
         //   </Button>
         // </Link>
-        <div>
+        <div ref={containerRef}>
           {!showForm ? (
             <Button variant={'gray'} onClick={() => setShowForm(true)}>
               {t('reserve-button')} <ArrowRight className="h-4 w-4" />
@@ -99,7 +134,7 @@ export default function EventNormalCheckOut({
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div ref={containerRef} className="flex flex-col gap-4">
           {isLoading ? (
             <Button disabled>Loading...</Button>
           ) : (
@@ -109,7 +144,7 @@ export default function EventNormalCheckOut({
                   {t('payment-membershipIntro')}{' '}
                   <Link
                     href="/registration/membership"
-                    className="text-blue-500 hover:underline"
+                    className="text-textColor-blue hover:underline"
                   >
                     membership
                   </Link>

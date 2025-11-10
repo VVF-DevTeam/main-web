@@ -54,7 +54,7 @@ const PaymentSuccess = async ({
       </p>
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
         Please check the payment details at{' '}
-        <Link href={`/profile/${userName}`} className="text-blue-600 underline">
+        <Link href={`/profile/${userName}`} className="text-textColor-blue underline">
           your profile
         </Link>
         .

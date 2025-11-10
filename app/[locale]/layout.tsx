@@ -10,8 +10,10 @@ import { Toaster as SonnerToaster } from 'sonner'
 
 // CSS and CSS Modules
 import '@/lib/ui/css/globals.css'
-import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
-import { roboto } from '@/lib/ui/fonts/Roboto'
+// import { taipro } from '@/lib/ui/fonts/TaiHeritagePro'
+// import { roboto } from '@/lib/ui/fonts/Roboto'
+import { beVietnamPro } from '@/lib/ui/fonts/BeVietnamPro'
+import { lato } from '@/lib/ui/fonts/Lato'
 
 // Metadata
 export const metadata: Metadata = {
@@ -52,7 +54,7 @@ export default async function RootLayout({
     >
       <html lang="en">
         <body
-          className={`antialiased ${taipro.variable} ${roboto.variable} min-w-full`}
+          className={`antialiased  ${beVietnamPro.variable} ${lato.variable} min-w-full`}
         >
           <main>{children}</main>
           <SonnerToaster />

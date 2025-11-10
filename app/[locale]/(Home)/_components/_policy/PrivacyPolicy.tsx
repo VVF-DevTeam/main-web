@@ -35,7 +35,7 @@ const PrivacyPolicy = async ({locale}: {locale: string}) => {
             <li>{t('section2.item4')}</li>
           </ul>
 
-          <p className="mb-4">{t('section2.note')} <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">{t('stripe-policy')}</a>.</p>
+          <p className="mb-4">{t('section2.note')} <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-textColor-blue">{t('stripe-policy')}</a>.</p>
         </section>
 
         <section>

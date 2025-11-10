@@ -24,14 +24,22 @@ const EventAdminButtons = async () => {
           View All Events
         </Button>
       </Link>
-      {/* Create New Tag */}
+      {/* Create & Edit Tags */}
       {isAdmin && (
         <Link href={'/events/createEventCategory'}>
           <Button variant={'gray'} size={'lg'}>
-            Create New Tag
+            Create & Edit Tags
           </Button>
         </Link>
       )}
+      {/* Create & Edit Series */}
+      {isAdmin && (
+        <Link href={'/events/createEventSeries'}>
+          <Button size={'lg'} className="bg-bgColor-blue">
+            Create & Edit Series
+          </Button>
+        </Link>
+      )}      
     </div>
   )
 }

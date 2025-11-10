@@ -7,20 +7,19 @@ const EditorInstructions = () => {
       <p>
         To add images
         <Image
-          src="https://drive.google.com/thumbnail?id=1m3nrNZMpxDHIYQUNcsXXuIA4pHBK0CX5&sz=w100"
+          src="https://drive.google.com/thumbnail?id=1m3nrNZMpxDHIYQUNcsXXuIA4pHBK0CX5"
           width="30"
           height="30"
           alt="add image button"
           className="ml-2 inline-block"
         />
         , please first upload them to Google Drive, then get image id and use in
-        this format: https://drive.google.com/thumbnail?id=xxx&sz=w1000
-        (sz=w1000 is the size of the image, please change if needed). To align
+        this format: https://drive.google.com/thumbnail?id=xxx. To align
         image, use these buttons:
         <Image
-          src="https://drive.google.com/thumbnail?id=1-hAH2TAPRhGeMIayQTgzzinqMHHrlN7E&sz=w100"
+          src="https://drive.google.com/thumbnail?id=1-hAH2TAPRhGeMIayQTgzzinqMHHrlN7E"
           width="50"
-          height="50"
+          height="26"
           alt="align button"
           className="ml-2 inline-block"
         />

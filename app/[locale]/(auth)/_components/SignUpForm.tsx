@@ -97,13 +97,13 @@ const SignUpForm = () => {
   return (
     <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-28">
       {/* Form Header */}
-      <h1 className="header-font-default mt-8 text-3xl font-semibold text-textColor-brand lg:mt-12">
+      <h1 className="header-font-default mt-8 text-3xl font-semibold text-textColor-brand900 lg:mt-12">
         {t('register')}
       </h1>
-      <p className="mt-6 text-sm text-textColor-gray">
+      <p className="mt-6 text-sm">
         {t('description-signUp')}
       </p>
-      <Separator className="my-4 h-[1px] w-full bg-bgColor-gray" />
+      <Separator className="my-4 h-[1px] w-full bg-bgColor-gray300" />
 
       {/* Form */}
       <div>
@@ -118,7 +118,7 @@ const SignUpForm = () => {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('firstName')}
                   </FormLabel>
                   <FormControl>
@@ -140,7 +140,7 @@ const SignUpForm = () => {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('lastName')}
                   </FormLabel>
                   <FormControl>
@@ -161,7 +161,7 @@ const SignUpForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('email')}
                   </FormLabel>
                   <FormControl>
@@ -183,7 +183,7 @@ const SignUpForm = () => {
               name="age"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('age')}
                   </FormLabel>
                   <FormControl>
@@ -205,7 +205,7 @@ const SignUpForm = () => {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('phoneNumber')}
                   </FormLabel>
                   <FormControl>
@@ -233,7 +233,7 @@ const SignUpForm = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-textColor-brand">
+                  <FormLabel className="text-textColor-brand900">
                     {t('address')}
                   </FormLabel>
                   <FormControl>
@@ -256,7 +256,7 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="password"
-                    className="text-textColor-brand"
+                    className="text-textColor-brand900"
                   >
                     {t('password')}
                   </FormLabel>
@@ -293,7 +293,7 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="confirmPassword"
-                    className="text-textColor-brand"
+                    className="text-textColor-brand900"
                   >
                     {t('confirmPassword')}
                   </FormLabel>
@@ -324,7 +324,7 @@ const SignUpForm = () => {
             <div className="mt-6 flex flex-col gap-y-4 self-stretch">
               <Button
                 type="submit"
-                className="max-w-60 bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"
+                className="max-w-60 bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand600"
               >
                 {t('createAccount')}
               </Button>
@@ -337,7 +337,7 @@ const SignUpForm = () => {
           {t('alreadyHaveAccount')}{' '}
           <Link
             href="/signIn"
-            className="text-textColor-brand decoration-2 transition-all hover:text-textColor-brand/80 hover:underline"
+            className="text-textColor-brand900 decoration-2 transition-all hover:text-textColor-brand/80 hover:underline"
           >
             {t('login')}
           </Link>

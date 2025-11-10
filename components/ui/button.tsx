@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-bgColor-brand text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand/90 shadow',
+          'bg-bgColor-brand900 text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand600 shadow',
         destructive:
           'bg-bgColor-destructive text-textColor-white shadow-sm hover:bg-bgColor-destructive/90',
         outline:
@@ -18,7 +18,7 @@ const buttonVariants = cva(
         black:
           'bg-primary text-primary-foreground shadow-sm hover:bg-secondary/80',
         ghost: 'hover:text-accent-foreground',
-        gray: 'bg-bgColor-gray text-textColor-white hover:bg-bgColor-black/80',
+        gray: 'bg-bgColor-gray500 text-textColor-white hover:bg-bgColor-black/80',
       },
       size: {
         default: 'h-9 px-4 py-2',

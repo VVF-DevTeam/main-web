@@ -4,7 +4,6 @@ import ClassDescription from '../_component/_class/ClassDescription'
 import BackButton from '@/components/ui/back-button'
 import ConcertDescriptions from '../_component/_concert/ConcertDescriptions'
 import ConcertHeaders from '../_component/_concert/ConcertHeaders'
-import EventGalleryCarousel from '../_component/EventGalleryCarousel'
 
 // Libraries
 import { Metadata } from 'next'
@@ -61,6 +60,17 @@ const ClassPage = async ({ params }: ClassPageProps) => {
       hosts: {
         select: {
           name: true,
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          Review: true,
+        },
+      },
+      series: {
+        select: {
+          id: true,
         },
       },
     },
@@ -71,36 +81,50 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   }
 
   // Check if gallery carousel should be rendered
-  const shouldShowGallery =
+  const shouldShowGallery = !!(
     publishedClass.imgUrls &&
     Array.isArray(publishedClass.imgUrls as string[]) &&
     (publishedClass.imgUrls as string[]).length > 0
+  )
 
   return (
     <>
       {publishedClass.eventType === 'CONCERT' ? (
-        <div className="w-full overflow-hidden">
+        <div className="w-full">
           {/* Event Headers */}
           <ConcertHeaders event={publishedClass} />
-          <ConcertDescriptions event={publishedClass} locale={locale} />
+          <ConcertDescriptions
+            event={{
+              ...publishedClass,
+              imgUrls: (publishedClass.imgUrls as string[]) || [],
+            }}
+            locale={locale}
+            shouldShowGallery={shouldShowGallery as boolean}
+            reviewsCount={publishedClass._count.Review}
+            seriesId={publishedClass.series?.id}
+          />
         </div>
       ) : (
         <div>
-          <div className="width-max-default mx-auto">
-            <BackButton variant={'responsive'} />
+          <div className="width-max-default relative mx-auto pt-[92px]">
+            <BackButton variant={'default'} className="top-[30px]" />
             <ClassImage
               eventId={publishedClass.id}
-              imageUrl={publishedClass.imgUrl!}
-              location={publishedClass.location!}
-              startDate={publishedClass.startDate!}
               hosts={publishedClass.hosts}
               title={publishedClass.title}
               locale={locale}
-              socialLinks={publishedClass.socialLinks as { platform: string; url: string }[] | null}
+              socialLinks={
+                publishedClass.socialLinks as
+                  | { platform: string; url: string }[]
+                  | null
+              }
+              reviewsCount={publishedClass._count.Review}
+              seriesId={publishedClass.series?.id}
             />
           </div>
           <ClassDescription
             description={publishedClass.description!}
+            imageUrl={publishedClass.imgUrl!}
             startDate={publishedClass.startDate!}
             endDate={publishedClass.endDate}
             startTime={publishedClass.startTime!}
@@ -121,13 +145,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             title={publishedClass.title}
             fullCourseDiscount={publishedClass.fullCourseDiscount || 0}
             eventType={publishedClass.eventType}
-          />
-        </div>
-      )}
-      {/* Gallery Carousel at the bottom */}
-      {shouldShowGallery && (
-        <div className="my-8">
-          <EventGalleryCarousel
+            shouldShowGallery={shouldShowGallery as boolean}
             imageUrls={publishedClass.imgUrls as string[]}
           />
         </div>

@@ -2,6 +2,10 @@
 
 import { prisma } from '@/lib/db'
 import { Prisma, ReviewRating } from '@prisma/client'
+import {
+  RATING_MAP,
+  convertReviewRatingToNumber,
+} from '@/lib/utilFunctions/ratingUtils'
 
 export interface CreateReviewData {
   userId: string
@@ -38,14 +42,6 @@ export interface ReviewsPaginationResult {
   currentPage: number
 }
 
-const RatingToString = {
-  '1': ReviewRating.One,
-  '2': ReviewRating.Two,
-  '3': ReviewRating.Three,
-  '4': ReviewRating.Four,
-  '5': ReviewRating.Five,
-}
-
 // Create a new review
 export async function createReview(data: CreateReviewData) {
   try {
@@ -53,11 +49,13 @@ export async function createReview(data: CreateReviewData) {
       data: {
         userId: data.userId,
         eventId: data.eventId || null,
-        rating: RatingToString[data.rating as keyof typeof RatingToString] || ReviewRating.One,
+        rating:
+          RATING_MAP[data.rating as keyof typeof RATING_MAP] ||
+          ReviewRating.One,
         comment: data.comment,
         anonymous: data.anonymous || false,
         imageLink: data.imageLink || null,
-      }
+      },
     })
 
     return { success: true, review }
@@ -73,14 +71,16 @@ export async function getReviewsPaginated(
   reviewsPerPage: number = 6,
   searchTerm?: string,
   eventId?: string,
-  rating?: ReviewRating
+  rating?: ReviewRating,
+  removeEmptyComments?: boolean,
+  seriesId?: string
 ): Promise<ReviewsPaginationResult> {
   try {
     const skip = (page - 1) * reviewsPerPage
 
     // Build where clause
     const whereClause: Prisma.ReviewWhereInput = {}
-    
+
     if (searchTerm) {
       whereClause.OR = [
         { comment: { contains: searchTerm, mode: 'insensitive' } },
@@ -91,12 +91,29 @@ export async function getReviewsPaginated(
 
     if (eventId) {
       whereClause.eventId = eventId
+    } else if (seriesId) {
+      // Only filter by series if eventId is not set (eventId is more specific)
+      whereClause.event = {
+        seriesId: seriesId,
+      }
     }
 
     if (rating) {
       whereClause.rating = rating
     }
 
+    if (removeEmptyComments) {
+      // Exclude comments from specific user
+      whereClause.userId = {
+        not: 'cm5z8p8o90000lt6otnd5ukp8', // account using for uploading reviews
+      }
+
+      whereClause.comment = {
+        not: {
+          in: ['', ' ', '\t', '\n', '\r\n', '  ', '   '],
+        },
+      }
+    }
     // Get reviews with pagination
     const [reviews, totalCount] = await Promise.all([
       prisma.review.findMany({
@@ -131,7 +148,6 @@ export async function getReviewsPaginated(
       }),
       prisma.review.count({ where: whereClause }),
     ])
-
     const totalPages = Math.ceil(totalCount / reviewsPerPage)
 
     return {
@@ -202,13 +218,68 @@ export async function getPublishedEventsForReviewsWithSearch(
 
     return events
   } catch (error) {
-    console.error('Error getting published events for reviews with search:', error)
+    console.error(
+      'Error getting published events for reviews with search:',
+      error
+    )
+    return []
+  }
+}
+
+// Get all series that have published events with reviews
+export async function getPublishedSeriesForReviewsWithSearch(
+  searchTerm?: string,
+  limit: number = 15
+) {
+  try {
+    const series = await prisma.eventSeries.findMany({
+      where: {
+        events: {
+          some: {
+            isPublished: true,
+            Review: {
+              some: {}, // Only series that have events with reviews
+            },
+          },
+        },
+        ...(searchTerm && {
+          name: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        }),
+      },
+      select: {
+        id: true,
+        name: true,
+        keyName: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+      take: limit,
+    })
+
+    return series
+  } catch (error) {
+    console.error(
+      'Error getting published series for reviews with search:',
+      error
+    )
     return []
   }
 }
 
 // Update a review (owner only)
-export async function updateReview(reviewId: string, data: { comment: string; rating: ReviewRating; anonymous?: boolean; imageLink?: string | null }) {
+export async function updateReview(
+  reviewId: string,
+  data: {
+    comment: string
+    rating: ReviewRating
+    anonymous?: boolean
+    imageLink?: string | null
+  }
+) {
   try {
     await prisma.review.update({
       where: {
@@ -253,8 +324,8 @@ export async function getTopRatedRecentEvents(limit: number = 5) {
       where: {
         isPublished: true,
         Review: {
-          some: {} // Only events that have at least one review
-        }
+          some: {}, // Only events that have at least one review
+        },
       },
       select: {
         id: true,
@@ -282,44 +353,42 @@ export async function getTopRatedRecentEvents(limit: number = 5) {
     })
 
     // Calculate average rating and find highest rating comment for each event
-    const eventsWithRatings = events.map(event => {
-      const reviewsWithRatings = event.Review.map(review => {
-        const ratingValue = (() => {
-          switch (review.rating) {
-            case 'One': return 1
-            case 'Two': return 2
-            case 'Three': return 3
-            case 'Four': return 4
-            case 'Five': return 5
-            default: return 0
-          }
-        })()
-        
+    const eventsWithRatings = events.map((event) => {
+      const reviewsWithRatings = event.Review.map((review) => {
+        const ratingValue = convertReviewRatingToNumber(review.rating)
+
         return {
           ...review,
-          ratingValue
+          ratingValue,
         }
       })
-      
-      const ratings = reviewsWithRatings.map(review => review.ratingValue)
-      const averageRating = ratings.length > 0 
-        ? ratings.reduce((sum: number, rating: number) => sum + rating, 0) / ratings.length 
-        : 0
+
+      const ratings = reviewsWithRatings.map((review) => review.ratingValue)
+      const averageRating =
+        ratings.length > 0
+          ? ratings.reduce((sum: number, rating: number) => sum + rating, 0) /
+            ratings.length
+          : 0
 
       // Find the review with the highest rating (first one if there are ties)
-      const highestRatingReview = reviewsWithRatings.reduce((highest, current) => {
-        return current.ratingValue > highest.ratingValue ? current : highest
-      }, reviewsWithRatings[0])
+      const highestRatingReview = reviewsWithRatings.reduce(
+        (highest, current) => {
+          return current.ratingValue > highest.ratingValue ? current : highest
+        },
+        reviewsWithRatings[0]
+      )
 
       return {
         ...event,
         averageRating,
         reviewCount: ratings.length,
-        highestRatingReview: highestRatingReview ? {
-          rating: highestRatingReview.ratingValue,
-          comment: highestRatingReview.comment,
-          userName: highestRatingReview.user?.name || 'Anonymous'
-        } : null,
+        highestRatingReview: highestRatingReview
+          ? {
+              rating: highestRatingReview.ratingValue,
+              comment: highestRatingReview.comment,
+              userName: highestRatingReview.user?.name || 'Anonymous',
+            }
+          : null,
       }
     })
 
@@ -334,4 +403,3 @@ export async function getTopRatedRecentEvents(limit: number = 5) {
     return []
   }
 }
-

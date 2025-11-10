@@ -48,7 +48,7 @@ export const getStatusColor = (status: PaymentStatus): string => {
     case 'Ongoing':
       return 'text-green-600'
     case 'Upcoming':
-      return 'text-blue-600'
+      return 'text-textColor-blue'
     case 'Expired':
     case 'Past':
       return 'text-red-600'

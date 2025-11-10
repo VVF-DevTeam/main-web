@@ -48,7 +48,7 @@ describe('renders not found page', () => {
     
     const image = screen.getByAltText('Not Found')
     expect(image).toBeInTheDocument()
-    expect(image).toHaveAttribute('src', 'https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000')
+    expect(image).toHaveAttribute('src', 'https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD')
     expect(image).toHaveAttribute('width', '450')
     expect(image).toHaveAttribute('height', '450')
   })

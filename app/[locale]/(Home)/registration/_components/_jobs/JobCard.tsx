@@ -30,7 +30,7 @@ const JobCard = async ({ job }: JobCardProps) => {
   return (
     <div className="group flex w-[calc(100%-3px)] flex-col rounded-lg bg-slate-50 shadow-xl hover:bg-slate-100">
       {/* Header */}
-      <div className="relative bg-bgColor-brandLighter pt-10">
+      <div className="relative bg-bgColor-brand200 pt-10">
         {/* Tags */}
         <div
           className={cn(

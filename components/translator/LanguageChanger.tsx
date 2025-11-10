@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import i18nConfig from '@/i18nConfig';
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function LanguageChanger() {
   // @ts-ignore: useTranslation will always throw an error for typescript
@@ -12,8 +13,7 @@ export default function LanguageChanger() {
   const router = useRouter();
   const currentPathname = usePathname();
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newLocale = e.target.value;
+  const handleChange = (newLocale: string) => {
 
     // set cookie for next-i18n-router
     const days = 30;
@@ -38,10 +38,15 @@ export default function LanguageChanger() {
   };
 
   return (
-    <select onChange={handleChange} value={currentLocale} className='text-textColor'>
-      <option value="en">English</option>
-      <option value="vi">Tiếng Việt</option>
-      <option value="fr">Français</option>
-    </select>
+    <Select onValueChange={handleChange} value={currentLocale}>
+      <SelectTrigger className="hover:text-textColor-brand900">
+        <SelectValue placeholder="Select a language" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="en">EN</SelectItem>
+        <SelectItem value="vi">VN</SelectItem>
+        <SelectItem value="fr">FR</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }

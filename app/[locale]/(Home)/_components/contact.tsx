@@ -17,9 +17,9 @@ const Contact = async ({ locale }: ContactProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="h-[230px] lg:h-[280px] w-full bg-bgColor-brandLighter">
+    <div className="h-[230px] lg:h-[280px] w-full bg-bgColor-brand600">
       <div className="flex-col-center h-full w-full gap-y-12 lg:gap-y-16">
-        <h2 className="header-sub cursor-default text-center text-bgColor-blackLight lg:text-5xl pt-2">
+        <h2 className="header-sub cursor-default text-center text-textColor-black lg:text-5xl pt-2">
           {t('header-contactUs')}
         </h2>
         <Link
@@ -27,7 +27,7 @@ const Contact = async ({ locale }: ContactProps) => {
           target="_blank"
           aria-label={t('button-contactUs') as string}
           rel="noopener noreferrer"
-          className="inline-flex items-center rounded-md border-b-2 bg-bgColor-brand px-10 py-6 font-bold tracking-wide shadow-md hover:bg-bgColor-brand/90 mb-2"
+          className="inline-flex items-center rounded-md border-b-2 bg-bgColor-brand900 px-10 py-6 font-bold tracking-wide shadow-md hover:bg-bgColor-brand900/90 mb-2"
         >
           <span className="mx-auto flex items-center gap-x-4 text-textColor-white">
             {t('button-contactUs')}

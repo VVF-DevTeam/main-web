@@ -7,30 +7,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Mail, Copy, Globe } from 'lucide-react'
-import { toast } from 'sonner'
+// import { Mail, Copy, Globe } from 'lucide-react'
+// import { toast } from 'sonner'
 // Libraries
 import LanguageChanger from '@/components/translator/LanguageChanger'
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 // Main Component
 const Header = () => {
-  const handleClick = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast('Copied to clipboard', {
-      icon: <Copy className="h-4 w-4" />,
-      className: 'text-green-500',
-    })
-  }
+  // const handleClick = (text: string) => {
+  //   navigator.clipboard.writeText(text)
+  //   toast('Copied to clipboard', {
+  //     icon: <Copy className="h-4 w-4" />,
+  //     className: 'text-green-500',
+  //   })
+  // }
 
   return (
-    <div className="flex-between h-[50px] w-full bg-bgColor-blackLight text-textColor-white sm:px-3 md:px-8">
+    <div className="flex h-[48px] w-full items-center justify-end bg-bgColor-secondary900 sm:px-3 md:px-8">
       {/* Tooltip for email */}
-      <div className="flex gap-x-2">
-        {/* <TooltipProvider>
-          <Tooltip> */}
-        {/* <TooltipTrigger asChild>
+      {/* <div className="flex gap-x-2">
+        <TooltipProvider>
+          <Tooltip>
+        <TooltipTrigger asChild>
               <button
                 type="button"
                 className="group hidden items-center gap-x-2 rounded-md p-1 hover:text-[#EFB9A2] focus:outline-none focus:ring-2 focus:ring-[#EFB9A2] focus:ring-offset-2 sm:flex"
@@ -40,22 +41,22 @@ const Header = () => {
                 <Phone className="h-5 w-5" />
                 <span>{'+1 (778) 583-7088'}</span>
               </button>
-            </TooltipTrigger> */}
-        {/* <TooltipContent>
-              <p className="flex gap-x-2 text-sm text-textColor-brand">
+            </TooltipTrigger>
+        <TooltipContent>
+              <p className="flex gap-x-2 text-sm text-textColor-brand900">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider> */}
+        </TooltipProvider>
 
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="flex-center gap-x-2 rounded-md p-1 text-sm hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2 md:text-base"
+                className="flex-center gap-x-2 rounded-md p-1 text-sm hover:text-textColor-brand600 focus:outline-none focus:ring-2 focus:ring-offset-2 md:text-base"
                 onClick={() => handleClick('media@vietvibe.org')}
                 aria-label="Copy email address to clipboard"
                 aria-live="polite"
@@ -64,25 +65,25 @@ const Header = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent className="bg-bgColor-black">
-              <p className="flex gap-x-2 text-sm text-textColor-brandLight">
+              <p className="flex gap-x-2 text-sm text-textColor-brand600">
                 Copy
                 <Copy className="h-4 w-4" />
               </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </div> */}
 
       <div className="flex-center gap-x-2">
         {/* Mobile App Links */}
-        <div className="flex-center hidden gap-x-2 md:flex">
+        <div className="flex items-center justify-center gap-x-2">
           {/* Android App Link */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="rounded-md p-1 hover:text-textColor-brand900 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download Android app"
                 >
                   <Link
@@ -103,7 +104,7 @@ const Header = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download Android App
                 </p>
               </TooltipContent>
@@ -116,7 +117,7 @@ const Header = () => {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brandLight focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  className="flex items-end gap-x-1 rounded-md p-1 hover:text-textColor-brand900 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   aria-label="Download iOS app"
                 >
                   <Link
@@ -137,7 +138,7 @@ const Header = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-bgColor-black">
-                <p className="text-sm text-textColor-brandLight">
+                <p className="text-sm text-textColor-brand600">
                   Download iOS App
                 </p>
               </TooltipContent>
@@ -146,8 +147,15 @@ const Header = () => {
         </div>
 
         {/* LanguageChanger: Top-Right Corner */}
-        <div className="flex-center gap-x-2 pl-7">
-          <Globe className="h-5 w-5" />
+        <div className="flex-center pl-7">
+          <Image
+            src="/icons/solar-globe.png"
+            alt="Globe"
+            width={24}
+            height={24}
+            className="flex-shrink-0 invert"
+            unoptimized
+          />
           <LanguageChanger />
         </div>
       </div>

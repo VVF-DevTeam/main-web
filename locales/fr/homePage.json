@@ -24,6 +24,7 @@
   "job-navBecomeHost": "Devenez L'hôte",
   "login-nav": "Se connecter",
   "logout-nav": "Déconnexion",
+  "signUp-nav": "S'inscrire",
   "main-navRegistration": "Inscriptions",
   "music-description-introduction": "Avec des interprètes professionnels, nos cours et ateliers de musique offrent aux participants la possibilité d'apprendre, de grandir et de se connecter avec l'art de la musique",
   "music-header-introduction": "Cours et ateliers musicaux",
@@ -49,5 +50,17 @@
   "event-happening-on": "a lieu le",
   "event-at": "à",
   "event-few-spots-left": "avec seulement quelques places restantes!",
-  "event-dont-miss-chance": "Ne manquez pas l'occasion de vous joindre!"
+  "event-dont-miss-chance": "Inscrivez-vous!",
+  "footer-copyright": "©2025 Fondation Viet Vibe. Tous droits réservés",
+  "footer-privacyPolicy": "Politique de confidentialité",
+  "footer-termsOfService": "Conditions d'utilisation",
+  "registerDoubleSection-title": "Engagez-vous, faites la différence.",
+  "registerDoubleSection-description": "Rejoignez notre communauté pour participer à des événements amusants et enrichissants et apprendre de nouvelles connaissances",
+  "registerDoubleSection-becomeVolunteer": "Devenez bénévole",
+  "registerDoubleSection-becomeVolunteerDescription": "Participer et nous aider à organiser des événements et des ateliers pour la communauté vietnamienne à Vancouver.",
+  "registerDoubleSection-becomeHost": "Devenez hôte",
+  "registerDoubleSection-becomeHostDescription": "Partagez vos connaissances et compétences avec d'autres en hébergeant des événements et des ateliers.",
+  "trusted-by-our-members": "Trusted by our Members",
+  "learnMore": "En savoir plus",
+  "review-motto": "Nous sommes toujours en quête de fournir la meilleure expérience pour tous les participants"
 }

@@ -132,7 +132,7 @@ const SignInForm = () => {
         <CustomIcon height={100} width={100} />
         <h1 className="text-3xl">Viet Vibe Foundation</h1>
       </div>
-      <h1 className="header-font-default text-4xl font-semibold text-textColor-brand">
+      <h1 className="header-font-default text-4xl font-semibold text-textColor-brand900">
         {t('login')}
       </h1>
       <p className="mt-8 text-base text-muted-foreground">
@@ -153,7 +153,7 @@ const SignInForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="header-font-default text-lg text-textColor-brand">
+                  <FormLabel className="header-font-default text-lg text-textColor-brand900">
                     {t('email')}
                   </FormLabel>
                   <FormControl>
@@ -177,7 +177,7 @@ const SignInForm = () => {
                 <FormItem>
                   <FormLabel
                     htmlFor="password"
-                    className="header-font-default text-lg text-textColor-brand"
+                    className="header-font-default text-lg text-textColor-brand900"
                   >
                     {t('password')}
                   </FormLabel>
@@ -210,13 +210,13 @@ const SignInForm = () => {
             <div className="flex-center mt-2 flex-col gap-y-4 self-stretch">
               <Link
                 href="/forgotPassword"
-                className="place-self-end text-sm text-textColor-brand hover:underline hover:text-textColor-brand/80"
+                className="place-self-end text-sm text-textColor-brand900 hover:underline hover:text-textColor-brand900/80"
               >
                 {t('forgotPassword')}
               </Link>
               <Button
                 type="submit"
-                className="w-full bg-bgColor-brand font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand/80"
+                className="w-full bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand900/80"
               >
                 {t('login')}
               </Button>
@@ -227,7 +227,7 @@ const SignInForm = () => {
                 {t('noAccount')}{' '}
                 <Link
                   href="/signUp"
-                  className="text-textColor-brand decoration-2 transition-all hover:text-textColor-brand/70 hover:underline"
+                  className="text-textColor-brand900 decoration-2 transition-all hover:text-textColor-brand/70 hover:underline"
                 >
                   {t('signUp')}
                 </Link>

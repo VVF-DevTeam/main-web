@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
 // Components
-import { Ribbon, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
 // Interfaces
@@ -55,25 +55,25 @@ const NavAbout: React.FC<NavAboutProps> = ({
     <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
-          'flex items-center justify-center font-semibold transition-all',
+          'flex items-center justify-center text-lg transition-all xl:text-xl',
           mode === 'desktop'
-            ? `whitespace-nowrap text-sm gap-x-[5px] ${
+            ? `gap-x-[5px] whitespace-nowrap ${
                 isActive
-                  ? 'text-textColor-brand'
-                  : 'text-textColor hover:text-textColor-brand hover:underline'
+                  ? 'font-semibold'
+                  : 'text-textColor hover:text-textColor-brand900 hover:underline'
               }`
-            : `mt-2 h-full w-full rounded-md p-4 text-xl gap-x-4 ${
+            : `mt-2 h-full w-full gap-x-4 rounded-md p-4 ${
                 isActive
-                  ? 'text-textColor-brand'
-                  : 'px-5 text-slate-200 hover:bg-bgColor-brand'
+                  ? 'text-textColor-brand600'
+                  : 'px-5 text-slate-200 hover:bg-bgColor-brand900'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Ribbon className="h-5 w-5" />
+        {/* <Ribbon className="h-5 w-5" /> */}
         <span>{title}</span>
         <ChevronDown
-          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-6 w-6 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -87,7 +87,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/vision"
           className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -98,7 +98,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/members"
           className={classNames(
-            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -110,7 +110,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         <Link
           href="/about/founders"
           className={classNames(
-            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}

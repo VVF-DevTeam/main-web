@@ -25,8 +25,8 @@ import {
 } from '@/components/ui/select'
 import {
   getEventsOfHost,
-  getPublishedEvents,
-} from '@/lib/actions/event/getEventInfo'
+  getAllPublishedEvents,
+} from '@/lib/actions/event/getEvent'
 import { getUsersSimple } from '@/lib/actions/user/getAllUsersSimple'
 import { UserInfoProps, UserInfoSimpleProps } from '@/lib/types/userInfo'
 import { Input } from '@/components/ui/input'
@@ -388,7 +388,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
       try {
         // get list of events for ADMIN (all events)
         if (user.role.includes('ADMIN')) {
-          const publishedEvents = await getPublishedEvents()
+          const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
         } else if (user.role.includes('HOST')) {
           const eventsOfHost = await getEventsOfHost(user.id)

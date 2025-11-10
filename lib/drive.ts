@@ -25,7 +25,7 @@ export async function listDriveImages(type: 'avatars' | 'reviews') {
     res.data.files?.map((file) => ({
       id: file.id,
       name: file.name,
-      url: `https://drive.google.com/thumbnail?id=${file.id}&sz=w500`, // change width here if needed
+      url: `https://drive.google.com/thumbnail?id=${file.id}`, // change width here if needed
     })) || []
   )
 }

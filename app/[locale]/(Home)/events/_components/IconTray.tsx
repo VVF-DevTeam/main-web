@@ -4,6 +4,12 @@ import React from 'react'
 // Components
 import CustomIcon from '@/app/[locale]/components/CustomIcon'
 import Link from 'next/link'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 // Interfaces
 interface IconTrayProps {
@@ -15,30 +21,68 @@ interface IconTrayProps {
   }[]
   isLink?: boolean
   color?: string
+  width?: number
+  height?: number
+  gap?: number
 }
 
 // Component
-const IconTray = ({ iconList, isLink = false, color = 'black' }: IconTrayProps) => {
+const IconTray = ({
+  iconList,
+  isLink = false,
+  color = 'black',
+  width = 30,
+  height = 30,
+  gap = 4,
+}: IconTrayProps) => {
   return (
     <div>
       {isLink ? (
-        <div className="flex gap-x-4">
+        <div className="flex" style={{ gap: `${gap}px` }}>
           {iconList.map((icon) => (
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href={icon.url}
-              key={icon.id}
-              className="transition-transform duration-300 hover:scale-105"
-            >
-              <CustomIcon src={icon.icon} height={30} width={30} color={color} />
-            </Link>
+            <TooltipProvider key={icon.id} delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={icon.url}
+                    className="transition-transform duration-300 hover:scale-105"
+                  >
+                    <CustomIcon
+                      src={icon.icon}
+                      height={height}
+                      width={width}
+                      color={color}
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent className="bg-bgColor-black" sideOffset={4}>
+                  <p className="text-sm text-textColor-brand600">
+                    View {icon.name} of instructor
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ))}
         </div>
       ) : (
-        <div className="flex gap-x-4">
+        <div className="flex" style={{ gap: `${gap}px` }}>
           {iconList.map((icon) => (
-            <CustomIcon key={icon.id} src={icon.icon} height={30} width={30} />
+            <TooltipProvider key={icon.id} delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <CustomIcon src={icon.icon} height={height} width={width} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="bg-bgColor-black" sideOffset={4}>
+                  <p className="text-sm text-textColor-brand600">
+                    View {icon.name} of instructor
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ))}
         </div>
       )}

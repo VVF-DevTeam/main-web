@@ -14,8 +14,10 @@ import ReviewsDisplay from './_components/ReviewsDisplay'
 import {
   getReviewsPaginated,
   getPublishedEventsForReviewsWithSearch,
+  getPublishedSeriesForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
-import { ReviewRating } from '@prisma/client'
+import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
+// import { ReviewRating } from '@prisma/client'
 import ScrollToReviews from './_components/ScrollToReviews'
 interface PostsProps {
   params: Promise<{ locale: string }>
@@ -27,6 +29,7 @@ interface PostsProps {
     reviewSearch?: string
     reviewEvent?: string
     reviewRating?: string
+    reviewSeries?: string
     redirectToReviewsSection?: boolean
   }>
 }
@@ -41,6 +44,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     reviewSearch,
     reviewEvent,
     reviewRating,
+    reviewSeries,
     redirectToReviewsSection,
   } = await searchParams
 
@@ -63,24 +67,8 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   const currentReviewSearch = reviewSearch || ''
   const currentReviewEvent = reviewEvent || ''
   const currentReviewRating = reviewRating || ''
+  const currentReviewSeries = reviewSeries || ''
 
-  // Convert rating string to ReviewRating enum
-  const convertToReviewRating = (rating: string): ReviewRating | undefined => {
-    switch (rating) {
-      case '1':
-        return ReviewRating.One
-      case '2':
-        return ReviewRating.Two
-      case '3':
-        return ReviewRating.Three
-      case '4':
-        return ReviewRating.Four
-      case '5':
-        return ReviewRating.Five
-      default:
-        return undefined
-    }
-  }
 
   // Fetch reviews data on server side
   const reviewsResult = await getReviewsPaginated(
@@ -90,11 +78,19 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     currentReviewEvent === 'all' ? undefined : currentReviewEvent || undefined,
     currentReviewRating === 'all'
       ? undefined
-      : convertToReviewRating(currentReviewRating)
+      : convertStringToReviewRating(currentReviewRating),
+    false,
+    currentReviewSeries === 'all' ? undefined : currentReviewSeries || undefined
   )
 
   // Fetch events for review filtering (latest 15 events)
   const eventsForReviews = await getPublishedEventsForReviewsWithSearch(
+    undefined,
+    15
+  )
+
+  // Fetch series for review filtering
+  const seriesForReviews = await getPublishedSeriesForReviewsWithSearch(
     undefined,
     15
   )
@@ -117,7 +113,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
           <div>
             <a
               href="#reviews-section"
-              className="inline-flex items-center gap-1 text-sm text-bgColor-brand hover:text-bgColor-brandDark hover:underline group"
+              className="inline-flex items-center gap-1 text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline group"
             >
               <span>Go to Reviews</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -156,12 +152,12 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/*Separator */}
-        <div className="h-px w-full bg-bgColor-gray/15" />
+        <div className="h-px w-full bg-bgColor-gray300" />
 
         {/* Posts */}
         <div className="flex-col-default md:grid md:grid-cols-[55%_45%]">
           {/* Posts */}
-          <div className="flex flex-col border-b border-bgColor-gray/15 md:border-b-0 md:border-r">
+          <div className="flex flex-col border-b border-bgColor-gray300 md:border-b-0 md:border-r">
             <Suspense
               key={`${title}-${currentPage}`}
               fallback={<PostsSkeleton />}
@@ -180,9 +176,9 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
                 <Link href="/posts/allPosts" className="group mb-2 py-6">
                   <Button
                     variant={'ghost'}
-                    className="flex-center gap-x-2 bg-bgColor-gray/15 p-6 text-textColor hover:bg-bgColor-gray/25 hover:text-textColor/90"
+                    className="flex-center gap-x-2 bg-bgColor-gray300 p-6 text-textColor-black hover:bg-bgColor-gray500"
                   >
-                    <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-y-[-1px]" />
+                    <ArrowRight className="h-10 w-10 duration-100 ease-in group-hover:translate-x-[2px]" />
                     <span className="text-xl">{t('allPost')}</span>
                   </Button>
                 </Link>
@@ -215,7 +211,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
         </div>
 
         {/*Separator */}
-        <div className="h-px w-full bg-bgColor-gray/15" />
+        <div className="h-px w-full bg-bgColor-gray300" />
 
         {/* Reviews */}
         <div
@@ -240,9 +236,11 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
               totalPages={reviewsResult.totalPages}
               totalCount={reviewsResult.totalCount}
               initialEvents={eventsForReviews}
+              initialSeries={seriesForReviews}
               initialSearchTerm={currentReviewSearch}
               initialSelectedEvent={currentReviewEvent}
               initialSelectedRating={currentReviewRating}
+              initialSelectedSeries={currentReviewSeries}
             />
           </Suspense>
         </div>

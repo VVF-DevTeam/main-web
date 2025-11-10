@@ -25,17 +25,17 @@ const Directors = async ({ locale }: DirectorsProps) => {
         {/* First Director */}
         <div className="flex-col-center w-full gap-y-3 md:flex-row md:justify-end md:gap-x-5 md:pr-2">
           <Image
-            src="https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u&sz=w1000"
+            src="https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u"
             alt="Trong Nguyen"
-            width={200}
-            height={50}
+            width={140}
+            height={140}
             className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex-col-center gap-y-2 md:items-start">
             <span className="header-font-black text-xl font-bold">
               {t('name1-director')}
             </span>
-            <span className="header-font-black text-sm font-semibold text-textColor-brand">
+            <span className="header-font-black text-sm font-semibold text-textColor-brand900">
               {t('title1-director')}
             </span>
             <span className="max-w-[300px] text-center text-sm md:text-left">
@@ -46,17 +46,17 @@ const Directors = async ({ locale }: DirectorsProps) => {
         {/* Second Director */}
         <div className="flex-col-center w-full gap-x-5 gap-y-3 md:flex-row md:justify-start md:pl-4">
           <Image
-            src="https://drive.google.com/thumbnail?id=14oie7aYFMkMRwPYx9Ngty7B7wx-2NczG&sz=w1000"
+            src="https://drive.google.com/thumbnail?id=14oie7aYFMkMRwPYx9Ngty7B7wx-2NczG"
             alt="Eattle Nguyen"
-            width={200}
-            height={50}
+            width={140}
+            height={140}
             className="h-[140px] w-[140px] rounded-full object-cover"
           />
           <div className="flex-col-center gap-y-2 md:items-start">
             <span className="header-font-black text-xl font-bold">
               {t('name2-director')}
             </span>
-            <span className="header-font-black text-sm font-semibold text-textColor-brand">
+            <span className="header-font-black text-sm font-semibold text-textColor-brand900">
               {t('title2-director')}
             </span>
             <span className="max-w-[300px] text-center text-sm md:text-left">

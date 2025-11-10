@@ -46,8 +46,8 @@ const JobStartDate = ({ job }: JobStartDateProps) => {
       toast.success('Success', {
         description: 'Job Start Date updated successfully',
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       console.log(response)
       setIsEditing(false)
@@ -57,8 +57,8 @@ const JobStartDate = ({ job }: JobStartDateProps) => {
       toast.error('Error', {
         description: 'Something went wrong',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -122,7 +122,11 @@ const JobStartDate = ({ job }: JobStartDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {job.startDate.toLocaleDateString('en-US')}
+            {job.startDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
           </p>
         )}
       </div>

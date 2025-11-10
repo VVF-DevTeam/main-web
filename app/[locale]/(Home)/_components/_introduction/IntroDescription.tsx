@@ -22,7 +22,7 @@ const IntroDescription = async ({
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex-col-center text-place-default default-gap pr-6 md:max-w-96">
+    <div className="flex-col-center default-gap pr-6 text-center md:max-w-96 md:text-left">
       <h1 className="text-3xl font-bold tracking-wide text-textColor">
         {t(title)}
       </h1>

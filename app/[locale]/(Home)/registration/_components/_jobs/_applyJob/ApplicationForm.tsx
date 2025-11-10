@@ -176,7 +176,7 @@ const ApplicationForm = ({
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   First Name
                 </FormLabel>
                 <FormControl>
@@ -195,7 +195,7 @@ const ApplicationForm = ({
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Last Name
                 </FormLabel>
                 <FormControl>
@@ -214,7 +214,7 @@ const ApplicationForm = ({
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">Address</FormLabel>
+                <FormLabel className="text-textColor-brand900">Address</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: 123 Main St"
@@ -231,7 +231,7 @@ const ApplicationForm = ({
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">City</FormLabel>
+                <FormLabel className="text-textColor-brand900">City</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: Vancouver"
@@ -248,7 +248,7 @@ const ApplicationForm = ({
             name="country"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">Country</FormLabel>
+                <FormLabel className="text-textColor-brand900">Country</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: Canada"
@@ -265,7 +265,7 @@ const ApplicationForm = ({
             name="postCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Postal Code
                 </FormLabel>
                 <FormControl>
@@ -284,7 +284,7 @@ const ApplicationForm = ({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">Email</FormLabel>
+                <FormLabel className="text-textColor-brand900">Email</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="eg: liam.brown@gmail.com"
@@ -301,7 +301,7 @@ const ApplicationForm = ({
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">
+                <FormLabel className="text-textColor-brand900">
                   Phone Number
                 </FormLabel>
                 <FormControl>
@@ -320,7 +320,7 @@ const ApplicationForm = ({
             name="resume"
             render={() => (
               <FormItem>
-                <FormLabel className="text-textColor-brand">Resume</FormLabel>
+                <FormLabel className="text-textColor-brand900">Resume</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
@@ -341,7 +341,7 @@ const ApplicationForm = ({
           {/* Submit Button */}
           <Button
             type="submit"
-            className="col-span-2 max-w-32 bg-bgColor-brand text-textColor-white hover:bg-bgColor-brandLight"
+            variant="default"
           >
             Apply
           </Button>

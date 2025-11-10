@@ -1,10 +1,10 @@
 import React from 'react'
-import PostList from './PostList'
+import PostListVertical from './PostListVertical'
 import { auth } from '@/auth'
 import initTranslations from '@/app/i18n'
 import { getPublishedPostsByTitlePaginated } from '@/lib/actions/post/getPosts'
 
-interface Postsprops {
+interface PostsProps {
   locale: string
   title: string
   currentPage: number
@@ -16,7 +16,7 @@ const PublishedPosts = async ({
   title,
   currentPage,
   postsPerPage,
-}: Postsprops) => {
+}: PostsProps) => {
   const { t } = await initTranslations(locale, ['post', 'common'])
   const session = await auth()
   const paginationResult = await getPublishedPostsByTitlePaginated(
@@ -37,7 +37,7 @@ const PublishedPosts = async ({
 
       {/* Posts */}
       {paginationResult !== null && paginationResult.posts.length > 0 ? (
-        <PostList
+        <PostListVertical
           posts={paginationResult.posts}
           userId={session?.user?.id || null}
           currentPage={paginationResult.currentPage}

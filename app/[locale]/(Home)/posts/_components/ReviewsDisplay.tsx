@@ -10,7 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Star, Search, Filter, Trash2, Edit, Image as ImageIcon } from 'lucide-react'
+import {
+  Star,
+  Search,
+  Filter,
+  Trash2,
+  Edit,
+  Image as ImageIcon,
+} from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { FiEdit2 } from 'react-icons/fi'
 import axios from 'axios'
@@ -18,6 +25,7 @@ import {
   deleteReview,
   updateReview,
   getPublishedEventsForReviewsWithSearch,
+  getPublishedSeriesForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
 import { ReviewWithUserAndEvent } from '@/lib/actions/review/reviewActions'
 import { toast } from 'sonner'
@@ -25,6 +33,10 @@ import { ReviewRating } from '@prisma/client'
 import { useTranslation } from 'react-i18next'
 import useDebounce from '@/hooks/useDebounce'
 import Image from 'next/image'
+import {
+  convertReviewRatingToNumber,
+  NUMBER_TO_RATING_MAP,
+} from '@/lib/utilFunctions/ratingUtils'
 
 interface ReviewsDisplayProps {
   currentPage: number
@@ -34,9 +46,11 @@ interface ReviewsDisplayProps {
   totalPages: number
   totalCount: number
   initialEvents: Event[]
+  initialSeries: Series[]
   initialSearchTerm: string
   initialSelectedEvent: string
   initialSelectedRating: string
+  initialSelectedSeries: string
 }
 
 interface Event {
@@ -44,20 +58,26 @@ interface Event {
   title: string
 }
 
+interface Series {
+  id: string
+  name: string
+  keyName: string
+}
+
 const generateRandomNumber = (id: string) => {
   // Create a simple hash from the ID string
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < id.length; i++) {
-    const char = id.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    const char = id.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
   }
-  
+
   // Convert to positive number and get 4 digits (1000-9999)
-  const positiveHash = Math.abs(hash);
-  const fourDigitNumber = (positiveHash % 9000) + 1000;
-  
-  return fourDigitNumber.toString();
+  const positiveHash = Math.abs(hash)
+  const fourDigitNumber = (positiveHash % 9000) + 1000
+
+  return fourDigitNumber.toString()
 }
 
 const ReviewsDisplay = ({
@@ -68,9 +88,11 @@ const ReviewsDisplay = ({
   totalPages: initialTotalPages,
   totalCount: initialTotalCount,
   initialEvents,
+  initialSeries,
   initialSearchTerm,
   initialSelectedEvent,
   initialSelectedRating,
+  initialSelectedSeries,
 }: ReviewsDisplayProps) => {
   console.log(reviewsPerPage) // Do not remove, will use for later
 
@@ -82,11 +104,15 @@ const ReviewsDisplay = ({
   const totalCount = initialTotalCount
   const loading = false
   const events = initialEvents
+  const series = initialSeries
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm)
   const [selectedEvent, setSelectedEvent] = useState(initialSelectedEvent)
   const [selectedRating, setSelectedRating] = useState(initialSelectedRating)
+  const [selectedSeries, setSelectedSeries] = useState(initialSelectedSeries)
   const [filteredEvents, setFilteredEvents] = useState(events)
+  const [filteredSeries, setFilteredSeries] = useState(series)
   const [eventSearchTerm, setEventSearchTerm] = useState('')
+  const [seriesSearchTerm, setSeriesSearchTerm] = useState('')
   const [editingReview, setEditingReview] = useState<string | null>(null)
   const [editComment, setEditComment] = useState('')
   const [editRating, setEditRating] = useState<ReviewRating | null>(null)
@@ -102,22 +128,7 @@ const ReviewsDisplay = ({
   const isInitialRenderRef = useRef(true)
 
   // Helper function to convert ReviewRating enum to number
-  const ratingEnumToNumber = (rating: ReviewRating): number => {
-    switch (rating) {
-      case ReviewRating.One:
-        return 1
-      case ReviewRating.Two:
-        return 2
-      case ReviewRating.Three:
-        return 3
-      case ReviewRating.Four:
-        return 4
-      case ReviewRating.Five:
-        return 5
-      default:
-        return 0
-    }
-  }
+  const ratingEnumToNumber = convertReviewRatingToNumber
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -127,11 +138,13 @@ const ReviewsDisplay = ({
     const urlSearchTerm = searchParams.get('reviewSearch') || ''
     const urlEvent = searchParams.get('reviewEvent') || ''
     const urlRating = searchParams.get('reviewRating') || ''
+    const urlSeries = searchParams.get('reviewSeries') || ''
 
     // Update local state with URL parameters
     setSearchTerm(urlSearchTerm)
     setSelectedEvent(urlEvent)
     setSelectedRating(urlRating)
+    setSelectedSeries(urlSeries)
   }, [searchParams])
 
   const handleSearch = useCallback(
@@ -164,9 +177,16 @@ const ReviewsDisplay = ({
         params.delete('reviewRating')
       }
 
+      // Handle series filter
+      if (selectedSeries && selectedSeries !== 'all') {
+        params.set('reviewSeries', selectedSeries)
+      } else {
+        params.delete('reviewSeries')
+      }
+
       router.push(`?${params.toString()}`, { scroll: false })
     },
-    [debouncedSearchTerm, selectedEvent, selectedRating, searchParams, router]
+    [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, searchParams, router]
   )
 
   // Track previous filter values to detect actual filter changes
@@ -174,6 +194,7 @@ const ReviewsDisplay = ({
     searchTerm: initialSearchTerm,
     selectedEvent: initialSelectedEvent,
     selectedRating: initialSelectedRating,
+    selectedSeries: initialSelectedSeries,
   })
 
   // Auto-trigger search when filters change (but not when page changes)
@@ -186,6 +207,7 @@ const ReviewsDisplay = ({
         searchTerm: debouncedSearchTerm,
         selectedEvent,
         selectedRating,
+        selectedSeries,
       }
       return
     }
@@ -194,7 +216,8 @@ const ReviewsDisplay = ({
     const filtersChanged =
       prevFiltersRef.current.searchTerm !== debouncedSearchTerm ||
       prevFiltersRef.current.selectedEvent !== selectedEvent ||
-      prevFiltersRef.current.selectedRating !== selectedRating
+      prevFiltersRef.current.selectedRating !== selectedRating ||
+      prevFiltersRef.current.selectedSeries !== selectedSeries
 
     if (filtersChanged) {
       // Update the ref with new values
@@ -202,6 +225,7 @@ const ReviewsDisplay = ({
         searchTerm: debouncedSearchTerm,
         selectedEvent,
         selectedRating,
+        selectedSeries,
       }
 
       // Debounce the search to avoid too many API calls
@@ -211,16 +235,18 @@ const ReviewsDisplay = ({
 
       return () => clearTimeout(timeoutId)
     }
-  }, [debouncedSearchTerm, selectedEvent, selectedRating, handleSearch])
+  }, [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, handleSearch])
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm('')
     setSelectedEvent('all')
     setSelectedRating('all')
+    setSelectedSeries('all')
     const params = new URLSearchParams(searchParams)
     params.delete('reviewSearch')
     params.delete('reviewEvent')
     params.delete('reviewRating')
+    params.delete('reviewSeries')
     params.set('reviewPage', '1')
     router.push(`?${params.toString()}`, { scroll: false })
   }, [searchParams, router])
@@ -248,6 +274,22 @@ const ReviewsDisplay = ({
       }
     },
     [events]
+  )
+
+  // Handle series search
+  const handleSeriesSearch = useCallback(
+    async (searchTerm: string) => {
+      if (searchTerm === '') {
+        setFilteredSeries(series)
+      } else {
+        const filtered = await getPublishedSeriesForReviewsWithSearch(
+          searchTerm,
+          15
+        )
+        setFilteredSeries(filtered)
+      }
+    },
+    [series]
   )
 
   // Handle image modal
@@ -401,8 +443,17 @@ const ReviewsDisplay = ({
             <label className="mb-1 block text-sm font-medium text-gray-700">
               {t('filterByEvent')}
             </label>
-            <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-              <SelectTrigger>
+            <Select
+              value={selectedEvent}
+              onValueChange={(value) => {
+                setSelectedEvent(value)
+                // Clear series filter when event is selected (they're mutually exclusive)
+                if (value !== 'all') {
+                  setSelectedSeries('all')
+                }
+              }}
+            >
+              <SelectTrigger className="border border-input shadow-sm">
                 <SelectValue placeholder={t('allEvents') || ''} />
               </SelectTrigger>
               <SelectContent>
@@ -439,7 +490,7 @@ const ReviewsDisplay = ({
               {t('filterByRating')}
             </label>
             <Select value={selectedRating} onValueChange={setSelectedRating}>
-              <SelectTrigger>
+              <SelectTrigger className="border border-input shadow-sm">
                 <SelectValue placeholder={t('allRatings') || ''} />
               </SelectTrigger>
               <SelectContent>
@@ -449,6 +500,52 @@ const ReviewsDisplay = ({
                 <SelectItem value="3">3 {t('stars')}</SelectItem>
                 <SelectItem value="2">2 {t('stars')}</SelectItem>
                 <SelectItem value="1">1 {t('stars')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="w-full md:w-48">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              {t('filterBySeries')}
+            </label>
+            <Select
+              value={selectedSeries}
+              onValueChange={(value) => {
+                setSelectedSeries(value)
+                // Clear event filter when series is selected (they're mutually exclusive)
+                if (value !== 'all') {
+                  setSelectedEvent('all')
+                }
+              }}
+            >
+              <SelectTrigger className="border border-input shadow-sm">
+                <SelectValue placeholder="All Series" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="pb-2">
+                  <Input
+                    type="search"
+                    autoComplete="off"
+                    placeholder="Search for series (if not shown in list)"
+                    value={seriesSearchTerm}
+                    onChange={(e) => {
+                      setSeriesSearchTerm(e.target.value)
+                    }}
+                    onKeyDown={async (e) => {
+                      e.stopPropagation()
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        await handleSeriesSearch(seriesSearchTerm)
+                      }
+                    }}
+                  />
+                </div>
+                <SelectItem value="all">All Series</SelectItem>
+                {filteredSeries.map((seriesItem) => (
+                  <SelectItem key={seriesItem.id} value={seriesItem.id}>
+                    {seriesItem.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -473,15 +570,18 @@ const ReviewsDisplay = ({
           .replace('{total}', totalCount.toString())}
         {(debouncedSearchTerm ||
           (selectedEvent && selectedEvent !== 'all') ||
-          (selectedRating && selectedRating !== 'all')) && (
+          (selectedRating && selectedRating !== 'all') ||
+          (selectedSeries && selectedSeries !== 'all')) && (
           <>
             <span className="ml-2">{t('filteredResults')} </span>
             <span className="ml-2 font-semibold">
               {t('averageRating')}:{' '}
-              {(reviews.reduce(
-                (acc, review) => acc + ratingEnumToNumber(review.rating),
-                0
-              ) / reviews.length).toFixed(1)}
+              {(
+                reviews.reduce(
+                  (acc, review) => acc + ratingEnumToNumber(review.rating),
+                  0
+                ) / reviews.length
+              ).toFixed(1)}
             </span>
           </>
         )}
@@ -492,7 +592,8 @@ const ReviewsDisplay = ({
         <div className="py-8 text-center text-gray-500">
           {debouncedSearchTerm ||
           (selectedEvent && selectedEvent !== 'all') ||
-          (selectedRating && selectedRating !== 'all') ? (
+          (selectedRating && selectedRating !== 'all') ||
+          (selectedSeries && selectedSeries !== 'all') ? (
             <p>{t('noReviewsMatch')}</p>
           ) : (
             <p>{t('noReviewsYet')}</p>
@@ -524,15 +625,10 @@ const ReviewsDisplay = ({
                                   : 'text-gray-300 hover:text-yellow-400'
                               }`}
                               onClick={() => {
-                                const ratingMap = {
-                                  1: ReviewRating.One,
-                                  2: ReviewRating.Two,
-                                  3: ReviewRating.Three,
-                                  4: ReviewRating.Four,
-                                  5: ReviewRating.Five,
-                                }
                                 setEditRating(
-                                  ratingMap[star as keyof typeof ratingMap]
+                                  NUMBER_TO_RATING_MAP[
+                                    star as keyof typeof NUMBER_TO_RATING_MAP
+                                  ]
                                 )
                               }}
                             />
@@ -566,7 +662,9 @@ const ReviewsDisplay = ({
 
                       {/* Image Upload/Remove */}
                       <div className="space-y-2">
-                        <span className="text-sm font-medium">Image (Optional)</span>
+                        <span className="text-sm font-medium">
+                          Image (Optional)
+                        </span>
                         <div className="flex flex-col items-center">
                           <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
                             {editImagePreview ? (
@@ -594,7 +692,9 @@ const ReviewsDisplay = ({
                                 <p className="text-sm font-medium text-gray-600">
                                   Add Photo
                                 </p>
-                                <p className="text-xs text-gray-500">Optional</p>
+                                <p className="text-xs text-gray-500">
+                                  Optional
+                                </p>
                               </div>
                             )}
                             <input
@@ -606,7 +706,9 @@ const ReviewsDisplay = ({
                             />
                           </label>
                           {isEditImageLoading && (
-                            <p className="mt-2 text-sm text-blue-500">Uploading...</p>
+                            <p className="mt-2 text-sm text-textColor-blue">
+                              Uploading...
+                            </p>
                           )}
                           {editImagePreview && (
                             <Button
@@ -662,8 +764,8 @@ const ReviewsDisplay = ({
                       {/* Review Image */}
                       {review.imageLink && (
                         <div className="mb-3 flex justify-center">
-                          <div 
-                            className="relative h-48 w-full max-w-sm overflow-hidden rounded-lg border border-gray-200 cursor-pointer transition-transform hover:scale-105"
+                          <div
+                            className="relative h-48 w-full max-w-sm cursor-pointer overflow-hidden rounded-lg border border-gray-200 transition-transform hover:scale-105"
                             onClick={() => openImageModal(review.imageLink!)}
                           >
                             <Image
@@ -674,8 +776,8 @@ const ReviewsDisplay = ({
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
                             {/* Click indicator overlay */}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
-                              <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-2">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 hover:bg-opacity-10">
+                              <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 hover:opacity-100">
                                 <Search className="h-5 w-5 text-gray-700" />
                               </div>
                             </div>
@@ -685,7 +787,15 @@ const ReviewsDisplay = ({
 
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
-                          {t('by')} {review.anonymous ? t('anonymous') + ' ' + generateRandomNumber(review.id) : review.user?.name || t('anonymous') + ' ' + generateRandomNumber(review.id)} 
+                          {t('by')}{' '}
+                          {review.anonymous
+                            ? t('anonymous') +
+                              ' ' +
+                              generateRandomNumber(review.id)
+                            : review.user?.name ||
+                              t('anonymous') +
+                                ' ' +
+                                generateRandomNumber(review.id)}
                         </span>
                         <div className="flex items-center gap-2">
                           <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-gray-200">
@@ -700,7 +810,7 @@ const ReviewsDisplay = ({
                             ) : (
                               <Image
                                 src={
-                                  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab&sz=w2000'
+                                  'https://drive.google.com/thumbnail?id=1Vjy12B-hkodyEouCprguvMvICCg2o5Ab'
                                 }
                                 alt={review.user?.name || 'User'}
                                 className="h-full w-full object-cover"
@@ -711,7 +821,14 @@ const ReviewsDisplay = ({
                           </div>
                         </div>
                         <span>
-                          {new Date(review.updatedAt).toLocaleDateString()}
+                          {new Date(review.updatedAt).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            }
+                          )}
                         </span>
                       </div>
                     </>
@@ -725,7 +842,7 @@ const ReviewsDisplay = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditReview(review)}
-                        className="text-blue-600 hover:bg-blue-50 hover:text-blue-800"
+                        className="text-textColor-blue hover:bg-blue-50 hover:text-blue-800"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -774,23 +891,23 @@ const ReviewsDisplay = ({
 
       {/* Image Modal */}
       {modalImageUrl && (
-          <div
-            className="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-0 m-0 [margin-top:0!important]"
-            onClick={handleModalOverlayClick}
-          >
+        <div
+          className="fixed inset-0 z-[90] m-0 flex items-center justify-center bg-black/80 p-0 [margin-top:0!important]"
+          onClick={handleModalOverlayClick}
+        >
           <div className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-lg">
             <Image
               src={modalImageUrl}
               alt="Review image full size"
               width={800}
               height={600}
-              className="h-auto w-auto max-h-[90vh] max-w-[90vw] object-contain"
+              className="h-auto max-h-[90vh] w-auto max-w-[90vw] object-contain"
               sizes="90vw"
             />
             {/* Close button */}
             <button
               onClick={closeImageModal}
-              className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 hover:bg-opacity-100 transition-all duration-200"
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 transition-all duration-200 hover:bg-opacity-100"
             >
               ✕
             </button>

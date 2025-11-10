@@ -7,27 +7,26 @@ import { usePathname } from 'next/navigation'
 
 // Components
 import Link from 'next/link'
-import { Home, CalendarDays, Newspaper, LucideIcon, Ribbon } from 'lucide-react'
+// import { Home, CalendarDays, Newspaper, LucideIcon, Ribbon } from 'lucide-react'
 
 //Interfaces
-const navLogos: Record<string, LucideIcon> = {
-  home: Home,
-  events: CalendarDays,
-  posts: Newspaper,
-  about: Ribbon,
-}
+// const navLogos: Record<string, LucideIcon> = {
+//   home: Home,
+//   events: CalendarDays,
+//   posts: Newspaper,
+//   about: Ribbon,
+// }
 
 type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
   label: string
   path: string
-  logo: string
   mode: screenSize
 }
 
 // Main Component
-const NavLink = ({ label, path, logo, mode }: NavLinkProps) => {
-  const Icon = navLogos[logo]
+const NavLink = ({ label, path, mode }: NavLinkProps) => {
+  // const Icon = navLogos[logo]
   const pathname = usePathname()
   const isActive =
     path === '/' 
@@ -36,15 +35,15 @@ const NavLink = ({ label, path, logo, mode }: NavLinkProps) => {
 
   // css variables
   const baseClasses =
-    'flex-center whitespace-nowrap font-semibold transition-all tracking-wide'
+    'flex-center whitespace-nowrap transition-all tracking-wide'
   const inactiveColor =
     mode === 'desktop'
-      ? 'text-textColor hover:text-textColor-brand hover:underline'
-      : 'text-textColor-white hover:bg-bgColor-brand'
+      ? 'text-textColor hover:text-textColor-brand900 hover:underline'
+      : 'text-textColor-white hover:bg-bgColor-brand900'
   const layoutClasses =
     mode === 'desktop'
-      ? 'gap-x-[5px] text-sm'
-      : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl'
+      ? 'gap-x-[5px] text-lg xl:text-xl'
+      : 'mt-2 h-full w-full gap-x-4 rounded-md p-4 text-lg xl:text-xl'
 
   return (
     <Link
@@ -52,11 +51,11 @@ const NavLink = ({ label, path, logo, mode }: NavLinkProps) => {
       className={cn(
         baseClasses,
         layoutClasses,
-        isActive ? 'text-textColor-brand' : inactiveColor
+        isActive ? mode === 'desktop' ? 'font-semibold' : 'text-textColor-brand600' : inactiveColor
       )}
       aria-current={isActive ? 'page' : undefined}
     >
-      <Icon className="h-5 w-5" aria-hidden="true" />
+      {/* <Icon className="h-5 w-5" aria-hidden="true" /> */}
       <span>{label}</span>
     </Link>
   )

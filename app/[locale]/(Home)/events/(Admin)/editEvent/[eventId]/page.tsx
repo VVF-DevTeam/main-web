@@ -21,6 +21,7 @@ import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
 import EventFullDiscount from './_components/EventFullDiscount'
+import EventEditSeries from './_components/EventSeries'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
@@ -28,6 +29,7 @@ import EventFormLink from './_components/EventFormLink'
 import EventSocialMedia from './_components/EventSocialMedia'
 import EventSubtitle from './_components/EventSubtitle'
 import EventGallery from './_components/EventGallery'
+import DeleteEventButton from './_components/DeleteEventButton'
 
 // Main Component
 const EditEventPage = async ({
@@ -64,11 +66,18 @@ const EditEventPage = async ({
           id: true,
         },
       },
+      series: true,
     },
   })
 
   // Fetch event categories
   const categories = await prisma.eventCategory.findMany()
+  // Fetch all event series
+  const allSeries = await prisma.eventSeries.findMany({
+    orderBy: {
+      name: 'asc',
+    },
+  })
   // TODO: If the event is not found, show a 404 page.
   if (!event) {
     redirect('/events')
@@ -119,14 +128,17 @@ const EditEventPage = async ({
             </span>
           </div>
 
-          {/* Publish Button */}
-          <PublishButton
-            id={event.id}
-            type={'event'}
-            canPublish={canPublish}
-            isPublished={event.isPublished}
-            domain={'events'}
-          />
+          {/* Buttons */}
+          <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
+            <DeleteEventButton eventId={event.id} />
+            <PublishButton
+              id={event.id}
+              type={'event'}
+              canPublish={canPublish}
+              isPublished={event.isPublished}
+              domain={'events'}
+            />
+          </div>
         </div>
 
         {/* Event Body */}
@@ -236,7 +248,7 @@ const EditEventPage = async ({
               <Link
                 href="/events/createEventCategory"
                 target="_blank"
-                className="text-blue-700 underline"
+                className="text-textColor-blue underline"
               >
                 here
               </Link>
@@ -244,10 +256,30 @@ const EditEventPage = async ({
             </p>
             <EventCategories event={event} categories={categories} />
           </div>
+
+          {/* Event Series */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XV :</span> Event Series
+            </h2>
+            <p>
+              If you don&apos;t see any series, you can create one{' '}
+              <Link
+                href="/events/createEventSeries"
+                target="_blank"
+                className="text-textColor-blue underline"
+              >
+                here
+              </Link>
+              . After adding, please refresh the page.
+            </p>
+            <EventEditSeries event={event} allSeries={allSeries} />
+          </div>
+
           {/* Event Registration Form Link */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XV :</span> Event
+              <span className="text-gray-500">Step XVI :</span> Event
               Registration Form (Optional)
             </h2>
             <p>
@@ -261,7 +293,7 @@ const EditEventPage = async ({
           {/* Event Social Media - Only show for concert events */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVI :</span> Social Media
+              <span className="text-gray-500">Step XVII :</span> Social Media
               Links (Optional)
             </h2>
             <EventSocialMedia event={event} />
@@ -270,7 +302,7 @@ const EditEventPage = async ({
           {event.eventType === 'CLASS' && (
             <div className="flex flex-col gap-y-8">
               <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-                <span className="text-gray-500">Step XVII :</span> Full Course
+                <span className="text-gray-500">Step XVIII :</span> Full Course
                 Discount (Optional)
               </h2>
               <EventFullDiscount event={event} />
@@ -279,7 +311,7 @@ const EditEventPage = async ({
           {/* Event Gallery */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVIII :</span> Event Gallery
+              <span className="text-gray-500">Step XIX :</span> Event Gallery
               (Optional)
             </h2>
             <EventGallery event={event} />

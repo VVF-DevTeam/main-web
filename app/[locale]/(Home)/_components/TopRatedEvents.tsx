@@ -158,7 +158,7 @@ const TopRatedEvents = async ({ locale }: TopRatedEventsProps) => {
         </Button>
       </Link>
 
-      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand md:w-1/2" />
+      <Separator className="mx-auto mt-12 w-2/3 bg-bgColor-brand900 md:w-1/2" />
     </div>
   )
 }

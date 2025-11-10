@@ -8,8 +8,7 @@ import Link from 'next/link'
 // Components
 import MobileSidebar from './_navbar/mobileSidebar'
 import NavLinks from './_navbar/navLinks'
-import CompanyLogo from '@/app/[locale]/components/CustomIcon'
-import Image from 'next/image'
+import CustomIcon from '@/app/[locale]/components/CustomIcon'
 
 // Main Component
 const Navbar = async ({ locale }: { locale: string }) => {
@@ -17,31 +16,31 @@ const Navbar = async ({ locale }: { locale: string }) => {
   const session = await auth()
 
   return (
-    <nav className="sticky z-10 top-0 w-full px-6 shadow-md">
+    <nav className="sticky z-10 top-0 w-full md:px-2 lg:px-6 shadow-md h-[100px] flex items-center bg-white">
 
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
-      <div className="white-overlay"></div>
+      {/* <div className="white-overlay"></div>
       <Image
-        src="https://drive.google.com/thumbnail?id=18KrAvZmI1kaoe16AjXSp_6cKC3GZXl4v&sz=w1000"
+        src="https://drive.google.com/thumbnail?id=18KrAvZmI1kaoe16AjXSp_6cKC3GZXl4v"
         alt="Intro"
         className="next-background object-top"
         fill
         priority
-      />
+      /> */}
 
       {/* Nav Links */}
 
-      <div className="flex-between items-center">
-        <div className="flex h-[70px] w-full items-center gap-x-4">
+      <div className="flex-between items-center w-full gap-x-4 px-2 md:px-4 lg:px-8">
+        <div className="flex h-[70px] w-full items-center gap-x-4 pl-2">
           {/* Company Logo with Slogan*/}
-          <Link href="/" className='-ml-10 md:-ml-2'>
-            <CompanyLogo />
+          <Link href="/" className=''>
+            <CustomIcon />
           </Link>
 
           {/* User Button */}
           {session?.user?.id && (
             <Link
-              className="flex-center -ml-12 gap-x-[5px] text-textColor transition-all hover:text-textColor-brand md:-ml-10"
+              className="flex-center gap-x-[5px] text-textColor transition-all hover:text-textColor-brand900"
               href={`/profile/${session?.user?.name}`}
               aria-label="Go to user profile"
             >

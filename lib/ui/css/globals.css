@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: var(--font-roboto);
+  font-family: var(--font-be-vietnam-pro);
 }
 
 @layer base {
@@ -13,21 +13,45 @@ body {
     --background-gray: 240 4% 46%; /* #71717A */
     --background-black-light: 220 3% 20%; /* #323335 */
     --background-black: 315 8% 10%; /* #1B171A */
-    --background-blue: 219 100% 57%; /* #2563EB */
     --background-yellow: 45 100% 50%; /* #FFB800 */
     --background-green: 152 76% 40%; /* #12805D */
-    --brand-color-dark: 0 100% 25%; /* #7f0000 */
-    --brand-color: 6 54% 51%; /* #C54B3E */
-    --brand-color-light: 18 71% 79%; /* #EFB9A2 */
-    --brand-color-lighter: 19 73% 96%; /* #FCF1EC */
-    --text-black: 220 3% 20%; /* #323335 */
-    --text-white: 0 0% 100%; /* #FFFFFF */
-    --text-gray: 240 4% 46%; /* #71717A */
-    --text-blue: 219 100% 57%; /* #2563EB */
-    --text-yellow: 45 100% 50%; /* #FFB800 */
-    --text-green: 152 76% 40%; /* #12805D */
-    --text-red: 0 80% 50%;     /* #E60000 */
-    --text-pink: 340 80% 55%; /* #E63980 */
+    
+    /* brand variants */
+    --brand-color-dark900: 349 83% 41%; /* #C11233 */
+    --brand-color-dark600: 349 59% 59%; /* #D45A71 */
+    --brand-color-dark400: 348 58% 82%; /* #ECB8C2 */
+    --brand-color-dark200: 350 59% 88%; /* #F3D0D6 */
+    --brand-color-dark100: 347 58% 95%; /* #FAECEF */
+    
+    /* --brand-color-900: 347 89% 44%;  #D20C36 */
+    /* --brand-color-600: 347 69% 61%; /* #E05572 */
+    /* --brand-color-400: 347 64% 70%; /* #E38095 */
+    /* --brand-color-200: 348 60% 81%; /* #EBB0BC */
+    /* --brand-color-100: 347 54% 85%; /* #EEC6CF */
+
+    --brand-color-900: 349 83% 41%;  /* #C11233 */
+    --brand-color-600: 349 59% 59%; /* #D45A71 */
+    --brand-color-400: 348 58% 82%; /* #ECB8C2 */
+    --brand-color-200: 350 59% 88%; /* #F3D0D6 */
+    --brand-color-100: 347 58% 95%; /* #FAECEF */
+
+    /* secondary variants */
+    --secondary-color-900: 37 100% 58%; /* #FFAE2B */
+    --secondary-color-600: 37 100% 71%; /* #FFC66B */
+    --secondary-color-400: 37 100% 79%; /* #FFD795 */
+    --secondary-color-200: 37 100% 92%; /* #FFEFD5 */
+    --secondary-color-100: 37 100% 96%; /* #FFF7EA */
+    
+    /* gray variants */
+    --gray-color-500: 216 3% 64%; /* #A0A2A5 */
+    --gray-color-300: 216 9% 89%; /* #E1E3E6 */
+    --gray-color-100: 210 33% 96%; /* #F3F4F6 */
+
+    /* other variants */
+    --black: 210 6% 14%; /* #222426 */
+    --white: 60 100% 100%; /* #FFFFFE */
+    --blue: 219 100% 57%; /* #2563EB */
+    --red: 0 84% 60%; /* #EF4444 */
     --destructive: 0 84% 60%; /* #EF4444 */
     --foreground: 240 10% 3.9%; /* #09090B */
     --card: 0 0% 100%; /* #FFFFFF */

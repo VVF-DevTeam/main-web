@@ -201,11 +201,11 @@ export default function BecomeHostForm({
         <div>
           {/* Header Section */}
           <div className="mb-6 text-center sm:mb-8">
-            <h1 className="tracking header-font-default mb-3 text-4xl font-bold text-textColor-brandDark">
+            <h1 className="tracking header-font-default mb-3 text-4xl font-bold text-textColor-brandDark900">
               {t('becomeHost-header')}
             </h1>
             <div className="mx-auto w-2/3 border-b border-bgColor-brand md:w-1/2"></div>
-            {/* <p className="text-base text-textColor-gray sm:text-lg lg:text-xl">
+            {/* <p className="text-base text-textColor-gray500 sm:text-lg lg:text-xl">
             {t('becomeHost-description')}
           </p> */}
           </div>
@@ -219,7 +219,7 @@ export default function BecomeHostForm({
                   {' '}
                   {t('becomeHost-description3')}{' '}
                   <Link
-                    className="text-blue-600 underline hover:text-blue-600/80"
+                    className="text-textColor-blue underline hover:text-textColor-blue/80"
                     href="/registration/jobs"
                   >
                     member
@@ -251,7 +251,7 @@ export default function BecomeHostForm({
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-firstname')}
                           </FormLabel>
                           <FormControl>
@@ -266,7 +266,7 @@ export default function BecomeHostForm({
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-lastname')}
                           </FormLabel>
                           <FormControl>
@@ -285,7 +285,7 @@ export default function BecomeHostForm({
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             Email
                           </FormLabel>
                           <FormControl>
@@ -304,7 +304,7 @@ export default function BecomeHostForm({
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-phone')}
                           </FormLabel>
                           <FormControl>
@@ -324,7 +324,7 @@ export default function BecomeHostForm({
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-textColor-brand">
+                        <FormLabel className="text-textColor-brand900">
                           {t('host-address')}
                         </FormLabel>
                         <FormControl>
@@ -341,7 +341,7 @@ export default function BecomeHostForm({
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-city')}
                           </FormLabel>
                           <FormControl>
@@ -356,7 +356,7 @@ export default function BecomeHostForm({
                       name="country"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-country')}
                           </FormLabel>
                           <FormControl>
@@ -371,7 +371,7 @@ export default function BecomeHostForm({
                       name="postalCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-textColor-brand">
+                          <FormLabel className="text-textColor-brand900">
                             {t('host-postalCode')}
                           </FormLabel>
                           <FormControl>
@@ -391,7 +391,7 @@ export default function BecomeHostForm({
                     name="teachHost"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-textColor-brand">
+                        <FormLabel className="text-textColor-brand900">
                           {t('host-description')}
                         </FormLabel>
                         <FormControl>
@@ -406,7 +406,7 @@ export default function BecomeHostForm({
                     name="experience"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-textColor-brand">
+                        <FormLabel className="text-textColor-brand900">
                           {t('host-experience')}
                         </FormLabel>
                         <FormControl>

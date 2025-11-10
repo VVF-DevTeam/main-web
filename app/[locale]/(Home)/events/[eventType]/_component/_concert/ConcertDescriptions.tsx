@@ -1,4 +1,3 @@
-
 import React from 'react'
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
@@ -7,6 +6,18 @@ import { EventSchedule } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
+import EventGalleryCarousel from '../EventGalleryCarousel'
+import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'
+import AddReviewButton from '@/components/review/AddReviewButton'
+import ShareButton from '@/components/ui/share-button'
 
 type EventWithRelations = {
   id: string
@@ -29,11 +40,16 @@ type EventWithRelations = {
   hosts: { name: string | null }[]
   schedules: EventSchedule[]
   eventType: string
+  imgUrls: string[]
+  days: string[]
 }
 
 interface ConcertDescriptionsProps {
   event: EventWithRelations
   locale: string
+  shouldShowGallery?: boolean
+  reviewsCount: number
+  seriesId?: string
 }
 
 const typeMap = {
@@ -43,7 +59,13 @@ const typeMap = {
   EVENT: 'Event',
 }
 
-const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) => {
+const ConcertDescriptions = async ({
+  event,
+  locale,
+  shouldShowGallery = true,
+  reviewsCount,
+  seriesId,
+}: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   // Get the current user's id
@@ -61,69 +83,192 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
     : null
 
   return (
-    <div className="w-full bg-[#620BC4] py-16 text-white">
-      <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
-        {/* Event Info Section */}
-        <div className="grid w-full gap-8 md:grid-cols-2">
-          {/* Left Column - Event Details */}
-          <div className="flex flex-col gap-y-6">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl">
-                {t('headerInfo')}
-              </h2>
-              <div className="space-y-2 text-lg">
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('dateHeader')}:</span>
-                  {event.startDate?.toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}{' '}
-                  {/* If the start date and end date are the same, don't show the end date */}
-                  {event.startDate?.getTime() === event.endDate?.getTime() ? (
-                    <p></p>
-                  ) : (
-                    <>
-                      -{' '}
-                      {event.endDate?.toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </>
-                  )}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('timeHeader')}:</span>
-                  {event.startTime} - {event.endTime}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold">{t('location')}:</span>
-                  {event.location}
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="w-full bg-bgColor-secondary200 py-3">
+      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-6 p-6 md:p-10 lg:gap-y-8 lg:p-12">
+        <div className="flex w-full items-center justify-between">
+          <h2 className="web_h2">{t('headerAbout')}</h2>
 
-          {/* Right Column - Map */}
-          <div className="h-[300px] w-full overflow-hidden rounded-lg">
-            <iframe
-              src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
-              title="Event Location"
-              width="100%"
-              height="100%"
-              allowFullScreen
-              className="rounded-lg"
-            ></iframe>
+          {/* Share & Reviews */}
+          <div className="col-span-2 flex flex-col items-end gap-2 place-self-end pr-6 md:col-span-1">
+            {!seriesId && reviewsCount > 0 && (
+              <Link
+                href={`/posts?reviewEvent=${event.id}&reviewPage=1&redirectToReviewsSection=true`}
+                className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('jumpToReviewsSection')}{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              </Link>
+            )}
+            {seriesId && (
+              <Link
+                href={`/posts?reviewSeries=${seriesId}&reviewPage=1&redirectToReviewsSection=true`}
+                className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('jumpToReviewsSectionSeries')}{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              </Link>
+            )}
+            <div className="flex items-center gap-1">
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <ShareButton />
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-bgColor-black">
+                    <p className="text-sm text-textColor-brand600">Share</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <AddReviewButton user={session?.user} useIcon={true} />
+            </div>
           </div>
         </div>
 
-        {/* Description Section */}
-        <div className="w-full space-y-6">
-          <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl">
+        {/* Event Info Section */}
+        <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
+          {/* Event Description */}
+          {/* <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
             {t('headerAbout')}
-          </h2>
-          <div className="prose prose-invert max-w-none">
+          </h1> */}
+
+          <div className="w-full text-pretty">
             <TextPreview value={event.description || ''} />
           </div>
+          {/* <p className="mt-2 text-muted-foreground">
+          (To become a VVF member, please refer to the registration form using
+          the reserve button below)
+        </p> */}
+
+          {/* Info Section */}
+          <div className="md:pl-[clamp(20px,4vw,100px)]">
+            <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
+              {t('headerInfo')}
+            </h1>
+            <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[800px] flex-col gap-y-10 overflow-y-auto px-[15px] pt-5 md:px-[20px]">
+              <div className="flex flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
+                {/* Date Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <CalendarDays className="h-5 w-5 shrink-0 text-red-600" />
+                    <span className="text-base">
+                      {event.startDate?.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                      {event.startDate?.getTime() !==
+                        event.endDate?.getTime() && (
+                        <>
+                          {' - '}
+                          {event.endDate?.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </>
+                      )}{' '}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Time Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <Clock className="h-5 w-5 shrink-0 text-red-600" />
+                    <span className="text-base">
+                      {event.days
+                        .map((day: string) => {
+                          const translated = t(day)
+                          return (
+                            translated.charAt(0).toUpperCase() +
+                            translated.slice(1).toLowerCase()
+                          )
+                        })
+                        .join(', ')}{' '}
+                      at {event.startTime} - {event.endTime}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Price Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
+                    <span className="text-base">
+                      {event.price?.toNumber() === 0
+                        ? 'Free'
+                        : `$${event.price?.toNumber().toString()}`}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Spots Left Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center justify-between gap-x-3">
+                    <div className="flex items-center gap-x-3">
+                      <Users className="h-5 w-5 shrink-0 text-red-600" />
+                      <span className="text-base">{event.capacity} spots</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
+                {/* Location Row */}
+                <div className="flex items-start gap-x-3 p-4">
+                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                  <div className="flex flex-col">
+                    <span className="text-base">{event.location}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Map */}
+              <div>
+                <iframe
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
+                  title="Class Location"
+                  className="h-[300px] w-full rounded-2xl"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              {existingPayment && existingPayment.length > 0 && (
+                <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Options */}
+        <div className="w-full">
+          <PaymentOptions
+            stripePriceId={event.stripePriceId!}
+            stripeProductId={event.stripeProductId!}
+            stripeSubscribedPriceId={event.subscribedPriceId!}
+            formLink={event.formLink!}
+            eventKeyName={event.keyName}
+            price={event.price?.toNumber() || 0}
+            eventId={event.id}
+            title={event.title}
+            userId={author}
+            fullCourseDiscount={event.fullCourseDiscount || 0}
+            email={email}
+            type={typeMap[event.eventType as keyof typeof typeMap]}
+            loggedIn={author ? true : false}
+          />
+
+          {existingPayment && existingPayment.length > 0 && (
+            <p className="mt-4 font-medium text-green-400">
+              {t('alreadyPaid')}
+            </p>
+          )}
         </div>
 
         {/* Schedule Section */}
@@ -142,7 +287,7 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
                     schedule.description && (
                       <div
                         key={schedule.id}
-                        className="rounded-lg bg-white/10 p-4 backdrop-blur-sm"
+                        className="rounded-lg bg-bgColor-brand900 p-4 shadow-[0_0_15px_rgba(0,0,0,0.1)]"
                       >
                         <div className="mb-2 text-sm font-medium text-white/80">
                           {schedule.startTime} - {schedule.endTime}
@@ -155,32 +300,11 @@ const ConcertDescriptions = async ({ event, locale }: ConcertDescriptionsProps) 
           </div>
         )}
 
-        {/* Payment Options */}
-        {author ? (
-          <div className="w-full">
-            <PaymentOptions
-              stripePriceId={event.stripePriceId!}
-              stripeProductId={event.stripeProductId!}
-              stripeSubscribedPriceId={event.subscribedPriceId!}
-              formLink={event.formLink!}
-              eventKeyName={event.keyName}
-              price={event.price?.toNumber() || 0}
-              eventId={event.id}
-              title={event.title}
-              userId={author}
-              fullCourseDiscount={event.fullCourseDiscount || 0}
-              email={email}
-              type={typeMap[event.eventType as keyof typeof typeMap]}
-            />
-
-            {existingPayment && existingPayment.length > 0 && (
-              <p className="mt-4 font-medium text-green-400">
-                {t('alreadyPaid')}
-              </p>
-            )}
+        {/* Gallery Carousel at the bottom */}
+        {shouldShowGallery && (
+          <div className="my-8">
+            <EventGalleryCarousel imageUrls={event.imgUrls as string[]} />
           </div>
-        ) : (
-          <p className="italic text-white/80">{t('loginToMakePayment')}</p>
         )}
       </div>
     </div>

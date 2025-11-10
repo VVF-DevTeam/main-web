@@ -1,5 +1,6 @@
 {
   "allPost": "Tất Cả Bài Viết",
+  "articles": "Bài Viết",
   "description-header": "Cập nhật những tin tức mới nhất từ VVF",
   "header": "Bảng Tin",
   "newPost": "Bài Viết Mới",
@@ -14,6 +15,7 @@
   "filterByEvent": "Lọc Theo Sự Kiện",
   "allEvents": "Tất cả sự kiện",
   "filterByRating": "Lọc Theo Đánh Giá",
+  "filterBySeries": "Lọc Theo Series",
   "allRatings": "Tất cả đánh giá",
   "stars": "sao",
   "search": "Tìm Kiếm",
@@ -34,5 +36,7 @@
   "reviewUpdated": "Đánh giá đã được cập nhật thành công",
   "reviewUpdateFailed": "Không thể cập nhật đánh giá",
   "reviewUpdateError": "Lỗi khi cập nhật đánh giá",
-  "averageRating": "Trung bình đánh giá"
+  "averageRating": "Trung bình đánh giá",
+  "postHomepageDescription": "Nơi chia sẻ những trải nghiệm thú vị của chúng mình!",
+  "readAllArticles": "Xem Tất Cả Bài Viết"
 }

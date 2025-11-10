@@ -20,10 +20,10 @@ const EventStep = async ({ step, locale }: EventStepProp) => {
       >
         {step}
       </div>
-      <h3 className="text-center text-2xl font-bold tracking-wide">
+      <h3 className="text-center web_h3">
         {t('header-step' + step)}
       </h3>
-      <p className="text-center text-xl text-textColor-gray">
+      <p className="text-center text-xl text-textColor-gray500">
         {t('description-step' + step)}
       </p>
     </div>

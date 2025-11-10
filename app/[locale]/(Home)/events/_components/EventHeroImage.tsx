@@ -18,7 +18,7 @@ const EventHeroImage = async ({ locale }: EventHeroImageProps) => {
       {/* NextJS Image and Dark Overlay */}
       <div className="dark-overlay"></div>
       <Image
-        src="https://drive.google.com/thumbnail?id=13ci_qVojwKNcZlAAfp5ovVMTiLAbymVj&sz=w2000"
+        src="https://drive.google.com/thumbnail?id=13ci_qVojwKNcZlAAfp5ovVMTiLAbymVj"
         alt="Event List Background"
         className="next-background object-top"
         fill
@@ -26,7 +26,7 @@ const EventHeroImage = async ({ locale }: EventHeroImageProps) => {
       />
 
       {/* Titles and Descriptions */}
-      <h2 className="header-main">{t('header-introduction')}</h2>
+      <h2 className="web_h1">{t('header-introduction')}</h2>
       <span className="header-text">{t('description-introduction')}</span>
     </div>
   )

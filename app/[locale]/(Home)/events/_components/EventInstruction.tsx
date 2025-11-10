@@ -36,11 +36,9 @@ const EventInstruction = async ({ locale }: EventInstructionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
   return (
-    <div className="mx-auto bg-gray-100 px-12 py-16">
-      <h1 className="text-center text-3xl font-bold tracking-wide">
-        {t('header-eventInstruction')}
-      </h1>
-      <div className="flex-col-default grid-all-cols-3 py-10">
+    <div className="mx-auto px-12 py-16">
+      <h1 className="web_h1 text-center">{t('header-eventInstruction')}</h1>
+      <div className="flex flex-col gap-x-8 gap-y-6 py-10 md:grid md:grid-cols-2 lg:grid-cols-3">
         {EventStepList.map((stage, index) => (
           <EventStep key={index} step={stage.step} locale={locale} />
         ))}

@@ -26,6 +26,9 @@ const JobList = async ({ title, locale }: JobListProps) => {
         mode: 'insensitive',
       },
     },
+    orderBy: {
+      updatedAt: 'desc',
+    },
   })
 
   return (
@@ -34,7 +37,7 @@ const JobList = async ({ title, locale }: JobListProps) => {
       <div className="flex w-full flex-col items-center">
         {/* Header */}
         <div className="flex-col-center">
-          <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark lg:text-5xl">
+          <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
           {t('headerJob')}
           </h1>
 

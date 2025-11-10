@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import type { ImageProps, StaticImageData } from 'next/image'
 import { Post } from '@prisma/client'
 import { AxiosStatic } from 'axios'
-
+import Image from 'next/image'
 // 1) Mock next/image to a plain <img> for easy assertions
 vi.mock('next/image', () => {
   const MockImage = (props: ImageProps) => {
@@ -17,7 +17,7 @@ vi.mock('next/image', () => {
         ? props.src
         : (props.src as StaticImageData).src
 
-    return <img data-testid="next-image" alt={props.alt} src={src} />
+    return <Image data-testid="next-image" alt={props.alt} src={src} />
   }
 
   return { __esModule: true, default: MockImage }

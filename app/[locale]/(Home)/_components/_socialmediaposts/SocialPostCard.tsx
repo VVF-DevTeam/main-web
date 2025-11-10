@@ -24,7 +24,7 @@ const SocialPostCard: React.FC<PostCardProps> = ({
     <div
       className={`relative block ${forPostPage ? '' : 'min-h-[28rem]'} transform rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-xl`}
     >
-      <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brandLight"></div>
+      <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand600"></div>
       <div className="flex h-full flex-col justify-between">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
@@ -32,13 +32,13 @@ const SocialPostCard: React.FC<PostCardProps> = ({
             <h3 className="text-textColor-black font-semibold">
               {post.username}
             </h3>
-            <span className="mx-2 text-textColor-gray">•</span>
-            <p className="text-sm text-textColor-gray">{post.timestamp}</p>
+            <span className="mx-2 text-textColor-gray500">•</span>
+            <p className="text-sm text-textColor-gray500">{post.timestamp}</p>
           </div>
           {post.platform === 'facebook' ? (
             <FaFacebook className="text-xl text-textColor-blue" />
           ) : (
-            <FaInstagram className="text-xl text-textColor-pink" />
+            <FaInstagram className="text-xl text-pink-600" />
           )}
         </div>
 
@@ -49,7 +49,7 @@ const SocialPostCard: React.FC<PostCardProps> = ({
             href={post.url || '/'}
             target="_blank"
             rel="noopener noreferrer"
-            className="cursor-pointer00 underline hover:text-blue-600"
+            className="cursor-pointer00 underline hover:text-textColor-blue"
           >
             Read more
           </Link>
@@ -70,7 +70,7 @@ const SocialPostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Footer: Likes & Comments */}
-        <div className="mt-auto flex items-center justify-between text-textColor-gray">
+        <div className="mt-auto flex items-center justify-between text-textColor-gray500">
           <div className="flex items-center space-x-2">
             <FaHeart className="text-textColor-red" />
             <span>{post.likes.toLocaleString()}</span>

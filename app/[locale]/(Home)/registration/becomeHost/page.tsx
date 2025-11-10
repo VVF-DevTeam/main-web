@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { auth } from '@/auth'
 import { ArrowLeft } from 'lucide-react'
-import Image from 'next/image'
 
 import initTranslations from '@/app/i18n'
 
@@ -31,15 +30,15 @@ const MembershipPage = async ({
           </Link>{' '}
           {t('becomehost-notLogin3')}
         </p>
-        <Image
-          src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD&sz=w2000"
+        <img
+          src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD"
           alt="Not Found"
           width={450}
           height={450}
         />
         <Link
           href="/"
-          className="group flex items-center gap-2 text-blue-500 transition-colors duration-300 hover:text-blue-600"
+          className="group flex items-center gap-2 text-blue-500 transition-colors duration-300 hover:text-textColor-blue"
         >
           <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-2" />
           {t('goHome')}

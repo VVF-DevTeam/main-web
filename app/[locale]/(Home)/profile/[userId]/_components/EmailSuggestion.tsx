@@ -64,7 +64,7 @@ const EmailSuggestion = ({ field, emails }: EmailSuggestionProps) => {
             {value.map((email) => (
               <div
                 key={email}
-                className="flex items-center rounded-full bg-bgColor-grayLight px-3 py-1 text-sm"
+                className="flex items-center rounded-full bg-bgColor-gray300 px-3 py-1 text-sm"
               >
                 <span>{email}</span>
                 <button
@@ -121,7 +121,7 @@ const EmailSuggestion = ({ field, emails }: EmailSuggestionProps) => {
                       }
                       setShowSuggestions(false)
                     }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-bgColor-grayLight"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-bgColor-gray300"
                   >
                     {name} ({email})
                   </button>

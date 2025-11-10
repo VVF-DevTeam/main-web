@@ -265,6 +265,46 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
               </DropdownMenu>
             </div>
 
+            {/* Display newly selected tags that haven't been saved yet */}
+            {(primaryTags.length > 0 || secondaryTags.length > 0) && (
+              <div className="mb-6">
+                <p className="mb-3 text-center text-sm font-semibold text-gray-600">
+                  Newly Selected Tags (Not Saved Yet):
+                </p>
+                <div className="mb-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                  {[...primaryTags, ...secondaryTags].map((category) => (
+                    <div className="flex items-center gap-1" key={category.id}>
+                      <Badge
+                        style={{
+                          backgroundColor: category.bgColor,
+                          color: category.textColor,
+                        }}
+                        className="rounded-2xl px-3 py-2"
+                      >
+                        {category.title}
+                      </Badge>
+                      <XIcon
+                        onClick={() => {
+                          if (category.type === 'Primary') {
+                            setPrimaryTags(
+                              primaryTags.filter((ctg) => ctg.id !== category.id)
+                            )
+                          } else {
+                            setSecondaryTags(
+                              secondaryTags.filter(
+                                (ctg) => ctg.id !== category.id
+                              )
+                            )
+                          }
+                        }}
+                        className="h-4 w-4 cursor-pointer text-gray-500 transition-colors hover:text-red-600"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Display tgs that have already been saved in the database, than can removed from the events */}
             <div className="mb-12 flex flex-wrap items-center justify-center gap-x-3">
               {event.categories.map((category) => (
@@ -288,10 +328,17 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
             <div className="flex justify-between">
               <div>
                 <p className="text-sm italic text-muted-foreground text-slate-500">
-                  Tags selected : {event.categories.length}
+                  Tags selected :{' '}
+                  {event.categories.length +
+                    primaryTags.length +
+                    secondaryTags.length}
                 </p>
                 <p className="text-sm italic text-muted-foreground text-slate-500">
-                  Tags remaining : {5 - event.categories.length}
+                  Tags remaining :{' '}
+                  {5 -
+                    (event.categories.length +
+                      primaryTags.length +
+                      secondaryTags.length)}
                 </p>
               </div>
               <Button

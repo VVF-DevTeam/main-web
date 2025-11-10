@@ -13,7 +13,7 @@ const MemberImage = ({ imageUrl }: MemberImageProps) => {
       <Image
         src={imageUrl}
         alt="Org Members"
-        className="absolute rounded-xl object-cover shadow-lg"
+        className="rounded-xl object-cover shadow-lg"
         fill
         sizes="(min-width: 1460px) 600px, (min-width: 1040px) 42vw, (min-width: 780px) 600px, calc(100vw - 96px)"
       />

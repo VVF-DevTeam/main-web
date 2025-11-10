@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 // Components
 
-import { ClipboardList, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
 // Interfaces
@@ -47,25 +47,25 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
     <div ref={dropdownRef} className="relative -mr-1 w-full">
       <button
         className={classNames(
-          'flex items-center justify-center font-semibold transition-all',
+          'flex items-center justify-center text-lg transition-all xl:text-xl',
           mode === 'desktop'
-            ? `gap-x-[5px] whitespace-nowrap text-sm ${
+            ? `gap-x-[5px] whitespace-nowrap ${
                 isActive
-                  ? 'text-textColor-brand'
-                  : 'text-textColor hover:text-textColor-brand hover:underline'
+                  ? 'text-textColor-brand900'
+                  : 'text-textColor hover:text-textColor-brand900 hover:underline'
               }`
-            : `mt-2 h-full w-full gap-x-4 rounded-md p-4 text-xl ${
+            : `mt-2 h-full w-full gap-x-4 rounded-md p-4 ${
                 isActive
-                  ? 'text-textColor-brand'
-                  : 'px-5 text-slate-200 hover:bg-bgColor-brand'
+                  ? 'text-textColor-brand600'
+                  : 'px-5 text-slate-200 hover:bg-bgColor-brand900'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <ClipboardList className="h-5 w-5" />
+        {/* <ClipboardList className="h-5 w-5" /> */}
         <span>{t('main-navRegistration')}</span>
         <ChevronDown
-          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-6 w-6 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -79,7 +79,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/registration/membership"
           className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -90,7 +90,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/registration/jobs"
           className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -101,7 +101,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/registration/becomeHost"
           className={classNames(
-            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -112,7 +112,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/about/members"
           className={classNames(
-            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -124,7 +124,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
         <Link
           href="/about/founders"
           className={classNames(
-            'flex p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand',
+            'flex p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
           onClick={() => setIsOpen(!isOpen)}

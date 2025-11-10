@@ -33,11 +33,11 @@ const JobDescription = async ({
   jobType,
 }: JobDescriptionProps) => {
   const { t } = await initTranslation(locale, ['job', 'common'])
-  
-  // Get the current user's id 
+
+  // Get the current user's id
   const session = await auth()
   const author = session?.user?.id!
-  
+
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
       {/* Time and Location */}
@@ -51,17 +51,19 @@ const JobDescription = async ({
           </p>
           <p>
             {t('startDate')}:{' '}
-            {startDate.toLocaleDateString('en-GB', {
-              day: 'numeric',
+            {startDate.toLocaleDateString('en-US', {
+              year: 'numeric',
               month: 'short',
+              day: 'numeric',
             })}
           </p>
-          { endDate && (
+          {endDate && (
             <p>
               {t('endDate')}:{' '}
-              {endDate.toLocaleDateString('en-GB', {
-                day: 'numeric',
+              {endDate.toLocaleDateString('en-US', {
+                year: 'numeric',
                 month: 'short',
+                day: 'numeric',
               })}
             </p>
           )}
@@ -93,7 +95,13 @@ const JobDescription = async ({
         </p> */}
       </div>
 
-      <JobApplyModal id={id} author={author} title={title} keyName={keyName} jobType={jobType} />
+      <JobApplyModal
+        id={id}
+        author={author}
+        title={title}
+        keyName={keyName}
+        jobType={jobType}
+      />
     </div>
   )
 }
