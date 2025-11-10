@@ -28,7 +28,14 @@ export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
   // `src` of the image should be like `https://drive.google.com/thumbnail?id=1JLCsSSkUa9T6_dIksI8L3XWu8K0H6gKz`.
   // if not return as it is
 
-  if (!src.includes('drive.google.com') && !src.includes('id=')) {
+  let allowedHosts = ['drive.google.com'];
+  let srcUrlHost = '';
+  try {
+    // If src is not a valid URL, keep srcUrlHost empty
+    srcUrlHost = new URL(src).host;
+  } catch (e) {}
+
+  if (!allowedHosts.includes(srcUrlHost) && !src.includes('id=')) {
     return src;
   }
 
