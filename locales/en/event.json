@@ -27,7 +27,7 @@
   "headerAbout": "About The Event",
   "header-eventInstruction": "How It Works\n",
   "header-finishedEvent": "Past Events",
-  "headerGallery": "Event Gallery",
+  "headerGallery": "Previous Events Gallery",
   "headerInfo": "Time & Location",
   "header-introduction": "VIET VIBE EVENTS",
   "header-pastEvent": "Past Events",
@@ -78,6 +78,7 @@
   "wednesday": "Wed",
   "Week": "Week",
   "jumpToReviewsSection": "See reviews for this event",
+  "jumpToReviewsSectionSeries": "See reviews for events in this series",
   "read-more": "Read more",
   "more-events": "More Events",
   "slot": "Number of slots",
@@ -86,5 +87,6 @@
   "event-happening-on": "is happening on",
   "event-at": "at",
   "event-few-spots-left": "with only a few spots left!",
-  "event-dont-miss-chance": "Register now!"
+  "event-dont-miss-chance": "Register now!",
+  "login-to-reserve": "Please login to reserve"
 }

@@ -304,9 +304,10 @@ interface AddReviewButtonProps {
     name?: string | null
     email?: string | null
   } | null
+  useIcon?: boolean
 }
 
-const AddReviewButton = ({ user }: AddReviewButtonProps) => {
+const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
   const [showAddReviewModal, setShowAddReviewModal] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const router = useRouter()
@@ -420,29 +421,36 @@ const AddReviewButton = ({ user }: AddReviewButtonProps) => {
 
   return (
     <>
-      <TooltipProvider delayDuration={300}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className="group p-1"
-              onClick={openAddReviewModal}
-              disabled={events.length === 0}
-            >
-              <Image
-                src="/icons/edit-review-icon.svg"
-                alt="Edit Review"
-                width={20}
-                height={20}
-                className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
-              />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="bg-bgColor-black">
-            <p className="text-sm text-textColor-brand600">Add Review</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {!useIcon ? (
+        <Button onClick={openAddReviewModal} disabled={events.length === 0}>
+          Add Review
+        </Button>
+      ) : (
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className="group p-1"
+                onClick={openAddReviewModal}
+                disabled={events.length === 0}
+              >
+                <Image
+                  src="/icons/edit-review-icon.svg"
+                  alt="Edit Review"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
+                />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-bgColor-black">
+              <p className="text-sm text-textColor-brand600">Add Review</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
       {showAddReviewModal && (
         <AddReviewModal
           form={form}

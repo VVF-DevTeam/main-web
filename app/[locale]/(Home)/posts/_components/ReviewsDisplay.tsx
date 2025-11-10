@@ -25,6 +25,7 @@ import {
   deleteReview,
   updateReview,
   getPublishedEventsForReviewsWithSearch,
+  getPublishedSeriesForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
 import { ReviewWithUserAndEvent } from '@/lib/actions/review/reviewActions'
 import { toast } from 'sonner'
@@ -45,14 +46,22 @@ interface ReviewsDisplayProps {
   totalPages: number
   totalCount: number
   initialEvents: Event[]
+  initialSeries: Series[]
   initialSearchTerm: string
   initialSelectedEvent: string
   initialSelectedRating: string
+  initialSelectedSeries: string
 }
 
 interface Event {
   id: string
   title: string
+}
+
+interface Series {
+  id: string
+  name: string
+  keyName: string
 }
 
 const generateRandomNumber = (id: string) => {
@@ -79,9 +88,11 @@ const ReviewsDisplay = ({
   totalPages: initialTotalPages,
   totalCount: initialTotalCount,
   initialEvents,
+  initialSeries,
   initialSearchTerm,
   initialSelectedEvent,
   initialSelectedRating,
+  initialSelectedSeries,
 }: ReviewsDisplayProps) => {
   console.log(reviewsPerPage) // Do not remove, will use for later
 
@@ -93,11 +104,15 @@ const ReviewsDisplay = ({
   const totalCount = initialTotalCount
   const loading = false
   const events = initialEvents
+  const series = initialSeries
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm)
   const [selectedEvent, setSelectedEvent] = useState(initialSelectedEvent)
   const [selectedRating, setSelectedRating] = useState(initialSelectedRating)
+  const [selectedSeries, setSelectedSeries] = useState(initialSelectedSeries)
   const [filteredEvents, setFilteredEvents] = useState(events)
+  const [filteredSeries, setFilteredSeries] = useState(series)
   const [eventSearchTerm, setEventSearchTerm] = useState('')
+  const [seriesSearchTerm, setSeriesSearchTerm] = useState('')
   const [editingReview, setEditingReview] = useState<string | null>(null)
   const [editComment, setEditComment] = useState('')
   const [editRating, setEditRating] = useState<ReviewRating | null>(null)
@@ -123,11 +138,13 @@ const ReviewsDisplay = ({
     const urlSearchTerm = searchParams.get('reviewSearch') || ''
     const urlEvent = searchParams.get('reviewEvent') || ''
     const urlRating = searchParams.get('reviewRating') || ''
+    const urlSeries = searchParams.get('reviewSeries') || ''
 
     // Update local state with URL parameters
     setSearchTerm(urlSearchTerm)
     setSelectedEvent(urlEvent)
     setSelectedRating(urlRating)
+    setSelectedSeries(urlSeries)
   }, [searchParams])
 
   const handleSearch = useCallback(
@@ -160,9 +177,16 @@ const ReviewsDisplay = ({
         params.delete('reviewRating')
       }
 
+      // Handle series filter
+      if (selectedSeries && selectedSeries !== 'all') {
+        params.set('reviewSeries', selectedSeries)
+      } else {
+        params.delete('reviewSeries')
+      }
+
       router.push(`?${params.toString()}`, { scroll: false })
     },
-    [debouncedSearchTerm, selectedEvent, selectedRating, searchParams, router]
+    [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, searchParams, router]
   )
 
   // Track previous filter values to detect actual filter changes
@@ -170,6 +194,7 @@ const ReviewsDisplay = ({
     searchTerm: initialSearchTerm,
     selectedEvent: initialSelectedEvent,
     selectedRating: initialSelectedRating,
+    selectedSeries: initialSelectedSeries,
   })
 
   // Auto-trigger search when filters change (but not when page changes)
@@ -182,6 +207,7 @@ const ReviewsDisplay = ({
         searchTerm: debouncedSearchTerm,
         selectedEvent,
         selectedRating,
+        selectedSeries,
       }
       return
     }
@@ -190,7 +216,8 @@ const ReviewsDisplay = ({
     const filtersChanged =
       prevFiltersRef.current.searchTerm !== debouncedSearchTerm ||
       prevFiltersRef.current.selectedEvent !== selectedEvent ||
-      prevFiltersRef.current.selectedRating !== selectedRating
+      prevFiltersRef.current.selectedRating !== selectedRating ||
+      prevFiltersRef.current.selectedSeries !== selectedSeries
 
     if (filtersChanged) {
       // Update the ref with new values
@@ -198,6 +225,7 @@ const ReviewsDisplay = ({
         searchTerm: debouncedSearchTerm,
         selectedEvent,
         selectedRating,
+        selectedSeries,
       }
 
       // Debounce the search to avoid too many API calls
@@ -207,16 +235,18 @@ const ReviewsDisplay = ({
 
       return () => clearTimeout(timeoutId)
     }
-  }, [debouncedSearchTerm, selectedEvent, selectedRating, handleSearch])
+  }, [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, handleSearch])
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm('')
     setSelectedEvent('all')
     setSelectedRating('all')
+    setSelectedSeries('all')
     const params = new URLSearchParams(searchParams)
     params.delete('reviewSearch')
     params.delete('reviewEvent')
     params.delete('reviewRating')
+    params.delete('reviewSeries')
     params.set('reviewPage', '1')
     router.push(`?${params.toString()}`, { scroll: false })
   }, [searchParams, router])
@@ -244,6 +274,22 @@ const ReviewsDisplay = ({
       }
     },
     [events]
+  )
+
+  // Handle series search
+  const handleSeriesSearch = useCallback(
+    async (searchTerm: string) => {
+      if (searchTerm === '') {
+        setFilteredSeries(series)
+      } else {
+        const filtered = await getPublishedSeriesForReviewsWithSearch(
+          searchTerm,
+          15
+        )
+        setFilteredSeries(filtered)
+      }
+    },
+    [series]
   )
 
   // Handle image modal
@@ -397,7 +443,16 @@ const ReviewsDisplay = ({
             <label className="mb-1 block text-sm font-medium text-gray-700">
               {t('filterByEvent')}
             </label>
-            <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+            <Select
+              value={selectedEvent}
+              onValueChange={(value) => {
+                setSelectedEvent(value)
+                // Clear series filter when event is selected (they're mutually exclusive)
+                if (value !== 'all') {
+                  setSelectedSeries('all')
+                }
+              }}
+            >
               <SelectTrigger className="border border-input shadow-sm">
                 <SelectValue placeholder={t('allEvents') || ''} />
               </SelectTrigger>
@@ -449,6 +504,52 @@ const ReviewsDisplay = ({
             </Select>
           </div>
 
+          <div className="w-full md:w-48">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              {t('filterBySeries')}
+            </label>
+            <Select
+              value={selectedSeries}
+              onValueChange={(value) => {
+                setSelectedSeries(value)
+                // Clear event filter when series is selected (they're mutually exclusive)
+                if (value !== 'all') {
+                  setSelectedEvent('all')
+                }
+              }}
+            >
+              <SelectTrigger className="border border-input shadow-sm">
+                <SelectValue placeholder="All Series" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="pb-2">
+                  <Input
+                    type="search"
+                    autoComplete="off"
+                    placeholder="Search for series (if not shown in list)"
+                    value={seriesSearchTerm}
+                    onChange={(e) => {
+                      setSeriesSearchTerm(e.target.value)
+                    }}
+                    onKeyDown={async (e) => {
+                      e.stopPropagation()
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        await handleSeriesSearch(seriesSearchTerm)
+                      }
+                    }}
+                  />
+                </div>
+                <SelectItem value="all">All Series</SelectItem>
+                {filteredSeries.map((seriesItem) => (
+                  <SelectItem key={seriesItem.id} value={seriesItem.id}>
+                    {seriesItem.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -469,7 +570,8 @@ const ReviewsDisplay = ({
           .replace('{total}', totalCount.toString())}
         {(debouncedSearchTerm ||
           (selectedEvent && selectedEvent !== 'all') ||
-          (selectedRating && selectedRating !== 'all')) && (
+          (selectedRating && selectedRating !== 'all') ||
+          (selectedSeries && selectedSeries !== 'all')) && (
           <>
             <span className="ml-2">{t('filteredResults')} </span>
             <span className="ml-2 font-semibold">
@@ -490,7 +592,8 @@ const ReviewsDisplay = ({
         <div className="py-8 text-center text-gray-500">
           {debouncedSearchTerm ||
           (selectedEvent && selectedEvent !== 'all') ||
-          (selectedRating && selectedRating !== 'all') ? (
+          (selectedRating && selectedRating !== 'all') ||
+          (selectedSeries && selectedSeries !== 'all') ? (
             <p>{t('noReviewsMatch')}</p>
           ) : (
             <p>{t('noReviewsYet')}</p>

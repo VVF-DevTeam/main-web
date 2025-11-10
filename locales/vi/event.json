@@ -27,7 +27,7 @@
   "headerAbout": "Thông Tin Sự Kiện",
   "header-eventInstruction": "Cách Hoạt Động",
   "header-finishedEvent": "Sự Kiện Đã Qua",
-  "headerGallery": "Ảnh của sự kiện",
+  "headerGallery": "Gallery của Sự Kiện Trước",
   "headerInfo": "Thời gian & Địa điểm",
   "header-introduction": "SỰ KIỆN CỦA VVF",
   "header-pastEvent": "Các Sự Kiện Đã Qua",
@@ -78,6 +78,7 @@
   "wednesday": "T4",
   "Week": "Tuần",
   "jumpToReviewsSection": "Xem review của sự kiện này",
+  "jumpToReviewsSectionSeries": "Xem review của các sự kiện trong series này",
   "read-more": "Xem thêm",
   "more-events": "Các Sự Kiện Khác",
   "slot": "Số chỗ",
@@ -86,5 +87,6 @@
   "event-happening-on": "sẽ diễn ra vào",
   "event-at": "lúc",
   "event-few-spots-left": "chỉ còn vài chỗ trống!",
-  "event-dont-miss-chance": "Đăng ký ngay!"
+  "event-dont-miss-chance": "Đăng ký ngay!",
+  "login-to-reserve": "Xin vui lòng đăng nhập để đặt chỗ"
 }

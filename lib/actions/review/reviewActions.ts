@@ -72,7 +72,8 @@ export async function getReviewsPaginated(
   searchTerm?: string,
   eventId?: string,
   rating?: ReviewRating,
-  removeEmptyComments?: boolean
+  removeEmptyComments?: boolean,
+  seriesId?: string
 ): Promise<ReviewsPaginationResult> {
   try {
     const skip = (page - 1) * reviewsPerPage
@@ -90,6 +91,11 @@ export async function getReviewsPaginated(
 
     if (eventId) {
       whereClause.eventId = eventId
+    } else if (seriesId) {
+      // Only filter by series if eventId is not set (eventId is more specific)
+      whereClause.event = {
+        seriesId: seriesId,
+      }
     }
 
     if (rating) {
@@ -214,6 +220,50 @@ export async function getPublishedEventsForReviewsWithSearch(
   } catch (error) {
     console.error(
       'Error getting published events for reviews with search:',
+      error
+    )
+    return []
+  }
+}
+
+// Get all series that have published events with reviews
+export async function getPublishedSeriesForReviewsWithSearch(
+  searchTerm?: string,
+  limit: number = 15
+) {
+  try {
+    const series = await prisma.eventSeries.findMany({
+      where: {
+        events: {
+          some: {
+            isPublished: true,
+            Review: {
+              some: {}, // Only series that have events with reviews
+            },
+          },
+        },
+        ...(searchTerm && {
+          name: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        }),
+      },
+      select: {
+        id: true,
+        name: true,
+        keyName: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+      take: limit,
+    })
+
+    return series
+  } catch (error) {
+    console.error(
+      'Error getting published series for reviews with search:',
       error
     )
     return []

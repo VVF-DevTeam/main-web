@@ -117,7 +117,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         <Button
           variant="default"
           onClick={() => router.push('/signIn')}
-          className="mb-4 font-semibold"
+          className="mb-4 font-semibold w-full"
         >
           {t('login-to-reserve')}
         </Button>

@@ -8,12 +8,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import ShareButton from '@/components/ui/share-button'
 
 // Libraries
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
 import Link from 'next/link'
-import { ArrowRight, Share } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 interface ClassImageProps {
   eventId: string
   hosts: { name: string | null; image: string | null }[]
@@ -21,6 +22,7 @@ interface ClassImageProps {
   locale: string
   socialLinks: { platform: string; url: string }[] | null
   reviewsCount: number
+  seriesId?: string
 }
 
 const ClassImage = async ({
@@ -30,6 +32,7 @@ const ClassImage = async ({
   locale,
   socialLinks,
   reviewsCount,
+  seriesId,
 }: ClassImageProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
   // Get current user session
@@ -117,14 +120,25 @@ const ClassImage = async ({
 
         {/* Share & Reviews */}
         <div className="col-span-2 flex flex-col items-end gap-2 place-self-end pr-6 md:col-span-1">
-          {reviewsCount > 0 && (
+          {!seriesId && reviewsCount > 0 && (
             <Link
               href={`/posts?reviewEvent=${eventId}&reviewPage=1&redirectToReviewsSection=true`}
-              className="group inline-flex items-center gap-1 text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline whitespace-nowrap"
+              className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
               {t('jumpToReviewsSection')}{' '}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+            </Link>
+          )}
+          {seriesId && (
+            <Link
+              href={`/posts?reviewSeries=${seriesId}&reviewPage=1&redirectToReviewsSection=true`}
+              className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('jumpToReviewsSectionSeries')}{' '}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
             </Link>
           )}
@@ -154,16 +168,14 @@ const ClassImage = async ({
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button className="group p-1">
-                    <Share className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110" />
-                  </button>
+                  <ShareButton />
                 </TooltipTrigger>
                 <TooltipContent className="bg-bgColor-black">
                   <p className="text-sm text-textColor-brand600">Share</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <AddReviewButton user={session?.user} />
+            <AddReviewButton user={session?.user} useIcon={true} />
           </div>
         </div>
       </div>

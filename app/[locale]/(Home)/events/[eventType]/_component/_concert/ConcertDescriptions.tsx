@@ -7,7 +7,17 @@ import { Decimal } from '@prisma/client/runtime/library'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import EventGalleryCarousel from '../EventGalleryCarousel'
-import { CalendarDays, Ticket, Users, MapPin } from 'lucide-react'
+import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip'
+import AddReviewButton from '@/components/review/AddReviewButton'
+import ShareButton from '@/components/ui/share-button'
 
 type EventWithRelations = {
   id: string
@@ -31,12 +41,15 @@ type EventWithRelations = {
   schedules: EventSchedule[]
   eventType: string
   imgUrls: string[]
+  days: string[]
 }
 
 interface ConcertDescriptionsProps {
   event: EventWithRelations
   locale: string
   shouldShowGallery?: boolean
+  reviewsCount: number
+  seriesId?: string
 }
 
 const typeMap = {
@@ -50,6 +63,8 @@ const ConcertDescriptions = async ({
   event,
   locale,
   shouldShowGallery = true,
+  reviewsCount,
+  seriesId,
 }: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -68,24 +83,65 @@ const ConcertDescriptions = async ({
     : null
 
   return (
-    <div className="w-full bg-bgColor-secondary200 py-16">
-      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-12 p-6 md:p-12 lg:gap-y-16 lg:p-16">
+    <div className="w-full bg-bgColor-secondary200 py-3">
+      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-6 p-6 md:p-10 lg:gap-y-8 lg:p-12">
+        <div className="flex w-full items-center justify-between">
+          <h2 className="web_h2">{t('headerAbout')}</h2>
+
+          {/* Share & Reviews */}
+          <div className="col-span-2 flex flex-col items-end gap-2 place-self-end pr-6 md:col-span-1">
+            {!seriesId && reviewsCount > 0 && (
+              <Link
+                href={`/posts?reviewEvent=${event.id}&reviewPage=1&redirectToReviewsSection=true`}
+                className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('jumpToReviewsSection')}{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              </Link>
+            )}
+            {seriesId && (
+              <Link
+                href={`/posts?reviewSeries=${seriesId}&reviewPage=1&redirectToReviewsSection=true`}
+                className="group inline-flex items-center gap-1 whitespace-nowrap text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('jumpToReviewsSectionSeries')}{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              </Link>
+            )}
+            <div className="flex items-center gap-1">
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <ShareButton />
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-bgColor-black">
+                    <p className="text-sm text-textColor-brand600">Share</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <AddReviewButton user={session?.user} useIcon={true} />
+            </div>
+          </div>
+        </div>
+
         {/* Event Info Section */}
         <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
           {/* Event Description */}
-          <div className="">
-            {/* <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+          {/* <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
             {t('headerAbout')}
           </h1> */}
 
-            <div className="w-full text-pretty">
-              <TextPreview value={event.description || ''} />
-            </div>
-            {/* <p className="mt-2 text-muted-foreground">
+          <div className="w-full text-pretty">
+            <TextPreview value={event.description || ''} />
+          </div>
+          {/* <p className="mt-2 text-muted-foreground">
           (To become a VVF member, please refer to the registration form using
           the reserve button below)
         </p> */}
-          </div>
 
           {/* Info Section */}
           <div className="md:pl-[clamp(20px,4vw,100px)]">
@@ -94,7 +150,7 @@ const ConcertDescriptions = async ({
             </h1>
             <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[800px] flex-col gap-y-10 overflow-y-auto px-[15px] pt-5 md:px-[20px]">
               <div className="flex flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
-                {/* Date and Time Row */}
+                {/* Date Row */}
                 <div className="relative p-4">
                   <div className="flex items-center gap-x-3">
                     <CalendarDays className="h-5 w-5 shrink-0 text-red-600" />
@@ -104,7 +160,8 @@ const ConcertDescriptions = async ({
                         month: 'short',
                         day: 'numeric',
                       })}
-                      {event.startDate?.getTime() !== event.endDate?.getTime() && (
+                      {event.startDate?.getTime() !==
+                        event.endDate?.getTime() && (
                         <>
                           {' - '}
                           {event.endDate?.toLocaleDateString('en-US', {
@@ -119,12 +176,34 @@ const ConcertDescriptions = async ({
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
                 </div>
 
+                {/* Time Row */}
+                <div className="relative p-4">
+                  <div className="flex items-center gap-x-3">
+                    <Clock className="h-5 w-5 shrink-0 text-red-600" />
+                    <span className="text-base">
+                      {event.days
+                        .map((day: string) => {
+                          const translated = t(day)
+                          return (
+                            translated.charAt(0).toUpperCase() +
+                            translated.slice(1).toLowerCase()
+                          )
+                        })
+                        .join(', ')}{' '}
+                      at {event.startTime} - {event.endTime}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                </div>
+
                 {/* Price Row */}
                 <div className="relative p-4">
                   <div className="flex items-center gap-x-3">
                     <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
                     <span className="text-base">
-                      {event.price?.toNumber() === 0 ? 'Free' : `$${event.price?.toNumber().toString()}`}
+                      {event.price?.toNumber() === 0
+                        ? 'Free'
+                        : `$${event.price?.toNumber().toString()}`}
                     </span>
                   </div>
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -135,7 +214,7 @@ const ConcertDescriptions = async ({
                   <div className="flex items-center justify-between gap-x-3">
                     <div className="flex items-center gap-x-3">
                       <Users className="h-5 w-5 shrink-0 text-red-600" />
-                      <span className="text-base">{event.capacity} spots left</span>
+                      <span className="text-base">{event.capacity} spots</span>
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -167,6 +246,31 @@ const ConcertDescriptions = async ({
           </div>
         </div>
 
+        {/* Payment Options */}
+        <div className="w-full">
+          <PaymentOptions
+            stripePriceId={event.stripePriceId!}
+            stripeProductId={event.stripeProductId!}
+            stripeSubscribedPriceId={event.subscribedPriceId!}
+            formLink={event.formLink!}
+            eventKeyName={event.keyName}
+            price={event.price?.toNumber() || 0}
+            eventId={event.id}
+            title={event.title}
+            userId={author}
+            fullCourseDiscount={event.fullCourseDiscount || 0}
+            email={email}
+            type={typeMap[event.eventType as keyof typeof typeMap]}
+            loggedIn={author ? true : false}
+          />
+
+          {existingPayment && existingPayment.length > 0 && (
+            <p className="mt-4 font-medium text-green-400">
+              {t('alreadyPaid')}
+            </p>
+          )}
+        </div>
+
         {/* Schedule Section */}
         {event.schedules && event.schedules.length > 0 && (
           <div className="w-full space-y-6">
@@ -194,35 +298,6 @@ const ConcertDescriptions = async ({
                 )}
             </div>
           </div>
-        )}
-
-        {/* Payment Options */}
-        {author ? (
-          <div className="w-full">
-            <PaymentOptions
-              stripePriceId={event.stripePriceId!}
-              stripeProductId={event.stripeProductId!}
-              stripeSubscribedPriceId={event.subscribedPriceId!}
-              formLink={event.formLink!}
-              eventKeyName={event.keyName}
-              price={event.price?.toNumber() || 0}
-              eventId={event.id}
-              title={event.title}
-              userId={author}
-              fullCourseDiscount={event.fullCourseDiscount || 0}
-              email={email}
-              type={typeMap[event.eventType as keyof typeof typeMap]}
-              loggedIn={author ? true : false}
-            />
-
-            {existingPayment && existingPayment.length > 0 && (
-              <p className="mt-4 font-medium text-green-400">
-                {t('alreadyPaid')}
-              </p>
-            )}
-          </div>
-        ) : (
-          <p className="italic text-white/80">{t('loginToMakePayment')}</p>
         )}
 
         {/* Gallery Carousel at the bottom */}

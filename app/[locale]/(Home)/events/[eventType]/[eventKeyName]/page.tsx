@@ -65,7 +65,12 @@ const ClassPage = async ({ params }: ClassPageProps) => {
       },
       _count: {
         select: {
-          Review: true
+          Review: true,
+        },
+      },
+      series: {
+        select: {
+          id: true,
         },
       },
     },
@@ -85,7 +90,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   return (
     <>
       {publishedClass.eventType === 'CONCERT' ? (
-        <div className="w-full overflow-hidden">
+        <div className="w-full">
           {/* Event Headers */}
           <ConcertHeaders event={publishedClass} />
           <ConcertDescriptions
@@ -95,6 +100,8 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             }}
             locale={locale}
             shouldShowGallery={shouldShowGallery as boolean}
+            reviewsCount={publishedClass._count.Review}
+            seriesId={publishedClass.series?.id}
           />
         </div>
       ) : (
@@ -112,6 +119,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
                   | null
               }
               reviewsCount={publishedClass._count.Review}
+              seriesId={publishedClass.series?.id}
             />
           </div>
           <ClassDescription

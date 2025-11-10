@@ -9,11 +9,11 @@ import PostSummary from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_
 import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
-import { Button } from '@/components/ui/button'
 import PublishButton from '@/app/[locale]/components/PublishButton'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
+import DeletePostButton from './_components/DeletePostButton'
 
 // Interfaces
 interface EditPostProps {
@@ -72,9 +72,8 @@ const EditPost = async ({ params }: EditPostProps) => {
             </p>
           </div>
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
-            {/* TODO: Add delete button */}
             {/* Buttons */}
-            <Button variant={'destructive'}>Delete Post</Button>
+            <DeletePostButton postId={post.id} />
             <PublishButton
               id={post.id}
               canPublish={canPublish}

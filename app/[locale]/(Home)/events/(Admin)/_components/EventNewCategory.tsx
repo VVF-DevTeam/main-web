@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ColorPicker, useColor } from 'react-color-palette'
@@ -19,19 +19,77 @@ import PreviewBadge from './PreviewBadge'
 
 import 'react-color-palette/css'
 import { axiosInstance } from '@/lib/axios'
-const NewCategory = () => {
-  const [title, setTitle] = useState('')
-  const [categoryType, setCategoryType] = useState('')
-  const [isItalic, setIsItalic] = useState(false)
-  const [isBold, setIsBold] = useState(false)
-  const [bgcolor, setBgColor] = useColor('#ffff')
-  const [titleColor, setTitleColor] = useColor('#1A1A1A')
+
+interface EventNewCategoryProps {
+  categoryId?: string
+  initialTitle?: string
+  initialType?: string
+  initialIsItalic?: boolean
+  initialIsBold?: boolean
+  initialBgColor?: string
+  initialTextColor?: string
+  onReset?: () => void
+}
+
+const EventNewCategory = ({
+  categoryId,
+  initialTitle,
+  initialType,
+  initialIsItalic,
+  initialIsBold,
+  initialBgColor,
+  initialTextColor,
+  onReset,
+}: EventNewCategoryProps) => {
+  const [title, setTitle] = useState(initialTitle || '')
+  const [categoryType, setCategoryType] = useState(initialType || '')
+  const [isItalic, setIsItalic] = useState(initialIsItalic || false)
+  const [isBold, setIsBold] = useState(initialIsBold || false)
+  const [bgcolor, setBgColor] = useColor(initialBgColor || '#ffff')
+  const [titleColor, setTitleColor] = useColor(initialTextColor || '#1A1A1A')
 
   const router = useRouter()
 
-  const isDisabled = title.length === 0 || categoryType.length === 0
+  // Helper function to convert hex to rgb
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+          a: 1,
+        }
+      : { r: 255, g: 255, b: 255, a: 1 }
+  }
 
-  const createCategory = async () => {
+  // Helper function to convert hex to hsv
+  const hexToHsv = (hex: string) => {
+    console.log(hex)
+    // Simple conversion - for now just return default values
+    return { h: 0, s: 0, v: 0, a: 1 }
+  }
+
+  // Update form when initial values change (when a tag is selected)
+  useEffect(() => {
+    if (initialTitle !== undefined) {
+      setTitle(initialTitle || '')
+      setCategoryType(initialType || '')
+      setIsItalic(initialIsItalic || false)
+      setIsBold(initialIsBold || false)
+      if (initialBgColor) {
+        setBgColor({ hex: initialBgColor, rgb: hexToRgb(initialBgColor), hsv: hexToHsv(initialBgColor) })
+      }
+      if (initialTextColor) {
+        setTitleColor({ hex: initialTextColor, rgb: hexToRgb(initialTextColor), hsv: hexToHsv(initialTextColor) })
+      }
+    }
+  }, [categoryId, initialTitle, initialType, initialIsItalic, initialIsBold, initialBgColor, initialTextColor, setBgColor, setTitleColor])
+
+  const isDisabled = title.length === 0 || categoryType.length === 0
+  const isEditMode = !!categoryId
+
+  const saveCategory = async () => {
     if (title.length === 0 || categoryType.length === 0) return
     const data = {
       title: title,
@@ -43,15 +101,32 @@ const NewCategory = () => {
     }
 
     try {
-      const response = await axiosInstance.post(`/api/categories/create`, data)
-      if (response.status === 200) {
-        toast.success('Category created successfully')
+      if (isEditMode) {
+        // Update existing category
+        const response = await axiosInstance.put(`/api/categories/edit/${categoryId}`, data)
+        if (response.status === 200) {
+          toast.success('Category updated successfully')
+        }
+      } else {
+        // Create new category
+        const response = await axiosInstance.post(`/api/categories/create`, data)
+        if (response.status === 200) {
+          toast.success('Category created successfully')
+        }
       }
+      
       // reset all states
       setTitle('')
       setCategoryType('')
       setIsItalic(false)
       setIsBold(false)
+      setBgColor({ hex: '#ffff', rgb: { r: 255, g: 255, b: 255, a: 1 }, hsv: { h: 0, s: 0, v: 100, a: 1 } })
+      setTitleColor({ hex: '#1A1A1A', rgb: { r: 26, g: 26, b: 26, a: 1 }, hsv: { h: 0, s: 0, v: 10, a: 1 } })
+      
+      // Call onReset if provided
+      if (onReset) {
+        onReset()
+      }
 
       router.refresh()
     } catch (error) {
@@ -81,7 +156,7 @@ const NewCategory = () => {
           <h3 className="mb-6 font-semibold text-gray-600 md:text-xl">
             STEP II: Choose category type.
           </h3>
-          <Select onValueChange={setCategoryType}>
+          <Select onValueChange={setCategoryType} value={categoryType}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Choose type" />
             </SelectTrigger>
@@ -118,6 +193,7 @@ const NewCategory = () => {
           STEP IV: Pick a background color.
         </h3>
         <ColorPicker
+          key={`bg-${categoryId || 'new'}-${initialBgColor || '#ffff'}`}
           height={130}
           color={bgcolor}
           hideInput={['rgb', 'hsv']}
@@ -134,6 +210,7 @@ const NewCategory = () => {
           STEP V: Choose a text color.
         </h3>
         <ColorPicker
+          key={`text-${categoryId || 'new'}-${initialTextColor || '#1A1A1A'}`}
           height={130}
           color={titleColor}
           hideInput={['rgb', 'hsv']}
@@ -154,14 +231,14 @@ const NewCategory = () => {
 
       {/* ------------------ Save Button ------------------------- */}
       <Button
-        onClick={() => createCategory()}
+        onClick={() => saveCategory()}
         className="mt-6 md:absolute md:bottom-0 md:right-0"
         disabled={isDisabled}
       >
-        Save Changes
+        {isEditMode ? 'Update Category' : 'Save Changes'}
       </Button>
     </div>
   )
 }
 
-export default NewCategory
+export default EventNewCategory

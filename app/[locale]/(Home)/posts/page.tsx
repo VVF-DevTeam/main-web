@@ -14,6 +14,7 @@ import ReviewsDisplay from './_components/ReviewsDisplay'
 import {
   getReviewsPaginated,
   getPublishedEventsForReviewsWithSearch,
+  getPublishedSeriesForReviewsWithSearch,
 } from '@/lib/actions/review/reviewActions'
 import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 // import { ReviewRating } from '@prisma/client'
@@ -28,6 +29,7 @@ interface PostsProps {
     reviewSearch?: string
     reviewEvent?: string
     reviewRating?: string
+    reviewSeries?: string
     redirectToReviewsSection?: boolean
   }>
 }
@@ -42,6 +44,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     reviewSearch,
     reviewEvent,
     reviewRating,
+    reviewSeries,
     redirectToReviewsSection,
   } = await searchParams
 
@@ -64,6 +67,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   const currentReviewSearch = reviewSearch || ''
   const currentReviewEvent = reviewEvent || ''
   const currentReviewRating = reviewRating || ''
+  const currentReviewSeries = reviewSeries || ''
 
 
   // Fetch reviews data on server side
@@ -75,11 +79,18 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     currentReviewRating === 'all'
       ? undefined
       : convertStringToReviewRating(currentReviewRating),
-    false
+    false,
+    currentReviewSeries === 'all' ? undefined : currentReviewSeries || undefined
   )
 
   // Fetch events for review filtering (latest 15 events)
   const eventsForReviews = await getPublishedEventsForReviewsWithSearch(
+    undefined,
+    15
+  )
+
+  // Fetch series for review filtering
+  const seriesForReviews = await getPublishedSeriesForReviewsWithSearch(
     undefined,
     15
   )
@@ -225,9 +236,11 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
               totalPages={reviewsResult.totalPages}
               totalCount={reviewsResult.totalCount}
               initialEvents={eventsForReviews}
+              initialSeries={seriesForReviews}
               initialSearchTerm={currentReviewSearch}
               initialSelectedEvent={currentReviewEvent}
               initialSelectedRating={currentReviewRating}
+              initialSelectedSeries={currentReviewSeries}
             />
           </Suspense>
         </div>

@@ -27,7 +27,7 @@
   "headerAbout": "À propos de l'événement",
   "header-eventInstruction": "Comment ça marche\n",
   "header-finishedEvent": "Événements Passés",
-  "headerGallery": "Galerie d'événements",
+  "headerGallery": "Galerie d'événements passés",
   "headerInfo": "Heure et lieu",
   "header-introduction": "ÉVÉNEMENTS de VIET VIBE",
   "header-pastEvent": "Événements passés",
@@ -78,6 +78,7 @@
   "wednesday": "Mer",
   "Week": "Semaine",
   "jumpToReviewsSection": "Voir les avis pour cet événement",
+  "jumpToReviewsSectionSeries": "Voir les avis pour les événements de cette série",
   "read-more": "Lire la suite",
   "more-events": "Plus d'événements",
   "slot": "Nombre d'emplacements",
@@ -86,5 +87,6 @@
   "event-happening-on": "a lieu le",
   "event-at": "à",
   "event-few-spots-left": "avec seulement quelques places restantes!",
-  "event-dont-miss-chance": "Inscrivez-vous!"
+  "event-dont-miss-chance": "Inscrivez-vous!",
+  "login-to-reserve": "Veuillez vous connecter pour réserver"
 }
