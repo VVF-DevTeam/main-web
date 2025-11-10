@@ -1,5 +1,3 @@
-import { constants } from 'fs/promises'
-
 type gdriveLoaderArgs = { src: string; width: number; quality?: number }
 
 export function extractGoogleDriveId(url: string): string {
