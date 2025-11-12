@@ -5,6 +5,9 @@ import BackButton from '@/components/ui/back-button'
 import ConcertDescriptions from '../_component/_concert/ConcertDescriptions'
 import ConcertHeaders from '../_component/_concert/ConcertHeaders'
 
+// Types
+import { SeatingMap } from '../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+
 // Libraries
 import { Metadata } from 'next'
 import { prisma } from '@/lib/db'
@@ -102,6 +105,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             shouldShowGallery={shouldShowGallery as boolean}
             reviewsCount={publishedClass._count.Review}
             seriesId={publishedClass.series?.id}
+            seatingMap={publishedClass.seatingMap as SeatingMap}
           />
         </div>
       ) : (

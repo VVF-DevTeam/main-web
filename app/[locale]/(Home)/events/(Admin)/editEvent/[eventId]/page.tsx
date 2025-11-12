@@ -30,6 +30,7 @@ import EventSocialMedia from './_components/EventSocialMedia'
 import EventSubtitle from './_components/EventSubtitle'
 import EventGallery from './_components/EventGallery'
 import DeleteEventButton from './_components/DeleteEventButton'
+import EventSeating from './_components/EventSeating'
 
 // Main Component
 const EditEventPage = async ({
@@ -67,6 +68,11 @@ const EditEventPage = async ({
         },
       },
       series: true,
+      tickets: {
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
     },
   })
 
@@ -315,6 +321,14 @@ const EditEventPage = async ({
               (Optional)
             </h2>
             <EventGallery event={event} />
+          </div>
+          {/* Event Seating */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XX :</span> Event Seating
+              (Optional)
+            </h2>
+            <EventSeating event={event} />
           </div>
         </div>
       </div>

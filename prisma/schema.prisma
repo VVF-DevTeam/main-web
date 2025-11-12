@@ -12,7 +12,6 @@ model EventCategory {
   id        String       @id @default(cuid())
   title     String
   bgColor   String
-  eventId   String?
   isBold    Boolean      @default(false)
   isItalic  Boolean      @default(false)
   textColor String
@@ -45,11 +44,11 @@ model Event {
   stripePriceId      String?
   stripeProductId    String?
   subscribedPriceId  String?
-  seriesId           String?
   socialLinks        Json?
   subtitle           String?
   subImgUrls         Json?
   imgUrls            Json?
+  seriesId           String?
   series             EventSeries?    @relation(fields: [seriesId], references: [id])
   schedules          EventSchedule[]
   tickets            EventTicket[]
@@ -57,15 +56,16 @@ model Event {
   Review             Review[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
+  seatingMap         Json?
 
   @@unique([title, eventType])
   @@index([id])
 }
 
 model EventSeries {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  keyName     String   @unique
+  id          String    @id @default(cuid())
+  name        String    @unique
+  keyName     String    @unique
   description String?
   eventType   EventType
   events      Event[]
@@ -85,11 +85,26 @@ model EventTicket {
   id        String     @id @default(cuid())
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
-  type      TicketType
-  price     Float
-  capacity  Int
+  type      String
+  price     Decimal
+  currency  String     @default("CAD")
+
+  // Capacity just for this tier
+  capacity    Int
+  sold        Int        @default(0)
+
+  // Time range
+  validFrom   DateTime?
+  validTo     DateTime?
+
+  // Stripe catalog mapping
+  stripeProductId String
+  stripePriceId   String
+
+  // Relation
   eventId   String
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  payments  Payment[]
 }
 
 model Ticket {
@@ -194,23 +209,23 @@ model Job {
 }
 
 model Application {
-  id          String   @id @default(uuid())
-  firstName   String
-  lastName    String
-  address     String
-  city        String
-  country     String
-  postCode    String
-  email       String
-  phoneNumber String
-  resume      Bytes
-  appliedAt   DateTime @default(now())
+  id              String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  address         String
+  city            String
+  country         String
+  postCode        String
+  email           String
+  phoneNumber     String
+  resume          Bytes
+  appliedAt       DateTime @default(now())
+  jobId           String?
+  userId          String
   positionToApply String?
-  reasonToApply String?
-  jobId       String?
-  userId      String
-  job         Job?      @relation(fields: [jobId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  reasonToApply   String?
+  job             Job?     @relation(fields: [jobId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
 
   @@unique([jobId, userId])
   @@index([id])
@@ -223,15 +238,24 @@ model Payment {
   type            PaymentType
   expiresAt       DateTime?
   quantity        Int
-  userId          String?
-  eventId         String?
+
+  // Stripe 
   stripeProductId String
   stripePriceId   String
   stripePaymentId String
+
+  // info
   pricePaid       Decimal
   refunded        Boolean     @default(false)
-  event           Event?      @relation(fields: [eventId], references: [id], onDelete: Restrict)
-  user            User?       @relation(fields: [userId], references: [id])
+
+  // Relations
+  userId          String?
+  eventId         String?
+  eventTicketId   String?
+  event           Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  user            User?        @relation(fields: [userId], references: [id])
+  eventTicket     EventTicket? @relation(fields: [eventTicketId], references: [id])
+
 }
 
 model PostLikes {
@@ -294,10 +318,10 @@ model Review {
   eventId   String?
   rating    ReviewRating
   comment   String
-  anonymous Boolean      @default(false)  
+  anonymous Boolean      @default(false)
+  imageLink String?
   event     Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  imageLink String?
 }
 
 enum Role {
@@ -324,12 +348,6 @@ enum JobType {
 enum CategoryType {
   Primary
   Secondary
-}
-
-enum TicketType {
-  NonMember
-  Member
-  DropIn
 }
 
 enum PaymentType {

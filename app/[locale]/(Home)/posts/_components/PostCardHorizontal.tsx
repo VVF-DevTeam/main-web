@@ -44,7 +44,7 @@ const PostCardHorizontal = ({
           alt={`Thumbnail for ${title} post`}
           fill
           priority={true}
-          sizes="(min-width: 1280px) 426px, (min-width: 780px) 396px, (min-width: 400px) calc(100vw - 98px), calc(13.75vw + 230px)"
+          sizes="(min-width: 1280px) 20vw, (min-width: 780px) calc(100vw - 140px), (min-width: 400px) calc(100vw - 98px), calc(13.75vw + 230px)"
           className="hover-focus-zoomIn object-cover"
         />
       </div>

@@ -17,9 +17,7 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
       : 'authjs.session-token',
   })
 
-  // console.log('Cookies:', req.cookies.getAll())
-  console.log('Token:', token)
-  
+  // console.log('Cookies:', req.cookies.getAll())  
   if (!token) return false
 
   if (role) {

@@ -441,6 +441,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
                   width={20}
                   height={20}
                   className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
+                  unoptimized
                 />
               </Button>
             </TooltipTrigger>
