@@ -1,14 +1,14 @@
 import React from 'react'
+
+// Libraries
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
-import { EventSchedule } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import TextPreview from '@/app/[locale]/components/TextPreview'
-import PaymentOptions from '../_stripepayment/PaymentOptions'
-import EventGalleryCarousel from '../EventGalleryCarousel'
-import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
 import Link from 'next/link'
+
+// Components
+import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
 import { ArrowRight } from 'lucide-react'
 import {
   TooltipProvider,
@@ -18,6 +18,12 @@ import {
 } from '@/components/ui/tooltip'
 import AddReviewButton from '@/components/review/AddReviewButton'
 import ShareButton from '@/components/ui/share-button'
+import TextPreview from '@/app/[locale]/components/TextPreview'
+import PaymentOptions from '../_stripepayment/PaymentOptions'
+import EventGalleryCarousel from '../EventGalleryCarousel'
+// Types
+import { EventSchedule } from '@prisma/client'
+import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 
 type EventWithRelations = {
   id: string
@@ -50,6 +56,7 @@ interface ConcertDescriptionsProps {
   shouldShowGallery?: boolean
   reviewsCount: number
   seriesId?: string
+  seatingMap: SeatingMap
 }
 
 const typeMap = {
@@ -65,6 +72,7 @@ const ConcertDescriptions = async ({
   shouldShowGallery = true,
   reviewsCount,
   seriesId,
+  seatingMap,
 }: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -262,6 +270,7 @@ const ConcertDescriptions = async ({
             email={email}
             type={typeMap[event.eventType as keyof typeof typeMap]}
             loggedIn={author ? true : false}
+            seatingMap={seatingMap}
           />
 
           {existingPayment && existingPayment.length > 0 && (

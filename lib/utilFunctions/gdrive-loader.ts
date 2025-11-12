@@ -20,8 +20,8 @@ export function extractGoogleDriveId(url: string): string {
     return fileIdMatch[1]
   }
 
-  // If no match, return original (might already be an ID)
-  return url
+  // If no match, return not found image
+  return '1Vxf5XRe8ENcYtKA2FbaYb2blj9fTwBCx'
 }
 
 export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
@@ -30,15 +30,28 @@ export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
 
   const allowedHosts = ['drive.google.com']
   let srcUrlHost = ''
-  try {
-    // If src is not a valid URL, keep srcUrlHost empty
+
+  // If src is not a valid URL, keep srcUrlHost empty
+  const hostMatch = src.match(/^(?:https?:\/\/)?([^\/?#]+)(?:[\/?#]|$)/i)
+  if (hostMatch) {
+    srcUrlHost = hostMatch[1]
+  } else if (
+    typeof URL !== 'undefined' &&
+    'canParse' in URL &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (URL as any).canParse(src)
+  ) {
     srcUrlHost = new URL(src).host
-  } catch (e) {
-    console.error('Error parsing URL:', e)
+  } else {
+    return src
   }
 
-  if (!allowedHosts.includes(srcUrlHost) && !src.includes('id=')) {
+  if (!(allowedHosts.includes(srcUrlHost) && src.includes('?id='))) {
     return src
+  }
+
+  if (src.includes('scontent')) {
+    console.log('src', src)
   }
 
   const id = extractGoogleDriveId(src)
