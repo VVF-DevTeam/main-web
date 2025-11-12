@@ -20,7 +20,7 @@ import EventType from './_components/EventType'
 import EventHosts from './_components/EventHosts'
 import EventDescription from './_components/EventDescription'
 import EventCapacity from './_components/EventCapacity'
-import EventFullDiscount from './_components/EventFullDiscount'
+// import EventFullDiscount from './_components/EventFullDiscount'
 import EventEditSeries from './_components/EventSeries'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
@@ -304,20 +304,10 @@ const EditEventPage = async ({
             </h2>
             <EventSocialMedia event={event} />
           </div>
-          {/* Event Full Discount */}
-          {event.eventType === 'CLASS' && (
-            <div className="flex flex-col gap-y-8">
-              <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-                <span className="text-gray-500">Step XVIII :</span> Full Course
-                Discount (Optional)
-              </h2>
-              <EventFullDiscount event={event} />
-            </div>
-          )}
           {/* Event Gallery */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XIX :</span> Event Gallery
+              <span className="text-gray-500">Step XVIII :</span> Event Gallery
               (Optional)
             </h2>
             <EventGallery event={event} />
@@ -325,7 +315,7 @@ const EditEventPage = async ({
           {/* Event Seating */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XX :</span> Event Seating
+              <span className="text-gray-500">Step XIX :</span> Event Seating
               (Optional)
             </h2>
             <EventSeating event={event} />

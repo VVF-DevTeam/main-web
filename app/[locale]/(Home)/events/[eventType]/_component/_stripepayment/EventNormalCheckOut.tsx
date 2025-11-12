@@ -105,6 +105,14 @@ export default function EventNormalCheckOut({
     prevShowFormRef.current = showForm
   }, [showForm])
 
+  const baseStripePriceId = stripePriceId ?? null
+  const resolvedStripeProductId = stripeProductId ?? null
+  const dropInStripePriceId = isSubscribed
+    ? stripeSubscribedPriceId ?? baseStripePriceId
+    : baseStripePriceId
+  const canRenderCheckout = Boolean(dropInStripePriceId && resolvedStripeProductId)
+  const showLoadingState = isLoading
+
   return (
     // Edit classname if needed
     <>
@@ -135,8 +143,12 @@ export default function EventNormalCheckOut({
         </div>
       ) : (
         <div ref={containerRef} className="flex flex-col gap-4">
-          {isLoading ? (
+          {showLoadingState ? (
             <Button disabled>Loading...</Button>
+          ) : !canRenderCheckout ? (
+            <p className="text-sm text-red-600">
+              Unable to load payment configuration. Please try again later.
+            </p>
           ) : (
             <>
               {!isSubscribed && (
@@ -184,9 +196,13 @@ export default function EventNormalCheckOut({
               {paymentType === 'drop-in' ? (
                 <NormalCheckoutButton
                   stripePriceId={
-                    isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
+                    (
+                      isSubscribed
+                        ? stripeSubscribedPriceId ?? dropInStripePriceId
+                        : dropInStripePriceId
+                    )!
                   }
-                  stripeProductId={stripeProductId!}
+                  stripeProductId={resolvedStripeProductId!}
                   eventKeyName={eventKeyName}
                   userId={userId}
                   eventId={eventId}
@@ -199,9 +215,13 @@ export default function EventNormalCheckOut({
               ) : (
                 <NormalCheckoutButton
                   stripePriceId={
-                    isSubscribed ? stripeSubscribedPriceId! : stripePriceId!
+                    (
+                      isSubscribed
+                        ? stripeSubscribedPriceId ?? dropInStripePriceId
+                        : dropInStripePriceId
+                    )!
                   }
-                  stripeProductId={stripeProductId!}
+                  stripeProductId={resolvedStripeProductId!}
                   eventKeyName={eventKeyName}
                   userId={userId}
                   eventId={eventId}

@@ -256,11 +256,19 @@ export default {
             }
           }
         } else {
-          // temporarily bypass auth for subscriptions
+          // bypass auth for subscriptions
           if (path.includes('subscriptions')) {
             return NextResponse.next()
           }
 
+          // bypass auth for tickets
+          if (path.includes('events/tickets')) {
+            return NextResponse.next()
+          }
+          
+          // Prevent access to events API without authentication on PC (use Prisma on server side to query the database then pass the data to the client side)
+          // Client side will not make GET request to the database, except for some situations like: fetching ticket information, and subscription status
+          // On phone, we use JWT token for authentication
           const secretHeader = request.headers.get('secret')
           const response = NextResponse.next()
           if (secretHeader && validateSecretToken(secretHeader)) {

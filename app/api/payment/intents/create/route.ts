@@ -7,11 +7,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    const { stripePriceId, stripeProductId, amount, classId, userId, type } = await req.json()
+    const { amount, eventId, userId, ticketId, type } = await req.json()
 
-    if (!amount || !classId) {
+    if (!amount || !eventId) {
       return NextResponse.json(
-        { message: 'Missing amount or classId' },
+        { message: 'Missing amount or eventId' },
         { status: 400 }
       )
     }
@@ -21,9 +21,8 @@ export async function POST(req: NextRequest) {
       currency: 'cad',
       metadata: {
         userId: userId,
-        eventId: classId,
-        stripePriceId: stripePriceId,
-        stripeProductId: stripeProductId,
+        eventId: eventId,
+        ticketId: ticketId,
         type: type,
       },
     })

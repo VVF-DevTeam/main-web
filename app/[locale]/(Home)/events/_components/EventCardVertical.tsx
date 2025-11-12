@@ -124,13 +124,6 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
               ${event.price === 0 ? 'Free' : event.price?.toString()}
               {/* {event.priceMember ? '/$' + event.priceMember : null} */}
             </span>
-            {/* <span className="flex-center gap-x-2">
-            <Ticket className="h-5 w-5 rotate-45" />
-            {event.capacity! - event.ticketsSold! === 0
-              ? 'Sold Out'
-              : event.capacity! - event.ticketsSold!}{' '}
-            {t('slot-event')}
-          </span> */}
           </div>
 
           {/* Timings */}

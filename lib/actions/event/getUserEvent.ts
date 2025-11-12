@@ -41,7 +41,6 @@ export const getUserEvents = async ({
             isPublished: true,
             eventType: true,
             capacity: true,
-            ticketsSold: true,
             days: true,
             endDate: true,
           },

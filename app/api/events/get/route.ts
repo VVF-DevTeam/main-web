@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getEventById } from '@/lib/actions/event/getEventById'
-import { getEventPagiation } from '@/lib/actions/event/getEventPagination'
+import { getEventPagination } from '@/lib/actions/event/getEventPagination'
 
 export const GET = async (request: NextRequest) => {
   const eventId = request?.nextUrl?.searchParams.get('eventId')
@@ -22,7 +22,7 @@ export const GET = async (request: NextRequest) => {
 
   try {
     if (!eventId) {
-      const [events, total] = await getEventPagiation({
+      const [events, total] = await getEventPagination({
         searchTitle,
         isPublished,
         requestTime,
@@ -31,7 +31,7 @@ export const GET = async (request: NextRequest) => {
       })
       event = events.map((item) => ({
         ...item,
-        remainingTicket: (item.capacity || 0) - (item.ticketsSold || 0),
+        remainingTicket: (item.capacity || 0), // TODO: calculate total ticket sold
       }))
       totalEvent = total
     } else {

@@ -28,7 +28,6 @@ model Event {
   startTime          String?
   endTime            String?
   capacity           Int?
-  ticketsSold        Int?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   days               String[]
@@ -86,8 +85,11 @@ model EventTicket {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
   type      String
+
+  //
   price     Decimal
   currency  String     @default("CAD")
+  discountMemberPercent Int?
 
   // Capacity just for this tier
   capacity    Int
@@ -100,35 +102,12 @@ model EventTicket {
   // Stripe catalog mapping
   stripeProductId String
   stripePriceId   String
+  subscribedStripePriceId String?
 
   // Relation
   eventId   String
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
   payments  Payment[]
-}
-
-model Ticket {
-  id          String     @id @default(cuid())
-  title       String?
-  description String?
-  price       Float
-  eventId     String
-  published   Boolean    @default(false)
-  updatedAt   DateTime   @default(now())
-  createdAt   DateTime   @updatedAt
-  consumed    Boolean    @default(false)
-  purchases   Purchase[]
-}
-
-model Purchase {
-  id            String  @id @default(cuid())
-  userId        String
-  ticketId      String
-  paymentMethod String?
-  ticket        Ticket  @relation(fields: [ticketId], references: [id])
-  user          User    @relation(fields: [userId], references: [id])
-
-  @@unique([userId, ticketId])
 }
 
 model User {
@@ -155,7 +134,6 @@ model User {
   posts                Post[]
   likedPosts           PostLikes[]
   visitedPosts         PostVisits[]
-  purchases            Purchase[]
   Review               Review[]
   Devices              UserDevice[]
   EventHost            Event[]       @relation("EventToUser")
@@ -240,8 +218,6 @@ model Payment {
   quantity        Int
 
   // Stripe 
-  stripeProductId String
-  stripePriceId   String
   stripePaymentId String
 
   // info

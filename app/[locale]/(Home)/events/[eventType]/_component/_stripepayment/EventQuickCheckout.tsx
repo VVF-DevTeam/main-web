@@ -20,8 +20,7 @@ interface CheckoutFormProps {
   price: number
   eventId: string
   userId: string
-  stripePriceId: string
-  stripeProductId: string
+  ticketId: string
   type: PaymentType
 }
 
@@ -29,8 +28,7 @@ interface QuickCheckoutFormProps {
   price: number
   eventId: string
   userId: string
-  stripePriceId: string
-  stripeProductId: string
+  ticketId: string
   type: string
 }
 
@@ -42,8 +40,7 @@ function QuickCheckoutForm({
   price,
   eventId,
   userId,
-  stripePriceId,
-  stripeProductId,
+  ticketId,
   type,
 }: CheckoutFormProps) {
   const stripe = useStripe()
@@ -77,8 +74,7 @@ function QuickCheckoutForm({
         amount: isSubscribed ? price * 0.8 * 100 : price * 100,
         eventId,
         userId,
-        stripePriceId,
-        stripeProductId,
+        ticketId,
         type: type,
       })
 
@@ -142,8 +138,7 @@ export default function EventQuickCheckout({
   price,
   eventId,
   userId,
-  stripePriceId,
-  stripeProductId,
+  ticketId,
   type,
 }: QuickCheckoutFormProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
@@ -156,8 +151,7 @@ export default function EventQuickCheckout({
         price={price}
         eventId={eventId}
         userId={userId}
-        stripePriceId={stripePriceId}
-        stripeProductId={stripeProductId}
+        ticketId={ticketId}
         type={type === "Class" ? "ClassDropIn" : type as PaymentType}
       />
     </Elements>

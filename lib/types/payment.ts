@@ -8,7 +8,6 @@ export type PaymentWithRelations = {
     type: PaymentType
     expiresAt: Date | null
     quantity: number
-    stripeProductId: string
     refunded: boolean
     user: {
       name: string | null
