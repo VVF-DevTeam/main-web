@@ -2,6 +2,38 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
+// Retrieve an EventTicket by id
+export const GET = async (request: Request) => {
+  try {
+    const { searchParams } = new URL(request.url)
+    const ticketId = searchParams.get('ticketId')
+
+    if (!ticketId) {
+      return new NextResponse('Ticket id is required', { status: 400 })
+    }
+
+    const ticket = await prisma.eventTicket.findUnique({
+      where: { id: ticketId },
+      include: {
+        event: true,
+      },
+    })
+
+    if (!ticket) {
+      return new NextResponse('Ticket not found', { status: 404 })
+    }
+
+    return NextResponse.json(ticket)
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log('[GET EVENT TICKET ERROR]: ', error.stack)
+    } else {
+      console.log('[GET EVENT TICKET ERROR]: ', error)
+    }
+    return new NextResponse('Internal Server Error', { status: 500 })
+  }
+}
+
 // Create an EventTicket
 export const POST = async (request: Request) => {
   try {
@@ -11,10 +43,12 @@ export const POST = async (request: Request) => {
       price,
       capacity,
       currency,
+      discountMemberPercent,
       validFrom,
       validTo,
       stripeProductId,
       stripePriceId,
+      subscribedStripePriceId,
     } = await request.json()
 
     // Ensure the related event exists
@@ -32,10 +66,15 @@ export const POST = async (request: Request) => {
         price,
         capacity,
         currency: currency || 'CAD',
+        discountMemberPercent:
+          discountMemberPercent !== undefined && discountMemberPercent !== null
+            ? Math.round(Number(discountMemberPercent))
+            : null,
         validFrom: validFrom ? new Date(validFrom) : null,
         validTo: validTo ? new Date(validTo) : null,
         stripeProductId,
         stripePriceId,
+        subscribedStripePriceId: subscribedStripePriceId || null,
       },
     })
 
@@ -81,10 +120,21 @@ export const PUT = async (request: Request) => {
       return new NextResponse('Ticket not found', { status: 404 })
     }
 
-    const { validFrom, validTo, currency, ...rest } = values as {
+    const {
+      validFrom,
+      validTo,
+      currency,
+      discountMemberPercent,
+      subscribedStripePriceId,
+      price,
+      ...rest
+    } = values as {
       validFrom?: string | Date | null
       validTo?: string | Date | null
       currency?: string
+      discountMemberPercent?: number | null
+      subscribedStripePriceId?: string | null
+      price?: number
       [key: string]: unknown
     }
 
@@ -92,7 +142,18 @@ export const PUT = async (request: Request) => {
       where: { id },
       data: {
         ...rest,
+        ...(price !== undefined && { price: price }),
         currency: currency ?? existing.currency,
+        discountMemberPercent:
+          discountMemberPercent !== undefined
+            ? discountMemberPercent !== null
+              ? Math.round(Number(discountMemberPercent))
+              : null
+            : existing.discountMemberPercent,
+        subscribedStripePriceId:
+          subscribedStripePriceId !== undefined
+            ? subscribedStripePriceId ?? null
+            : existing.subscribedStripePriceId,
         validFrom: validFrom
           ? new Date(validFrom)
           : validFrom === null

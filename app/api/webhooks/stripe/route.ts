@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     let chargedAmount: number = 0
     let subscriptionId: string | null = null
     let subscriptionEnd: number | null = null
-    let stripePriceId: string | null = null
+    // let stripePriceId: string | null = null
     let metadata: Record<string, string> | null = null
     let quantity: number | null = null
     let paymentId: string | null = null
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
         )
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
-          stripePriceId = subscriptionDetails.stripePriceId
+          // stripePriceId = subscriptionDetails.stripePriceId
         }
       }
     } else if (event.type === 'checkout.session.completed') {
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
         const subscriptionDetails = await getSubscriptionDetails(subscriptionId)
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
-          stripePriceId = subscriptionDetails.stripePriceId
+          // stripePriceId = subscriptionDetails.stripePriceId
         }
       }
     } else {
@@ -197,8 +197,6 @@ export async function POST(req: NextRequest) {
         data: {
           userId: metadata.userId,
           eventId: metadata.eventId,
-          stripeProductId: metadata.stripeProductId,
-          stripePriceId: stripePriceId || metadata.stripePriceId,
           stripePaymentId: paymentId,
           pricePaid: chargedAmount / 100,
           type: metadata.type as PaymentType,

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
 
-export const getEventPagiation = async ({
+export const getEventPagination = async ({
   searchTitle,
   isPublished,
   requestTime,
@@ -26,7 +26,6 @@ export const getEventPagiation = async ({
         isPublished: true,
         eventType: true,
         capacity: true,
-        ticketsSold: true,
         days: true,
         endDate: true,
       },

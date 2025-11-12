@@ -51,7 +51,7 @@ export const getPaginatedPayments = async (
       
       if (user.role.includes('ADMIN')) {
         // Admin: get all payments
-        [totalCount, payments] = await Promise.all([
+        const [adminTotalCount, adminPayments] = await Promise.all([
           prisma.payment.count(),
           prisma.payment.findMany({
             select: {
@@ -61,7 +61,6 @@ export const getPaginatedPayments = async (
               type: true,
               expiresAt: true,
               quantity: true,
-              stripeProductId: true,
               refunded: true,
               user: {
                 select: {
@@ -85,6 +84,8 @@ export const getPaginatedPayments = async (
             take: smartFetchLimit,
           }),
         ])
+        totalCount = adminTotalCount
+        payments = adminPayments as PaymentWithRelations[]
       } else if (user.role.includes('HOST')) {
         // Host: get payments for hosted events
         const hostedEvents = await prisma.event.findMany({
@@ -107,7 +108,7 @@ export const getPaginatedPayments = async (
           },
         } as const
 
-        [totalCount, payments] = await Promise.all([
+        const [hostTotalCount, hostPayments] = await Promise.all([
           prisma.payment.count({ where }),
           prisma.payment.findMany({
             where,
@@ -118,7 +119,6 @@ export const getPaginatedPayments = async (
               type: true,
               expiresAt: true,
               quantity: true,
-              stripeProductId: true,
               refunded: true,
               user: {
                 select: {
@@ -142,6 +142,8 @@ export const getPaginatedPayments = async (
             take: smartFetchLimit,
           }),
         ])
+        totalCount = hostTotalCount
+        payments = hostPayments as PaymentWithRelations[]
       } else {
         return {
           payments: [],

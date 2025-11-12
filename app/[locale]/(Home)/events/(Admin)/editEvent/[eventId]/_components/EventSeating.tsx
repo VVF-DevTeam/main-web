@@ -48,7 +48,12 @@ export const SEAT_STATUS = {
   NO_SEAT: 0,
   HAS_SEAT: 1,
   OCCUPIED: 2,
-} as const
+}
+
+export const SEAT_STATUS_USER: Record<number, string> = {
+  1: 'Available Seat',
+  2: 'Reserved Seat',
+}
 
 export const SEAT_STATUS_LABELS: Record<number, string> =
   seatStatusMapping as Record<number, string>
@@ -58,16 +63,19 @@ export const getSeatStatusLabel = (status: number): string => {
 }
 
 // Seat is always an object with status attribute
-type SeatValue =
-  | { status: number }
-  | {
-      ticketType: string
-      ticketId: string
-      price: number
-      currency: string
-      name?: string
-      status: number
-    }
+export type SeatValue = {
+  ticketType: string
+  ticketId: string
+  name?: string
+  status: number
+}
+
+const createEmptySeat = (): SeatValue => ({
+  ticketType: '',
+  ticketId: '',
+  name: '',
+  status: SEAT_STATUS.NO_SEAT,
+})
 export type SeatingMap = SeatValue[][]
 
 const EventSeatingSchema = z.object({
@@ -219,13 +227,13 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                 ) {
                   return prevMap[rowIdx][colIdx]
                 }
-                return { status: 0 }
+                return createEmptySeat()
               })
           }
-          // New row, initialize with { status: 0 }
+          // New row, initialize with default empty seats
           return Array(w)
             .fill(null)
-            .map(() => ({ status: 0 }))
+            .map(() => createEmptySeat())
         })
       return newMap
     })
@@ -249,7 +257,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
           .map(() =>
             Array(w)
               .fill(null)
-              .map(() => ({ status: 0 }))
+              .map(() => createEmptySeat())
           )
   }, [widthValue, heightValue, seatingMap])
 
@@ -267,7 +275,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
     setSelectedColumn(null)
     setSelectionType('seat')
     const seat = previewMatrix[rowIndex]?.[colIndex]
-    if (seat && 'ticketId' in seat && typeof seat.ticketId === 'string') {
+    if (seat && seat.ticketId) {
       setSelectedTicketId(seat.ticketId)
     } else {
       setSelectedTicketId('')
@@ -284,16 +292,9 @@ const EventSeating = ({ event }: EventSeatingProps) => {
     const row = previewMatrix[rowIndex]
     if (row && row.length > 0) {
       const firstSeat = row[0]
-      if (
-        firstSeat &&
-        'ticketId' in firstSeat &&
-        typeof firstSeat.ticketId === 'string'
-      ) {
+      if (firstSeat && firstSeat.ticketId) {
         // Check if all seats have the same ticket
-        const allSame = row.every(
-          (seat) =>
-            seat && 'ticketId' in seat && seat.ticketId === firstSeat.ticketId
-        )
+        const allSame = row.every((seat) => seat && seat.ticketId === firstSeat.ticketId)
         if (allSame) {
           setSelectedTicketId(firstSeat.ticketId)
         } else {
@@ -317,16 +318,9 @@ const EventSeating = ({ event }: EventSeatingProps) => {
     const column = previewMatrix.map((row) => row[colIndex])
     if (column && column.length > 0) {
       const firstSeat = column[0]
-      if (
-        firstSeat &&
-        'ticketId' in firstSeat &&
-        typeof firstSeat.ticketId === 'string'
-      ) {
+      if (firstSeat && firstSeat.ticketId) {
         // Check if all seats have the same ticket
-        const allSame = column.every(
-          (seat) =>
-            seat && 'ticketId' in seat && seat.ticketId === firstSeat.ticketId
-        )
+        const allSame = column.every((seat) => seat && seat.ticketId === firstSeat.ticketId)
         if (allSame) {
           setSelectedTicketId(firstSeat.ticketId)
         } else {
@@ -368,8 +362,8 @@ const EventSeating = ({ event }: EventSeatingProps) => {
 
         if (shouldUpdate) {
           if (!ticketId || ticketId === '') {
-            // Return seat with status 0 when clearing
-            return { status: SEAT_STATUS.NO_SEAT }
+            // Return seat with default empty values when clearing
+            return createEmptySeat()
           }
           const ticket = tickets.find((t) => t.id === ticketId)
           if (ticket) {
@@ -383,13 +377,11 @@ const EventSeating = ({ event }: EventSeatingProps) => {
             return {
               ticketType: ticket.type,
               ticketId: ticket.id,
-              price: Number(ticket.price),
-              currency: ticket.currency || 'CAD',
               name: generateSeatName(rIdx, cIdx),
               status: seatStatus,
             }
           }
-          return { status: SEAT_STATUS.NO_SEAT }
+          return createEmptySeat()
         }
         return seat
       })
@@ -430,13 +422,13 @@ const EventSeating = ({ event }: EventSeatingProps) => {
         matrix = seatingMap.map((row, rIdx) =>
           row.map((seat, cIdx) => {
             // If seat has a ticket, update the name and preserve status
-            if ('ticketId' in seat) {
+            if (seat.ticketId) {
               return {
                 ...seat,
                 name: generateSeatName(rIdx, cIdx),
               }
             }
-            // Otherwise, return seat as is (status-only object)
+            // Otherwise, return seat as is (empty/default seat)
             return seat
           })
         )
@@ -447,7 +439,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
           .map(() =>
             Array(values.width)
               .fill(null)
-              .map(() => ({ status: 0 }))
+              .map(() => createEmptySeat())
           )
       }
 
@@ -547,13 +539,10 @@ const EventSeating = ({ event }: EventSeatingProps) => {
 
   const getSeatColor = (seat: SeatValue) => {
     // Check for seats with tickets first (they may also have status)
-    if ('ticketId' in seat && 'ticketType' in seat) {
-      const ticketId = typeof seat.ticketId === 'string' ? seat.ticketId : ''
-      const ticketType =
-        typeof seat.ticketType === 'string' ? seat.ticketType : ''
-      return getTicketColor(ticketId, ticketType)
+    if (seat.ticketId && seat.ticketType) {
+      return getTicketColor(seat.ticketId, seat.ticketType)
     }
-    // Otherwise, treat as empty seat (status-only object)
+    // Otherwise, treat as empty/default seat
     return 'text-gray-400'
   }
 
@@ -563,25 +552,17 @@ const EventSeating = ({ event }: EventSeatingProps) => {
     colIndex?: number
   ) => {
     const seatName =
-      'name' in seat && typeof seat.name === 'string'
+      seat.name && typeof seat.name === 'string'
         ? seat.name
         : rowIndex !== undefined && colIndex !== undefined
           ? generateSeatName(rowIndex, colIndex)
           : 'Seat'
 
     // Check for seats with tickets first (they may also have status)
-    if ('ticketType' in seat && typeof seat.ticketType === 'string') {
-      const currency =
-        'currency' in seat && typeof seat.currency === 'string'
-          ? seat.currency
-          : 'CAD'
-      const price =
-        'price' in seat && typeof seat.price === 'number'
-          ? ` - ${currency} $${seat.price.toFixed(2)}`
-          : ''
-      return `${seatName} - ${seat.ticketType}${price}`
+    if (seat.ticketType) {
+      return `${seatName} - ${seat.ticketType}`
     }
-    // Otherwise, treat as empty seat (status-only object)
+    // Otherwise, treat as empty/default seat
     return `${seatName} - Empty seat`
   }
 
@@ -850,9 +831,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                                   isEditingSeats && 'ring-1 ring-gray-300'
                                 )}
                                 strokeWidth={1.5}
-                                fill={
-                                  'ticketId' in seat ? 'currentColor' : 'none'
-                                }
+                                fill={seat.ticketId ? 'currentColor' : 'none'}
                               />
                             </button>
                           ))}
@@ -935,11 +914,11 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                           <Square
                             className={cn('h-6 w-6', getSeatColor(seat))}
                             strokeWidth={1.5}
-                            fill={
-                              typeof seat === 'object' && 'ticketId' in seat
-                                ? 'currentColor'
-                                : 'none'
-                            }
+                              fill={
+                                typeof seat === 'object' && seat.ticketId
+                                  ? 'currentColor'
+                                  : 'none'
+                              }
                           />
                         </div>
                       ))}

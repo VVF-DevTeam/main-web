@@ -74,7 +74,6 @@ const ClassDescription = async ({
   imageUrls,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
-  console.log(imageUrl)
 
   // Get the current user's id
   const session = await auth()

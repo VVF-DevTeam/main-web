@@ -1,4 +1,4 @@
-import RefundButton from '@/components/payment/RefundButton'
+// import RefundButton from '@/components/payment/RefundButton'
 import {
   getPaymentStatus,
   getStatusColor,
@@ -131,7 +131,7 @@ export default async function PaymentManagement({
                         {status}
                       </td>
                       <td className="px-4 py-3">
-                        <RefundButton
+                        {/* <RefundButton
                           paymentId={payment.id}
                           stripeProductId={payment.stripeProductId}
                           amount={Number(payment.pricePaid)}
@@ -143,7 +143,7 @@ export default async function PaymentManagement({
                             payment.stripeProductId === 'cash' ||
                             payment.stripeProductId === 'bank-transfer'
                           }
-                        />
+                        /> */}
                       </td>
                     </tr>
                   )

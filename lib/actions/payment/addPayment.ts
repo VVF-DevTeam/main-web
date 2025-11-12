@@ -34,8 +34,6 @@ export async function addPayment({
         pricePaid,
         quantity,
         stripePaymentId: paymentMethod,
-        stripePriceId: paymentMethod,
-        stripeProductId: paymentMethod,
         type: paymentType as PaymentType,
         expiresAt: membershipEndDate,
       },

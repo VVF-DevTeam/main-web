@@ -23,7 +23,6 @@ describe('Testing getRemainSessions function', () => {
       startTime: null,
       endTime: null,
       capacity: null,
-      ticketsSold: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       days: [
@@ -50,6 +49,8 @@ describe('Testing getRemainSessions function', () => {
       stripeProductId: null,
       subscribedPriceId: null,
       socialLinks: null,
+      seriesId: null,
+      seatingMap: null,
     })
 
     const eventId = 'testingGetRemainSessions'
