@@ -65,7 +65,10 @@ export async function getPublishedEventsWithFilters({
         })
       : await prisma.event.findMany({
           ...baseQuery,
-          include: { categories: includeCategories ? true : false },
+          include: { 
+            categories: includeCategories ? true : false,
+            tickets: true,
+          },
         })
 
     return events

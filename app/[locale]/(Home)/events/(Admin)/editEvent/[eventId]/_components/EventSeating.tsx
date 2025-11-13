@@ -979,11 +979,18 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                 <SelectValue placeholder="Select a ticket type" />
               </SelectTrigger>
               <SelectContent>
-                {tickets.map((ticket) => (
-                  <SelectItem key={ticket.id} value={ticket.id}>
-                    {ticket.type} - ${Number(ticket.price).toFixed(2)}
-                  </SelectItem>
-                ))}
+                {tickets.map((ticket) => {
+                  // Calculate display price: if payTotalNumber exists, show price * payTotalNumber, else show single ticket price
+                  const displayPrice = ticket.payTotalNumber
+                    ? Number(ticket.price) * ticket.payTotalNumber
+                    : Number(ticket.price)
+                  return (
+                    <SelectItem key={ticket.id} value={ticket.id}>
+                      {ticket.type} - ${displayPrice.toFixed(2)}
+                      {ticket.payTotalNumber && ` (Full Event: ${ticket.payTotalNumber} sessions)`}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           </div>

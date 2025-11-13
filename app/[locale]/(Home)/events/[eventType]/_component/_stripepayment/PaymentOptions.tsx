@@ -22,40 +22,51 @@ import {
   SEAT_STATUS,
   SEAT_STATUS_USER,
 } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+import { EventTicket } from '@prisma/client'
 interface PaymentOptionsProps {
-  stripePriceId: string
-  stripeProductId: string
-  stripeSubscribedPriceId: string
   formLink: string
   eventKeyName: string
-  price: number
   eventId: string
   title: string
   userId: string
-  fullCourseDiscount?: number
   email: string
   type: string
   loggedIn: boolean
   seatingMap?: SeatingMap | null
+  tickets?: EventTicket[]
+}
+
+const calculateTicketDisplayPrice = (ticket: EventTicket | null): number | null => {
+  if (!ticket) {
+    return null
+  }
+
+  const basePrice = Number(ticket.price)
+
+  if (Number.isNaN(basePrice)) {
+    return null
+  }
+
+  if (ticket.payTotalNumber && ticket.payTotalNumber > 0) {
+    return basePrice * ticket.payTotalNumber
+  }
+
+  return basePrice
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
 
 const PaymentOptions: React.FC<PaymentOptionsProps> = ({
-  stripePriceId,
-  stripeProductId,
-  stripeSubscribedPriceId,
   formLink,
   eventKeyName,
-  price,
   eventId,
   title,
   userId,
-  fullCourseDiscount,
   email,
   type,
   loggedIn,
   seatingMap,
+  tickets = [],
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -70,13 +81,6 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     rowIndex: number
     seatIndex: number
   } | null>(null)
-  const [ticketInfo, setTicketInfo] = useState<{
-    stripePriceId: string | null
-    stripeProductId: string | null
-    price: number | null
-    currency: string | null
-  } | null>(null)
-  const [isTicketInfoLoading, setIsTicketInfoLoading] = useState(false)
 
   const generateSeatName = (rowIndex: number, colIndex: number) => {
     const rowName = String.fromCharCode(65 + rowIndex) // A, B, C, ...
@@ -167,98 +171,55 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     setIsSeatSheetOpen(open)
     if (!open) {
       setSelectedSeat(null)
-      setTicketInfo(null)
     }
   }
 
-  // Fetch ticket info when a seat with ticketId is selected
-  useEffect(() => {
+  const selectedTicket = useMemo(() => {
     if (!selectedSeat?.seat.ticketId) {
-      setTicketInfo(null)
-      return
+      return null
     }
 
-    let isCancelled = false
+    return tickets.find((ticket) => ticket.id === selectedSeat.seat.ticketId) ?? null
+  }, [selectedSeat?.seat.ticketId, tickets])
 
-    const fetchTicketInfo = async () => {
-      try {
-        setIsTicketInfoLoading(true)
-        setTicketInfo(null)
-        const response = await fetch(
-          `/api/events/tickets?ticketId=${selectedSeat.seat.ticketId}`,
-          {
-            cache: 'no-store',
-          }
-        )
-
-        if (!response.ok) {
-          const message = await response.text()
-          throw new Error(message || 'Failed to fetch ticket information')
-        }
-
-        const data: {
-          stripePriceId?: string | null
-          stripeProductId?: string | null
-          price?: number | string | null
-          currency?: string | null
-        } = await response.json()
-
-        if (!isCancelled) {
-          const parsedPrice =
-            data.price !== undefined && data.price !== null
-              ? Number(data.price)
-              : null
-          setTicketInfo({
-            stripePriceId: data.stripePriceId ?? null,
-            stripeProductId: data.stripeProductId ?? null,
-            price:
-              parsedPrice !== null && !Number.isNaN(parsedPrice)
-                ? parsedPrice
-                : null,
-            currency: data.currency ?? null,
-          })
-
-          console.log('ticketInfo', ticketInfo)
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          console.error('Error fetching ticket information:', error)
-          setTicketInfo(null)
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsTicketInfoLoading(false)
-        }
-      }
-    }
-
-    fetchTicketInfo()
-
-    return () => {
-      isCancelled = true
-    }
-  }, [selectedSeat?.seat.ticketId])
+  const selectedTicketDisplayPrice = useMemo(() => calculateTicketDisplayPrice(selectedTicket), [selectedTicket])
+  const selectedTicketCurrency = selectedTicket?.currency || 'CAD'
 
   const renderSeatDetails = () => {
     if (!selectedSeat) return null
 
     const { seat, rowIndex, seatIndex } = selectedSeat
     const seatName = getSeatName(seat, rowIndex, seatIndex)
-    const priceDisplay =
-      seat.ticketId && isTicketInfoLoading
-        ? 'Loading...'
-        : seat.ticketId && ticketInfo?.price && ticketInfo.price > 0
-          ? `${ticketInfo.currency || 'CAD'} $${ticketInfo.price.toFixed(2)}`
-          : 'N/A'
-    const secondaryDetails = seat.ticketId
-      ? [
-          { label: 'Ticket Type', value: seat.ticketType || 'N/A' },
-          { label: 'Ticket ID', value: seat.ticketId },
-          {
-            label: 'Price',
-            value: priceDisplay,
-          },
-        ]
+    const hasTicket = Boolean(seat.ticketId)
+    const ticket = selectedTicket
+    const displayPrice = hasTicket ? selectedTicketDisplayPrice : null
+    const priceDisplay = hasTicket
+      ? ticket && displayPrice !== null
+        ? `${selectedTicketCurrency} $${displayPrice.toFixed(2)}${
+            ticket.payTotalNumber
+              ? ` (Full Event: ${ticket.payTotalNumber} sessions)`
+              : ''
+          }`
+        : 'N/A'
+      : 'N/A'
+    const secondaryDetails = hasTicket
+      ? ticket
+        ? [
+            { label: 'Ticket Type', value: seat.ticketType || 'N/A' },
+            {
+              label: 'Price',
+              value: priceDisplay,
+            },
+            ...(ticket.payTotalNumber
+              ? [
+                  {
+                    label: 'Sessions',
+                    value: `${ticket.payTotalNumber}`,
+                  },
+                ]
+              : []),
+          ]
+        : [{ label: 'Ticket', value: 'No ticket information available' }]
       : [{ label: 'Ticket', value: 'No ticket assigned' }]
 
     return (
@@ -433,21 +394,19 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             {selected === 'checkout' &&
             (!seatingMap || seatingMap.length === 0) ? (
               <div className="w-full">
+                {/* Show normal checkout for Class event */}
                 <EventNormalCheckOut
-                  stripePriceId={stripePriceId}
-                  stripeProductId={stripeProductId}
-                  stripeSubscribedPriceId={stripeSubscribedPriceId}
                   formLink={formLink}
                   eventKeyName={eventKeyName}
                   userId={userId}
                   eventId={eventId}
-                  price={price}
-                  fullCourseDiscount={fullCourseDiscount}
+                  tickets={tickets}
                   email={email}
                   type={type}
                 />
               </div>
             ) : seatingMap && seatingMap.length > 0 ? (
+              // Show seating map for Concert event
               <div className="w-full">
                 <div className="rounded-md border bg-white p-4">
                   <h3 className="mb-2 text-sm font-semibold">Seating Map</h3>
@@ -667,20 +626,14 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6 flex flex-col gap-4">
-            {renderSeatDetails()}{' '}
-            {isTicketInfoLoading ? (
-              <Button disabled>Loading ticket information...</Button>
-            ) : selectedSeat?.seat.ticketId && ticketInfo ? (
+            {renderSeatDetails()}
+            {selectedSeat?.seat.ticketId && selectedTicket ? (
               <EventNormalCheckOut
                 formLink={formLink}
                 eventKeyName={eventKeyName}
                 userId={userId}
                 eventId={eventId}
-                stripePriceId={ticketInfo.stripePriceId || undefined}
-                stripeProductId={ticketInfo.stripeProductId || undefined}
-                stripeSubscribedPriceId={stripeSubscribedPriceId}
-                price={ticketInfo.price ?? price}
-                fullCourseDiscount={fullCourseDiscount}
+                tickets={[selectedTicket]}
                 email={email}
                 type={type}
               />

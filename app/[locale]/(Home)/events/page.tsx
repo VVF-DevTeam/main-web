@@ -10,7 +10,7 @@ import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 
 // Actions
 // import { getPublishedEventsWithFilters } from '@/lib/actions/event/getEvent'
@@ -20,6 +20,7 @@ import { Event, EventCategory } from '@prisma/client'
 let eventsCache: {
   data: (Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   })[]
   timestamp: number
   locale: string
@@ -62,6 +63,7 @@ const EventsPage = async ({
       },
       include: {
         categories: true,
+        tickets: true,
       },
     })
 

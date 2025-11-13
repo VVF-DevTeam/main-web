@@ -3,6 +3,7 @@
 
 // Libraries
 import initTranslation from '@/app/i18n'
+import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 
 // Components
 import Image from 'next/image'
@@ -10,11 +11,12 @@ import Link from 'next/link'
 import { MapPin, CalendarDays, Ticket, ArrowRight } from 'lucide-react'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 
 interface EventCardHorizontalProps {
   event: Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   }
   locale: string
 }
@@ -83,9 +85,7 @@ const EventCardHorizontal = async ({
         <div className="flex items-center gap-2">
           <Ticket className="h-4 w-4 flex-shrink-0 rotate-45 text-bgColor-brand900 md:h-5 md:w-5" />
           <span>
-            {String(event.price) === '0'
-              ? 'Free'
-              : '$' + event.price?.toString()}
+            {getEventPrices(event.tickets, Number(event.price))}
             {/* {event.priceMember ? '/$' + event.priceMember : null} */}
           </span>
         </div>

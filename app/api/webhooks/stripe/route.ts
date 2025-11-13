@@ -197,6 +197,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: metadata.userId,
           eventId: metadata.eventId,
+          eventTicketId: metadata.eventTicketId,
           stripePaymentId: paymentId,
           pricePaid: chargedAmount / 100,
           type: metadata.type as PaymentType,

@@ -5,17 +5,19 @@
 import { cn } from '@/lib/utils'
 import initTranslation from '@/app/i18n'
 import Link from 'next/link'
+import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 // Components
 import Image from 'next/image'
 import { MapPin, Ticket, CalendarDays, CalendarClock } from 'lucide-react'
 // import EventButton from './EventButton'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 
 interface EventCardVerticalProps {
   event: Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   }
   locale: string
 }
@@ -121,7 +123,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           <div className="flex items-center gap-x-2 text-base">
             <span className="flex items-center gap-x-2">
               <Ticket className="h-4 w-4 rotate-[135deg] text-bgColor-brand900 md:h-5 md:w-5" />
-              ${event.price === 0 ? 'Free' : event.price?.toString()}
+              {getEventPrices(event.tickets, Number(event.price))}
               {/* {event.priceMember ? '/$' + event.priceMember : null} */}
             </span>
           </div>

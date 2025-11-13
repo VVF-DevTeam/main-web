@@ -6,6 +6,7 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { Decimal } from '@prisma/client/runtime/library'
 import Link from 'next/link'
+import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 
 // Components
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
@@ -22,7 +23,7 @@ import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 // Types
-import { EventSchedule } from '@prisma/client'
+import { EventSchedule, EventTicket } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 
 type EventWithRelations = {
@@ -48,6 +49,7 @@ type EventWithRelations = {
   eventType: string
   imgUrls: string[]
   days: string[]
+  tickets: EventTicket[]
 }
 
 interface ConcertDescriptionsProps {
@@ -209,9 +211,7 @@ const ConcertDescriptions = async ({
                   <div className="flex items-center gap-x-3">
                     <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
                     <span className="text-base">
-                      {event.price?.toNumber() === 0
-                        ? 'Free'
-                        : `$${event.price?.toNumber().toString()}`}
+                      {getEventPrices(event.tickets)}
                     </span>
                   </div>
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -257,20 +257,16 @@ const ConcertDescriptions = async ({
         {/* Payment Options */}
         <div className="w-full">
           <PaymentOptions
-            stripePriceId={event.stripePriceId!}
-            stripeProductId={event.stripeProductId!}
-            stripeSubscribedPriceId={event.subscribedPriceId!}
             formLink={event.formLink!}
             eventKeyName={event.keyName}
-            price={event.price?.toNumber() || 0}
             eventId={event.id}
             title={event.title}
             userId={author}
-            fullCourseDiscount={event.fullCourseDiscount || 0}
             email={email}
             type={typeMap[event.eventType as keyof typeof typeMap]}
             loggedIn={author ? true : false}
             seatingMap={seatingMap}
+            tickets={event.tickets}
           />
 
           {existingPayment && existingPayment.length > 0 && (

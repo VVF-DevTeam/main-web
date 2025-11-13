@@ -86,10 +86,11 @@ model EventTicket {
   updatedAt DateTime   @default(now())
   type      String
 
-  //
+  // Price and payment mode
   price     Decimal
   currency  String     @default("CAD")
   discountMemberPercent Int?
+  payTotalNumber Int? // if this field exists, the price is paid in total: price x payTotalNumber
 
   // Capacity just for this tier
   capacity    Int

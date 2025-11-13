@@ -23,7 +23,6 @@ export const PATCH = async (
     // Update likes of the post
     let updatedLikes
     if (action === 'like') {
-      console.log('liking a post')
       updatedLikes = await prisma.postLikes.create({
         data: {
           postId: post.id,
@@ -31,7 +30,6 @@ export const PATCH = async (
         },
       })
     } else {
-      console.log('disliking a post')
       updatedLikes = await prisma.postLikes.delete({
         where: {
           postId_userId: { postId: post.id, userId: userId },

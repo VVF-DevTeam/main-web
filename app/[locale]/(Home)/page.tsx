@@ -16,7 +16,7 @@ import RegisterDoubleSection from '@/app/[locale]/(Home)/_components/registerDou
 import { Metadata } from 'next'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 import { ReviewWithUserAndEvent } from '@/lib/actions/review/reviewActions'
 import { CachedPostItem } from '@/lib/actions/post/getPosts'
 
@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 let upcomingEventsCache: {
   data: (Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   })[]
   timestamp: number
   locale: string
@@ -48,6 +49,7 @@ let upcomingEventsCache: {
 let pastEventsCache: {
   data: (Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   })[]
   timestamp: number
   locale: string

@@ -8,11 +8,12 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 
 interface EventListVerticalProps {
   events: (Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   })[]
   locale: string
   title?: string
