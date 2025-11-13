@@ -49,6 +49,7 @@ export const POST = async (request: Request) => {
       stripeProductId,
       stripePriceId,
       subscribedStripePriceId,
+      payTotalNumber,
     } = await request.json()
 
     // Ensure the related event exists
@@ -75,6 +76,10 @@ export const POST = async (request: Request) => {
         stripeProductId,
         stripePriceId,
         subscribedStripePriceId: subscribedStripePriceId || null,
+        payTotalNumber:
+          payTotalNumber !== undefined && payTotalNumber !== null
+            ? Math.round(Number(payTotalNumber))
+            : null,
       },
     })
 
@@ -127,6 +132,7 @@ export const PUT = async (request: Request) => {
       discountMemberPercent,
       subscribedStripePriceId,
       price,
+      payTotalNumber,
       ...rest
     } = values as {
       validFrom?: string | Date | null
@@ -135,6 +141,7 @@ export const PUT = async (request: Request) => {
       discountMemberPercent?: number | null
       subscribedStripePriceId?: string | null
       price?: number
+      payTotalNumber?: number | null
       [key: string]: unknown
     }
 
@@ -154,6 +161,12 @@ export const PUT = async (request: Request) => {
           subscribedStripePriceId !== undefined
             ? subscribedStripePriceId ?? null
             : existing.subscribedStripePriceId,
+        payTotalNumber:
+          payTotalNumber !== undefined
+            ? payTotalNumber !== null
+              ? Math.round(Number(payTotalNumber))
+              : null
+            : existing.payTotalNumber,
         validFrom: validFrom
           ? new Date(validFrom)
           : validFrom === null

@@ -76,6 +76,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
           id: true,
         },
       },
+      tickets: true,
     },
   })
 
@@ -139,18 +140,14 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             schedules={publishedClass.schedules}
             days={publishedClass.days!}
             formLink={publishedClass.formLink!}
-            stripePriceId={publishedClass.stripePriceId!}
-            stripeProductId={publishedClass.stripeProductId!}
-            stripeSubscribedPriceId={publishedClass.subscribedPriceId!}
             locale={locale}
             keyName={publishedClass.keyName}
             classId={publishedClass.id}
-            price={publishedClass.price?.toNumber()!}
             title={publishedClass.title}
-            fullCourseDiscount={publishedClass.fullCourseDiscount || 0}
             eventType={publishedClass.eventType}
             shouldShowGallery={shouldShowGallery as boolean}
             imageUrls={publishedClass.imgUrls as string[]}
+            tickets={publishedClass.tickets}
           />
         </div>
       )}

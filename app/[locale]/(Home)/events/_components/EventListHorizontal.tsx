@@ -7,7 +7,7 @@ import EventPagination from './EventPagination'
 import Image from 'next/image'
 
 // Interfaces & Types
-import { Event, EventCategory } from '@prisma/client'
+import { Event, EventCategory, EventTicket } from '@prisma/client'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -18,6 +18,7 @@ import { getClosestFutureEvent } from '@/lib/actions/event/getClosestEvent'
 interface EventListHorizontalProps {
   events: (Event & {
     categories: EventCategory[]
+    tickets?: EventTicket[]
   })[]
   locale: string
   finished?: boolean

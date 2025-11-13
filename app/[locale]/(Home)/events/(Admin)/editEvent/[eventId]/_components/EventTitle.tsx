@@ -46,7 +46,6 @@ const EventTitle = ({ event }: EventTitleProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventTitleSchema>) => {
     const keyName = data.title.replace(/\s+/g, '-').toLowerCase()
-    console.log('keyName', keyName)
     
     try {
       const response = await axiosInstance.put(

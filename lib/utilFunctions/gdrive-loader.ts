@@ -50,10 +50,6 @@ export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
     return src
   }
 
-  if (src.includes('scontent')) {
-    console.log('src', src)
-  }
-
   const id = extractGoogleDriveId(src)
 
   return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`

@@ -41,7 +41,6 @@ export const getPaginatedPayments = async (
 
     if (cacheValidation.isValid) {
       // Use cached data
-      console.log('Using cached payment data')
       payments = getCachedPayments()!
       totalCount = getCachedTotalCount()
       isFromCache = true

@@ -6,38 +6,71 @@ import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
-import { useState, useEffect, useRef } from 'react'
-import { getRemainSessions } from '@/lib/actions/event/getRemainSessions'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
-import { PaymentType } from '@prisma/client'
-
-type PaymentButtonType = 'drop-in' | 'full-course'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { EventTicket, PaymentType } from '@prisma/client'
 
 interface EventNormalCheckOutProps {
-  stripePriceId?: string
-  stripeProductId?: string
-  formLink?: string // form link is a legacy property from the old version of the website for payment
+  formLink?: string
   eventKeyName: string
   userId: string
   eventId: string
-  stripeSubscribedPriceId?: string
-  price: number
-  fullCourseDiscount?: number
+  tickets: EventTicket[]
   email: string
   type: string
 }
 
+const calculateTicketTotalPrice = (ticket: EventTicket): number => {
+  const basePrice = Number(ticket.price) || 0
+
+  if (ticket.payTotalNumber && ticket.payTotalNumber > 0) {
+    return basePrice * ticket.payTotalNumber
+  }
+
+  return basePrice
+}
+
+const calculateMemberPrice = (
+  ticket: EventTicket,
+  totalPrice: number
+): number | null => {
+  if (ticket.discountMemberPercent == null) {
+    return null
+  }
+
+  const discount = Math.max(0, Math.min(100, ticket.discountMemberPercent))
+  const discounted = totalPrice * ((100 - discount) / 100)
+
+  return Number.isFinite(discounted) ? discounted : null
+}
+
+const resolvePaymentType = (
+  eventType: string,
+  ticket: EventTicket
+): PaymentType => {
+  if (eventType === 'Class') {
+    return ticket.payTotalNumber && ticket.payTotalNumber > 0
+      ? PaymentType.ClassFullCourse
+      : PaymentType.ClassDropIn
+  }
+
+  switch (eventType) {
+    case 'Concert':
+      return PaymentType.Concert
+    case 'Camping':
+      return PaymentType.Camping
+    case 'Event':
+      return PaymentType.Event
+    default:
+      return PaymentType.Event
+  }
+}
+
 export default function EventNormalCheckOut({
-  stripePriceId,
-  stripeProductId,
   formLink,
   eventKeyName,
   userId,
   eventId,
-  stripeSubscribedPriceId,
-  price,
-  fullCourseDiscount,
+  tickets,
   email,
   type,
 }: EventNormalCheckOutProps) {
@@ -45,35 +78,35 @@ export default function EventNormalCheckOut({
   const { t } = useTranslation('event')
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [paymentType, setPaymentType] = useState<PaymentButtonType>('drop-in')
-  const [remainSessions, setRemainSessions] = useState(0)
-  const [fullCoursePrice, setFullCoursePrice] = useState(0)
   const [showForm, setShowForm] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const prevShowFormRef = useRef(false)
-  const discount = fullCourseDiscount ? (100 - fullCourseDiscount) / 100 : 1
 
-  // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
-    const checkSubAndSessions = async () => {
+    let isMounted = true
+
+    const fetchSubscription = async () => {
       try {
-        const [subResult, sessions] = await Promise.all([
-          checkSubscription(userId),
-          getRemainSessions(eventId),
-        ])
-        setRemainSessions(sessions)
-        setIsSubscribed(subResult)
-        setFullCoursePrice(price * discount * sessions)
+        const subscribed = await checkSubscription(userId)
+        if (isMounted) {
+          setIsSubscribed(Boolean(subscribed))
+        }
       } catch (error) {
-        console.error('Error checking subscription or sessions:', error)
+        console.error('Error checking subscription:', error)
       } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
-    checkSubAndSessions()
-  }, [userId, eventId, price])
 
-  // Scroll to bottom when form is opened (transition from false to true)
+    fetchSubscription()
+
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
+
   useEffect(() => {
     if (showForm && !prevShowFormRef.current && containerRef.current) {
       // Find the closest scrollable parent
@@ -102,144 +135,141 @@ export default function EventNormalCheckOut({
       prevShowFormRef.current = showForm
       return () => clearTimeout(timeoutId)
     }
+
     prevShowFormRef.current = showForm
   }, [showForm])
 
-  const baseStripePriceId = stripePriceId ?? null
-  const resolvedStripeProductId = stripeProductId ?? null
-  const dropInStripePriceId = isSubscribed
-    ? stripeSubscribedPriceId ?? baseStripePriceId
-    : baseStripePriceId
-  const canRenderCheckout = Boolean(dropInStripePriceId && resolvedStripeProductId)
-  const showLoadingState = isLoading
+  const checkoutTickets = useMemo(
+    () =>
+      tickets.filter(
+        (ticket) => ticket.stripePriceId && ticket.stripeProductId
+      ),
+    [tickets]
+  )
+
+  const hasTickets = checkoutTickets.length > 0
+
+  if (formLink) {
+    return (
+      <div ref={containerRef}>
+        {!showForm ? (
+          <Button
+            variant={'gray'}
+            onClick={() => setShowForm(true)}
+            className="group"
+          >
+            {t('reserve-button')}{' '}
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Button>
+        ) : (
+          <div className="w-full max-w-full">
+            <iframe
+              id="form-iframe"
+              title="form-iframe"
+              src={formLink}
+              width="100%"
+              height="600"
+              className="min-h-[600px] w-full rounded border"
+            ></iframe>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
-    // Edit classname if needed
-    <>
-      {formLink ? (
-        // Link to google form payment (for old courses)
-        // <Link href={formLink!} target="_blank" rel="noopener noreferrer">
-        //   <Button variant={'gray'}>
-        //     {t('reserve-button')} <ArrowRight className="h-4 w-4" />
-        //   </Button>
-        // </Link>
-        <div ref={containerRef}>
-          {!showForm ? (
-            <Button variant={'gray'} onClick={() => setShowForm(true)}>
-              {t('reserve-button')} <ArrowRight className="h-4 w-4" />
-            </Button>
-          ) : (
-            <div className="w-full max-w-full">
-              <iframe 
-                id="form-iframe"
-                title="form-iframe"
-                src={formLink!} 
-                width="100%" 
-                height="600"
-                className="min-h-[600px] w-full rounded border"
-              ></iframe>
-            </div>
-          )}
-        </div>
+    <div ref={containerRef} className="flex flex-col gap-4">
+      {isLoading ? (
+        <Button disabled>Loading...</Button>
+      ) : !hasTickets ? (
+        <p className="text-sm text-red-600">
+          Tickets are currently unavailable. Please check back later.
+        </p>
       ) : (
-        <div ref={containerRef} className="flex flex-col gap-4">
-          {showLoadingState ? (
-            <Button disabled>Loading...</Button>
-          ) : !canRenderCheckout ? (
-            <p className="text-sm text-red-600">
-              Unable to load payment configuration. Please try again later.
-            </p>
-          ) : (
-            <>
-              {!isSubscribed && (
-                <p className="text-sm text-gray-500">
-                  {t('payment-membershipIntro')}{' '}
-                  <Link
-                    href="/registration/membership"
-                    className="text-textColor-blue hover:underline"
-                  >
-                    membership
-                  </Link>
-                  !
-                </p>
-              )}
-              <RadioGroup
-                value={paymentType}
-                onValueChange={(value) =>
-                  setPaymentType(value as PaymentButtonType)
-                }
-                className="flex flex-col gap-2"
+        <>
+          {!isSubscribed && (
+            <p className="text-sm text-gray-500">
+              {t('payment-membershipIntro')}{' '}
+              <Link
+                href="/registration/membership"
+                className="text-textColor-blue hover:underline"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="drop-in" id="drop-in" />
-                  <Label htmlFor="drop-in">
-                    {type === 'Class' ? 'Drop-in' : t('buy-tickets')}{' '}
-                    {isSubscribed
-                      ? `(${Math.round(price * 0.8 * 100) / 100}$)`
-                      : `(${Math.round(price * 100) / 100}$)`}{' '}
-                  </Label>
-                </div>
-                {type === 'Class' && (
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="full-course" id="full-course" />
-                    <Label htmlFor="full-course">
-                      Full course - {remainSessions} {t('sessions')} (
-                      {fullCourseDiscount}% off){' '}
-                      {isSubscribed
-                        ? `(${Math.round(fullCoursePrice * 0.8 * 100) / 100}$)`
-                        : `(${Math.round(fullCoursePrice * 100) / 100}$)`}
-                    </Label>
-                  </div>
-                )}
-              </RadioGroup>
-
-              {paymentType === 'drop-in' ? (
-                <NormalCheckoutButton
-                  stripePriceId={
-                    (
-                      isSubscribed
-                        ? stripeSubscribedPriceId ?? dropInStripePriceId
-                        : dropInStripePriceId
-                    )!
-                  }
-                  stripeProductId={resolvedStripeProductId!}
-                  eventKeyName={eventKeyName}
-                  userId={userId}
-                  eventId={eventId}
-                  buttonText="reserve-button"
-                  type={
-                    type === 'Class' ? 'ClassDropIn' : (type as PaymentType)
-                  }
-                  email={email}
-                />
-              ) : (
-                <NormalCheckoutButton
-                  stripePriceId={
-                    (
-                      isSubscribed
-                        ? stripeSubscribedPriceId ?? dropInStripePriceId
-                        : dropInStripePriceId
-                    )!
-                  }
-                  stripeProductId={resolvedStripeProductId!}
-                  eventKeyName={eventKeyName}
-                  userId={userId}
-                  eventId={eventId}
-                  buttonText="reserve-button"
-                  type="ClassFullCourse"
-                  price={
-                    isSubscribed
-                      ? Math.round(fullCoursePrice * 0.8)
-                      : Math.round(fullCoursePrice)
-                  }
-                  numberSession={remainSessions}
-                  email={email}
-                />
-              )}
-            </>
+                membership
+              </Link>
+              !
+            </p>
           )}
-        </div>
+
+          <div className="flex flex-col gap-4">
+            {checkoutTickets.map((ticket) => {
+              const totalPrice = calculateTicketTotalPrice(ticket)
+              const memberPrice = calculateMemberPrice(ticket, totalPrice)
+              const stripePriceIdForUser =
+                isSubscribed && ticket.subscribedStripePriceId
+                  ? ticket.subscribedStripePriceId
+                  : ticket.stripePriceId
+
+              if (!stripePriceIdForUser || !ticket.stripeProductId) {
+                return null
+              }
+
+              const paymentTypeValue = resolvePaymentType(type, ticket)
+              const perSessionPrice = Number(ticket.price) || 0
+              const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
+
+              return (
+                <div
+                  key={ticket.id}
+                  className="flex flex-col gap-3 rounded-md border bg-white p-4 shadow-sm"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-gray-900">
+                        {ticket.type}
+                      </span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {/* {currencyLabel}  */}${totalPrice.toFixed(2)}
+                      </span>
+                    </div>
+                    {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
+                      <span className="text-xs text-gray-500">
+                        Total for {ticket.payTotalNumber} {t('sessions')} - $
+                        {perSessionPrice.toFixed(2)} each
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-500">
+                        {/* {currencyLabel}  */} ${perSessionPrice.toFixed(2)} per
+                        session
+                      </span>
+                    )}
+                    {memberPrice !== null && (
+                      <span className="text-xs text-gray-500">
+                        {isSubscribed &&
+                          `Member price applied: ${currencyLabel} ${memberPrice.toFixed(2)}`}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4">
+                    <NormalCheckoutButton
+                      stripePriceId={stripePriceIdForUser}
+                      stripeProductId={ticket.stripeProductId}
+                      eventKeyName={eventKeyName}
+                      userId={userId}
+                      eventId={eventId}
+                      buttonText="reserve-button"
+                      type={paymentTypeValue}
+                      price={totalPrice}
+                      numberSession={ticket.payTotalNumber ?? undefined}
+                      email={email}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </>
       )}
-    </>
+    </div>
   )
 }

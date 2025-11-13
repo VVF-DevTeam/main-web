@@ -2,6 +2,7 @@
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
+import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 
 // Components
 import ClassScheduleItem from './ClassScheduleItem'
@@ -9,7 +10,7 @@ import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 
 // Interfaces & Types
-import { EventSchedule } from '@prisma/client'
+import { EventSchedule, EventTicket } from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import Image from 'next/image'
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
@@ -26,18 +27,15 @@ interface ClassDescriptionProps {
   locale: string
   days: string[]
   formLink: string
-  stripePriceId: string
-  stripeProductId: string
+
   schedules: EventSchedule[]
   keyName: string
   classId: string
-  price: number
   title: string
-  stripeSubscribedPriceId: string
-  fullCourseDiscount?: number
   eventType: string
   shouldShowGallery?: boolean
   imageUrls: string[]
+  tickets: EventTicket[]
 }
 
 const typeMap = {
@@ -61,17 +59,13 @@ const ClassDescription = async ({
   locale,
   days,
   formLink,
-  stripePriceId,
-  stripeProductId,
-  stripeSubscribedPriceId,
   keyName,
   classId,
-  price,
-  fullCourseDiscount,
   eventType,
   capacity,
   shouldShowGallery = true,
   imageUrls,
+  tickets,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -168,7 +162,7 @@ const ClassDescription = async ({
                 <div className="flex items-center gap-x-3">
                   <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
                   <span className="text-base">
-                    {price === 0 ? 'Free' : `$${price.toString()}`}
+                    {getEventPrices(tickets)}
                   </span>
                 </div>
                 <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -208,19 +202,15 @@ const ClassDescription = async ({
 
             {/* Payment Options */}
             <PaymentOptions
-              stripePriceId={stripePriceId}
-              stripeProductId={stripeProductId}
-              stripeSubscribedPriceId={stripeSubscribedPriceId}
               formLink={formLink}
               eventKeyName={keyName}
-              price={price}
               eventId={classId}
               title={title}
               userId={author}
-              fullCourseDiscount={fullCourseDiscount}
               email={email}
               type={typeMap[eventType as keyof typeof typeMap]}
               loggedIn={author ? true : false}
+              tickets={tickets}
             />
 
             {existingPayment && existingPayment.length > 0 && (
