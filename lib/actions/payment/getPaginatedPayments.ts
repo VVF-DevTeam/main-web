@@ -61,6 +61,7 @@ export const getPaginatedPayments = async (
               expiresAt: true,
               quantity: true,
               refunded: true,
+              stripePaymentId: true,
               user: {
                 select: {
                   name: true,
@@ -74,6 +75,11 @@ export const getPaginatedPayments = async (
                   startDate: true,
                   endDate: true,
                   location: true,
+                },
+              },
+              eventTicket: {
+                select: {
+                  stripeProductId: true,
                 },
               },
             },
@@ -119,6 +125,7 @@ export const getPaginatedPayments = async (
               expiresAt: true,
               quantity: true,
               refunded: true,
+              stripePaymentId: true,
               user: {
                 select: {
                   name: true,
@@ -132,6 +139,11 @@ export const getPaginatedPayments = async (
                   startDate: true,
                   endDate: true,
                   location: true,
+                },
+              },
+              eventTicket: {
+                select: {
+                  stripeProductId: true,
                 },
               },
             },

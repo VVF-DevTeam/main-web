@@ -9,6 +9,7 @@ export type PaymentWithRelations = {
     expiresAt: Date | null
     quantity: number
     refunded: boolean
+    stripePaymentId: string
     user: {
       name: string | null
       email: string
@@ -19,5 +20,8 @@ export type PaymentWithRelations = {
       startDate: Date | null
       endDate: Date
       location: string | null
+    } | null
+    eventTicket: {
+      stripeProductId: string
     } | null
   }

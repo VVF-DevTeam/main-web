@@ -288,6 +288,7 @@ export default function EventNormalCheckOut({
                       numberSession={ticket.payTotalNumber ?? undefined}
                       email={email}
                       seatNumber={seatNumber}
+                      eventTicketId={ticket.id}
                     />
                   </div>
                 </div>
