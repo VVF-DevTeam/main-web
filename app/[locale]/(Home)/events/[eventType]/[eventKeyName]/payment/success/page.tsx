@@ -4,14 +4,14 @@ import PaymentSuccess from '@/components/payment/PaymentSuccess'
 
 // Interfaces
 interface ClassPaymentSuccessPageProps {
-  params: Promise<{ locale: string; classKeyName: string }>
+  params: Promise<{ locale: string; eventKeyName: string }>
 }
 
 // Main Component
 const ClassPaymentSuccessPage = async ({
   params,
 }: ClassPaymentSuccessPageProps) => {
-  const { locale, classKeyName } = await params
+  const { locale, eventKeyName } = await params
 
   // get current user name
   const session = await auth()
@@ -19,7 +19,7 @@ const ClassPaymentSuccessPage = async ({
 
   //
   const publishedClass = await prisma.event.findUnique({
-    where: { keyName: classKeyName },
+    where: { keyName: eventKeyName },
     select: { title: true },
   })
 

@@ -85,6 +85,7 @@ model EventTicket {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
   type      String
+  imageUrl  String?    // Background for the ticket
 
   // Price and payment mode
   price     Decimal

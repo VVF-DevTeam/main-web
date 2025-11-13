@@ -3,6 +3,7 @@
 import NormalCheckoutButton from '@/components/payment/NormalCheckoutButton'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
@@ -17,6 +18,7 @@ interface EventNormalCheckOutProps {
   tickets: EventTicket[]
   email: string
   type: string
+  seatNumber?: string
 }
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
@@ -73,6 +75,7 @@ export default function EventNormalCheckOut({
   tickets,
   email,
   type,
+  seatNumber,
 }: EventNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -220,37 +223,59 @@ export default function EventNormalCheckOut({
               return (
                 <div
                   key={ticket.id}
-                  className="flex flex-col gap-3 rounded-md border bg-white p-4 shadow-sm"
+                  className="relative flex flex-col gap-3 overflow-hidden rounded-md border bg-white p-4 shadow-sm"
                 >
-                  <div className="flex flex-col gap-1">
+                  {/* Background Image - Right Half */}
+                  {ticket.imageUrl && (
+                    <div className="absolute bottom-0 right-0 top-0 w-1/2 overflow-hidden rounded-md">
+                      <Image
+                        src={ticket.imageUrl}
+                        alt={`${ticket.type} ticket background`}
+                        fill
+                        className="object-cover"
+                        sizes="50vw"
+                      />
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="relative z-10 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-gray-900">
+                      <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
                         {ticket.type}
                       </span>
-                      <span className="text-lg font-bold text-gray-900">
+                      <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
                         {/* {currencyLabel}  */}${totalPrice.toFixed(2)}
                       </span>
                     </div>
-                    {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
-                      <span className="text-xs text-gray-500">
-                        Total for {ticket.payTotalNumber} {t('sessions')} - $
-                        {perSessionPrice.toFixed(2)} each
-                      </span>
+                    {!seatNumber ? (
+                      <>
+                        {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
+                          <span className="text-xs text-gray-500 drop-shadow-sm">
+                            Total for {ticket.payTotalNumber} {t('sessions')} -
+                            ${perSessionPrice.toFixed(2)} each
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500 drop-shadow-sm">
+                            {/* {currencyLabel}  */} $
+                            {perSessionPrice.toFixed(2)} per session
+                          </span>
+                        )}
+                      </>
                     ) : (
-                      <span className="text-xs text-gray-500">
-                        {/* {currencyLabel}  */} ${perSessionPrice.toFixed(2)} per
-                        session
+                      <span className="text-xs text-gray-500 drop-shadow-sm">
+                        Seat Number: {seatNumber}
                       </span>
                     )}
                     {memberPrice !== null && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 drop-shadow-sm">
                         {isSubscribed &&
                           `Member price applied: ${currencyLabel} ${memberPrice.toFixed(2)}`}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="relative z-10 flex items-center justify-between gap-4">
                     <NormalCheckoutButton
                       stripePriceId={stripePriceIdForUser}
                       stripeProductId={ticket.stripeProductId}
@@ -262,6 +287,7 @@ export default function EventNormalCheckOut({
                       price={totalPrice}
                       numberSession={ticket.payTotalNumber ?? undefined}
                       email={email}
+                      seatNumber={seatNumber}
                     />
                   </div>
                 </div>
