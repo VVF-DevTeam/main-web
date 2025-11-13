@@ -18,8 +18,9 @@ export async function POST(req: Request) {
       price,
       numberSession,
       email,
+      seatNumber,
     } = await req.json()
-    
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -61,7 +62,9 @@ export async function POST(req: Request) {
       success_url:
         type === 'Membership'
           ? `${origin}/registration/membership/payment/success`
-          : `${origin}/events/class/${eventKeyName}/payment/success`,
+          : type === 'Concert'
+            ? `${origin}/events/concert/${eventKeyName}/payment/success`
+            : `${origin}/events/class/${eventKeyName}/payment/success`,
       cancel_url:
         type === 'Membership'
           ? `${origin}/registration/membership`
@@ -72,12 +75,16 @@ export async function POST(req: Request) {
         stripePriceId: stripePriceId,
         stripeProductId: stripeProductId,
         type: type,
+        seatNumber: seatNumber,
         description:
           type === 'Membership'
             ? 'Monthly Membership'
-            : numberSession
-              ? `Full Course Registration (${numberSession} sessions) for ${eventKeyName}`
-              : `Drop-in for ${eventKeyName}`,
+            : type === 'Concert'
+              ? `Concert Registration for ${eventKeyName}`
+              : type === 'Class'
+                ? `Class Registration for ${eventKeyName} with (${numberSession} sessions)`
+                : `Ticket Registration for ${eventKeyName} with (${numberSession} sessions)`,
+        
       },
     })
 

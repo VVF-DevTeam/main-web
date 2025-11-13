@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
 import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
+import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -187,6 +188,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Create payment record in database
     try {
       const expiresAt =
         metadata.type === 'Membership' && subscriptionEnd
@@ -206,6 +208,124 @@ export async function POST(req: NextRequest) {
         },
       })
 
+      // Send payment confirmation email for event tickets (not Membership)
+      if (
+        metadata.type !== 'Membership' &&
+        metadata.eventId &&
+        metadata.eventTicketId
+      ) {
+        try {
+          // Fetch user data
+          const user = await prisma.user.findUnique({
+            where: { id: metadata.userId },
+            select: { name: true, email: true },
+          })
+
+          // Fetch event and ticket data
+          const ticket = await prisma.eventTicket.findUnique({
+            where: { id: metadata.eventTicketId },
+            include: {
+              event: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          })
+
+          // update event ticket sold count
+          await prisma.eventTicket.update({
+            where: { id: metadata.eventTicketId },
+            data: {
+              sold: { increment: 1 },
+            },
+          })
+
+          // update event seatingMap
+          if (metadata.seatNumber) {
+            const event = await prisma.event.findUnique({
+              where: { id: metadata.eventId },
+              select: {
+                seatingMap: true,
+              },
+            })
+
+            if (event && event.seatingMap) {
+              // Parse the seatingMap from JSON
+              const seatingMap = JSON.parse(
+                event.seatingMap as string
+              ) as Array<
+                Array<{
+                  name?: string
+                  status: number
+                  ticketId?: string
+                  ticketType?: string
+                  price?: number
+                  currency?: string
+                }>
+              >
+
+              // Find and update the seat with matching seatNumber
+              let seatFound = false
+              for (let rowIndex = 0; rowIndex < seatingMap.length; rowIndex++) {
+                const row = seatingMap[rowIndex]
+                if (Array.isArray(row)) {
+                  for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                    const seat = row[colIndex]
+                    if (seat && seat.name === metadata.seatNumber) {
+                      seat.status = 2 // OCCUPIED
+                      seatFound = true
+                      break
+                    }
+                  }
+                  if (seatFound) break
+                }
+              }
+
+              // Update the seatingMap in the database
+              if (seatFound) {
+                await prisma.event.update({
+                  where: { id: metadata.eventId },
+                  data: {
+                    seatingMap: seatingMap,
+                  },
+                })
+              }
+            } else if (!event) {
+              return NextResponse.json(
+                { error: { message: 'Event not found, could not update seatingMap' } },
+                { status: 400 }
+              )
+            }
+          }
+
+          // send email confirmation for event tickets (not Membership)
+          if (user && user.email && ticket) {
+            const pricePaid = chargedAmount / 100
+            const perSessionPrice = Number(ticket.price) || 0
+            const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+
+            await sendPaymentConfirmationEmail({
+              firstName,
+              to: user.email,
+              ticketType: ticket.type,
+              pricePaid,
+              quantity: quantity || 1,
+              currency: ticket.currency || 'CAD',
+              ticketImageUrl: ticket.imageUrl,
+              perSessionPrice,
+              payTotalNumber: ticket.payTotalNumber,
+              eventTitle: ticket.event.title,
+              seatNumber: metadata.seatNumber,
+            })
+          }
+        } catch (emailError) {
+          // Log email error but don't fail the webhook
+          console.error('[PAYMENT_CONFIRMATION_EMAIL_ERROR]', emailError)
+        }
+      }
+
+      // Update event ticket sold count
       // Invalidate payment cache after creating new payment
       invalidatePaymentCache()
 

@@ -259,20 +259,72 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     )
   }
 
-  // Generate row and column names
+  // Extract row and column names from seat names in seatingMap
   const { rowNames, columnNames } = useMemo(() => {
     if (!seatingMap || seatingMap.length === 0) {
       return { rowNames: [], columnNames: [] }
     }
-    const rows = seatingMap.length
-    const cols = seatingMap[0]?.length || 0
+
+    // Helper function to parse seat name into row and column parts
+    const parseSeatName = (seatName: string | undefined): { row: string; col: string } | null => {
+      if (!seatName) return null
+      
+      // Try to match pattern: letters followed by numbers (e.g., "A1", "B12", "AA1")
+      const match = seatName.match(/^([A-Za-z]+)(\d+)$/)
+      if (match) {
+        return { row: match[1].toUpperCase(), col: match[2] }
+      }
+      
+      // Fallback: try to split at first digit
+      const digitIndex = seatName.search(/\d/)
+      if (digitIndex > 0) {
+        return {
+          row: seatName.substring(0, digitIndex).toUpperCase(),
+          col: seatName.substring(digitIndex)
+        }
+      }
+      
+      return null
+    }
+
+    const extractedRowNames: string[] = []
+    const extractedColumnNames: string[] = []
+
+    // Extract row names from the first seat in each row
+    for (let rowIndex = 0; rowIndex < seatingMap.length; rowIndex++) {
+      const row = seatingMap[rowIndex]
+      if (row && row.length > 0) {
+        const firstSeat = row[0]
+        const parsed = parseSeatName(firstSeat?.name)
+        if (parsed) {
+          extractedRowNames[rowIndex] = parsed.row
+        } else {
+          // Fallback to generated name
+          extractedRowNames[rowIndex] = String.fromCharCode(65 + rowIndex)
+        }
+      } else {
+        // Fallback to generated name
+        extractedRowNames[rowIndex] = String.fromCharCode(65 + rowIndex)
+      }
+    }
+
+    // Extract column names from the first seat in each column
+    if (seatingMap[0]) {
+      for (let colIndex = 0; colIndex < seatingMap[0].length; colIndex++) {
+        const firstSeat = seatingMap[0][colIndex]
+        const parsed = parseSeatName(firstSeat?.name)
+        if (parsed) {
+          extractedColumnNames[colIndex] = parsed.col
+        } else {
+          // Fallback to generated name
+          extractedColumnNames[colIndex] = String(colIndex + 1)
+        }
+      }
+    }
+
     return {
-      rowNames: Array(rows)
-        .fill(null)
-        .map((_, i) => String.fromCharCode(65 + i)),
-      columnNames: Array(cols)
-        .fill(null)
-        .map((_, i) => String(i + 1)),
+      rowNames: extractedRowNames,
+      columnNames: extractedColumnNames,
     }
   }, [seatingMap])
 
@@ -636,6 +688,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 tickets={[selectedTicket]}
                 email={email}
                 type={type}
+                seatNumber={selectedSeat?.seat.name}
               />
             ) : selectedSeat?.seat.ticketId ? (
               <p className="text-sm text-red-600">

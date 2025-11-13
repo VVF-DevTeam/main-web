@@ -61,6 +61,17 @@ const EventTicketSchema = z
     stripePriceId: z.string().optional(),
     subscribedStripePriceId: z.string().optional(),
     payTotalNumber: z.coerce.number().min(1).optional().nullable(),
+    imageUrl: z
+      .string()
+      .optional()
+      .nullable()
+      .refine(
+        (val) =>
+          !val ||
+          (typeof val === 'string' &&
+            (val.trim() === '' || z.string().url().safeParse(val).success)),
+        { message: 'Must be a valid URL' }
+      ),
   })
   .refine(
     (data) => {
@@ -98,6 +109,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       validFrom: null,
       validTo: null,
       payTotalNumber: null,
+      imageUrl: null,
     },
   })
 
@@ -111,6 +123,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       validFrom: null,
       validTo: null,
       payTotalNumber: null,
+      imageUrl: null,
     })
     setEditingTicketId(null)
     setIsAddingNew(false)
@@ -118,7 +131,8 @@ const EventPrice = ({ event }: EventPriceProps) => {
   }
 
   const loadTicketIntoForm = (ticket: EventTicket) => {
-    const hasPayTotalNumber = ticket.payTotalNumber !== null && ticket.payTotalNumber !== undefined
+    const hasPayTotalNumber =
+      ticket.payTotalNumber !== null && ticket.payTotalNumber !== undefined
     ticketForm.reset({
       type: ticket.type,
       price: Number(ticket.price),
@@ -131,6 +145,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       stripePriceId: ticket.stripePriceId,
       subscribedStripePriceId: ticket.subscribedStripePriceId ?? undefined,
       payTotalNumber: ticket.payTotalNumber ?? null,
+      imageUrl: ticket.imageUrl ?? null,
     })
     setIsFullEvent(hasPayTotalNumber)
     setEditingTicketId(ticket.id)
@@ -148,9 +163,10 @@ const EventPrice = ({ event }: EventPriceProps) => {
       let subscribedStripePriceId = values.subscribedStripePriceId
 
       // Calculate Stripe price: if payTotalNumber exists, use price * payTotalNumber, else use single ticket price
-      const stripePrice = isFullEvent && values.payTotalNumber
-        ? values.price * values.payTotalNumber
-        : values.price
+      const stripePrice =
+        isFullEvent && values.payTotalNumber
+          ? values.price * values.payTotalNumber
+          : values.price
 
       // Create or update Stripe product and price
       if (editingTicketId) {
@@ -167,10 +183,12 @@ const EventPrice = ({ event }: EventPriceProps) => {
         const existingStripePrice = existingTicket?.payTotalNumber
           ? Number(existingTicket.price) * existingTicket.payTotalNumber
           : Number(existingTicket?.price || 0)
-        const priceChanged = existingTicket && existingStripePrice !== stripePrice
+        const priceChanged =
+          existingTicket && existingStripePrice !== stripePrice
         const payTotalNumberChanged =
           existingTicket &&
-          (existingTicket.payTotalNumber ?? null) !== (values.payTotalNumber ?? null)
+          (existingTicket.payTotalNumber ?? null) !==
+            (values.payTotalNumber ?? null)
         const discountChanged =
           existingTicket &&
           (existingTicket.discountMemberPercent ?? null) !==
@@ -178,7 +196,12 @@ const EventPrice = ({ event }: EventPriceProps) => {
         const typeChanged = values.type !== existingTicket?.type
 
         // Update Stripe if price, payTotalNumber, discount changed, or if type changed
-        if (priceChanged || payTotalNumberChanged || discountChanged || typeChanged) {
+        if (
+          priceChanged ||
+          payTotalNumberChanged ||
+          discountChanged ||
+          typeChanged
+        ) {
           const { data } = await axiosInstance.put<StripeTicketDataEdit>(
             '/api/payment/tickets',
             {
@@ -232,7 +255,12 @@ const EventPrice = ({ event }: EventPriceProps) => {
         stripeProductId,
         stripePriceId,
         subscribedStripePriceId,
-        payTotalNumber: isFullEvent && values.payTotalNumber ? values.payTotalNumber : null,
+        payTotalNumber:
+          isFullEvent && values.payTotalNumber ? values.payTotalNumber : null,
+        imageUrl:
+          values.imageUrl && values.imageUrl.trim() !== ''
+            ? values.imageUrl
+            : null,
       }
 
       if (editingTicketId) {
@@ -474,36 +502,36 @@ const EventPrice = ({ event }: EventPriceProps) => {
                         </span>
                       )}
                     </div>
-                  <div className="text-sm text-muted-foreground">
-                    Capacity: {ticket.capacity} | Sold: {ticket.sold}
-                    {ticket.discountMemberPercent !== null && (
-                      <> | Discount: {ticket.discountMemberPercent}%</>
+                    <div className="text-sm text-muted-foreground">
+                      Capacity: {ticket.capacity} | Sold: {ticket.sold}
+                      {ticket.discountMemberPercent !== null && (
+                        <> | Discount: {ticket.discountMemberPercent}%</>
+                      )}
+                    </div>
+                    {ticket.validFrom && ticket.validTo && (
+                      <div className="text-xs text-muted-foreground">
+                        Valid: {new Date(ticket.validFrom).toLocaleDateString()}{' '}
+                        - {new Date(ticket.validTo).toLocaleDateString()}
+                      </div>
                     )}
                   </div>
-                  {ticket.validFrom && ticket.validTo && (
-                    <div className="text-xs text-muted-foreground">
-                      Valid: {new Date(ticket.validFrom).toLocaleDateString()} -{' '}
-                      {new Date(ticket.validTo).toLocaleDateString()}
-                    </div>
-                  )}
+                  <div className="flex gap-x-2">
+                    <button
+                      onClick={() => loadTicketIntoForm(ticket)}
+                      className="rounded p-2 hover:bg-gray-100"
+                      title="Edit ticket"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(ticket.id)}
+                      className="rounded p-2 text-red-600 hover:bg-red-50"
+                      title="Delete ticket"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-x-2">
-                  <button
-                    onClick={() => loadTicketIntoForm(ticket)}
-                    className="rounded p-2 hover:bg-gray-100"
-                    title="Edit ticket"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(ticket.id)}
-                    className="rounded p-2 text-red-600 hover:bg-red-50"
-                    title="Delete ticket"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
               )
             })}
           </div>
@@ -692,6 +720,32 @@ const EventPrice = ({ event }: EventPriceProps) => {
                               field.onChange(
                                 value === '' ? null : Number(value)
                               )
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Ticket Background Image URL */}
+                  <FormField
+                    control={ticketForm.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Ticket Background Image URL (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="url"
+                            placeholder="FOLLOW SECTION XVIII"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              field.onChange(value === '' ? null : value)
                             }}
                           />
                         </FormControl>
