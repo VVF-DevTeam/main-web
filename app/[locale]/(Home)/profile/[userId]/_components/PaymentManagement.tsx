@@ -1,4 +1,4 @@
-// import RefundButton from '@/components/payment/RefundButton'
+import RefundButton from '@/components/payment/RefundButton'
 import {
   getPaymentStatus,
   getStatusColor,
@@ -90,6 +90,7 @@ export default async function PaymentManagement({
                       ? payment.expiresAt!
                       : payment.event?.endDate || payment.createdAt
                   )
+                  console.log('payment', payment)
                   const status = getPaymentStatus(payment)
                   const statusColor = getStatusColor(status)
 
@@ -131,19 +132,22 @@ export default async function PaymentManagement({
                         {status}
                       </td>
                       <td className="px-4 py-3">
-                        {/* <RefundButton
+                        <RefundButton
                           paymentId={payment.id}
-                          stripeProductId={payment.stripeProductId}
+                          stripeProductId={
+                            payment.eventTicket?.stripeProductId ||
+                            payment.stripePaymentId
+                          }
                           amount={Number(payment.pricePaid)}
                           disabled={
                             status === 'Expired' ||
                             status === 'Past' ||
                             status === 'Refunded' ||
-                            payment.stripeProductId === 'etf' ||
-                            payment.stripeProductId === 'cash' ||
-                            payment.stripeProductId === 'bank-transfer'
+                            payment.stripePaymentId === 'etf' ||
+                            payment.stripePaymentId === 'cash' ||
+                            payment.stripePaymentId === 'bank-transfer'
                           }
-                        /> */}
+                        />
                       </td>
                     </tr>
                   )

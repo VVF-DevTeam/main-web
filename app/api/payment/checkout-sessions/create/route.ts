@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       numberSession,
       email,
       seatNumber,
+      eventTicketId,
     } = await req.json()
 
     const session = await stripe.checkout.sessions.create({
@@ -74,6 +75,7 @@ export async function POST(req: Request) {
         eventId: eventId,
         stripePriceId: stripePriceId,
         stripeProductId: stripeProductId,
+        eventTicketId: eventTicketId,
         type: type,
         seatNumber: seatNumber,
         description:
@@ -84,7 +86,6 @@ export async function POST(req: Request) {
               : type === 'Class'
                 ? `Class Registration for ${eventKeyName} with (${numberSession} sessions)`
                 : `Ticket Registration for ${eventKeyName} with (${numberSession} sessions)`,
-        
       },
     })
 

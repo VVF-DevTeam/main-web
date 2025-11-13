@@ -116,7 +116,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   const getSeatColor = (seat: SeatValue) => {
     if (seat.status === SEAT_STATUS.OCCUPIED) {
-      return 'text-red-600'
+      return 'text-red-700'
     }
     if (seat.ticketId && seat.ticketType) {
       return getTicketColor(seat.ticketId, seat.ticketType)
@@ -378,7 +378,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         key: 'reserved',
         label: SEAT_STATUS_USER[SEAT_STATUS.OCCUPIED] || 'Reserved Seat',
         description: 'Seat has already been reserved.',
-        iconClass: 'text-red-600',
+        iconClass: 'text-red-700',
       },
       {
         key: 'selected',

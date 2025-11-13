@@ -11,9 +11,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const session = await auth()
-
+    console.log('session', session)
     // Check if user is authenticated and is an admin
-    if (!session?.user || !session.user.role?.includes('ADMIN') || !session.user.role?.includes('HOST')) {
+    if (!session?.user || !(session.user.role?.includes('ADMIN') || session.user.role?.includes('HOST'))) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

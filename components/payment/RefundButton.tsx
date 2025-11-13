@@ -29,13 +29,23 @@ export default function RefundButton({
         amount,
         stripeProductId,
       })
-      toast.success('Refund processed successfully')
+      toast.success('Refund processed successfully', {
+        description: `Payment by ${stripeProductId}`,
+        style: {
+          color: '#22c55e', // green-500 color
+        },
+      })
       
       // Invalidate payment cache and refresh the page data
       invalidatePaymentCache()
       router.refresh()
     } catch (error) {
-      toast.error('Failed to process refund')
+      toast.error('Failed to process refund', {
+        description: `Payment by ${stripeProductId}`,
+        style: {
+          color: '#ef4444', // red-500 color
+        },
+      })
       console.error('Refund error:', error)
     } finally {
       setIsLoading(false)
