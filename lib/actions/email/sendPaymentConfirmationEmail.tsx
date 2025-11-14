@@ -224,7 +224,7 @@ export async function sendPaymentConfirmationEmail({
         seatNumber,
       }),
     })
-
+    console.log('result sendPaymentConfirmationEmail', result)
     if (result.error) {
       console.error('[PAYMENT_CONFIRMATION_EMAIL_ERROR]', result.error)
       throw result.error

@@ -250,6 +250,8 @@ export async function POST(req: NextRequest) {
               },
             })
 
+            console.log('event seatingMap', event?.seatingMap)
+
             if (event && event.seatingMap) {
               // Parse the seatingMap from JSON
               const seatingMap = JSON.parse(
@@ -264,6 +266,8 @@ export async function POST(req: NextRequest) {
                   currency?: string
                 }>
               >
+
+              console.log('seatingMap', seatingMap)
 
               // Find and update the seat with matching seatNumber
               let seatFound = false
@@ -281,9 +285,11 @@ export async function POST(req: NextRequest) {
                   if (seatFound) break
                 }
               }
+              console.log('seatingMap after update', seatingMap)
 
               // Update the seatingMap in the database
               if (seatFound) {
+                console.log('updating seatingMap in database')
                 await prisma.event.update({
                   where: { id: metadata.eventId },
                   data: {
@@ -299,12 +305,15 @@ export async function POST(req: NextRequest) {
             }
           }
 
+          console.log('user', user)
+          console.log('ticket', ticket)
           // send email confirmation for event tickets (not Membership)
           if (user && user.email && ticket) {
             const pricePaid = chargedAmount / 100
             const perSessionPrice = Number(ticket.price) || 0
             const firstName = user.name?.split(' ')[0] || 'Valued Customer'
-
+            
+            console.log('sending email confirmation')
             await sendPaymentConfirmationEmail({
               firstName,
               to: user.email,
