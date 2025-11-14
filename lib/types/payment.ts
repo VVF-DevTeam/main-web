@@ -10,6 +10,7 @@ export type PaymentWithRelations = {
     quantity: number
     refunded: boolean
     stripePaymentId: string
+    seatNumber: string | null
     user: {
       name: string | null
       email: string

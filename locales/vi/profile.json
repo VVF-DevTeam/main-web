@@ -72,5 +72,6 @@
   "type": "Kiểu",
   "type-delete-title": "Nhập \"DELETE\":",
   "upcoming-event": "Sự kiện mới nhất",
-  "update-profile": "Cập nhật hồ sơ"
+  "update-profile": "Cập nhật hồ sơ",
+  "seatNumber": "Số ghế"
 }

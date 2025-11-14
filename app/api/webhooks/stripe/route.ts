@@ -207,6 +207,7 @@ export async function POST(req: NextRequest) {
           type: metadata.type as PaymentType,
           expiresAt: expiresAt,
           quantity: quantity,
+          seatNumber: metadata.seatNumber,
         },
       })
 
@@ -230,6 +231,12 @@ export async function POST(req: NextRequest) {
               event: {
                 select: {
                   title: true,
+                  startDate: true,
+                  endDate: true,
+                  location: true,
+                  days: true,
+                  startTime: true,
+                  endTime: true,
                 },
               },
             },
@@ -334,6 +341,11 @@ export async function POST(req: NextRequest) {
               payTotalNumber: ticket.payTotalNumber,
               eventTitle: ticket.event.title,
               seatNumber: metadata.seatNumber,
+              eventStartDate: ticket.event.startDate,
+              eventEndDate: ticket.event.endDate,
+              eventLocation: ticket.event.location,
+              eventStartTime: ticket.event.startTime,
+              eventEndTime: ticket.event.endTime,
             })
           }
         } catch (emailError) {

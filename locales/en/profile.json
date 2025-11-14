@@ -72,5 +72,6 @@
   "type": "Type",
   "type-delete-title": "Type \"DELETE\":",
   "upcoming-event": "Latest Events",
-  "update-profile": "Update Profile"
+  "update-profile": "Update Profile",
+  "seatNumber": "Seat Number"
 }

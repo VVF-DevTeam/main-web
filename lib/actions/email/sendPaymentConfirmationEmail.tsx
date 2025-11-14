@@ -14,6 +14,11 @@ interface EmailTemplatePaymentConfirmationProps {
   payTotalNumber?: number | null
   eventTitle?: string
   seatNumber?: string
+  eventStartDate?: Date | null
+  eventEndDate?: Date | null
+  eventLocation?: string | null
+  eventStartTime?: string | null
+  eventEndTime?: string | null
 }
 
 interface SendPaymentConfirmationEmailProps {
@@ -28,6 +33,11 @@ interface SendPaymentConfirmationEmailProps {
   payTotalNumber?: number | null
   eventTitle?: string
   seatNumber?: string
+  eventStartDate?: Date | null
+  eventEndDate?: Date | null
+  eventLocation?: string | null
+  eventStartTime?: string | null
+  eventEndTime?: string | null
 }
 
 // Email Template Component
@@ -42,142 +52,248 @@ const EmailTemplatePaymentConfirmation = ({
   payTotalNumber,
   eventTitle,
   seatNumber,
+  eventStartDate,
+  eventEndDate,
+  eventLocation,
+  eventStartTime,
+  eventEndTime,
 }: EmailTemplatePaymentConfirmationProps) => {
   const currencyLabel = currency.toUpperCase()
   const formattedPrice = pricePaid.toFixed(2)
   const formattedPerSessionPrice = perSessionPrice?.toFixed(2) || '0.00'
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px', backgroundColor: '#f5f5f5' }}>
-      <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: '#ffffff', borderRadius: '8px', padding: '20px' }}>
-        <h1 style={{ fontSize: '24px', marginBottom: '20px', color: '#111827' }}>
+    <div
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        padding: '20px',
+        backgroundColor: '#f5f5f5',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          padding: '20px',
+        }}
+      >
+        <h1
+          style={{ fontSize: '24px', marginBottom: '20px', color: '#111827' }}
+        >
           Payment Successful, {firstName}!
         </h1>
         <p style={{ fontSize: '16px', color: '#374151', marginBottom: '20px' }}>
-          Thank you for your purchase. Your payment has been successfully processed.
+          Thank you for your purchase! Your payment has been successfully
+          processed.
         </p>
-        
+
         {eventTitle && (
-          <p style={{ fontSize: '16px', color: '#374151', marginBottom: '20px', fontWeight: 'bold' }}>
+          <p
+            style={{
+              fontSize: '16px',
+              color: '#374151',
+              marginBottom: '20px',
+              fontWeight: 'bold',
+            }}
+          >
             Event: {eventTitle}
           </p>
         )}
 
         {/* Ticket Card */}
-        <div
+        <table
+          width="100%"
+          cellPadding={0}
+          cellSpacing={0}
           style={{
-            borderRadius: '6px',
+            borderRadius: 6,
             border: '1px solid #e5e7eb',
             backgroundColor: '#ffffff',
-            padding: '0',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
             marginBottom: '20px',
-            overflow: 'hidden',
           }}
         >
-          {/* Ticket Image - Full Width at Top */}
-          {ticketImageUrl && (
-            <div
-              style={{
-                width: '100%',
-                maxHeight: '200px',
-                overflow: 'hidden',
-                backgroundColor: '#f3f4f6',
-              }}
-            >
-              <img
-                src={ticketImageUrl}
-                alt={`${ticketType} ticket`}
+          <tbody>
+            <tr>
+              {/* Left: text content */}
+              <td
                 style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  objectFit: 'cover',
+                  padding: '16px',
+                  verticalAlign: 'top',
                 }}
-              />
-            </div>
-          )}
+              >
+                <div
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: '#111827',
+                    marginBottom: '8px',
+                  }}
+                >
+                  {ticketType}
+                </div>
 
-          {/* Content */}
-          <div
-            style={{
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '4px',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  color: '#111827',
-                }}
-              >
-                {ticketType}
-              </span>
-              <span
-                style={{
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  color: '#111827',
-                }}
-              >
-                {currencyLabel} ${formattedPrice}
-              </span>
-            </div>
-            {!seatNumber ? (
-              <>
-                {payTotalNumber && payTotalNumber > 0 ? (
-                  <span
+                <div
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: '#111827',
+                    marginBottom: '12px',
+                  }}
+                >
+                  {currencyLabel} ${formattedPrice}
+                </div>
+
+                {seatNumber ? (
+                  <div
                     style={{
                       fontSize: '12px',
                       color: '#6b7280',
+                      marginBottom: '8px',
                     }}
                   >
-                    Total for {payTotalNumber} sessions - ${currencyLabel} {formattedPerSessionPrice} each
-                  </span>
+                    Seat Number: {seatNumber}
+                  </div>
+                ) : payTotalNumber && payTotalNumber > 0 ? (
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Total for {payTotalNumber} sessions – {currencyLabel}{' '}
+                    {formattedPerSessionPrice} each
+                  </div>
                 ) : (
-                  <span
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {currencyLabel} {formattedPerSessionPrice} per session
+                  </div>
+                )}
+
+                {quantity > 1 && (
+                  <div
                     style={{
                       fontSize: '12px',
                       color: '#6b7280',
                     }}
                   >
-                    ${currencyLabel} {formattedPerSessionPrice} per session
-                  </span>
+                    Quantity: {quantity}
+                  </div>
                 )}
-              </>
-            ) : (
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: '#6b7280',
-                }}
-              >
-                Seat Number: {seatNumber}
-              </span>
-            )}
-            {quantity > 1 && (
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: '#6b7280',
-                }}
-              >
-                Quantity: {quantity}
-              </span>
-            )}
-          </div>
-        </div>
+                {eventStartDate &&
+                  eventEndDate &&
+                  (() => {
+                    const startDate = new Date(eventStartDate)
+                    const endDate = new Date(eventEndDate)
+                    const startDateStr = startDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                    const endDateStr = endDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                    const isSameDate =
+                      startDate.toDateString() === endDate.toDateString()
+                    const dateDisplay = isSameDate
+                      ? startDateStr
+                      : `${startDateStr} - ${endDateStr}`
+
+                    return (
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: '#111827',
+                          marginBottom: '8px',
+                        }}
+                      >
+                        Event Date: {dateDisplay}
+                      </div>
+                    )
+                  })()}
+                {eventLocation && (
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#111827',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Event Location: {eventLocation}
+                  </div>
+                )}
+                {eventStartTime && eventEndTime && (
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#111827',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Event Time: {eventStartTime} - {eventEndTime}
+                  </div>
+                )}
+
+                <span
+                  style={{
+                    fontSize: '10px',
+                    color: '#111827',
+                    marginBottom: '8px',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  {' '}
+                  Please arrive 15 minutes before the event starts so we can
+                  check you in, thank you and see you soon!
+                </span>
+              </td>
+
+              {/* Right: image column */}
+              {ticketImageUrl && (
+                <td
+                  width="40%"
+                  style={{
+                    backgroundColor: '#f3f4f6',
+                    textAlign: 'right',
+                    verticalAlign: 'middle',
+                    padding: 0,
+                  }}
+                >
+                  <a
+                    href="https://www.vietvibe.org/en/events"
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <img
+                      src={ticketImageUrl}
+                      alt={`${ticketType} ticket`}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </a>
+                </td>
+              )}
+            </tr>
+          </tbody>
+        </table>
 
         <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '20px' }}>
           If you have any questions, please contact us at{' '}
@@ -203,9 +319,14 @@ export async function sendPaymentConfirmationEmail({
   payTotalNumber,
   eventTitle,
   seatNumber,
+  eventStartDate,
+  eventEndDate,
+  eventLocation,
+  eventStartTime,
+  eventEndTime,
 }: SendPaymentConfirmationEmailProps) {
   const resend = new Resend(process.env.RESEND_API_KEY_PRODUCTION)
-  
+
   try {
     const result = await resend.emails.send({
       from: 'VVF Admin <admin.tech@vietvibe.org>',
@@ -222,6 +343,11 @@ export async function sendPaymentConfirmationEmail({
         payTotalNumber,
         eventTitle,
         seatNumber,
+        eventStartDate,
+        eventEndDate,
+        eventLocation,
+        eventStartTime,
+        eventEndTime,
       }),
     })
     console.log('result sendPaymentConfirmationEmail', result)
@@ -236,4 +362,3 @@ export async function sendPaymentConfirmationEmail({
     throw error
   }
 }
-

@@ -22,6 +22,7 @@ type PaymentHistoryItem = {
   expiresAt: Date | null
   quantity: number
   refunded: boolean
+  seatNumber: string | null
   event: {
     title: string
     keyName: string
@@ -127,7 +128,7 @@ const MyProfile = async ({
               {t('order-history')}
             </h3>
 
-            <div className="flex max-h-64 flex-grow flex-col overflow-hidden rounded-md border">
+            <div className="flex max-h-96 flex-grow flex-col overflow-hidden rounded-md border">
               <div className="flex-grow overflow-auto">
                 <table className="w-full">
                   <thead className="sticky top-0 bg-bgColor-brand100 shadow-md">
@@ -139,7 +140,7 @@ const MyProfile = async ({
                       <th className="px-4 py-3 text-center">{t('end-date')}</th>
                       <th className="px-4 py-3 text-center">{t('location')}</th>
                       <th className="px-4 py-3 text-center">{t('price')}</th>
-                      <th className="px-4 py-3 text-center">{t('quantity')}</th>
+                      <th className="px-4 py-3 text-center">{t('quantity')}/{t('seatNumber')}</th>
                       <th className="px-4 py-3 text-center">{t('type')}</th>
                       <th className="px-4 py-3 text-center">{t('status')}</th>
                     </tr>
@@ -205,7 +206,7 @@ const MyProfile = async ({
                                 ${Number(payment.pricePaid).toFixed(2)}
                               </td>
                               <td className="px-4 py-3 text-center">
-                                {payment.quantity}
+                                {payment.quantity}/{payment.seatNumber || '-'}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 {paymentTypeMap[payment.type]}

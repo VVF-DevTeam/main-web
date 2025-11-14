@@ -62,6 +62,7 @@ export const getPaginatedPayments = async (
               quantity: true,
               refunded: true,
               stripePaymentId: true,
+              seatNumber: true,
               user: {
                 select: {
                   name: true,
