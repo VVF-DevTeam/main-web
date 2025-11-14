@@ -193,7 +193,7 @@ const ConcertDescriptions = async ({
                     <span className="text-base">
                       {event.days
                         .map((day: string) => {
-                          const translated = t(day)
+                          const translated = t(day.toLowerCase())
                           return (
                             translated.charAt(0).toUpperCase() +
                             translated.slice(1).toLowerCase()
@@ -222,7 +222,7 @@ const ConcertDescriptions = async ({
                   <div className="flex items-center justify-between gap-x-3">
                     <div className="flex items-center gap-x-3">
                       <Users className="h-5 w-5 shrink-0 text-red-600" />
-                      <span className="text-base">{event.capacity} spots</span>
+                      <span className="text-base">{event.capacity} {t('spots')}</span>
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>

@@ -127,7 +127,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   const getSeatColor = (seat: SeatValue) => {
     if (seat.status === SEAT_STATUS.OCCUPIED) {
-      return 'text-red-700'
+      return 'text-gray-700'
     }
     if (seat.ticketId && seat.ticketType) {
       return getTicketColor(seat.ticketId, seat.ticketType)
@@ -414,9 +414,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     const secondaryDetails = hasTicket
       ? ticket
         ? [
-            { label: 'Ticket Type', value: seat.ticketType || 'N/A' },
+            { label: 'ticket-type', value: seat.ticketType || 'N/A' },
             {
-              label: 'Price',
+              label: 'price',
               value: priceDisplay,
             },
             ...(ticket.payTotalNumber
@@ -436,12 +436,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500">Seat</p>
           <p className="text-lg font-semibold text-gray-900">{seatName}</p>
-          <p className="text-sm text-gray-600">{`Row ${rowNames[rowIndex] || String.fromCharCode(65 + rowIndex)}, Seat ${columnNames[seatIndex] || String(seatIndex + 1)}`}</p>
+          <p className="text-sm text-gray-600">{`${t('row')} ${rowNames[rowIndex] || String.fromCharCode(65 + rowIndex)}, ${t('seat')} ${columnNames[seatIndex] || String(seatIndex + 1)}`}</p>
         </div>
 
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500">
-            Status
+            {t('status')}
           </p>
           <p className="text-sm font-medium capitalize text-gray-900">
             {SEAT_STATUS_USER[seat.status] || 'Unknown'}
@@ -450,7 +450,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-wide text-gray-500">
-            Details
+            {t('details')}
           </p>
           <dl className="space-y-2 text-sm text-gray-700">
             {secondaryDetails.map((item) => (
@@ -458,8 +458,8 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 key={item.label}
                 className="flex items-center justify-between"
               >
-                <dt className="font-medium text-gray-600">{item.label}</dt>
-                <dd className="text-right text-gray-900">{item.value}</dd>
+                <dt className="font-medium text-gray-600">{t(item.label)}</dt>
+                <dd className="text-right text-gray-900">{t(item.value)}</dd>
               </div>
             ))}
           </dl>
@@ -578,26 +578,25 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     () => [
       {
         key: 'available',
-        label: SEAT_STATUS_USER[SEAT_STATUS.HAS_SEAT] || 'Available Seat',
-        description:
-          'Seat is available to select. Different color means different ticket type.',
+        label: SEAT_STATUS_USER[SEAT_STATUS.HAS_SEAT] || t('seat-legend-available-label'),
+        description: t('seat-legend-available-description'),
         iconClass: 'text-blue-600',
       },
       {
         key: 'reserved',
-        label: SEAT_STATUS_USER[SEAT_STATUS.OCCUPIED] || 'Reserved Seat',
-        description: 'Seat has already been reserved.',
-        iconClass: 'text-red-700',
+        label: SEAT_STATUS_USER[SEAT_STATUS.OCCUPIED] || t('seat-legend-reserved-label'),
+        description: t('seat-legend-reserved-description'),
+        iconClass: 'text-gray-700',
       },
       {
         key: 'selected',
         label: 'Selected Seat',
-        description: 'Seat you have currently selected.',
+        description: t('seat-legend-selected-description'),
         iconClass: 'text-blue-600',
         wrapperClass: 'bg-gray-200 rounded',
       },
     ],
-    []
+    [t]
   )
 
   return (
@@ -837,15 +836,15 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               <div className="w-full rounded-md border bg-white p-4 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Selected Seats ({selectedSeatsWithTickets.length})
+                    {t('selected-seats')} ({selectedSeatsWithTickets.length})
                   </h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedSeats([])}
-                    className="text-sm text-red-600 hover:text-red-700"
+                    className="text-sm text-red-600 hover:text-gray-700"
                   >
-                    Clear All
+                    {t('clear-all')}
                   </Button>
                 </div>
                 <div className="space-y-2">
@@ -974,15 +973,15 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
           className="w-full max-w-md overflow-y-auto bg-white text-gray-900"
         >
           <SheetHeader>
-            <SheetTitle>Seat Information</SheetTitle>
+            <SheetTitle>{t('seat-information')}</SheetTitle>
             <SheetDescription>
               {selectedSeat
-                ? `Details for ${getSeatName(
+                ? `${t('details-for-seat')} ${getSeatName(
                     selectedSeat.seat,
                     selectedSeat.rowIndex,
                     selectedSeat.seatIndex
                   )}.`
-                : 'Select a seat to view its details.'}
+                : t('select-seat-to-view-details')}
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6 flex flex-col gap-4">
@@ -1022,7 +1021,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 {/* Keep the old checkout option for single seat purchase */}
                 <div className="mt-4 border-t pt-4">
                   <p className="mb-2 text-sm font-medium text-gray-700">
-                    Or purchase this seat directly:
+                    {t('or-purchase-seat-directly')}
                   </p>
                   <EventNormalCheckOut
                     formLink={formLink}
