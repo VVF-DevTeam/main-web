@@ -63,7 +63,7 @@
   "quick-checkout-class": "Quick Checkout (Drop-in only)",
   "quick-checkout-description": "Debit and Credit cards only. For other payment methods or paying for full course of a class, please use normal checkout.",
   "remaining": "remaining",
-  "reserve-button": "Click here to continue ",
+  "reserve-button": "Click here to pay",
   "reserve-here": "Reserve Here",
   "saturday": "Sat",
   "Sep": "September",
@@ -80,6 +80,7 @@
   "Week": "Week",
   "jumpToReviewsSection": "See reviews for this event",
   "jumpToReviewsSectionSeries": "See reviews for events in this series",
+  "jumpToReviews": "Reviews",
   "read-more": "Read more",
   "more-events": "More Events",
   "slot": "Number of slots",
@@ -108,5 +109,8 @@
   "ticket-type": "Ticket Type",
   "price": "Price",
   "selected-seats": "Selected Seats",
-  "clear-all": "Clear All"
+  "clear-all": "Clear All",
+  "no-ticket-selected": "No ticket selected",
+  "seat-added-to-cart": "This seat is already in your cart. Please check cart in the main page.",
+  "remove-from-cart": "Remove from Cart"
 }

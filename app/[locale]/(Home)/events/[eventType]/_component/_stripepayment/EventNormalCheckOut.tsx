@@ -192,7 +192,7 @@ export default function EventNormalCheckOut({
         <Button disabled>Loading...</Button>
       ) : !hasTickets ? (
         <p className="text-sm text-red-600">
-          Tickets are currently unavailable. Please check back later.
+          {t('no-ticket-selected')}
         </p>
       ) : (
         <>

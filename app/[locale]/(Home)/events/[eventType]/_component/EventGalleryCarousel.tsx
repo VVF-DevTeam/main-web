@@ -67,7 +67,7 @@ const EventGalleryCarousel: React.FC<EventGalleryCarouselProps> = ({
       </div>
 
       {/* Image Carousel */}
-      <div className="mx-auto w-[95vw] max-w-[1000px] overflow-hidden rounded-sm bg-black md:w-[85vw] lg:w-[75vw]">
+      <div className="mx-auto w-[92vw] max-w-[1000px] overflow-hidden rounded-sm bg-black md:w-[85vw] lg:w-[75vw]">
         <div className="relative h-[50vh] w-full rounded-lg md:h-[60vh]">
           <div
             className="flex h-full w-full transition-transform duration-500 ease-out"

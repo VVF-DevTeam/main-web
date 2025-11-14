@@ -63,7 +63,7 @@
   "quick-checkout-class": "Paiement rapide (uniquement sur place)",
   "quick-checkout-description": "Cartes de débit et de crédit uniquement. Pour tout autre mode de paiement ou pour régler un cours complet, veuillez utiliser le paiement standard.",
   "remaining": "restant",
-  "reserve-button": "Cliquez ici pour continuer ",
+  "reserve-button": "Cliquez ici pour payer",
   "reserve-here": "Réservez ici",
   "saturday": "Sam",
   "Sep": "Septembre",
@@ -80,6 +80,7 @@
   "Week": "Semaine",
   "jumpToReviewsSection": "Voir les avis pour cet événement",
   "jumpToReviewsSectionSeries": "Voir les avis pour les événements de cette série",
+  "jumpToReviews": "Les avis",
   "read-more": "Lire la suite",
   "more-events": "Plus d'événements",
   "slot": "Nombre d'emplacements",
@@ -107,6 +108,9 @@
   "details": "Détails",
   "ticket-type": "Type de billet",
   "price": "Prix",
-  "selected-seats": "Places sélectionnées",
-  "clear-all": "Tout effacer"
+  "selected-seats": "Places Sélectionnées",
+  "clear-all": "Tout effacer",
+  "no-ticket-selected": "Aucun billet sélectionné",
+  "seat-added-to-cart": "Cette place est déjà dans votre panier. Veuillez vérifier le panier dans la page d'événement.",
+  "remove-from-cart": "Supprimer du panier"
 }
