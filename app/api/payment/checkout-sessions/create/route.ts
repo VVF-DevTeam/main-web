@@ -50,6 +50,8 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership`
           : `${origin}/events/class/${eventKeyName}`,
+      discounts: [],
+      allow_promotion_codes: true,
       metadata: {
         userId: userId,
         eventId: eventId,
