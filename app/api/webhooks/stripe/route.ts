@@ -198,10 +198,15 @@ export async function POST(req: NextRequest) {
           : null
 
       // Handle multi-ticket checkout with ticketMetadata
-      let ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> | null = null
+      let ticketMetadata: Array<{
+        ticketId: string
+        seatNumbers: string[]
+      }> | null = null
       if (metadata.ticketMetadata) {
         try {
-          ticketMetadata = JSON.parse(metadata.ticketMetadata as string) as Array<{
+          ticketMetadata = JSON.parse(
+            metadata.ticketMetadata as string
+          ) as Array<{
             ticketId: string
             seatNumbers: string[]
           }>
@@ -210,6 +215,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      ////// FOR MULTI-TICKET CHECKOUT //////
       if (ticketMetadata && ticketMetadata.length > 0) {
         // Multi-ticket checkout: create payment record for each ticket type
         // Fetch all tickets to get their actual prices
@@ -227,16 +233,19 @@ export async function POST(req: NextRequest) {
           const ticket = ticketMap.get(ticketInfo.ticketId)
           if (ticket) {
             const ticketPrice = Number(ticket.price) || 0
-            const totalTicketPrice = ticket.payTotalNumber && ticket.payTotalNumber > 0
-              ? ticketPrice * ticket.payTotalNumber
-              : ticketPrice
-            totalExpectedPrice += totalTicketPrice * ticketInfo.seatNumbers.length
+            const totalTicketPrice =
+              ticket.payTotalNumber && ticket.payTotalNumber > 0
+                ? ticketPrice * ticket.payTotalNumber
+                : ticketPrice
+            totalExpectedPrice +=
+              totalTicketPrice * ticketInfo.seatNumbers.length
           }
         }
 
         // Calculate price ratio if there's a discrepancy (due to discounts, rounding, etc.)
         const actualTotal = chargedAmount / 100
-        const priceRatio = totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
+        const priceRatio =
+          totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
 
         for (const ticketInfo of ticketMetadata) {
           const ticket = ticketMap.get(ticketInfo.ticketId)
@@ -244,10 +253,11 @@ export async function POST(req: NextRequest) {
 
           const seatCount = ticketInfo.seatNumbers.length
           const ticketPrice = Number(ticket.price) || 0
-          const totalTicketPrice = ticket.payTotalNumber && ticket.payTotalNumber > 0
-            ? ticketPrice * ticket.payTotalNumber
-            : ticketPrice
-          
+          const totalTicketPrice =
+            ticket.payTotalNumber && ticket.payTotalNumber > 0
+              ? ticketPrice * ticket.payTotalNumber
+              : ticketPrice
+
           // Calculate price for this ticket type, adjusted by ratio
           const ticketPricePaid = totalTicketPrice * seatCount * priceRatio
 
@@ -291,10 +301,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Send payment confirmation email for event tickets (not Membership)
-      if (
-        metadata.type !== 'Membership' &&
-        metadata.eventId
-      ) {
+      if (metadata.type !== 'Membership' && metadata.eventId) {
         try {
           // Fetch user data
           const user = await prisma.user.findUnique({
@@ -397,69 +404,80 @@ export async function POST(req: NextRequest) {
               },
             })
 
-            console.log('event seatingMap', event?.seatingMap)
+            if (!event) {
+              console.error(
+                'Event not found, could not update seatingMap',
+                metadata.eventId
+              )
+              // Don't return error here - log and continue, as this shouldn't fail the webhook
+            } else if (event.seatingMap) {
+              try {
+                // Parse the seatingMap from JSON (if it's a string) or use directly (if already an object)
+                const seatingMap = (
+                  typeof event.seatingMap === 'string'
+                    ? JSON.parse(event.seatingMap)
+                    : event.seatingMap
+                ) as Array<
+                  Array<{
+                    name?: string
+                    status: number
+                    ticketId?: string
+                    ticketType?: string
+                    price?: number
+                    currency?: string
+                  }>
+                >
 
-            if (event && event.seatingMap) {
-              // Parse the seatingMap from JSON (if it's a string) or use directly (if already an object)
-              const seatingMap = (
-                typeof event.seatingMap === 'string'
-                  ? JSON.parse(event.seatingMap)
-                  : event.seatingMap
-              ) as Array<
-                Array<{
-                  name?: string
-                  status: number
-                  ticketId?: string
-                  ticketType?: string
-                  price?: number
-                  currency?: string
-                }>
-              >
-
-              console.log('seatingMap', seatingMap)
-
-              // Find and update all seats with matching seatNumbers
-              const seatsFound: string[] = []
-              for (const seatNumberToUpdate of seatNumbersToUpdate) {
-                for (let rowIndex = 0; rowIndex < seatingMap.length; rowIndex++) {
-                  const row = seatingMap[rowIndex]
-                  if (Array.isArray(row)) {
-                    for (let colIndex = 0; colIndex < row.length; colIndex++) {
-                      const seat = row[colIndex]
-                      if (seat && seat.name === seatNumberToUpdate) {
-                        seat.status = 2 // OCCUPIED
-                        seatsFound.push(seatNumberToUpdate)
-                        break
+                // Find and update all seats with matching seatNumbers
+                const seatsFound: string[] = []
+                for (const seatNumberToUpdate of seatNumbersToUpdate) {
+                  for (
+                    let rowIndex = 0;
+                    rowIndex < seatingMap.length;
+                    rowIndex++
+                  ) {
+                    const row = seatingMap[rowIndex]
+                    if (Array.isArray(row)) {
+                      for (
+                        let colIndex = 0;
+                        colIndex < row.length;
+                        colIndex++
+                      ) {
+                        const seat = row[colIndex]
+                        if (seat && seat.name === seatNumberToUpdate) {
+                          seat.status = 2 // OCCUPIED
+                          seatsFound.push(seatNumberToUpdate)
+                          break
+                        }
                       }
+                      if (seatsFound.includes(seatNumberToUpdate)) break
                     }
-                    if (seatsFound.includes(seatNumberToUpdate)) break
                   }
                 }
-              }
-              console.log('seatingMap after update', seatingMap)
-              console.log('seats found and updated:', seatsFound)
+                console.log('seats found and updated:', seatsFound)
 
-              // Update the seatingMap in the database if at least one seat was found
-              if (seatsFound.length > 0) {
-                console.log('updating seatingMap in database')
-                await prisma.event.update({
-                  where: { id: metadata.eventId },
-                  data: {
-                    seatingMap: seatingMap,
-                  },
-                })
+                // Update the seatingMap in the database if at least one seat was found
+                if (seatsFound.length > 0) {
+                  console.log('updating seatingMap in database')
+                  await prisma.event.update({
+                    where: { id: metadata.eventId },
+                    data: {
+                      seatingMap: seatingMap,
+                    },
+                  })
+                }
+              } catch (parseError) {
+                console.error(
+                  'Error parsing or updating seatingMap:',
+                  parseError
+                )
+                // Don't fail the webhook if seating map update fails
               }
-            } else if (!event) {
-              return NextResponse.json(
-                {
-                  error: {
-                    message: 'Event not found, could not update seatingMap',
-                  },
-                },
-                { status: 400 }
-              )
             }
-          } else if (metadata.eventTicketId) {
+          }
+
+          // Handle single ticket checkout email (if not already handled in multi-ticket section)
+          if (!ticketMetadata && metadata.eventTicketId) {
             // Single ticket checkout (backward compatibility)
             const ticket = await prisma.eventTicket.findUnique({
               where: { id: metadata.eventTicketId },
@@ -479,14 +497,13 @@ export async function POST(req: NextRequest) {
             })
 
             // update event ticket sold count (only if not already updated in multi-ticket section)
-            if (!ticketMetadata) {
-              await prisma.eventTicket.update({
-                where: { id: metadata.eventTicketId },
-                data: {
-                  sold: { increment: 1 },
-                },
-              })
-            }
+            // Note: ticketMetadata is already null here since we're in the single-ticket path
+            await prisma.eventTicket.update({
+              where: { id: metadata.eventTicketId },
+              data: {
+                sold: { increment: 1 },
+              },
+            })
 
             console.log('user', user)
             console.log('ticket', ticket)
@@ -508,9 +525,20 @@ export async function POST(req: NextRequest) {
                 perSessionPrice,
                 payTotalNumber: ticket.payTotalNumber,
                 eventTitle: ticket.event.title,
-                seatNumber: metadata.seatNumbers 
-                  ? (JSON.parse(metadata.seatNumbers as string) as string[]).join(', ')
-                  : metadata.seatNumber,
+                seatNumber: (() => {
+                  if (metadata.seatNumbers) {
+                    try {
+                      const parsed = JSON.parse(metadata.seatNumbers as string)
+                      return Array.isArray(parsed)
+                        ? parsed.join(', ')
+                        : metadata.seatNumber
+                    } catch (e) {
+                      console.error('Error parsing seatNumbers in email:', e)
+                      return metadata.seatNumber
+                    }
+                  }
+                  return metadata.seatNumber
+                })(),
                 eventStartDate: ticket.event.startDate,
                 eventEndDate: ticket.event.endDate,
                 eventLocation: ticket.event.location,
