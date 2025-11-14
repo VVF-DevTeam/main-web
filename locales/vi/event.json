@@ -51,7 +51,7 @@
   "Month": "Tháng",
   "nonMember": "Bình thường",
   "noEvent": "chúng mình đang lên kế hoạch để mang đến cho bạn những sự kiện tuyệt vời nhất. Vui lòng kiểm tra lại sau.",
-  "normal-checkout": "Thanh toán bình thường",
+  "normal-checkout": "Thanh toán thông thường",
   "Nov": "Tháng 11",
   "numberSessions": "Số buổi",
   "Oct": "Tháng 10",
@@ -63,7 +63,7 @@
   "quick-checkout-class": "Thanh toán nhanh (Chỉ cho drop-in)",
   "quick-checkout-description": "Chỉ áp dụng thẻ ghi nợ và thẻ tín dụng. Đối với các phương thức thanh toán khác hoặc thanh toán cho toàn bộ khóa học, vui lòng sử dụng phương thức thanh toán thông thường.",
   "remaining": "còn lại",
-  "reserve-button": "Nhấp vào đây để tiếp tục ",
+  "reserve-button": "Nhấp vào đây để thanh toán",
   "reserve-here": "Đặt Chỗ",
   "saturday": "T7",
   "Sep": "Tháng 9",
@@ -80,6 +80,7 @@
   "Week": "Tuần",
   "jumpToReviewsSection": "Xem review của sự kiện này",
   "jumpToReviewsSectionSeries": "Xem review của các sự kiện trong series này",
+  "jumpToReviews": "Reviews",
   "read-more": "Xem thêm",
   "more-events": "Các Sự Kiện Khác",
   "slot": "Số chỗ",
@@ -107,6 +108,9 @@
   "details": "Chi tiết",
   "ticket-type": "Loại vé",
   "price": "Giá",
-  "selected-seats": "Chỗ đã chọn",
-  "clear-all": "Xóa tất cả"
+  "selected-seats": "Chỗ Đã Chọn",
+  "clear-all": "Xóa tất cả",
+  "no-ticket-selected": "Chưa có vé nào được chọn",
+  "seat-added-to-cart": "Chỗ này đã được thêm vào giỏ hàng. Vui lòng kiểm tra giỏ hàng trong trang event.",
+  "remove-from-cart": "Xóa khỏi giỏ hàng"
 }

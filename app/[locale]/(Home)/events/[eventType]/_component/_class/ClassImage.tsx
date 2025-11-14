@@ -127,8 +127,9 @@ const ClassImage = async ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('jumpToReviewsSection')}{' '}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              <span className="hidden sm:inline">{t('jumpToReviewsSection')}</span>
+              <span className="sm:hidden">{t('jumpToReviews')}</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           )}
           {seriesId && (
@@ -138,8 +139,11 @@ const ClassImage = async ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('jumpToReviewsSectionSeries')}{' '}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
+              <span className="hidden sm:inline">
+                {t('jumpToReviewsSectionSeries')}
+              </span>
+              <span className="sm:hidden">{t('jumpToReviews')}</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           )}
           <div className="flex items-center gap-1">

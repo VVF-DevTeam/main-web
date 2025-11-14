@@ -107,7 +107,10 @@ const ConcertDescriptions = async ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {t('jumpToReviewsSection')}{' '}
+                <span className="hidden sm:inline">
+                  {t('jumpToReviewsSection')}
+                </span>
+                <span className="sm:hidden">{t('jumpToReviews')}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
               </Link>
             )}
@@ -118,7 +121,10 @@ const ConcertDescriptions = async ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {t('jumpToReviewsSectionSeries')}{' '}
+                <span className="hidden sm:inline">
+                  {t('jumpToReviewsSectionSeries')}
+                </span>
+                <span className="sm:hidden">{t('jumpToReviews')}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />{' '}
               </Link>
             )}
@@ -222,7 +228,9 @@ const ConcertDescriptions = async ({
                   <div className="flex items-center justify-between gap-x-3">
                     <div className="flex items-center gap-x-3">
                       <Users className="h-5 w-5 shrink-0 text-red-600" />
-                      <span className="text-base">{event.capacity} {t('spots')}</span>
+                      <span className="text-base">
+                        {event.capacity} {t('spots')}
+                      </span>
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -268,7 +276,6 @@ const ConcertDescriptions = async ({
             seatingMap={seatingMap}
             tickets={event.tickets}
           />
-
         </div>
 
         {/* Schedule Section */}
