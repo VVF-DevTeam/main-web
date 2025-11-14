@@ -24,6 +24,7 @@ interface NormalCheckoutButtonProps {
   numberSession?: number
   email: string
   seatNumber?: string
+  seatNumbers?: string[] // For multi-seat checkout
   eventTicketId?: string
 }
 
@@ -38,6 +39,7 @@ export default function NormalCheckoutButton({
   numberSession,
   email,
   seatNumber,
+  seatNumbers,
   eventTicketId,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
@@ -59,6 +61,7 @@ export default function NormalCheckoutButton({
           numberSession: numberSession,
           email: email,
           seatNumber: seatNumber,
+          seatNumbers: seatNumbers,
           eventTicketId: eventTicketId,
         }
       )

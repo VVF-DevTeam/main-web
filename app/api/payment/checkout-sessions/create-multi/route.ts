@@ -9,47 +9,54 @@ export async function POST(req: Request) {
   try {
     const origin = req.headers.get('origin') || 'http://localhost:3000'
     const {
-      stripePriceId,
-      stripeProductId,
       eventKeyName,
       userId,
       eventId,
       type,
-      numberSession,
       email,
-      seatNumber,
-      seatNumbers,
-      eventTicketId,
+      checkoutItems,
     } = await req.json()
 
-    // Handle multiple seats: create one line item per seat
-    const lineItems = seatNumbers && seatNumbers.length > 0
-      ? seatNumbers.map(() => ({
-          price: stripePriceId,
+    if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
+      return NextResponse.json(
+        { message: 'Invalid checkout items' },
+        { status: 400 }
+      )
+    }
+
+    // Create line items: one per seat, grouped by ticket type
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
+    const allSeatNumbers: string[] = []
+    const ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> = []
+
+    checkoutItems.forEach((item: {
+      ticketId: string
+      stripePriceId: string
+      stripeProductId: string
+      seatNumbers: string[]
+      eventTicketId: string
+    }) => {
+      // Create one line item per seat for this ticket type
+      item.seatNumbers.forEach((seatNumber) => {
+        lineItems.push({
+          price: item.stripePriceId,
           quantity: 1,
           ...(type === 'Membership'
             ? {}
             : {
                 adjustable_quantity: {
-                  enabled: false, // Disable for multi-seat to prevent confusion
+                  enabled: false,
                 },
               }),
-        }))
-      : [
-          {
-            price: stripePriceId,
-            quantity: 1,
-            ...(type === 'Membership'
-              ? {}
-              : {
-                  adjustable_quantity: {
-                    enabled: true,
-                    minimum: 1,
-                    maximum: 10,
-                  },
-                }),
-          },
-        ]
+        })
+        allSeatNumbers.push(seatNumber)
+      })
+
+      ticketMetadata.push({
+        ticketId: item.eventTicketId,
+        seatNumbers: item.seatNumbers,
+      })
+    })
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -71,22 +78,19 @@ export async function POST(req: Request) {
       metadata: {
         userId: userId,
         eventId: eventId,
-        stripePriceId: stripePriceId,
-        stripeProductId: stripeProductId,
-        eventTicketId: eventTicketId || '',
         type: type,
-        ...(seatNumber && { seatNumber: seatNumber }),
-        ...(seatNumbers && seatNumbers.length > 0 && { seatNumbers: JSON.stringify(seatNumbers) }),
+        seatNumbers: JSON.stringify(allSeatNumbers),
+        ticketMetadata: JSON.stringify(ticketMetadata), // Store which seats belong to which ticket type
         description:
           type === 'Membership'
             ? 'Monthly Membership'
             : type === 'Concert'
-              ? seatNumbers && seatNumbers.length > 1
-                ? `Concert Registration for ${eventKeyName} - ${seatNumbers.length} seats`
+              ? allSeatNumbers.length > 1
+                ? `Concert Registration for ${eventKeyName} - ${allSeatNumbers.length} seats`
                 : `Concert Registration for ${eventKeyName}`
               : type === 'Class'
-                ? `Class Registration for ${eventKeyName} with (${numberSession} sessions)`
-                : `Ticket Registration for ${eventKeyName} with (${numberSession} sessions)`,
+                ? `Class Registration for ${eventKeyName}`
+                : `Ticket Registration for ${eventKeyName}`,
       },
     })
 
@@ -102,3 +106,4 @@ export async function POST(req: Request) {
     )
   }
 }
+

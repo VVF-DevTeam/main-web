@@ -5,10 +5,15 @@ import { useRouter } from 'next/navigation'
 import EventNormalCheckOut from './EventNormalCheckOut'
 // import EventQuickCheckout from './EventQuickCheckout'
 import { Button } from '@/components/ui/button'
-import { ChevronRight, Armchair } from 'lucide-react'
+import { ChevronRight, Armchair, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
+import { loadStripe } from '@stripe/stripe-js'
+import { toast } from 'sonner'
+import { axiosInstance } from '@/lib/axios'
+import { isAxiosError } from 'axios'
+import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { SeatingMap, SeatValue} from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 import { cn } from '@/lib/utils'
 import {
@@ -81,6 +86,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     rowIndex: number
     seatIndex: number
   } | null>(null)
+  // Multi-seat selection: array of selected seats
+  const [selectedSeats, setSelectedSeats] = useState<Array<{
+    seat: SeatValue
+    rowIndex: number
+    seatIndex: number
+  }>>([])
 
   const generateSeatName = (rowIndex: number, colIndex: number) => {
     const rowName = String.fromCharCode(65 + rowIndex) // A, B, C, ...
@@ -146,8 +157,41 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   const handleSeatClick = useCallback(
     (seat: SeatValue, rowIndex: number, seatIndex: number) => {
+      // Always show details sheet (old behavior)
       setSelectedSeat({ seat, rowIndex, seatIndex })
       setIsSeatSheetOpen(true)
+    },
+    []
+  )
+
+  const handleAddToCart = useCallback(
+    (seat: SeatValue, rowIndex: number, seatIndex: number) => {
+      // Check if seat is already in cart
+      const seatKey = `${rowIndex}-${seatIndex}`
+      const isSelected = selectedSeats.some(
+        (s) => `${s.rowIndex}-${s.seatIndex}` === seatKey
+      )
+
+      if (!isSelected && seat.ticketId && seat.status !== SEAT_STATUS.OCCUPIED) {
+        // Add to cart
+        setSelectedSeats((prev) => [
+          ...prev,
+          { seat, rowIndex, seatIndex },
+        ])
+        // Optionally close the sheet after adding
+        // setIsSeatSheetOpen(false)
+      }
+    },
+    [selectedSeats]
+  )
+
+  const handleRemoveFromCart = useCallback(
+    (rowIndex: number, seatIndex: number) => {
+      setSelectedSeats((prev) =>
+        prev.filter(
+          (s) => !(s.rowIndex === rowIndex && s.seatIndex === seatIndex)
+        )
+      )
     },
     []
   )
@@ -184,6 +228,171 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   const selectedTicketDisplayPrice = useMemo(() => calculateTicketDisplayPrice(selectedTicket), [selectedTicket])
   const selectedTicketCurrency = selectedTicket?.currency || 'CAD'
+
+  // Calculate total for all selected seats
+  const selectedSeatsWithTickets = useMemo(() => {
+    return selectedSeats
+      .map((seatData) => {
+        const ticket = tickets.find((t) => t.id === seatData.seat.ticketId)
+        if (!ticket) return null
+        const price = calculateTicketDisplayPrice(ticket)
+        return {
+          ...seatData,
+          ticket,
+          price: price ?? 0,
+          seatName: getSeatName(seatData.seat, seatData.rowIndex, seatData.seatIndex),
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+  }, [selectedSeats, tickets, getSeatName])
+
+  const totalPrice = useMemo(() => {
+    return selectedSeatsWithTickets.reduce((sum, item) => sum + item.price, 0)
+  }, [selectedSeatsWithTickets])
+
+  const isSeatSelected = useCallback(
+    (rowIndex: number, seatIndex: number) => {
+      return selectedSeats.some(
+        (s) => s.rowIndex === rowIndex && s.seatIndex === seatIndex
+      )
+    },
+    [selectedSeats]
+  )
+
+  // Group seats by ticket type for proper checkout
+  const seatsByTicketType = useMemo(() => {
+    const map = new Map<string, typeof selectedSeatsWithTickets>()
+    selectedSeatsWithTickets.forEach((item) => {
+      const ticketId = item.ticket.id
+      if (!map.has(ticketId)) {
+        map.set(ticketId, [])
+      }
+      map.get(ticketId)!.push(item)
+    })
+    return map
+  }, [selectedSeatsWithTickets])
+
+  // Create ticketSeatMap for EventNormalCheckOut
+  const ticketSeatMap = useMemo(() => {
+    const map = new Map<string, string[]>()
+    seatsByTicketType.forEach((seats, ticketId) => {
+      map.set(ticketId, seats.map((s) => s.seatName))
+    })
+    return map
+  }, [seatsByTicketType])
+
+  // Check subscription status for member pricing
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+    const fetchSubscription = async () => {
+      try {
+        const subscribed = await checkSubscription(userId)
+        if (isMounted) {
+          setIsSubscribed(Boolean(subscribed))
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error)
+      } finally {
+        if (isMounted) {
+          setIsLoadingSubscription(false)
+        }
+      }
+    }
+    if (userId) {
+      fetchSubscription()
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
+
+  // Master checkout handler for multiple ticket types
+  const handleMasterCheckout = useCallback(async () => {
+    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    if (!stripe) {
+      toast.error('Error', {
+        description: 'Stripe is not available. Please try again later.',
+      })
+      return
+    }
+
+    try {
+      // Prepare checkout items: group by ticket type with seat numbers
+      const checkoutItems: Array<{
+        ticketId: string
+        stripePriceId: string
+        stripeProductId: string
+        seatNumbers: string[]
+        eventTicketId: string
+      }> = []
+
+      seatsByTicketType.forEach((seats) => {
+        const ticket = seats[0].ticket
+        const stripePriceIdForUser =
+          isSubscribed && ticket.subscribedStripePriceId
+            ? ticket.subscribedStripePriceId
+            : ticket.stripePriceId
+
+        if (stripePriceIdForUser && ticket.stripeProductId) {
+          checkoutItems.push({
+            ticketId: ticket.id,
+            stripePriceId: stripePriceIdForUser,
+            stripeProductId: ticket.stripeProductId,
+            seatNumbers: seats.map((s) => s.seatName),
+            eventTicketId: ticket.id,
+          })
+        }
+      })
+
+      if (checkoutItems.length === 0) {
+        toast.error('Error', {
+          description: 'No valid tickets found for checkout.',
+        })
+        return
+      }
+
+      // Call new API endpoint for multi-ticket checkout
+      const { data } = await axiosInstance.post(
+        '/api/payment/checkout-sessions/create-multi',
+        {
+          eventKeyName,
+          userId,
+          eventId,
+          type,
+          email,
+          checkoutItems,
+        }
+      )
+
+      const result = await stripe.redirectToCheckout({ sessionId: data.id })
+
+      if (result.error) {
+        toast.error('Error', {
+          description: `Stripe redirect error: ${result.error.message}`,
+        })
+      }
+    } catch (error: unknown) {
+      if (isAxiosError(error)) {
+        toast.error('Error', {
+          description:
+            error.response?.data?.message ||
+            'A network or server error occurred. Please try again.',
+        })
+      } else if (error instanceof Error) {
+        toast.error('Error', {
+          description: error.message || 'Unexpected error occurred.',
+        })
+      } else {
+        toast.error('Error', {
+          description:
+            'Unexpected error occurred. Please contact our developer team for support.',
+        })
+      }
+    }
+  }, [seatsByTicketType, isSubscribed, eventKeyName, userId, eventId, type, email])
 
   const renderSeatDetails = () => {
     if (!selectedSeat) return null
@@ -508,12 +717,13 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                                 selectedSeat?.seatIndex === seatIndex
                               const isSeatUnavailable =
                                 seat.status === SEAT_STATUS.OCCUPIED
+                              const isInCart = isSeatSelected(rowIndex, seatIndex)
                               return (
                                 <div
                                   key={seatIndex}
                                   role="button"
                                   tabIndex={isSeatUnavailable ? -1 : 0}
-                                  aria-pressed={isActiveSeat}
+                                  aria-pressed={isActiveSeat || isInCart}
                                   aria-disabled={isSeatUnavailable}
                                   aria-label={getSeatTitle(
                                     seat,
@@ -536,11 +746,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                                           )
                                   }
                                   className={cn(
-                                    'flex h-8 w-8 items-center justify-center rounded p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2',
+                                    'relative flex h-8 w-8 items-center justify-center rounded p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2',
                                     isSeatUnavailable
                                       ? 'cursor-not-allowed'
                                       : 'cursor-pointer hover:bg-gray-200/70',
-                                    isActiveSeat ? 'bg-gray-200' : ''
+                                    isActiveSeat ? 'bg-gray-200' : '',
+                                    isInCart ? 'ring-2 ring-primary ring-offset-1 bg-primary/10' : ''
                                   )}
                                   title={getSeatTitle(
                                     seat,
@@ -551,10 +762,16 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                                   <Armchair
                                     className={cn(
                                       'h-6 w-6',
-                                      getSeatColor(seat)
+                                      getSeatColor(seat),
+                                      isInCart && 'scale-110'
                                     )}
-                                    strokeWidth={2}
+                                    strokeWidth={isInCart ? 2.5 : 2}
                                   />
+                                  {isInCart && (
+                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm">
+                                      ✓
+                                    </span>
+                                  )}
                                 </div>
                               )
                             })}
@@ -613,6 +830,97 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               </div>
             ) : (
               <div></div>
+            )}
+
+            {/* Multi-seat cart summary */}
+            {selected === 'checkout' && seatingMap && seatingMap.length > 0 && selectedSeatsWithTickets.length > 0 && (
+              <div className="w-full rounded-md border bg-white p-4 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Selected Seats ({selectedSeatsWithTickets.length})
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedSeats([])}
+                    className="text-sm text-red-600 hover:text-red-700"
+                  >
+                    Clear All
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {selectedSeatsWithTickets.map((item) => (
+                    <div
+                      key={`${item.rowIndex}-${item.seatIndex}`}
+                      className="flex items-center justify-between rounded border bg-gray-50 p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.seatName}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {item.ticket.type}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {item.ticket.currency || 'CAD'} ${item.price.toFixed(2)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedSeats((prev) =>
+                              prev.filter(
+                                (s) =>
+                                  !(s.rowIndex === item.rowIndex && s.seatIndex === item.seatIndex)
+                              )
+                            )
+                          }}
+                          className="h-6 w-6 rounded p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          aria-label={`Remove ${item.seatName}`}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <span className="text-lg font-semibold text-gray-900">
+                    Total
+                  </span>
+                  <span className="text-xl font-bold text-primary">
+                    {selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} ${totalPrice.toFixed(2)}
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <EventNormalCheckOut
+                    formLink={formLink}
+                    eventKeyName={eventKeyName}
+                    userId={userId}
+                    eventId={eventId}
+                    tickets={Array.from(
+                      new Map(selectedSeatsWithTickets.map((item) => [item.ticket.id, item.ticket])).values()
+                    )}
+                    email={email}
+                    type={type}
+                    hideCheckoutButtons={true}
+                    ticketSeatMap={ticketSeatMap}
+                  />
+                  {/* Master checkout button */}
+                  {!isLoadingSubscription && (
+                    <Button
+                      onClick={handleMasterCheckout}
+                      className="mt-4 w-full group"
+                      disabled={selectedSeatsWithTickets.length === 0}
+                    >
+                      {t('reserve-button')}{' '}
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             )}
 
             {selected === 'etransfer' && (
@@ -680,16 +988,54 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
           <div className="mt-6 flex flex-col gap-4">
             {renderSeatDetails()}
             {selectedSeat?.seat.ticketId && selectedTicket ? (
-              <EventNormalCheckOut
-                formLink={formLink}
-                eventKeyName={eventKeyName}
-                userId={userId}
-                eventId={eventId}
-                tickets={[selectedTicket]}
-                email={email}
-                type={type}
-                seatNumber={selectedSeat?.seat.name}
-              />
+              <>
+                {/* Check if seat is already in cart */}
+                {isSeatSelected(selectedSeat.rowIndex, selectedSeat.seatIndex) ? (
+                  <div className="flex flex-col gap-3 rounded-md border border-green-200 bg-green-50 p-4">
+                    <p className="text-sm font-medium text-green-800">
+                      ✓ This seat is already in your cart
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        handleRemoveFromCart(selectedSeat.rowIndex, selectedSeat.seatIndex)
+                      }}
+                      className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      Remove from Cart
+                    </Button>
+                  </div>
+                ) : selectedSeat.seat.status !== SEAT_STATUS.OCCUPIED ? (
+                  <Button
+                    onClick={() => {
+                      handleAddToCart(
+                        selectedSeat.seat,
+                        selectedSeat.rowIndex,
+                        selectedSeat.seatIndex
+                      )
+                    }}
+                    className="w-full"
+                  >
+                    Add to Cart
+                  </Button>
+                ) : null}
+                {/* Keep the old checkout option for single seat purchase */}
+                <div className="mt-4 border-t pt-4">
+                  <p className="mb-2 text-sm font-medium text-gray-700">
+                    Or purchase this seat directly:
+                  </p>
+                  <EventNormalCheckOut
+                    formLink={formLink}
+                    eventKeyName={eventKeyName}
+                    userId={userId}
+                    eventId={eventId}
+                    tickets={[selectedTicket]}
+                    email={email}
+                    type={type}
+                    seatNumber={selectedSeat?.seat.name}
+                  />
+                </div>
+              </>
             ) : selectedSeat?.seat.ticketId ? (
               <p className="text-sm text-red-600">
                 Unable to load payment configuration for this ticket. Please try

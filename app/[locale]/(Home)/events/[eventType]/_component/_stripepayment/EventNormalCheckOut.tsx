@@ -19,6 +19,9 @@ interface EventNormalCheckOutProps {
   email: string
   type: string
   seatNumber?: string
+  seatNumbers?: string[] // For multi-seat checkout
+  hideCheckoutButtons?: boolean // Hide individual checkout buttons (for cart summary)
+  ticketSeatMap?: Map<string, string[]> // Map of ticketId to seatNumbers for this ticket type
 }
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
@@ -76,6 +79,9 @@ export default function EventNormalCheckOut({
   email,
   type,
   seatNumber,
+  seatNumbers,
+  hideCheckoutButtons = false,
+  ticketSeatMap,
 }: EventNormalCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -219,6 +225,9 @@ export default function EventNormalCheckOut({
               const paymentTypeValue = resolvePaymentType(type, ticket)
               const perSessionPrice = Number(ticket.price) || 0
               const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
+              
+              // Get seat numbers for this specific ticket type
+              const seatsForThisTicket = ticketSeatMap?.get(ticket.id) || seatNumbers || []
 
               return (
                 <div
@@ -251,7 +260,11 @@ export default function EventNormalCheckOut({
                           : totalPrice.toFixed(2)}
                       </span>
                     </div>
-                    {!seatNumber ? (
+                    {seatsForThisTicket.length > 0 ? (
+                      <span className="text-xs text-gray-500 drop-shadow-sm">
+                        Seats: {seatsForThisTicket.join(', ')}
+                      </span>
+                    ) : !seatNumber ? (
                       <>
                         {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
                           <span className="text-xs text-gray-500 drop-shadow-sm">
@@ -278,21 +291,24 @@ export default function EventNormalCheckOut({
                     )}
                   </div>
 
-                  <div className="relative z-10 flex items-center justify-between gap-4">
-                    <NormalCheckoutButton
-                      stripePriceId={stripePriceIdForUser}
-                      stripeProductId={ticket.stripeProductId}
-                      eventKeyName={eventKeyName}
-                      userId={userId}
-                      eventId={eventId}
-                      buttonText="reserve-button"
-                      type={paymentTypeValue}
-                      numberSession={ticket.payTotalNumber ?? undefined}
-                      email={email}
-                      seatNumber={seatNumber}
-                      eventTicketId={ticket.id}
-                    />
-                  </div>
+                  {!hideCheckoutButtons && (
+                    <div className="relative z-10 flex items-center justify-between gap-4">
+                      <NormalCheckoutButton
+                        stripePriceId={stripePriceIdForUser}
+                        stripeProductId={ticket.stripeProductId}
+                        eventKeyName={eventKeyName}
+                        userId={userId}
+                        eventId={eventId}
+                        buttonText="reserve-button"
+                        type={paymentTypeValue}
+                        numberSession={ticket.payTotalNumber ?? undefined}
+                        email={email}
+                        seatNumber={seatNumber}
+                        seatNumbers={seatsForThisTicket}
+                        eventTicketId={ticket.id}
+                      />
+                    </div>
+                  )}
                 </div>
               )
             })}
