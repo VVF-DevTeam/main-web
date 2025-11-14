@@ -15,7 +15,6 @@ export async function POST(req: Request) {
       userId,
       eventId,
       type,
-      price,
       numberSession,
       email,
       seatNumber,
@@ -25,38 +24,19 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
-        // If price is provided, use it as the price for the product (this is for full course payment)
-        price
-          ? {
-              price_data: {
-                product: stripeProductId,
-                currency: 'cad',
-                unit_amount: price * 100,
-              },
-              quantity: 1,
-              ...(type === 'Membership'
-                ? {}
-                : {
-                    adjustable_quantity: {
-                      enabled: true,
-                      minimum: 1,
-                      maximum: 10,
-                    },
-                  }),
-            }
-          : {
-              price: stripePriceId,
-              quantity: 1,
-              ...(type === 'Membership'
-                ? {}
-                : {
-                    adjustable_quantity: {
-                      enabled: true,
-                      minimum: 1,
-                      maximum: 10,
-                    },
-                  }),
-            },
+        {
+          price: stripePriceId,
+          quantity: 1,
+          ...(type === 'Membership'
+            ? {}
+            : {
+                adjustable_quantity: {
+                  enabled: true,
+                  minimum: 1,
+                  maximum: 10,
+                },
+              }),
+        },
       ],
       mode: type === 'Membership' ? 'subscription' : 'payment',
       customer_email: email,

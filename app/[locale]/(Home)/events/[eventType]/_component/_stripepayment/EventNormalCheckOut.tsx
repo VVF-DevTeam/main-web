@@ -211,7 +211,7 @@ export default function EventNormalCheckOut({
                 isSubscribed && ticket.subscribedStripePriceId
                   ? ticket.subscribedStripePriceId
                   : ticket.stripePriceId
-
+              
               if (!stripePriceIdForUser || !ticket.stripeProductId) {
                 return null
               }
@@ -245,7 +245,10 @@ export default function EventNormalCheckOut({
                         {ticket.type}
                       </span>
                       <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
-                        {/* {currencyLabel}  */}${totalPrice.toFixed(2)}
+                        {/* {currencyLabel}  */}$
+                        {isSubscribed && memberPrice !== null
+                          ? memberPrice.toFixed(2)
+                          : totalPrice.toFixed(2)}
                       </span>
                     </div>
                     {!seatNumber ? (
@@ -284,7 +287,6 @@ export default function EventNormalCheckOut({
                       eventId={eventId}
                       buttonText="reserve-button"
                       type={paymentTypeValue}
-                      price={totalPrice}
                       numberSession={ticket.payTotalNumber ?? undefined}
                       email={email}
                       seatNumber={seatNumber}

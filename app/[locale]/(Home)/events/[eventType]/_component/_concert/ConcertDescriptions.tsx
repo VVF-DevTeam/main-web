@@ -269,11 +269,6 @@ const ConcertDescriptions = async ({
             tickets={event.tickets}
           />
 
-          {existingPayment && existingPayment.length > 0 && (
-            <p className="mt-4 font-medium text-green-400">
-              {t('alreadyPaid')}
-            </p>
-          )}
         </div>
 
         {/* Schedule Section */}
