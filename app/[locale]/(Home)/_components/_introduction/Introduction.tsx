@@ -102,7 +102,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
         <div className="flex flex-col items-center justify-center gap-y-5 md:absolute md:left-1/2 md:top-1/2 md:z-[5] md:-translate-x-1/2 md:-translate-y-1/2">
           {/* Header Web_H1 */}
           <h2 className="web_h1 whitespace-nowrap md:max-w-[500px]">
-            {t('title-big-introduction')}
+            {t('title-big-introduction')} 
           </h2>
           <p className="web-body-regular md:max-w-[510px] pb-[20px]">
             {t('title-small-introduction')}

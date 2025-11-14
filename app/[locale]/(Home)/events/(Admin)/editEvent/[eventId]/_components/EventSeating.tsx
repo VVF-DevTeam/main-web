@@ -78,6 +78,117 @@ const createEmptySeat = (): SeatValue => ({
 })
 export type SeatingMap = SeatValue[][]
 
+const defaultRowName = (index: number) => String.fromCharCode(65 + index)
+const defaultColumnName = (index: number) => String(index + 1)
+
+const parseSeatName = (
+  seatName: string | undefined
+): { row: string; col: string } | null => {
+  if (!seatName) return null
+  const match = seatName.match(/^([A-Za-z]+)(\d+)$/)
+  if (match) {
+    return { row: match[1].toUpperCase(), col: match[2] }
+  }
+  const digitIndex = seatName.search(/\d/)
+  if (digitIndex > 0) {
+    return {
+      row: seatName.substring(0, digitIndex).toUpperCase(),
+      col: seatName.substring(digitIndex),
+    }
+  }
+  return null
+}
+
+const normalizeSeat = (seat: unknown): SeatValue => {
+  if (seat && typeof seat === 'object') {
+    const seatObj = seat as Partial<SeatValue> & {
+      status?: number | string | { toNumber: () => number }
+    }
+
+    const resolveStatus = (): number => {
+      if (typeof seatObj.status === 'number') return seatObj.status
+      if (typeof seatObj.status === 'string') {
+        const parsed = Number(seatObj.status)
+        return Number.isNaN(parsed) ? SEAT_STATUS.NO_SEAT : parsed
+      }
+      if (
+        seatObj.status &&
+        typeof seatObj.status === 'object' &&
+        'toNumber' in seatObj.status
+      ) {
+        try {
+          const decimalLike = seatObj.status as { toNumber: () => number }
+          if (typeof decimalLike.toNumber === 'function') {
+            return decimalLike.toNumber()
+          }
+        } catch {
+          return SEAT_STATUS.NO_SEAT
+        }
+      }
+      return SEAT_STATUS.NO_SEAT
+    }
+
+    return {
+      ticketType: seatObj.ticketType || '',
+      ticketId: seatObj.ticketId || '',
+      name: seatObj.name || '',
+      status: resolveStatus(),
+    }
+  }
+  return createEmptySeat()
+}
+
+const normalizeSeatingMapValue = (value: unknown): SeatingMap => {
+  if (!value) return []
+  let parsedValue = value
+  if (typeof value === 'string') {
+    try {
+      parsedValue = JSON.parse(value)
+    } catch (error) {
+      console.error('Invalid seating map JSON string:', error)
+      return []
+    }
+  }
+
+  if (Array.isArray(parsedValue)) {
+    return parsedValue
+      .filter((row) => Array.isArray(row))
+      .map((row) => (row as unknown[]).map((seat) => normalizeSeat(seat)))
+  }
+
+  return []
+}
+
+const deriveRowNamesFromMap = (map: SeatingMap): string[] => {
+  if (!map.length) return []
+  return map.map((row, index) => {
+    for (const seat of row) {
+      const parsed = parseSeatName(seat?.name)
+      if (parsed?.row) {
+        return parsed.row
+      }
+    }
+    return defaultRowName(index)
+  })
+}
+
+const deriveColumnNamesFromMap = (map: SeatingMap): string[] => {
+  if (!map.length || !map[0]?.length) return []
+  const columnCount = map[0].length
+  return Array(columnCount)
+    .fill(null)
+    .map((_, colIndex) => {
+      for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
+        const seat = map[rowIndex][colIndex]
+        const parsed = parseSeatName(seat?.name)
+        if (parsed?.col) {
+          return parsed.col
+        }
+      }
+      return defaultColumnName(colIndex)
+    })
+}
+
 const EventSeatingSchema = z.object({
   width: z.coerce
     .number()
@@ -102,43 +213,21 @@ const EventSeating = ({ event }: EventSeatingProps) => {
   const [selectionType, setSelectionType] = useState<'seat' | 'row' | 'column'>(
     'seat'
   )
-  const [seatingMap, setSeatingMap] = useState<SeatingMap>(() => {
-    if (
-      event.seatingMap &&
-      Array.isArray(event.seatingMap) &&
-      event.seatingMap.length > 0
-    ) {
-      // Validate and convert the seating map structure
-      try {
-        const map = event.seatingMap
-        if (Array.isArray(map[0])) {
-          return map as SeatingMap
-        }
-      } catch (e) {
-        console.error('Error parsing seating map:', e)
-      }
-    }
-    return []
-  })
+  const parsedEventSeatingMap = useMemo(
+    () => normalizeSeatingMapValue(event.seatingMap),
+    [event.seatingMap]
+  )
+
+  const [seatingMap, setSeatingMap] = useState<SeatingMap>(
+    parsedEventSeatingMap
+  )
   const [selectedTicketId, setSelectedTicketId] = useState<string>('')
-  const [rowNames, setRowNames] = useState<string[]>(() => {
-    // Initialize with default names (A, B, C, etc.)
-    if (seatingMap.length > 0) {
-      return Array(seatingMap.length)
-        .fill(null)
-        .map((_, i) => String.fromCharCode(65 + i)) // A, B, C, ...
-    }
-    return []
-  })
-  const [columnNames, setColumnNames] = useState<string[]>(() => {
-    // Initialize with default names (1, 2, 3, etc.)
-    if (seatingMap.length > 0 && seatingMap[0]?.length > 0) {
-      return Array(seatingMap[0].length)
-        .fill(null)
-        .map((_, i) => String(i + 1))
-    }
-    return []
-  })
+  const [rowNames, setRowNames] = useState<string[]>(() =>
+    deriveRowNamesFromMap(parsedEventSeatingMap)
+  )
+  const [columnNames, setColumnNames] = useState<string[]>(() =>
+    deriveColumnNamesFromMap(parsedEventSeatingMap)
+  )
   const currentDateTime = getCurrentDateTime()
   const tickets = event.tickets || []
 
@@ -152,6 +241,20 @@ const EventSeating = ({ event }: EventSeatingProps) => {
       height: seatingMap.length > 0 ? seatingMap.length : 0,
     },
   })
+
+  useEffect(() => {
+    setSeatingMap(parsedEventSeatingMap)
+    setRowNames(deriveRowNamesFromMap(parsedEventSeatingMap))
+    setColumnNames(deriveColumnNamesFromMap(parsedEventSeatingMap))
+    form.reset({
+      width:
+        parsedEventSeatingMap.length > 0 && parsedEventSeatingMap[0]?.length
+          ? parsedEventSeatingMap[0].length
+          : 0,
+      height:
+        parsedEventSeatingMap.length > 0 ? parsedEventSeatingMap.length : 0,
+    })
+  }, [parsedEventSeatingMap, form])
 
   const widthValue = form.watch('width')
   const heightValue = form.watch('height')
@@ -294,7 +397,9 @@ const EventSeating = ({ event }: EventSeatingProps) => {
       const firstSeat = row[0]
       if (firstSeat && firstSeat.ticketId) {
         // Check if all seats have the same ticket
-        const allSame = row.every((seat) => seat && seat.ticketId === firstSeat.ticketId)
+        const allSame = row.every(
+          (seat) => seat && seat.ticketId === firstSeat.ticketId
+        )
         if (allSame) {
           setSelectedTicketId(firstSeat.ticketId)
         } else {
@@ -320,7 +425,9 @@ const EventSeating = ({ event }: EventSeatingProps) => {
       const firstSeat = column[0]
       if (firstSeat && firstSeat.ticketId) {
         // Check if all seats have the same ticket
-        const allSame = column.every((seat) => seat && seat.ticketId === firstSeat.ticketId)
+        const allSame = column.every(
+          (seat) => seat && seat.ticketId === firstSeat.ticketId
+        )
         if (allSame) {
           setSelectedTicketId(firstSeat.ticketId)
         } else {
@@ -658,7 +765,10 @@ const EventSeating = ({ event }: EventSeatingProps) => {
 
                 {/* Row Names */}
                 <div>
-                  <label htmlFor="row-names" className="mb-2 block text-sm font-medium">
+                  <label
+                    htmlFor="row-names"
+                    className="mb-2 block text-sm font-medium"
+                  >
                     Row Names
                   </label>
                   <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
@@ -682,7 +792,10 @@ const EventSeating = ({ event }: EventSeatingProps) => {
 
                 {/* Column Names */}
                 <div>
-                  <label htmlFor="column-names" className="mb-2 block text-sm font-medium">
+                  <label
+                    htmlFor="column-names"
+                    className="mb-2 block text-sm font-medium"
+                  >
                     Column Names
                   </label>
                   <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
@@ -859,6 +972,11 @@ const EventSeating = ({ event }: EventSeatingProps) => {
       ) : (
         <div className="flex flex-col gap-y-2">
           <div className="text-muted-foreground">
+            <strong>IMPORTANT:</strong> Change the row and column mapping to
+            will not change the position of the seat that already has been
+            booked. You will have to remap manually
+          </div>
+          <div className="text-muted-foreground">
             <strong>Dimensions:</strong> {seatingMap[0].length} columns ×{' '}
             {seatingMap.length} rows
           </div>
@@ -914,11 +1032,11 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                           <Square
                             className={cn('h-6 w-6', getSeatColor(seat))}
                             strokeWidth={1.5}
-                              fill={
-                                typeof seat === 'object' && seat.ticketId
-                                  ? 'currentColor'
-                                  : 'none'
-                              }
+                            fill={
+                              typeof seat === 'object' && seat.ticketId
+                                ? 'currentColor'
+                                : 'none'
+                            }
                           />
                         </div>
                       ))}
@@ -987,7 +1105,8 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                   return (
                     <SelectItem key={ticket.id} value={ticket.id}>
                       {ticket.type} - ${displayPrice.toFixed(2)}
-                      {ticket.payTotalNumber && ` (Full Event: ${ticket.payTotalNumber} sessions)`}
+                      {ticket.payTotalNumber &&
+                        ` (Full Event: ${ticket.payTotalNumber} sessions)`}
                     </SelectItem>
                   )
                 })}

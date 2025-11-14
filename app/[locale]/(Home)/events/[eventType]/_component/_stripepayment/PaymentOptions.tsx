@@ -705,9 +705,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               // Show seating map for Concert event
               <div className="w-full">
                 <div className="rounded-md border bg-white p-4">
-                  <h3 className="web_h3 mb-2 font-semibold text-center">Seating Map</h3>
+                  <h3 className="web_h3 mb-2 text-base font-semibold text-center sm:text-lg md:text-xl">
+                    Seating Map
+                  </h3>
                   <div className="w-full overflow-x-auto">
-                    <div className="flex w-full justify-center">
+                    <div className="flex w-full md:justify-center">
                       <div className="inline-block rounded-lg border-2 border-gray-300 bg-gray-50 p-3">
                       {/* Stage */}
                       <div className="mb-4 flex justify-center">
@@ -724,12 +726,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                       {/* Seating */}
                       <div className="flex flex-col gap-1.5">
                         {/* Column Headers */}
-                        <div className="flex justify-center gap-1">
-                          <div className="h-8 w-7 flex-shrink-0"></div>
+                        <div className="flex justify-center md:gap-1">
+                          <div className="h-6 w-6 flex-shrink-0 sm:h-8 sm:w-7"></div>
                           {seatingMap[0]?.map((_, colIndex) => (
                             <div
                               key={colIndex}
-                              className="flex h-8 w-7 items-center justify-center text-xs font-semibold text-gray-700"
+                              className="flex h-6 w-6 items-center justify-center text-[10px] font-semibold text-gray-700 sm:h-8 sm:w-7 sm:text-xs"
                             >
                               {columnNames[colIndex] || String(colIndex + 1)}
                             </div>
@@ -739,10 +741,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                         {seatingMap.map((row, rowIndex) => (
                           <div
                             key={rowIndex}
-                            className="flex justify-center gap-1"
+                            className="flex justify-center md:gap-1"
                           >
                             {/* Row Label */}
-                            <div className="flex h-8 w-7 flex-shrink-0 items-center justify-center text-xs font-semibold text-gray-700">
+                            <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center text-[10px] font-semibold text-gray-700 sm:h-8 sm:w-7 sm:text-xs">
                               {rowNames[rowIndex] ||
                                 String.fromCharCode(65 + rowIndex)}
                             </div>
@@ -785,7 +787,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                                           )
                                   }
                                   className={cn(
-                                    'relative flex h-7 w-7 items-center justify-center rounded p-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2',
+                                    'relative flex h-6 w-6 items-center justify-center rounded p-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 sm:h-7 sm:w-7',
                                     isSeatUnavailable
                                       ? 'cursor-not-allowed'
                                       : 'cursor-pointer hover:bg-gray-200/70',
@@ -802,7 +804,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                                 >
                                   <Armchair
                                     className={cn(
-                                      'h-5 w-5',
+                                      'h-4 w-4 sm:h-5 sm:w-5',
                                       getSeatColor(seat),
                                       isInCart && 'scale-110'
                                     )}
@@ -830,11 +832,13 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                       >
                         <div
                           className={cn(
-                            'flex h-8 w-8 items-center justify-center rounded',
+                            'flex h-6 w-6 items-center justify-center rounded md:h-8 md:w-8',
                             item.wrapperClass
                           )}
                         >
-                          <Armchair className={cn('h-5 w-5', item.iconClass)} />
+                          <Armchair
+                            className={cn('h-4 w-4 md:h-5 md:w-5', item.iconClass)}
+                          />
                         </div>
                         <div className="flex flex-col leading-tight">
                           <span className="font-medium text-gray-800">
