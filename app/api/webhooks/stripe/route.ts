@@ -255,9 +255,11 @@ export async function POST(req: NextRequest) {
             console.log('event seatingMap', event?.seatingMap)
 
             if (event && event.seatingMap) {
-              // Parse the seatingMap from JSON
-              const seatingMap = JSON.parse(
-                event.seatingMap as string
+              // Parse the seatingMap from JSON (if it's a string) or use directly (if already an object)
+              const seatingMap = (
+                typeof event.seatingMap === 'string'
+                  ? JSON.parse(event.seatingMap)
+                  : event.seatingMap
               ) as Array<
                 Array<{
                   name?: string
@@ -301,7 +303,11 @@ export async function POST(req: NextRequest) {
               }
             } else if (!event) {
               return NextResponse.json(
-                { error: { message: 'Event not found, could not update seatingMap' } },
+                {
+                  error: {
+                    message: 'Event not found, could not update seatingMap',
+                  },
+                },
                 { status: 400 }
               )
             }
@@ -314,7 +320,7 @@ export async function POST(req: NextRequest) {
             const pricePaid = chargedAmount / 100
             const perSessionPrice = Number(ticket.price) || 0
             const firstName = user.name?.split(' ')[0] || 'Valued Customer'
-            
+
             console.log('sending email confirmation')
             await sendPaymentConfirmationEmail({
               firstName,
