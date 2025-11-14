@@ -21,7 +21,6 @@ interface NormalCheckoutButtonProps {
   eventId?: string
   buttonText: string
   type: PaymentType
-  price?: number
   numberSession?: number
   email: string
   seatNumber?: string
@@ -36,7 +35,6 @@ export default function NormalCheckoutButton({
   eventId,
   buttonText,
   type,
-  price,
   numberSession,
   email,
   seatNumber,
@@ -58,7 +56,6 @@ export default function NormalCheckoutButton({
           userId: userId,
           eventId: eventId,
           type: type,
-          price: price,
           numberSession: numberSession,
           email: email,
           seatNumber: seatNumber,

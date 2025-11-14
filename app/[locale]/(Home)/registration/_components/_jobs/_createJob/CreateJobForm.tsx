@@ -44,7 +44,7 @@ const createJobSchema = z.object({
   title: z
     .string({ required_error: 'Title is required' })
     .min(1, { message: 'Title must be at least 2 characters long' })
-    .max(20, { message: 'Title must be at most 20 characters long' }),
+    .max(40, { message: 'Title must be at most 20 characters long' }),
   jobType: z.string().min(1, { message: 'Event type is required' }),
 })
 
