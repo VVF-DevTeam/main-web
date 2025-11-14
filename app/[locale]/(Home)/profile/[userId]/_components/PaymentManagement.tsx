@@ -71,7 +71,7 @@ export default async function PaymentManagement({
                 <th className="px-4 py-3 text-left">End Date</th>
                 <th className="px-4 py-3 text-left">Location</th>
                 <th className="px-4 py-3 text-left">Amount</th>
-                <th className="px-4 py-3 text-left">Quantity</th>
+                <th className="px-4 py-3 text-left">Quantity/Seat</th>
                 <th className="px-4 py-3 text-left">Type</th>
                 <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-left">Actions</th>
@@ -124,7 +124,9 @@ export default async function PaymentManagement({
                       <td className="px-4 py-3">
                         ${Number(payment.pricePaid).toFixed(2)}
                       </td>
-                      <td className="px-4 py-3">{payment.quantity}</td>
+                      <td className="px-4 py-3">
+                        {payment.quantity}/{payment.seatNumber || '-'}
+                      </td>
                       <td className="px-4 py-3">
                         {paymentTypeMap[payment.type]}
                       </td>

@@ -72,5 +72,6 @@
   "type": "Taper",
   "type-delete-title": "Tapez « SUPPRIMER » :",
   "upcoming-event": "Derniers événements",
-  "update-profile": "Mettre à jour le profil"
+  "update-profile": "Mettre à jour le profil",
+  "seatNumber": "Numéro de siège"
 }

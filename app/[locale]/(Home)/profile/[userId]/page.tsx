@@ -50,6 +50,7 @@ export default async function ProfilePage({
       type: true,
       quantity: true,
       refunded: true,
+      seatNumber: true,
       event: {
         select: {
           id: true,

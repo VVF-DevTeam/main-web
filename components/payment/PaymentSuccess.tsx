@@ -8,6 +8,7 @@ interface PaymentSuccessProps {
   userName: string
   locale: string
   translationWorkspaces: string[]
+  userEmail: string
 }
 
 const PaymentSuccess = async ({
@@ -15,6 +16,7 @@ const PaymentSuccess = async ({
   userName,
   locale,
   translationWorkspaces,
+  userEmail,
 }: PaymentSuccessProps) => {
   const { t } = await initTranslations(locale, translationWorkspaces)
 
@@ -53,7 +55,10 @@ const PaymentSuccess = async ({
         {t('paymentSuccess-text')} <strong>{title}</strong>
       </p>
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
-        Please check the payment details at{' '}
+      {t('paymentSuccess-text2')} <strong>{userEmail}</strong>
+      </p>
+      <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
+        Please also check the payment details at{' '}
         <Link href={`/profile/${userName}`} className="text-textColor-blue underline">
           your profile
         </Link>

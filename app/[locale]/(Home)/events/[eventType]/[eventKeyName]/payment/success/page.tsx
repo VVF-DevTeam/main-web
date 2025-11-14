@@ -17,6 +17,9 @@ const ClassPaymentSuccessPage = async ({
   const session = await auth()
   const userName = session?.user?.name!
 
+  // get current user email
+  const userEmail = session?.user?.email!
+
   //
   const publishedClass = await prisma.event.findUnique({
     where: { keyName: eventKeyName },
@@ -29,6 +32,7 @@ const ClassPaymentSuccessPage = async ({
     <PaymentSuccess
       title={publishedClass.title}
       userName={userName}
+      userEmail={userEmail}
       locale={locale}
       translationWorkspaces={['event']}
     />
