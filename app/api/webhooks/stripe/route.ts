@@ -197,25 +197,103 @@ export async function POST(req: NextRequest) {
           ? new Date(subscriptionEnd * 1000)
           : null
 
-      await prisma.payment.create({
-        data: {
-          userId: metadata.userId,
-          eventId: metadata.eventId,
-          eventTicketId: metadata.eventTicketId,
-          stripePaymentId: paymentId,
-          pricePaid: chargedAmount / 100,
-          type: metadata.type as PaymentType,
-          expiresAt: expiresAt,
-          quantity: quantity,
-          seatNumber: metadata.seatNumber,
-        },
-      })
+      // Handle multi-ticket checkout with ticketMetadata
+      let ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> | null = null
+      if (metadata.ticketMetadata) {
+        try {
+          ticketMetadata = JSON.parse(metadata.ticketMetadata as string) as Array<{
+            ticketId: string
+            seatNumbers: string[]
+          }>
+        } catch (e) {
+          console.error('Error parsing ticketMetadata:', e)
+        }
+      }
+
+      if (ticketMetadata && ticketMetadata.length > 0) {
+        // Multi-ticket checkout: create payment record for each ticket type
+        // Fetch all tickets to get their actual prices
+        const ticketIds = ticketMetadata.map((t) => t.ticketId)
+        const tickets = await prisma.eventTicket.findMany({
+          where: { id: { in: ticketIds } },
+        })
+
+        // Create a map of ticketId to ticket for quick lookup
+        const ticketMap = new Map(tickets.map((t) => [t.id, t]))
+
+        // Calculate total expected price based on ticket prices
+        let totalExpectedPrice = 0
+        for (const ticketInfo of ticketMetadata) {
+          const ticket = ticketMap.get(ticketInfo.ticketId)
+          if (ticket) {
+            const ticketPrice = Number(ticket.price) || 0
+            const totalTicketPrice = ticket.payTotalNumber && ticket.payTotalNumber > 0
+              ? ticketPrice * ticket.payTotalNumber
+              : ticketPrice
+            totalExpectedPrice += totalTicketPrice * ticketInfo.seatNumbers.length
+          }
+        }
+
+        // Calculate price ratio if there's a discrepancy (due to discounts, rounding, etc.)
+        const actualTotal = chargedAmount / 100
+        const priceRatio = totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
+
+        for (const ticketInfo of ticketMetadata) {
+          const ticket = ticketMap.get(ticketInfo.ticketId)
+          if (!ticket) continue
+
+          const seatCount = ticketInfo.seatNumbers.length
+          const ticketPrice = Number(ticket.price) || 0
+          const totalTicketPrice = ticket.payTotalNumber && ticket.payTotalNumber > 0
+            ? ticketPrice * ticket.payTotalNumber
+            : ticketPrice
+          
+          // Calculate price for this ticket type, adjusted by ratio
+          const ticketPricePaid = totalTicketPrice * seatCount * priceRatio
+
+          await prisma.payment.create({
+            data: {
+              userId: metadata.userId,
+              eventId: metadata.eventId,
+              eventTicketId: ticketInfo.ticketId,
+              stripePaymentId: paymentId,
+              pricePaid: ticketPricePaid,
+              type: metadata.type as PaymentType,
+              expiresAt: expiresAt,
+              quantity: seatCount,
+              seatNumber: ticketInfo.seatNumbers.join(', '),
+            },
+          })
+
+          // Update ticket sold count for this ticket type
+          await prisma.eventTicket.update({
+            where: { id: ticketInfo.ticketId },
+            data: {
+              sold: { increment: seatCount },
+            },
+          })
+        }
+      } else {
+        // Single ticket checkout (backward compatibility)
+        await prisma.payment.create({
+          data: {
+            userId: metadata.userId,
+            eventId: metadata.eventId,
+            eventTicketId: metadata.eventTicketId,
+            stripePaymentId: paymentId,
+            pricePaid: chargedAmount / 100,
+            type: metadata.type as PaymentType,
+            expiresAt: expiresAt,
+            quantity: quantity,
+            seatNumber: metadata.seatNumber,
+          },
+        })
+      }
 
       // Send payment confirmation email for event tickets (not Membership)
       if (
         metadata.type !== 'Membership' &&
-        metadata.eventId &&
-        metadata.eventTicketId
+        metadata.eventId
       ) {
         try {
           // Fetch user data
@@ -224,34 +302,94 @@ export async function POST(req: NextRequest) {
             select: { name: true, email: true },
           })
 
-          // Fetch event and ticket data
-          const ticket = await prisma.eventTicket.findUnique({
-            where: { id: metadata.eventTicketId },
-            include: {
-              event: {
-                select: {
-                  title: true,
-                  startDate: true,
-                  endDate: true,
-                  location: true,
-                  days: true,
-                  startTime: true,
-                  endTime: true,
+          // Handle multi-ticket checkout
+          if (ticketMetadata && ticketMetadata.length > 0) {
+            // For multi-ticket, send one email with all ticket types
+            // Fetch all tickets
+            const ticketIds = ticketMetadata.map((t) => t.ticketId)
+            const tickets = await prisma.eventTicket.findMany({
+              where: { id: { in: ticketIds } },
+              include: {
+                event: {
+                  select: {
+                    title: true,
+                    startDate: true,
+                    endDate: true,
+                    location: true,
+                    days: true,
+                    startTime: true,
+                    endTime: true,
+                  },
                 },
               },
-            },
-          })
+            })
 
-          // update event ticket sold count
-          await prisma.eventTicket.update({
-            where: { id: metadata.eventTicketId },
-            data: {
-              sold: { increment: 1 },
-            },
-          })
+            // Use the first ticket for event details (they're all from the same event)
+            const firstTicket = tickets[0]
+            if (user && user.email && firstTicket) {
+              const pricePaid = chargedAmount / 100
+              const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+              const allSeatNumbers = ticketMetadata
+                .flatMap((t) => t.seatNumbers)
+                .join(', ')
 
-          // update event seatingMap
-          if (metadata.seatNumber) {
+              // Send email with combined information
+              await sendPaymentConfirmationEmail({
+                firstName,
+                to: user.email,
+                ticketType: tickets.map((t) => t.type).join(', '), // Combined ticket types
+                pricePaid,
+                quantity: quantity || allSeatNumbers.split(',').length,
+                currency: firstTicket.currency || 'CAD',
+                ticketImageUrl: firstTicket.imageUrl,
+                perSessionPrice: Number(firstTicket.price) || 0,
+                payTotalNumber: firstTicket.payTotalNumber,
+                eventTitle: firstTicket.event.title,
+                seatNumber: allSeatNumbers,
+                eventStartDate: firstTicket.event.startDate,
+                eventEndDate: firstTicket.event.endDate,
+                eventLocation: firstTicket.event.location,
+                eventStartTime: firstTicket.event.startTime,
+                eventEndTime: firstTicket.event.endTime,
+              })
+            }
+          } else if (metadata.eventTicketId) {
+            // update event ticket sold count (only if not already updated in multi-ticket section)
+            // Note: Ticket fetch for email is done later in the single-ticket email section
+            if (!ticketMetadata) {
+              await prisma.eventTicket.update({
+                where: { id: metadata.eventTicketId },
+                data: {
+                  sold: { increment: 1 },
+                },
+              })
+            }
+          }
+
+          // update event seatingMap - handle both single and multiple seats
+          // Get seat numbers from ticketMetadata if available, otherwise from metadata
+          const seatNumbersToUpdate: string[] = []
+          if (ticketMetadata && ticketMetadata.length > 0) {
+            // Use seat numbers from ticketMetadata (multi-ticket checkout)
+            ticketMetadata.forEach((ticketInfo) => {
+              seatNumbersToUpdate.push(...ticketInfo.seatNumbers)
+            })
+          } else if (metadata.seatNumbers) {
+            // Multiple seats (backward compatibility)
+            try {
+              const parsed = JSON.parse(metadata.seatNumbers as string)
+              if (Array.isArray(parsed)) {
+                seatNumbersToUpdate.push(...parsed)
+              }
+            } catch (e) {
+              console.error('Error parsing seatNumbers:', e)
+            }
+          } else if (metadata.seatNumber) {
+            // Single seat (backward compatibility)
+            seatNumbersToUpdate.push(metadata.seatNumber as string)
+          }
+
+          if (seatNumbersToUpdate.length > 0) {
             const event = await prisma.event.findUnique({
               where: { id: metadata.eventId },
               select: {
@@ -280,26 +418,29 @@ export async function POST(req: NextRequest) {
 
               console.log('seatingMap', seatingMap)
 
-              // Find and update the seat with matching seatNumber
-              let seatFound = false
-              for (let rowIndex = 0; rowIndex < seatingMap.length; rowIndex++) {
-                const row = seatingMap[rowIndex]
-                if (Array.isArray(row)) {
-                  for (let colIndex = 0; colIndex < row.length; colIndex++) {
-                    const seat = row[colIndex]
-                    if (seat && seat.name === metadata.seatNumber) {
-                      seat.status = 2 // OCCUPIED
-                      seatFound = true
-                      break
+              // Find and update all seats with matching seatNumbers
+              const seatsFound: string[] = []
+              for (const seatNumberToUpdate of seatNumbersToUpdate) {
+                for (let rowIndex = 0; rowIndex < seatingMap.length; rowIndex++) {
+                  const row = seatingMap[rowIndex]
+                  if (Array.isArray(row)) {
+                    for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                      const seat = row[colIndex]
+                      if (seat && seat.name === seatNumberToUpdate) {
+                        seat.status = 2 // OCCUPIED
+                        seatsFound.push(seatNumberToUpdate)
+                        break
+                      }
                     }
+                    if (seatsFound.includes(seatNumberToUpdate)) break
                   }
-                  if (seatFound) break
                 }
               }
               console.log('seatingMap after update', seatingMap)
+              console.log('seats found and updated:', seatsFound)
 
-              // Update the seatingMap in the database
-              if (seatFound) {
+              // Update the seatingMap in the database if at least one seat was found
+              if (seatsFound.length > 0) {
                 console.log('updating seatingMap in database')
                 await prisma.event.update({
                   where: { id: metadata.eventId },
@@ -318,35 +459,65 @@ export async function POST(req: NextRequest) {
                 { status: 400 }
               )
             }
-          }
-
-          console.log('user', user)
-          console.log('ticket', ticket)
-          // send email confirmation for event tickets (not Membership)
-          if (user && user.email && ticket) {
-            const pricePaid = chargedAmount / 100
-            const perSessionPrice = Number(ticket.price) || 0
-            const firstName = user.name?.split(' ')[0] || 'Valued Customer'
-
-            console.log('sending email confirmation')
-            await sendPaymentConfirmationEmail({
-              firstName,
-              to: user.email,
-              ticketType: ticket.type,
-              pricePaid,
-              quantity: quantity || 1,
-              currency: ticket.currency || 'CAD',
-              ticketImageUrl: ticket.imageUrl,
-              perSessionPrice,
-              payTotalNumber: ticket.payTotalNumber,
-              eventTitle: ticket.event.title,
-              seatNumber: metadata.seatNumber,
-              eventStartDate: ticket.event.startDate,
-              eventEndDate: ticket.event.endDate,
-              eventLocation: ticket.event.location,
-              eventStartTime: ticket.event.startTime,
-              eventEndTime: ticket.event.endTime,
+          } else if (metadata.eventTicketId) {
+            // Single ticket checkout (backward compatibility)
+            const ticket = await prisma.eventTicket.findUnique({
+              where: { id: metadata.eventTicketId },
+              include: {
+                event: {
+                  select: {
+                    title: true,
+                    startDate: true,
+                    endDate: true,
+                    location: true,
+                    days: true,
+                    startTime: true,
+                    endTime: true,
+                  },
+                },
+              },
             })
+
+            // update event ticket sold count (only if not already updated in multi-ticket section)
+            if (!ticketMetadata) {
+              await prisma.eventTicket.update({
+                where: { id: metadata.eventTicketId },
+                data: {
+                  sold: { increment: 1 },
+                },
+              })
+            }
+
+            console.log('user', user)
+            console.log('ticket', ticket)
+            // send email confirmation for single ticket
+            if (user && user.email && ticket) {
+              const pricePaid = chargedAmount / 100
+              const perSessionPrice = Number(ticket.price) || 0
+              const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+
+              console.log('sending email confirmation')
+              await sendPaymentConfirmationEmail({
+                firstName,
+                to: user.email,
+                ticketType: ticket.type,
+                pricePaid,
+                quantity: quantity || 1,
+                currency: ticket.currency || 'CAD',
+                ticketImageUrl: ticket.imageUrl,
+                perSessionPrice,
+                payTotalNumber: ticket.payTotalNumber,
+                eventTitle: ticket.event.title,
+                seatNumber: metadata.seatNumbers 
+                  ? (JSON.parse(metadata.seatNumbers as string) as string[]).join(', ')
+                  : metadata.seatNumber,
+                eventStartDate: ticket.event.startDate,
+                eventEndDate: ticket.event.endDate,
+                eventLocation: ticket.event.location,
+                eventStartTime: ticket.event.startTime,
+                eventEndTime: ticket.event.endTime,
+              })
+            }
           }
         } catch (emailError) {
           // Log email error but don't fail the webhook
