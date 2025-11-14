@@ -16,12 +16,16 @@ const SubscriptionPaymentSuccessPage = async ({
   const session = await auth()
   const userName = session?.user?.name!
 
+  // get current user email
+  const userEmail = session?.user?.email!
+
   return (
     <PaymentSuccess
       title="VVF Membership"
       userName={userName}
       locale={locale}
       translationWorkspaces={['membership']}
+      userEmail={userEmail}
     />
   )
 }
