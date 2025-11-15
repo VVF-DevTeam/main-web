@@ -101,10 +101,10 @@ const ConcertDescriptions = async ({
 
   return (
     <div className="w-full bg-bgColor-secondary200 py-3">
-      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-6 p-6 md:p-10 lg:gap-y-8 lg:p-12">
+      <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-y-6 p-3 md:p-10 lg:gap-y-8 lg:p-12">
         <div className="flex w-full items-center justify-between">
-          <h2 className="web_h2">{t('headerAbout')}</h2>
-
+          <h2 className="web_h2 hidden md:block">{t('headerAbout')}</h2>
+          <h2 className="web_h2 block md:hidden">{t('headerAboutMobile')}</h2>
           {/* Share & Reviews */}
           <div className="col-span-2 flex flex-col items-end gap-2 place-self-end pr-6 md:col-span-1">
             {!seriesId && reviewsCount > 0 && (
@@ -312,7 +312,7 @@ const ConcertDescriptions = async ({
                     schedule.description && (
                       <div
                         key={schedule.id}
-                        className="rounded-lg bg-bgColor-brand900 p-4 shadow-[0_0_15px_rgba(0,0,0,0.3)]"
+                        className="rounded-lg bg-[#D20C36] p-4 shadow-[0_0_15px_rgba(0,0,0,0.3)]"
                       >
                         <div className="mb-2 text-sm font-medium text-white/80">
                           {schedule.startTime} - {schedule.endTime}
