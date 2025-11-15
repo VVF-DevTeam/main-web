@@ -33,21 +33,21 @@ const EventDescriptionSchema = z.object({
     .min(100, { message: 'Description must be at least 100 characters long' }),
 })
 
-function htmlToVisibleText(html: string): string {
-  if (typeof window !== 'undefined') {
-    const div = document.createElement('div')
-    div.innerHTML = html
-    return div.innerText.trim()
-  }
+// function htmlToVisibleText(html: string): string {
+//   if (typeof window !== 'undefined') {
+//     const div = document.createElement('div')
+//     div.innerHTML = html
+//     return div.innerText.trim()
+//   }
 
-  // For server environments (Node.js), you can fall back to a lightweight HTML-to-text library
-  return html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/\n{2,}/g, '\n')
-    .trim()
-}
+//   // For server environments (Node.js), you can fall back to a lightweight HTML-to-text library
+//   return html
+//     .replace(/<br\s*\/?>/gi, '\n')
+//     .replace(/<\/p>/gi, '\n')
+//     .replace(/<[^>]+>/g, '')
+//     .replace(/\n{2,}/g, '\n')
+//     .trim()
+// }
 
 const EventDescription = ({ event }: EventDescriptionProps) => {
   const currentDateTime = getCurrentDateTime()
@@ -67,40 +67,46 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
 
       // update product description
-      const processedText = htmlToVisibleText(values.description)
+      // const processedText = htmlToVisibleText(values.description)
 
-      if (event.stripeProductId) {
-        await axiosInstance.put(`/api/payment/events`, {
-          stripeProductId: event.stripeProductId,
-          description: processedText,
-        })
-      }
+      // if (event.stripeProductId) {
+      //   await axiosInstance.put(`/api/payment/events`, {
+      //     stripeProductId: event.stripeProductId,
+      //     description: processedText,
+      //   })
+      // }
 
       // send a success message
       setEditing(false)
       toast.success('Event description updated successfully', {
         description: (
-          <span style={{ color: "var(--muted-foreground)" }}>
+          <span style={{ color: 'var(--muted-foreground)' }}>
             {currentDateTime}
           </span>
         ),
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast.error('Something went wrong', { 
+      toast.error('Something went wrong', {
         description: (
           <div className="flex flex-col gap-1">
-            <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
-            <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+            <span>
+              {error instanceof Error
+                ? error.message
+                : 'Please try again later'}
+            </span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
           </div>
         ),
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
