@@ -10,7 +10,7 @@ import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { EventTicket, PaymentType } from '@prisma/client'
 
-interface EventNormalCheckOutProps {
+interface EventSingleCheckOutProps {
   formLink?: string
   eventKeyName: string
   userId: string
@@ -19,9 +19,7 @@ interface EventNormalCheckOutProps {
   email: string
   type: string
   seatNumber?: string
-  seatNumbers?: string[] // For multi-seat checkout
   hideCheckoutButtons?: boolean // Hide individual checkout buttons (for cart summary)
-  ticketSeatMap?: Map<string, string[]> // Map of ticketId to seatNumbers for this ticket type
 }
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
@@ -70,7 +68,7 @@ const resolvePaymentType = (
   }
 }
 
-export default function EventNormalCheckOut({
+export default function EventSingleCheckOut({
   formLink,
   eventKeyName,
   userId,
@@ -79,10 +77,8 @@ export default function EventNormalCheckOut({
   email,
   type,
   seatNumber,
-  seatNumbers,
   hideCheckoutButtons = false,
-  ticketSeatMap,
-}: EventNormalCheckOutProps) {
+}: EventSingleCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
   const [isSubscribed, setIsSubscribed] = useState(false)
@@ -225,9 +221,6 @@ export default function EventNormalCheckOut({
               const paymentTypeValue = resolvePaymentType(type, ticket)
               const perSessionPrice = Number(ticket.price) || 0
               const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
-              
-              // Get seat numbers for this specific ticket type
-              const seatsForThisTicket = ticketSeatMap?.get(ticket.id) || seatNumbers || []
 
               return (
                 <div
@@ -260,28 +253,29 @@ export default function EventNormalCheckOut({
                           : totalPrice.toFixed(2)}
                       </span>
                     </div>
-                    {seatsForThisTicket.length > 0 ? (
+                    {/* Display seat information - single seat only */}
+                    {seatNumber ? (
+                      // SINGLE SEAT: Show individual seat number
                       <span className="text-xs text-gray-500 drop-shadow-sm">
-                        Seats: {seatsForThisTicket.join(', ')}
+                        Seat Number: {seatNumber}
                       </span>
-                    ) : !seatNumber ? (
+                    ) : (
+                      // NO SEAT: Show session pricing (for Class events without assigned seats)
                       <>
                         {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
+                          // Full course: Show total sessions and per-session price
                           <span className="text-xs text-gray-500 drop-shadow-sm">
                             Total for {ticket.payTotalNumber} {t('sessions')} -
                             ${perSessionPrice.toFixed(2)} each
                           </span>
                         ) : (
+                          // Drop-in: Show per-session price only
                           <span className="text-xs text-gray-500 drop-shadow-sm">
                             {/* {currencyLabel}  */} $
                             {perSessionPrice.toFixed(2)} per session
                           </span>
                         )}
                       </>
-                    ) : (
-                      <span className="text-xs text-gray-500 drop-shadow-sm">
-                        Seat Number: {seatNumber}
-                      </span>
                     )}
                     {memberPrice !== null && (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
@@ -291,6 +285,7 @@ export default function EventNormalCheckOut({
                     )}
                   </div>
 
+                  {/* Individual checkout button (hidden when using master checkout in cart) */}
                   {!hideCheckoutButtons && (
                     <div className="relative z-10 flex items-center justify-between gap-4">
                       <NormalCheckoutButton
@@ -304,7 +299,6 @@ export default function EventNormalCheckOut({
                         numberSession={ticket.payTotalNumber ?? undefined}
                         email={email}
                         seatNumber={seatNumber}
-                        seatNumbers={seatsForThisTicket}
                         eventTicketId={ticket.id}
                       />
                     </div>

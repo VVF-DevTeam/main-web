@@ -112,5 +112,6 @@
   "clear-all": "Tout effacer",
   "no-ticket-selected": "Aucun billet sélectionné",
   "seat-added-to-cart": "Cette place est déjà dans votre panier. Veuillez vérifier le panier dans la page d'événement.",
-  "remove-from-cart": "Supprimer du panier"
+  "remove-from-cart": "Supprimer du panier",
+  "goToCheckout": "Aller au paiement"
 }

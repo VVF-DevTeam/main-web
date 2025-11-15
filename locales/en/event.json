@@ -112,5 +112,6 @@
   "clear-all": "Clear All",
   "no-ticket-selected": "No ticket selected",
   "seat-added-to-cart": "This seat is already in your cart. Please check cart in the main page.",
-  "remove-from-cart": "Remove from Cart"
+  "remove-from-cart": "Remove from Cart",
+  "goToCheckout": "Go to Checkout"
 }

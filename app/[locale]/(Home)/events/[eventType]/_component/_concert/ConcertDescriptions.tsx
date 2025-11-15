@@ -9,7 +9,13 @@ import Link from 'next/link'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 
 // Components
-import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
+import {
+  CalendarDays,
+  Ticket,
+  Users,
+  MapPin,
+  Clock,
+} from 'lucide-react'
 import { ArrowRight } from 'lucide-react'
 import {
   TooltipProvider,
@@ -21,6 +27,7 @@ import AddReviewButton from '@/components/review/AddReviewButton'
 import ShareButton from '@/components/ui/share-button'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
+import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 // Types
 import { EventSchedule, EventTicket } from '@prisma/client'
@@ -164,106 +171,117 @@ const ConcertDescriptions = async ({
             <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
               {t('headerInfo')}
             </h1>
-            <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[800px] flex-col gap-y-10 overflow-y-auto px-[15px] pt-5 md:px-[20px]">
-              <div className="flex flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
-                {/* Date Row */}
-                <div className="relative p-4">
-                  <div className="flex items-center gap-x-3">
-                    <CalendarDays className="h-5 w-5 shrink-0 text-red-600" />
-                    <span className="text-base">
-                      {event.startDate?.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                      {event.startDate?.getTime() !==
-                        event.endDate?.getTime() && (
-                        <>
-                          {' - '}
-                          {event.endDate?.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </>
-                      )}{' '}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
-                </div>
-
-                {/* Time Row */}
-                <div className="relative p-4">
-                  <div className="flex items-center gap-x-3">
-                    <Clock className="h-5 w-5 shrink-0 text-red-600" />
-                    <span className="text-base">
-                      {event.days
-                        .map((day: string) => {
-                          const translated = t(day.toLowerCase())
-                          return (
-                            translated.charAt(0).toUpperCase() +
-                            translated.slice(1).toLowerCase()
-                          )
-                        })
-                        .join(', ')}{' '}
-                      at {event.startTime} - {event.endTime}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
-                </div>
-
-                {/* Price Row */}
-                <div className="relative p-4">
-                  <div className="flex items-center gap-x-3">
-                    <Ticket className="h-5 w-5 shrink-0 rotate-[135deg] text-red-600" />
-                    <span className="text-base">
-                      {getEventPrices(event.tickets)}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
-                </div>
-
-                {/* Spots Left Row */}
-                <div className="relative p-4">
-                  <div className="flex items-center justify-between gap-x-3">
+            <div className="sticky top-[120px] z-[5] -mt-5 flex flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)] px-[15px] py-5 md:px-[20px]">
+              <div className="flex h-[50vh] min-h-0 flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)]">
+                {/* Info Card */}
+                <div className="flex min-h-0 shrink flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.2)]">
+                  {/* Date Row */}
+                  <div className="relative p-[clamp(0.5rem,1.5vh,1rem)]">
                     <div className="flex items-center gap-x-3">
-                      <Users className="h-5 w-5 shrink-0 text-red-600" />
-                      <span className="text-base">
-                        {event.capacity} {t('spots')}
+                      <CalendarDays className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
+                      <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
+                        {event.startDate?.toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                        {event.startDate?.getTime() !==
+                          event.endDate?.getTime() && (
+                          <>
+                            {' - '}
+                            {event.endDate?.toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </>
+                        )}{' '}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                  </div>
+
+                  {/* Time Row */}
+                  <div className="relative p-[clamp(0.5rem,1.5vh,1rem)]">
+                    <div className="flex items-center gap-x-3">
+                      <Clock className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
+                      <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
+                        {event.days
+                          .map((day: string) => {
+                            const translated = t(day.toLowerCase())
+                            return (
+                              translated.charAt(0).toUpperCase() +
+                              translated.slice(1).toLowerCase()
+                            )
+                          })
+                          .join(', ')}{' '}
+                        at {event.startTime} - {event.endTime}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                  </div>
+
+                  {/* Price Row */}
+                  <div className="relative p-[clamp(0.5rem,1.5vh,1rem)]">
+                    <div className="flex items-center gap-x-3">
+                      <Ticket className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 rotate-[135deg] text-red-600" />
+                      <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
+                        {getEventPrices(event.tickets)}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                  </div>
+
+                  {/* Spots Left Row */}
+                  <div className="relative p-[clamp(0.5rem,1.5vh,1rem)]">
+                    <div className="flex items-center justify-between gap-x-3">
+                      <div className="flex items-center gap-x-3">
+                        <Users className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
+                        <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
+                          {event.capacity} {t('spots')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
+                  </div>
+
+                  {/* Location Row */}
+                  <div className="flex items-start gap-x-3 p-[clamp(0.5rem,1.5vh,1rem)]">
+                    <MapPin className="mt-0.5 h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
+                    <div className="flex flex-col">
+                      <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
+                        {event.location}
                       </span>
                     </div>
                   </div>
-                  <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
                 </div>
 
-                {/* Location Row */}
-                <div className="flex items-start gap-x-3 p-4">
-                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                  <div className="flex flex-col">
-                    <span className="text-base">{event.location}</span>
-                  </div>
+                {/* Map */}
+                <div className="flex min-h-0 flex-1 rounded-2xl ">
+                  <iframe
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
+                    title="Class Location"
+                    className="h-full w-full rounded-2xl"
+                    allowFullScreen
+                  ></iframe>
                 </div>
               </div>
 
-              {/* Map */}
-              <div>
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
-                  title="Class Location"
-                  className="h-[300px] w-full rounded-2xl"
-                  allowFullScreen
-                ></iframe>
-              </div>
+              {/* Go to check out section button */}
+              <ScrollToCheckoutButton text={t('goToCheckout')} />
 
+              {/* Already paid */}
               {existingPayment && existingPayment.length > 0 && (
-                <p className="font-medium text-green-600">{t('alreadyPaid')}</p>
+                <p className="text-[clamp(0.75rem,1.5vh,1rem)] font-medium text-green-600">
+                  {t('alreadyPaid')}
+                </p>
               )}
             </div>
           </div>
         </div>
 
         {/* Payment Options */}
-        <div className="w-full">
+        <div id="checkout-section" className="w-full">
           <PaymentOptions
             formLink={event.formLink!}
             eventKeyName={event.keyName}
@@ -294,7 +312,7 @@ const ConcertDescriptions = async ({
                     schedule.description && (
                       <div
                         key={schedule.id}
-                        className="rounded-lg bg-bgColor-brand900 p-4 shadow-[0_0_15px_rgba(0,0,0,0.1)]"
+                        className="rounded-lg bg-bgColor-brand900 p-4 shadow-[0_0_15px_rgba(0,0,0,0.3)]"
                       >
                         <div className="mb-2 text-sm font-medium text-white/80">
                           {schedule.startTime} - {schedule.endTime}

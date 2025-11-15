@@ -28,18 +28,60 @@ export async function POST(req: Request) {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
     const allSeatNumbers: string[] = []
     const ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> = []
+    
+    // Count total items to determine if discount applies
+    let totalItemCount = 0
+    checkoutItems.forEach((item) => {
+      totalItemCount += item.seatNumbers.length
+    })
+    
+    // Apply 10% discount at price level if more than 3 items (allows users to still enter promotion codes)
+    const shouldApplyDiscount = totalItemCount > 3 && type !== 'Membership'
+    
+    // Cache for discounted prices to avoid creating duplicates
+    const discountedPriceCache = new Map<string, string>()
 
-    checkoutItems.forEach((item: {
-      ticketId: string
-      stripePriceId: string
-      stripeProductId: string
-      seatNumbers: string[]
-      eventTicketId: string
-    }) => {
+    for (const item of checkoutItems) {
+      let priceIdToUse = item.stripePriceId
+      
+      // If discount applies, create or retrieve discounted price
+      if (shouldApplyDiscount) {
+        if (!discountedPriceCache.has(item.stripePriceId)) {
+          try {
+            // Retrieve original price to get amount
+            const originalPrice = await stripe.prices.retrieve(item.stripePriceId)
+            
+            // Calculate 10% discount
+            const originalAmount = originalPrice.unit_amount || 0
+            const discountedAmount = Math.round(originalAmount * 0.85)
+            
+            // Create a discounted price
+            const discountedPrice = await stripe.prices.create({
+              unit_amount: discountedAmount,
+              currency: originalPrice.currency,
+              product: item.stripeProductId,
+              metadata: {
+                originalPriceId: item.stripePriceId,
+                discountType: 'bulk_10_percent',
+              },
+            })
+            
+            discountedPriceCache.set(item.stripePriceId, discountedPrice.id)
+            priceIdToUse = discountedPrice.id
+          } catch (error) {
+            // If price creation fails, use original price
+            console.error('Failed to create discounted price:', error)
+            priceIdToUse = item.stripePriceId
+          }
+        } else {
+          priceIdToUse = discountedPriceCache.get(item.stripePriceId)!
+        }
+      }
+      
       // Create one line item per seat for this ticket type
-      item.seatNumbers.forEach((seatNumber) => {
+      item.seatNumbers.forEach((seatNumber: string) => {
         lineItems.push({
-          price: item.stripePriceId,
+          price: priceIdToUse,
           quantity: 1,
           ...(type === 'Membership'
             ? {}
@@ -56,7 +98,7 @@ export async function POST(req: Request) {
         ticketId: item.eventTicketId,
         seatNumbers: item.seatNumbers,
       })
-    })
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -73,7 +115,6 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership`
           : `${origin}/events/class/${eventKeyName}`,
-      discounts: [],
       allow_promotion_codes: true,
       metadata: {
         userId: userId,

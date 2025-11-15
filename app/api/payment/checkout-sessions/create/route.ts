@@ -18,38 +18,25 @@ export async function POST(req: Request) {
       numberSession,
       email,
       seatNumber,
-      seatNumbers,
       eventTicketId,
     } = await req.json()
 
-    // Handle multiple seats: create one line item per seat
-    const lineItems = seatNumbers && seatNumbers.length > 0
-      ? seatNumbers.map(() => ({
-          price: stripePriceId,
-          quantity: 1,
-          ...(type === 'Membership'
-            ? {}
-            : {
-                adjustable_quantity: {
-                  enabled: false, // Disable for multi-seat to prevent confusion
-                },
-              }),
-        }))
-      : [
-          {
-            price: stripePriceId,
-            quantity: 1,
-            ...(type === 'Membership'
-              ? {}
-              : {
-                  adjustable_quantity: {
-                    enabled: true,
-                    minimum: 1,
-                    maximum: 10,
-                  },
-                }),
-          },
-        ]
+    // Create single line item for one ticket
+    const lineItems = [
+      {
+        price: stripePriceId,
+        quantity: 1,
+        ...(type === 'Membership'
+          ? {}
+          : {
+              adjustable_quantity: {
+                enabled: true,
+                minimum: 1,
+                maximum: 10,
+              },
+            }),
+      },
+    ]
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -66,7 +53,6 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership`
           : `${origin}/events/class/${eventKeyName}`,
-      discounts: [],
       allow_promotion_codes: true,
       metadata: {
         userId: userId,
@@ -76,14 +62,11 @@ export async function POST(req: Request) {
         eventTicketId: eventTicketId || '',
         type: type,
         ...(seatNumber && { seatNumber: seatNumber }),
-        ...(seatNumbers && seatNumbers.length > 0 && { seatNumbers: JSON.stringify(seatNumbers) }),
         description:
           type === 'Membership'
             ? 'Monthly Membership'
             : type === 'Concert'
-              ? seatNumbers && seatNumbers.length > 1
-                ? `Concert Registration for ${eventKeyName} - ${seatNumbers.length} seats`
-                : `Concert Registration for ${eventKeyName}`
+              ? `Concert Registration for ${eventKeyName}`
               : type === 'Class'
                 ? `Class Registration for ${eventKeyName} with (${numberSession} sessions)`
                 : `Ticket Registration for ${eventKeyName} with (${numberSession} sessions)`,
