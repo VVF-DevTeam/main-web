@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import EventNormalCheckOut from './EventNormalCheckOut'
+import EventSingleCheckOut from './EventSingleCheckOut'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { EventTicket } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
@@ -120,21 +120,21 @@ const defaultProps = {
   type: 'Class',
 }
 
-describe('EventNormalCheckOut', () => {
+describe('EventSingleCheckOut', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockCheckSubscription.mockResolvedValue(false)
   })
 
   test('renders loading state initially', () => {
-    render(<EventNormalCheckOut {...defaultProps} />)
+    render(<EventSingleCheckOut {...defaultProps} />)
 
     expect(screen.getByText('Loading...')).toBeInTheDocument()
     expect(screen.getByRole('button')).toBeDisabled()
   })
 
   test('renders ticket list for class events', async () => {
-    render(<EventNormalCheckOut {...defaultProps} />)
+    render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
@@ -158,7 +158,7 @@ describe('EventNormalCheckOut', () => {
   test('uses subscribed pricing when user is subscribed', async () => {
     mockCheckSubscription.mockResolvedValue(true)
 
-    render(<EventNormalCheckOut {...defaultProps} />)
+    render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
@@ -178,7 +178,7 @@ describe('EventNormalCheckOut', () => {
 
   test('renders fallback when no tickets are available', async () => {
     render(
-      <EventNormalCheckOut
+      <EventSingleCheckOut
         {...defaultProps}
         tickets={[]}
       />
@@ -204,7 +204,7 @@ describe('EventNormalCheckOut', () => {
     ]
 
     render(
-      <EventNormalCheckOut
+      <EventSingleCheckOut
         {...defaultProps}
         type="Concert"
         tickets={concertTicket}
@@ -226,7 +226,7 @@ describe('EventNormalCheckOut', () => {
     const user = userEvent.setup()
 
     render(
-      <EventNormalCheckOut
+      <EventSingleCheckOut
         {...defaultProps}
         formLink="https://forms.google.com/test-form"
       />
@@ -250,7 +250,7 @@ describe('EventNormalCheckOut', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     mockCheckSubscription.mockRejectedValue(new Error('Subscription failed'))
 
-    render(<EventNormalCheckOut {...defaultProps} />)
+    render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
@@ -269,7 +269,7 @@ describe('EventNormalCheckOut', () => {
   })
 
   test('membership link points to registration page', async () => {
-    render(<EventNormalCheckOut {...defaultProps} />)
+    render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()

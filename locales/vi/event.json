@@ -112,5 +112,6 @@
   "clear-all": "Xóa tất cả",
   "no-ticket-selected": "Chưa có vé nào được chọn",
   "seat-added-to-cart": "Chỗ này đã được thêm vào giỏ hàng. Vui lòng kiểm tra giỏ hàng trong trang event.",
-  "remove-from-cart": "Xóa khỏi giỏ hàng"
+  "remove-from-cart": "Xóa khỏi giỏ hàng",
+  "goToCheckout": "Đến thanh toán"
 }

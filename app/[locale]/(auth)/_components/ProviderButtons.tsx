@@ -38,7 +38,7 @@ const ProviderButtons = () => {
         <button
           key={id}
           type="button"
-          className="flex-center rounded-xl border-2 border-bgColor-gray300 px-8 py-2 transition-colors duration-200 hover:border-bgColor-gray100 hover:bg-bgColor-gray100 xl:px-10"
+          className="flex-center rounded-xl border-2 border-bgColor-gray300 px-8 py-2 transition-colors duration-200 hover:border-bgColor-gray500 xl:px-10"
           onClick={() => onSubmit(id)}
           aria-label={`Sign in with ${id}`}
         >

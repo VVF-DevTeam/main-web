@@ -97,7 +97,7 @@ const ClassImage = async ({
         <h1 className="web_h1 p-2">{t(title)}</h1>
       </div>
 
-      <div className="flex-between flex items-center">
+      <div className="flex-between flex items-center mb-5">
         {/* Hosted By */}
         <p className="web_h5 pl-2">
           {t('hostedBy')}{' '}
@@ -127,7 +127,9 @@ const ClassImage = async ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="hidden sm:inline">{t('jumpToReviewsSection')}</span>
+              <span className="hidden sm:inline">
+                {t('jumpToReviewsSection')}
+              </span>
               <span className="sm:hidden">{t('jumpToReviews')}</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
