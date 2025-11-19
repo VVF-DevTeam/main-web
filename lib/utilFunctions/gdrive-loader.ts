@@ -46,7 +46,7 @@ export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
     return src
   }
 
-  if (!(allowedHosts.includes(srcUrlHost) && src.includes('?id='))) {
+  if (!(allowedHosts.includes(srcUrlHost) && src.includes('id='))) {
     return src
   }
 
