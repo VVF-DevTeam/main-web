@@ -38,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useTranslation } from 'react-i18next'
 
 const addReviewSchema = z.object({
   eventId: z.string().optional(),
@@ -67,6 +68,8 @@ const AddReviewModal = ({
   setShowAddReviewModal: (show: boolean) => void
   onSubmit: (data: AddReviewFormValues) => void
 }) => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation('post')
   const [imagePreview, setImagePreview] = useState('')
   const [isImageLoading, setIsImageLoading] = useState(false)
 
@@ -123,7 +126,7 @@ const AddReviewModal = ({
       >
         {/* Modal Header */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Add Review</h2>
+          <h2 className="text-2xl font-bold">{t('addReview')}</h2>
           <button
             onClick={() => setShowAddReviewModal(false)}
             className="text-gray-500 hover:text-gray-700"
@@ -308,6 +311,8 @@ interface AddReviewButtonProps {
 }
 
 const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation('post')
   const [showAddReviewModal, setShowAddReviewModal] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const router = useRouter()
@@ -423,7 +428,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
     <>
       {!useIcon ? (
         <Button onClick={openAddReviewModal} disabled={events.length === 0}>
-          Add Review
+          {t('addReview')}
         </Button>
       ) : (
         <TooltipProvider delayDuration={300}>
@@ -446,7 +451,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent className="bg-bgColor-black">
-              <p className="text-sm text-textColor-brand600">Add Review</p>
+              <p className="text-sm text-textColor-brand600">{t('addReview')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

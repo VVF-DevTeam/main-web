@@ -115,7 +115,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
               href="#reviews-section"
               className="inline-flex items-center gap-1 text-sm text-bgColor-brand900 hover:text-bgColor-brandDark900 hover:underline group"
             >
-              <span>Go to Reviews</span>
+              <span>{t('goToReviews')}</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

@@ -38,5 +38,7 @@
   "reviewUpdateError": "Lỗi khi cập nhật đánh giá",
   "averageRating": "Trung bình đánh giá",
   "postHomepageDescription": "Nơi chia sẻ những trải nghiệm thú vị của chúng mình!",
-  "readAllArticles": "Xem Tất Cả Bài Viết"
+  "readAllArticles": "Xem Tất Cả Bài Viết",
+  "goToReviews": "Đến Phần Đánh Giá",
+  "addReview": "Thêm Đánh Giá"
 }

@@ -38,5 +38,7 @@
   "reviewUpdateError": "Erreur lors de la mise à jour de l'avis",
   "averageRating": "Note moyenne",
   "postHomepageDescription": "Lisez nos expériences amusantes !",
-  "readAllArticles": "Lire tous les articles"
+  "readAllArticles": "Lire tous les articles",
+  "goToReviews": "Aller à la section des avis",
+  "addReview": "Ajouter un avis"
 }

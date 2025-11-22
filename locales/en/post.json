@@ -38,5 +38,7 @@
   "reviewUpdateError": "Error updating review",
   "averageRating": "Average Rating",
   "postHomepageDescription": "Read our fun experiences!",
-  "readAllArticles": "Read All Articles"
+  "readAllArticles": "Read All Articles",
+  "goToReviews": "Go to Reviews Section",
+  "addReview": "Add Review"
 }
