@@ -56,7 +56,7 @@
   "Nov": "Novembre",
   "numberSessions": "Nombre de séances",
   "Oct": "Octobre",
-  "payment-membershipIntro": "20% de réduction lorsque vous vous abonnez au",
+  "payment-membershipIntro": "Jusqu'à 20% de réduction lorsque vous vous abonnez au",
   "paymentSuccess-header": "Paiement réussi",
   "paymentSuccess-text": "Vous avez payé avec succès pour l'événement :",
   "paymentSuccess-text2": "Un email avec les détails de votre billet a été envoyé à votre adresse email à :",
@@ -70,9 +70,9 @@
   "Sep": "Septembre",
   "sessions": "séances",
   "slot-event": "emplacements",
-  "subHeaderSchedule": "Peut changer selon l'instructeur",
+  "subHeaderSchedule": "Peut changer selon les organisateurs",
   "sunday": "Dim",
-  "TBD": "À déterminer par les instructeurs",
+  "TBD": "À déterminer par les organisateurs",
   "thursday": "Jeu",
   "time": "Temps",
   "timeHeader": "Temps",
@@ -114,5 +114,7 @@
   "no-ticket-selected": "Aucun billet sélectionné",
   "seat-added-to-cart": "Cette place est déjà dans votre panier. Veuillez vérifier le panier dans la page d'événement.",
   "remove-from-cart": "Supprimer du panier",
-  "goToCheckout": "Aller au paiement"
+  "goToCheckout": "Aller au paiement",
+  "total": "Total",
+  "each": "par séance"
 }

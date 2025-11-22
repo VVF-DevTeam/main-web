@@ -15,15 +15,16 @@ const backButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: // default location is the top left corner of the screen
+        // default location is the top left corner of the screen
+        default:
           'absolute left-1 md:left-3 top-[170px] bg-bgColor-brand900 text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand600 shadow',
         responsive:
           'mt-6 ml-3 top-[170px] bg-bgColor-brand900 text-textColor-white p-3 text-sm font-semibold hover:bg-bgColor-brand600 shadow',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
+        default: 'md:h-9 px-3 md:px-4 py-2 h-8 md:text-sm text-xs',
+        sm: 'md:h-8 h-7 rounded-md px-3 text-xs',
+        lg: 'md:h-10 h-9 rounded-md px-8',
         icon: 'h-9 w-9',
       },
     },
@@ -59,9 +60,9 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
     } else if (parentPath.split('/').at(-1) === 'editEvent') {
       // For Edit Post Page, the flow is from allPosts to editPost
       parentPath = parentPath.replace('editEvent', 'allEvents')
-    } else if (eventType.some(type => parentPath.includes(type))) {
+    } else if (eventType.some((type) => parentPath.includes(type))) {
       // For Event Pages, these pages are bridge pages so we will skip them
-      const matchedType = eventType.find(type => parentPath.includes(type))
+      const matchedType = eventType.find((type) => parentPath.includes(type))
 
       if (matchedType === 'event') {
         if (currentPath?.includes('/event/')) {
@@ -92,6 +93,5 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
   }
 )
 BackButton.displayName = 'BackButton'
-
 
 export default BackButton

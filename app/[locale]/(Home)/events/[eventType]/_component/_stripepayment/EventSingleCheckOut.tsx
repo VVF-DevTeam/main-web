@@ -265,14 +265,14 @@ export default function EventSingleCheckOut({
                         {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
                           // Full course: Show total sessions and per-session price
                           <span className="text-xs text-gray-500 drop-shadow-sm">
-                            Total for {ticket.payTotalNumber} {t('sessions')} -
-                            ${perSessionPrice.toFixed(2)} each
+                            {t('total')} {ticket.payTotalNumber} {t('sessions')} -
+                            ${perSessionPrice.toFixed(2)} {t('each')}
                           </span>
                         ) : (
                           // Drop-in: Show per-session price only
                           <span className="text-xs text-gray-500 drop-shadow-sm">
                             {/* {currencyLabel}  */} $
-                            {perSessionPrice.toFixed(2)} per session
+                            {perSessionPrice.toFixed(2)} {t('each')}
                           </span>
                         )}
                       </>

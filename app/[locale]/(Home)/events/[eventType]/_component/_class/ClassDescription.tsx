@@ -84,7 +84,7 @@ const ClassDescription = async ({
     : null
 
   return (
-    <div className="w-full bg-bgColor-secondary200 py-3">
+    <div className="w-full">
       <div className="mx-auto mt-5 flex max-w-[1280px] flex-col items-start gap-y-8 p-2 md:mt-10 lg:gap-y-8">
         {/* Event Info Section */}
         <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">

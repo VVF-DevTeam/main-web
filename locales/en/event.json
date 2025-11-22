@@ -56,7 +56,7 @@
   "Nov": "November",
   "numberSessions": "Number of Sessions",
   "Oct": "October",
-  "payment-membershipIntro": "20% off when you subscribe to the",
+  "payment-membershipIntro": "Up to 20% off when you subscribe to the",
   "paymentSuccess-header": "Payment Successful",
   "paymentSuccess-text": "You have successfully paid for the event:",
   "paymentSuccess-text2": "An email with your ticket details has been sent to your email address at:",
@@ -70,9 +70,9 @@
   "Sep": "September",
   "sessions": "sessions",
   "slot-event": "slots",
-  "subHeaderSchedule": "May change according to instructor",
+  "subHeaderSchedule": "May change according to organizers",
   "sunday": "Sun",
-  "TBD": "TBD by instructors",
+  "TBD": "TBD by organizers",
   "thursday": "Thu",
   "time": "Time",
   "timeHeader": "Time",
@@ -114,5 +114,7 @@
   "no-ticket-selected": "No ticket selected",
   "seat-added-to-cart": "This seat is already in your cart. Please check cart in the main page.",
   "remove-from-cart": "Remove from Cart",
-  "goToCheckout": "Go to Checkout"
+  "goToCheckout": "Go to Checkout",
+  "total": "Total",
+  "each": "per session"
 }

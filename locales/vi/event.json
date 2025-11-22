@@ -56,7 +56,7 @@
   "Nov": "Tháng 11",
   "numberSessions": "Số buổi",
   "Oct": "Tháng 10",
-  "payment-membershipIntro": "Giảm giá 20% khi bạn đăng ký",
+  "payment-membershipIntro": "Giảm giá lên tới 20% khi bạn đăng ký",
   "paymentSuccess-header": "Thanh toán thành công",
   "paymentSuccess-text": "Bạn đã thanh toán thành công cho event:",
   "paymentSuccess-text2": "Một email với chi tiết vé ngồi đã được gửi đến địa chỉ email của bạn tại:",
@@ -70,9 +70,9 @@
   "Sep": "Tháng 9",
   "sessions": "buổi",
   "slot-event": "chỗ",
-  "subHeaderSchedule": "Có thể thay đổi tùy theo người hướng dẫn",
+  "subHeaderSchedule": "Có thể thay đổi tùy theo ban tổ chức",
   "sunday": "CN",
-  "TBD": "Giảng viên sẽ thông báo sau",
+  "TBD": "Ban tổ chức sẽ thông báo sau",
   "thursday": "T5",
   "time": "Thời gian",
   "timeHeader": "Giờ",
@@ -114,5 +114,7 @@
   "no-ticket-selected": "Chưa có vé nào được chọn",
   "seat-added-to-cart": "Chỗ này đã được thêm vào giỏ hàng. Vui lòng kiểm tra giỏ hàng trong trang event.",
   "remove-from-cart": "Xóa khỏi giỏ hàng",
-  "goToCheckout": "Đến thanh toán"
+  "goToCheckout": "Đến thanh toán",
+  "total": "Tổng",
+  "each": "cho mỗi buổi"
 }

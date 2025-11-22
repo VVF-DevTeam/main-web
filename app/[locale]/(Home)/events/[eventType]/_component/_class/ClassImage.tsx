@@ -39,7 +39,7 @@ const ClassImage = async ({
   const session = await auth()
 
   return (
-    <div className="mx-auto flex max-w-[1280px] flex-col gap-y-10">
+    <div className="mx-auto flex max-w-[1280px] flex-col gap-y-8">
       {/* <div className="grid-all-cols-2 mx-auto flex w-full flex-col p-6 pt-10 md:grid">
         <div className="relative aspect-video w-full basis-1/2 md:h-[35vh] lg:h-[50vh]">
           <Image

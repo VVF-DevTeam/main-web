@@ -111,7 +111,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         </div>
       ) : (
         <div>
-          <div className="width-max-default relative mx-auto pt-[92px]">
+          <div className="width-max-default relative mx-auto pt-[90px] md:pt-[120px]">
             <BackButton variant={'default'} className="top-[30px]" />
             <ClassImage
               eventId={publishedClass.id}
