@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
-
+import moment from 'moment-timezone'
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -44,31 +44,55 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
   const { isValid, isSubmitting } = form.formState
 
   const onSubmit = async (data: z.infer<typeof EventEndDateSchema>) => {
-    // Check if the end Date is after the start date
-    const endDate = new Date(data.endDate).getTime()
-    const startDate = event.startDate
-      ? new Date(event.startDate).getTime()
-      : null
-
-    if (startDate !== null && endDate < startDate) {
-      toast.error('End Date cannot be before the Start Date', {
-        description: (
-          <span style={{ color: 'var(--muted-foreground)' }}>
-            {currentDateTime}
-          </span>
-        ),
-        style: {
-          color: '#ef4444', // red-500 color
-        },
-      })
-      return
-    }
-
-    // Save the end date
     try {
+      // Treat the selected date as midnight in Vancouver timezone (replace timezone, don't convert)
+      const vancouverTimeZone = 'America/Vancouver'
+      const selectedDate = data.endDate
+      
+      // Extract year, month, day from the selected date
+      const year = selectedDate.getFullYear()
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0') // moment expects 1-12
+      const day = String(selectedDate.getDate()).padStart(2, '0')
+      
+      // Create a moment at midnight in Vancouver timezone using the selected date components
+      // Format: YYYY-MM-DD HH:mm:ss
+      const dateString = `${year}-${month}-${day} 12:00:00`
+      const vancouverMidnight = moment.tz(dateString, 'YYYY-MM-DD HH:mm:ss', vancouverTimeZone)
+      
+      // Convert from Vancouver timezone to UTC
+      const vancouverMidnightUTC = vancouverMidnight.utc().toDate()
+      
+      // Check if the end Date is after the start date
+      const endDate = vancouverMidnightUTC.getTime()
+      const startDate = event.startDate
+        ? new Date(event.startDate).getTime()
+        : null
+
+      // If the end Date is before the start Date, show an error
+      if (startDate !== null && endDate < startDate) {
+        toast.error('End Date cannot be before the Start Date', {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#ef4444', // red-500 color
+          },
+        })
+        return
+      }
+
+      // Format the data with the converted date
+      const formattedData = {
+        ...data,
+        endDate: vancouverMidnightUTC,
+      }
+
+      // Save the end date
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
-        data
+        formattedData
       )
       console.log(response)
       toast.success('Event End Date updated successfully', {

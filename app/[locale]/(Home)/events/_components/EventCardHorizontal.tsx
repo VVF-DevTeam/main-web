@@ -4,6 +4,7 @@
 // Libraries
 import initTranslation from '@/app/i18n'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
+import moment from 'moment-timezone'
 
 // Components
 import Image from 'next/image'
@@ -33,6 +34,7 @@ const EventCardHorizontal = async ({
     event.endDate &&
     new Date(event.startDate) <= now &&
     new Date(event.endDate) >= now
+  const startDateVancouver = moment(event.startDate).tz('America/Vancouver')
 
   return (
     <div className="group relative flex h-[165px] w-full flex-col gap-4 rounded-3xl bg-white p-4 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)] md:flex-row md:items-center md:gap-6 md:p-6">
@@ -62,16 +64,9 @@ const EventCardHorizontal = async ({
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 flex-shrink-0 text-bgColor-brand900 md:h-5 md:w-5" />
           <span className="line-clamp-1">
-            {event.startDate?.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}{' '}
+            {startDateVancouver.format('MMM D, YYYY')}{' '}
             at{' '}
-            {event.startDate?.toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {event.startTime}
           </span>
         </div>
 

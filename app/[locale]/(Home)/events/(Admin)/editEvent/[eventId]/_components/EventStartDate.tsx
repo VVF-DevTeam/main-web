@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
-
+import moment from 'moment-timezone'
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -44,9 +44,30 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventStartDateSchema>) => {
     try {
+      // Treat the selected date as midnight in Vancouver timezone (replace timezone, don't convert)
+      const vancouverTimeZone = 'America/Vancouver'
+      const selectedDate = data.startDate
+      
+      // Extract year, month, day from the selected date
+      const year = selectedDate.getFullYear()
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0') // moment expects 1-12
+      const day = String(selectedDate.getDate()).padStart(2, '0')
+      
+      // Create a moment at midnight in Vancouver timezone using the selected date components
+      // Format: YYYY-MM-DD HH:mm:ss
+      const dateString = `${year}-${month}-${day} 00:00:00`
+      const vancouverMidnight = moment.tz(dateString, 'YYYY-MM-DD HH:mm:ss', vancouverTimeZone)
+      // Convert from Vancouver timezone to UTC
+      const vancouverMidnightUTC = vancouverMidnight.utc().toDate()
+      // Format the data with the converted date
+      const formattedData = {
+        ...data,
+        startDate: vancouverMidnightUTC,
+      }
+      
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
-        data
+        formattedData
       )
       toast.success('Event Start Date updated successfully', {
         description: (

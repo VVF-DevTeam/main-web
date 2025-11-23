@@ -11,6 +11,7 @@ import {
   addMonths,
   subMonths,
   isSameDay,
+  startOfDay,
 } from 'date-fns'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react'
@@ -43,9 +44,13 @@ const EventCalendarMonth = ({
   const daysInMonthGrid = eachDayOfInterval({ start, end })
   const today = new Date()
 
-  const formattedMonth = new Intl.DateTimeFormat(locale, {
+  let formattedMonth = new Intl.DateTimeFormat(locale, {
     month: 'long',
   }).format(currentDate)
+
+  formattedMonth =
+    formattedMonth.charAt(0).toUpperCase() +
+    formattedMonth.slice(1).toLowerCase()
 
   return (
     <div className="overflow-x-auto">
@@ -62,7 +67,7 @@ const EventCalendarMonth = ({
         </span>
       </div>
 
-      <div className="bg-bgColor-white grid min-w-[700px] grid-cols-7 border">
+      <div className="grid min-w-[700px] grid-cols-7 border bg-bgColor-white">
         {days.map((day) => (
           <div key={day} className="border py-2 text-center font-semibold">
             {t(day)}
@@ -77,11 +82,16 @@ const EventCalendarMonth = ({
           const dailyEvents = events.filter((e) => {
             const start = e.startDate ? new Date(e.startDate) : null
             const end = e.endDate ? new Date(e.endDate) : null
+            if (!start || !end) return false
+
+            // Normalize dates to compare only day portions (remove time)
+            const normalizedDate = startOfDay(date)
+            const normalizedStart = startOfDay(start)
+            const normalizedEnd = startOfDay(end)
+
             return (
-              start &&
-              end &&
-              date >= start &&
-              date <= end &&
+              normalizedDate >= normalizedStart &&
+              normalizedDate <= normalizedEnd &&
               e.days?.includes(dayText.toUpperCase())
             )
           })
@@ -92,7 +102,7 @@ const EventCalendarMonth = ({
               className={`min-h-[120px] border p-2 text-sm ${
                 isCurrentMonth
                   ? 'bg-bgColor-white'
-                  : 'text-textColor-gray500 bg-bgColor-gray100'
+                  : 'bg-bgColor-gray100 text-textColor-gray500'
               }`}
             >
               <div

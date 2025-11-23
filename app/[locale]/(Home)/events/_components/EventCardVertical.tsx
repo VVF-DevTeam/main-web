@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import initTranslation from '@/app/i18n'
 import Link from 'next/link'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
+import moment from 'moment-timezone'
 // Components
 import Image from 'next/image'
 import { MapPin, Ticket, CalendarDays, CalendarClock } from 'lucide-react'
@@ -31,6 +32,11 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
     event.endDate &&
     new Date(event.startDate) <= now &&
     new Date(event.endDate) >= now
+  const startDateVancouver = moment(event.startDate).tz('America/Vancouver')
+  const endDateVancouver = moment(event.endDate).tz('America/Vancouver')
+  const isSameDate =
+    startDateVancouver.format('YYYY-MM-DD') ===
+    endDateVancouver.format('YYYY-MM-DD')
 
   return (
     <div className="group relative mx-auto flex w-full max-w-[360px] flex-col rounded-2xl bg-slate-50 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:scale-105 hover:bg-slate-100 hover:shadow-[0_0_25px_rgba(0,0,0,0.15)]">
@@ -72,7 +78,10 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           </div>
 
           {/* Title */}
-          <h2 className="mb-4 text-2xl font-[900]" style={{ fontFamily: 'var(--font-lato)' }}>
+          <h2
+            className="mb-4 text-2xl font-[900]"
+            style={{ fontFamily: 'var(--font-lato)' }}
+          >
             {event.title} {hasStartedAndNotEnded && <span>(Started)</span>}
           </h2>
 
@@ -80,17 +89,13 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           <div className="flex items-center gap-x-2">
             <CalendarDays className="h-4 w-4 text-bgColor-brand900 md:h-5 md:w-5" />
             <span className="text-base">
-              {event.startDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}{' '}
-              -{' '}
-              {event.endDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {startDateVancouver.format('MMM D, YYYY')}
+              {!isSameDate && (
+                <>
+                  {' - '}
+                  {endDateVancouver.format('MMM D, YYYY')}
+                </>
+              )}
             </span>
           </div>
 
