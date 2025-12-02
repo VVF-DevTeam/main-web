@@ -133,8 +133,8 @@ function AvailabilitySelector({
           disabled={!canGoPrev}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
             canGoPrev
-              ? 'border-gray-300 text-textColor-gray500 hover:bg-bgColor-gray100'
-              : 'cursor-not-allowed border-gray-200 text-textColor-gray/50'
+              ? 'border-gray-300 text-textColor-black hover:bg-bgColor-gray100'
+              : 'cursor-not-allowed border-gray-200 text-textColor-gray500'
           }`}
         >
           <ArrowLeft className="h-4 w-4" />
@@ -151,8 +151,8 @@ function AvailabilitySelector({
           disabled={!canGoNext}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
             canGoNext
-              ? 'border-gray-300 text-textColor-gray500 hover:bg-bgColor-gray100'
-              : 'cursor-not-allowed border-gray-200 text-textColor-gray/50'
+              ? 'border-gray-300 text-textColor-black hover:bg-bgColor-gray100'
+              : 'cursor-not-allowed border-gray-200 text-textColor-gray500'
           }`}
         >
           {t('host-availability-next')}
