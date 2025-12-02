@@ -23,7 +23,7 @@ const EditorInstructions = () => {
           here
         </a>
         , then get image id and use in this format:
-        "https://drive.google.com/thumbnail?id=xxx". To align image, use these
+        `&quot;`https://drive.google.com/thumbnail?id=xxx`&quot;`. To align image, use these
         buttons:
         <Image
           src="https://drive.google.com/thumbnail?id=1-hAH2TAPRhGeMIayQTgzzinqMHHrlN7E"

@@ -4,7 +4,7 @@ const ImageAddInstruction = () => {
   return (
     <div>
       <p>
-        Only accept images from Google Drive with this format "https://drive.google.com/thumbnail?id=FILE_ID". You can upload them to Google Drive {' '}
+        Only accept images from Google Drive with this format `&quot;`https://drive.google.com/thumbnail?id=FILE_ID`&quot;`. You can upload them to Google Drive {' '}
         <a
           className="text-blue-700 underline"
           href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
