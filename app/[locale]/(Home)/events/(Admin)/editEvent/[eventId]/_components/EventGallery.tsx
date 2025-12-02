@@ -137,7 +137,16 @@ const EventGallery = ({ event }: EventGalleryProps) => {
             https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
             <br/> 
             https://drive.google.com/thumbnail?id=FILE_ID (refer above)
-          </span>
+          </span> <br />
+          Please upload them to Google Drive {' '}
+          <a
+            className="text-blue-700 underline"
+            href="https://drive.google.com/drive/u/3/folders/1ckHqzTIwgdfbOjofRKbmx0vejnoejbW9"
+            target="_blank"
+            rel="noreferrer"
+          >
+            here
+          </a>.
         </div>
         {galleryImages.map((imageUrl, index) => (
           <div key={index} className="flex items-end gap-x-4">

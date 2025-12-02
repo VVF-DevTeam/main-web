@@ -13,9 +13,18 @@ const EditorInstructions = () => {
           alt="add image button"
           className="ml-2 inline-block"
         />
-        , please first upload them to Google Drive, then get image id and use in
-        this format: https://drive.google.com/thumbnail?id=xxx. To align
-        image, use these buttons:
+        , please first upload them to Google Drive {' '}
+        <a
+          className="text-blue-700 underline"
+          href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
+          target="_blank"
+          rel="noreferrer"
+        >
+          here
+        </a>
+        , then get image id and use in this format:
+        "https://drive.google.com/thumbnail?id=xxx". To align image, use these
+        buttons:
         <Image
           src="https://drive.google.com/thumbnail?id=1-hAH2TAPRhGeMIayQTgzzinqMHHrlN7E"
           width="50"
