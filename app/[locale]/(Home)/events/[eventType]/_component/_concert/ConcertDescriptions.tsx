@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db'
 import { Decimal } from '@prisma/client/runtime/library'
 import Link from 'next/link'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
+import moment from 'moment-timezone'
 
 // Components
 import {
@@ -89,6 +90,15 @@ const ConcertDescriptions = async ({
   const session = await auth()
   const author = session?.user?.id!
   const email = session?.user?.email!
+
+  // Convert dates to Vancouver timezone for comparison and display
+  const startDateVancouver = event.startDate
+    ? moment(event.startDate).tz('America/Vancouver')
+    : null
+  const endDateVancouver = moment(event.endDate).tz('America/Vancouver')
+  const isSameDate =
+    startDateVancouver?.format('YYYY-MM-DD') ===
+    endDateVancouver.format('YYYY-MM-DD')
 
   // Check if user has already paid for this event
   const existingPayment = author
@@ -180,20 +190,11 @@ const ConcertDescriptions = async ({
                     <div className="flex items-center gap-x-3">
                       <CalendarDays className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
                       <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
-                        {event.startDate?.toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                        {event.startDate?.getTime() !==
-                          event.endDate?.getTime() && (
+                        {startDateVancouver?.format('MMM D, YYYY')}
+                        {!isSameDate && (
                           <>
                             {' - '}
-                            {event.endDate?.toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
+                            {endDateVancouver.format('MMM D, YYYY')}
                           </>
                         )}{' '}
                       </span>
