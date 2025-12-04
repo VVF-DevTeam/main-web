@@ -10,7 +10,7 @@ import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 
 // Interfaces & Types
-import { EventSchedule, EventTicket } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import Image from 'next/image'
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
@@ -36,6 +36,7 @@ interface ClassDescriptionProps {
   shouldShowGallery?: boolean
   imageUrls: string[]
   tickets: EventTicket[]
+  sponsors: EventSponsor[]
 }
 
 const typeMap = {
@@ -66,6 +67,7 @@ const ClassDescription = async ({
   shouldShowGallery = true,
   imageUrls,
   tickets,
+  sponsors,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -116,7 +118,7 @@ const ClassDescription = async ({
             <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
               {t('headerInfo')}
             </h1>
-            <div className="sticky top-[120px] z-[5] -mt-5 flex flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)] max-h-[80vh] px-[15px] py-5 md:px-[20px] overflow-y-auto">
+            <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[80vh] flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)] overflow-y-auto px-[15px] py-5 md:px-[20px]">
               <div className="flex h-[50vh] shrink-0 flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)]">
                 {/* Info Card */}
                 <div className="flex shrink-0 flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.3)]">
@@ -233,8 +235,33 @@ const ClassDescription = async ({
           </div>
         </div>
 
-        {/* Schedule */}
+        {/* Sponsors */}
         <div className="min-w-full">
+          <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+            {t('headerSponsors')}
+          </h1>
+          <div className="flex w-full gap-x-4 pt-4">
+            {sponsors.map((sponsor) => (
+              <div
+                key={sponsor.id}
+                className="flex w-[200px] flex-col items-center justify-center gap-y-2"
+              >
+                <Image
+                  src={sponsor.imgUrl}
+                  alt={sponsor.name}
+                  width={150}
+                  height={150}
+                />
+                {sponsor.displayName && (
+                  <span className="text-sm font-medium">{sponsor.name}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Schedule */}
+        <div className="mt-4 min-w-full">
           <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
             {t('headerSchedule')}
           </h1>
@@ -262,7 +289,7 @@ const ClassDescription = async ({
 
         {/* Gallery Carousel at the bottom */}
         {shouldShowGallery && (
-          <div className="my-8">
+          <div className="mb-8 mt-4">
             <EventGalleryCarousel imageUrls={imageUrls} />
           </div>
         )}

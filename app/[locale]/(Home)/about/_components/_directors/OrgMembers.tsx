@@ -44,15 +44,15 @@ const directors = [
     name: 'Khai Hung Luong',
     title: 'CTO',
   },
-  {
-    id: 5,
-    description: 'description-LunaNguyen',
-    bio: 'bio-LunaNguyen',
-    imageUrl:
-      'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn',
-    name: 'Luna Nguyen',
-    title: 'CHRO',
-  },
+  // {
+  //   id: 5,
+  //   description: 'description-LunaNguyen',
+  //   bio: 'bio-LunaNguyen',
+  //   imageUrl:
+  //     'https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn',
+  //   name: 'Luna Nguyen',
+  //   title: 'CHRO',
+  // },
 ]
 
 const honoraryMembers = [
@@ -63,7 +63,7 @@ const honoraryMembers = [
     imageUrl:
       'https://drive.google.com/thumbnail?id=1sx23QaUry-Ed6yJ-whOrOKd4H3_rb0MJ',
     name: 'Andy Nguyen',
-    title: 'Supervisor',
+    title: 'Supervisor/Patron',
   },
 ]
 
@@ -94,7 +94,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
       {/* Honorary Members */}
       <div className="flex-center px-6 py-14">
-        <h1 className="header-sub header-font-default mb-10 text-3xl italic text-textColor-brandDark900 lg:text-5xl">
+        <h1 className="header-sub header-font-default text-3xl italic text-textColor-brandDark900 lg:text-5xl">
           {t('header-honorableMention-aboutUs')}
           <Separator className="mt-2 bg-bgColor-brandDark900" />
         </h1>
@@ -116,13 +116,15 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
         </p>
 
         <p>
-          Minh Tue Nguyen (Co-founder), Khue Le (Co-founder), Jayant Puri, Elena
-          Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi Dat, Tran Quyet Tien,
-          Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan, Phu Loc, Thanh Hang
-          Nguyen, Thao Pham, Le Duc Hieu, Duc Anh Do, Thi Phuong Thao Nguyen,
-          Pham Bao Tran, Nguyen Ngoc Thuy Nguyen, Pham Gia Tri, Dao Gia An, Van
-          Le, Tang Phuong Minh, Luong Quoc Trung, Doan Thu Tra, Vinh Bao Phu,
-          Bui Gia Khanh.
+          Julia Nguyen (Project Manager), Luna Nguyen (Former CHRO), Minh Tue
+          Nguyen (Co-founder), Khue Le (Co-founder), Sally Nam (Designer Lead),
+          Jayant Puri, Elena Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi
+          Dat, Tran Quyet Tien, Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan,
+          Phu Loc, Thanh Hang Nguyen, Thao Pham, Le Duc Hieu, Duc Anh Do, Thi
+          Phuong Thao Nguyen, Pham Bao Tran, Nguyen Ngoc Thuy Nguyen, Pham Gia
+          Tri, Dao Gia An, Van Le, Tang Phuong Minh, Luong Quoc Trung, Doan Thu
+          Tra, Vinh Bao Phu, Bui Gia Khanh, Bill V, Felix Nguyen, Jerry Diep,
+          Loc Pham, Nguyen Tran Le Phan, Tony Huynh.
         </p>
       </div>
     </div>

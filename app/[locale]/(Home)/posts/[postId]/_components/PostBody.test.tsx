@@ -12,6 +12,7 @@ vi.mock('next/image', () => {
         ? props.src
         : (props.src as StaticImageData).src
 
+    {/* eslint-disable-next-line @next/next/no-img-element */}
     return <img data-testid="post-image" alt={props.alt} src={src} />
   }
 

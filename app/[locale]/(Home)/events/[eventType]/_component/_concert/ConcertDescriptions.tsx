@@ -10,13 +10,7 @@ import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 import moment from 'moment-timezone'
 
 // Components
-import {
-  CalendarDays,
-  Ticket,
-  Users,
-  MapPin,
-  Clock,
-} from 'lucide-react'
+import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
 import { ArrowRight } from 'lucide-react'
 import {
   TooltipProvider,
@@ -31,8 +25,9 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 // Types
-import { EventSchedule, EventTicket } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+import Image from 'next/image'
 
 type EventWithRelations = {
   id: string
@@ -58,6 +53,7 @@ type EventWithRelations = {
   imgUrls: string[]
   days: string[]
   tickets: EventTicket[]
+  sponsors: EventSponsor[]
 }
 
 interface ConcertDescriptionsProps {
@@ -258,7 +254,7 @@ const ConcertDescriptions = async ({
                 </div>
 
                 {/* Map */}
-                <div className="flex min-h-0 flex-1 rounded-2xl ">
+                <div className="flex min-h-0 flex-1 rounded-2xl">
                   <iframe
                     src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${event.location}`}
                     title="Class Location"
@@ -295,6 +291,31 @@ const ConcertDescriptions = async ({
             seatingMap={seatingMap}
             tickets={event.tickets}
           />
+        </div>
+
+        {/* Sponsors */}
+        <div className="min-w-full py-2">
+          <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
+            {t('headerSponsors')}
+          </h1>
+          <div className="flex w-full gap-x-4 pt-4">
+            {event.sponsors.map((sponsor) => (
+              <div
+                key={sponsor.id}
+                className="flex w-[200px] flex-col items-center justify-center gap-y-2"
+              >
+                <Image
+                  src={sponsor.imgUrl}
+                  alt={sponsor.name}
+                  width={150}
+                  height={150}
+                />
+                {sponsor.displayName && (
+                  <span className="text-sm font-medium">{sponsor.name}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Schedule Section */}

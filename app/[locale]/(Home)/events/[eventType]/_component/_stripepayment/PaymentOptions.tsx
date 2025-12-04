@@ -103,11 +103,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     }
   }, [loggedIn])
 
-  const generateSeatName = (rowIndex: number, colIndex: number) => {
+  const generateSeatName = useCallback((rowIndex: number, colIndex: number) => {
     const rowName = String.fromCharCode(65 + rowIndex) // A, B, C, ...
     const colName = String(colIndex + 1)
     return `${rowName}${colName}`
-  }
+  }, [])
 
   const getTicketColor = (ticketId: string, ticketType: string): string => {
     const combined = `${ticketId}-${ticketType}`
@@ -158,12 +158,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     return `${seatName} - Empty seat`
   }
 
-  const getSeatName = (seat: SeatValue, rowIndex: number, colIndex: number) => {
+  const getSeatName = useCallback((seat: SeatValue, rowIndex: number, colIndex: number) => {
     if (seat.name) {
       return seat.name
     }
     return generateSeatName(rowIndex, colIndex)
-  }
+  }, [generateSeatName])
 
   const handleSeatClick = useCallback(
     (seat: SeatValue, rowIndex: number, seatIndex: number) => {

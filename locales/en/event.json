@@ -116,5 +116,6 @@
   "remove-from-cart": "Remove from Cart",
   "goToCheckout": "Go to Checkout",
   "total": "Total",
-  "each": "per session"
+  "each": "per session",
+  "headerSponsors": "Sponsored By"
 }
