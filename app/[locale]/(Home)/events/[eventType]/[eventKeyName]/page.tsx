@@ -77,6 +77,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         },
       },
       tickets: true,
+      sponsors: true,
     },
   })
 
@@ -148,6 +149,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             shouldShowGallery={shouldShowGallery as boolean}
             imageUrls={publishedClass.imgUrls as string[]}
             tickets={publishedClass.tickets}
+            sponsors={publishedClass.sponsors}
           />
         </div>
       )}

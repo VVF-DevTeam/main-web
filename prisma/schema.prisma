@@ -48,6 +48,7 @@ model Event {
   subImgUrls         Json?
   imgUrls            Json?
   seriesId           String?
+  sponsors           EventSponsor[]  @relation("EventToSponsor")
   series             EventSeries?    @relation(fields: [seriesId], references: [id])
   schedules          EventSchedule[]
   tickets            EventTicket[]
@@ -56,9 +57,19 @@ model Event {
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
   seatingMap         Json?
+  eventHosts         Json?
 
   @@unique([title, eventType])
   @@index([id])
+}
+
+model EventSponsor {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  displayName Boolean   @default(false)
+  imgUrl      String    
+  description String?
+  event       Event[]   @relation("EventToSponsor")
 }
 
 model EventSeries {

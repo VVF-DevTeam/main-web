@@ -320,6 +320,23 @@ const EditEventPage = async ({
             </h2>
             <EventSeating event={event} />
           </div>
+          {/* Event Sponsors */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XX :</span> Event Sponsors
+              (Optional)
+            </h2>
+            <p>
+              Please use this link to manage sponsors: {' '}
+              <a
+                href="/events/manageSponsors"
+                target="_blank"
+                className="text-textColor-blue underline"
+              >
+                here
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

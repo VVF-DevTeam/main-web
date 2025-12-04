@@ -30,6 +30,8 @@ const MembershipPage = async ({
           </Link>{' '}
           {t('becomehost-notLogin3')}
         </p>
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://drive.google.com/thumbnail?id=19tM0WbHYTAMlN_y8MkpYs8ZxoXUMAZYD"
           alt="Not Found"

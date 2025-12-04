@@ -116,5 +116,6 @@
   "remove-from-cart": "Supprimer du panier",
   "goToCheckout": "Aller au paiement",
   "total": "Total",
-  "each": "par séance"
+  "each": "par séance",
+  "headerSponsors": "Soutenu par"
 }

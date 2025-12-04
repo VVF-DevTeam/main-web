@@ -278,6 +278,7 @@ const EmailTemplatePaymentConfirmation = ({
                       textDecoration: 'none',
                     }}
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={ticketImageUrl}
                       alt={`${ticketType} ticket`}
