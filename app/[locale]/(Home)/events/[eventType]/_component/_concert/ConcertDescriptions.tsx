@@ -26,8 +26,14 @@ import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import SponsorsList from '../../../_components/SponsorsList'
 // Types
-import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+
+type SponsorOnEvent = {
+  tier: SponsorTier
+  order: number | null
+  sponsor: EventSponsor
+}
 
 type EventWithRelations = {
   id: string
@@ -53,7 +59,7 @@ type EventWithRelations = {
   imgUrls: string[]
   days: string[]
   tickets: EventTicket[]
-  sponsors: EventSponsor[]
+  sponsors: SponsorOnEvent[]
 }
 
 interface ConcertDescriptionsProps {

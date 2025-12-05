@@ -48,7 +48,7 @@ model Event {
   subImgUrls         Json?
   imgUrls            Json?
   seriesId           String?
-  sponsors           EventSponsor[]  @relation("EventToSponsor")
+  sponsors           SponsorOnEvent[]
   series             EventSeries?    @relation(fields: [seriesId], references: [id])
   schedules          EventSchedule[]
   tickets            EventTicket[]
@@ -64,13 +64,28 @@ model Event {
 }
 
 model EventSponsor {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  displayName Boolean   @default(false)
+  id          String             @id @default(cuid())
+  name        String             @unique
+  displayName Boolean            @default(false)
   imgUrl      String
   url         String?    
   description String?
-  event       Event[]   @relation("EventToSponsor")
+  events      SponsorOnEvent[]
+}
+
+model SponsorOnEvent {
+  id        String       @id @default(cuid())
+  eventId   String
+  sponsorId String
+  tier      SponsorTier  @default(Bronze)
+  order     Int?         // Optional: for custom ordering within each tier
+  createdAt DateTime     @default(now())
+  event     Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sponsor   EventSponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, sponsorId])
+  @@index([eventId])
+  @@index([sponsorId])
 }
 
 model EventSeries {
@@ -356,4 +371,11 @@ enum ReviewRating {
   Three @map("3")
   Four  @map("4")
   Five  @map("5")
+}
+
+enum SponsorTier {
+  Platinum
+  Gold
+  Silver
+  Bronze
 }

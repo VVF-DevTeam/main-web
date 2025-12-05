@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { SponsorTier } from '@prisma/client'
 
 export const PUT = async (
   request: Request,
@@ -12,14 +13,14 @@ export const PUT = async (
 
     const existingSponsor = await prisma.eventSponsor.findUnique({
       where: { id: sponsorId },
-      include: { event: true },
+      include: { events: true },
     })
 
     if (!existingSponsor) {
       return new NextResponse('Sponsor not found', { status: 404 })
     }
 
-    // First, disconnect all existing events
+    // Delete all existing SponsorOnEvent relations and create new ones
     const updated = await prisma.eventSponsor.update({
       where: { id: sponsorId },
       data: {
@@ -28,8 +29,13 @@ export const PUT = async (
         description: values.description,
         displayName: values.displayName,
         url: values.url,
-        event: {
-          set: values.eventIds.map((id: string) => ({ id })),
+        events: {
+          deleteMany: {},
+          create: values.events.map((event: { eventId: string; tier: SponsorTier; order: number }) => ({
+            eventId: event.eventId,
+            tier: event.tier,
+            order: event.order,
+          })),
         },
       },
     })

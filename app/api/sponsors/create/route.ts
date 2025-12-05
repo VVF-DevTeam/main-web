@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { SponsorTier } from '@prisma/client'
 
 export const POST = async (request: Request) => {
   try {
@@ -13,8 +14,12 @@ export const POST = async (request: Request) => {
         description: values.description,
         displayName: values.displayName,
         url: values.url,
-        event: {
-          connect: values.eventIds.map((id: string) => ({ id })),
+        events: {
+          create: values.events.map((event: { eventId: string; tier: SponsorTier; order: number }) => ({
+            eventId: event.eventId,
+            tier: event.tier,
+            order: event.order,
+          })),
         },
       },
     })
