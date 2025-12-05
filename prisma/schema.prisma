@@ -67,7 +67,8 @@ model EventSponsor {
   id          String    @id @default(cuid())
   name        String    @unique
   displayName Boolean   @default(false)
-  imgUrl      String    
+  imgUrl      String
+  url         String?    
   description String?
   event       Event[]   @relation("EventToSponsor")
 }

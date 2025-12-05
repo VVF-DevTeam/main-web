@@ -8,6 +8,7 @@ import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 import ClassScheduleItem from './ClassScheduleItem'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
+import SponsorsList from '../../../_components/SponsorsList'
 
 // Interfaces & Types
 import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
@@ -236,29 +237,7 @@ const ClassDescription = async ({
         </div>
 
         {/* Sponsors */}
-        <div className="min-w-full">
-          <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerSponsors')}
-          </h1>
-          <div className="flex w-full gap-x-4 pt-4">
-            {sponsors.map((sponsor) => (
-              <div
-                key={sponsor.id}
-                className="flex w-[200px] flex-col items-center justify-center gap-y-2"
-              >
-                <Image
-                  src={sponsor.imgUrl}
-                  alt={sponsor.name}
-                  width={150}
-                  height={150}
-                />
-                {sponsor.displayName && (
-                  <span className="text-sm font-medium">{sponsor.name}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <SponsorsList sponsors={sponsors} headerText={t('headerSponsors')} />
 
         {/* Schedule */}
         <div className="mt-4 min-w-full">

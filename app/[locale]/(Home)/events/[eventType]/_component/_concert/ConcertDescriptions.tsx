@@ -24,10 +24,10 @@ import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
+import SponsorsList from '../../../_components/SponsorsList'
 // Types
 import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
-import Image from 'next/image'
 
 type EventWithRelations = {
   id: string
@@ -294,29 +294,7 @@ const ConcertDescriptions = async ({
         </div>
 
         {/* Sponsors */}
-        <div className="min-w-full py-2">
-          <h1 className="mb-4 text-xl font-bold md:text-3xl lg:text-4xl">
-            {t('headerSponsors')}
-          </h1>
-          <div className="flex w-full gap-x-4 pt-4">
-            {event.sponsors.map((sponsor) => (
-              <div
-                key={sponsor.id}
-                className="flex w-[200px] flex-col items-center justify-center gap-y-2"
-              >
-                <Image
-                  src={sponsor.imgUrl}
-                  alt={sponsor.name}
-                  width={150}
-                  height={150}
-                />
-                {sponsor.displayName && (
-                  <span className="text-sm font-medium">{sponsor.name}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <SponsorsList sponsors={event.sponsors} headerText={t('headerSponsors')} />
 
         {/* Schedule Section */}
         {event.schedules && event.schedules.length > 0 && (

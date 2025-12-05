@@ -36,6 +36,7 @@ const SponsorsManager = ({
   const [displayName, setDisplayName] = useState(false)
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [url, setUrl] = useState('')
   const currentDateTime = getCurrentDateTime()
 
   const resetForm = () => {
@@ -45,12 +46,14 @@ const SponsorsManager = ({
     setDescription('')
     setDisplayName(false)
     setSelectedEventIds([])
+    setUrl('')
   }
 
   const handleEditClick = (sponsor: SponsorWithEvents) => {
     setEditingSponsor(sponsor)
     setName(sponsor.name)
     setImgUrl(sponsor.imgUrl)
+    setUrl(sponsor.url ?? '')
     setDescription(sponsor.description ?? '')
     setDisplayName(sponsor.displayName)
     setSelectedEventIds(sponsor.event.map((e) => e.id))
@@ -80,6 +83,7 @@ const SponsorsManager = ({
     const payload = {
       name,
       imgUrl,
+      url: url || null,
       description: description || null,
       displayName,
       eventIds: selectedEventIds,
@@ -197,7 +201,7 @@ const SponsorsManager = ({
               {sponsors.map((sponsor) => (
                 <Card
                   key={sponsor.id}
-                  className="cursor-pointer p-4 transition-shadow hover:shadow-md"
+                  className={`cursor-pointer p-4 transition-shadow hover:shadow-md ${sponsor.name === editingSponsor?.name ? 'bg-bgColor-secondary200' : ''}`}
                   onClick={() => handleEditClick(sponsor)}
                 >
                   <div className="flex items-start gap-3">
@@ -309,7 +313,16 @@ const SponsorsManager = ({
               <label className="mb-1 block text-sm font-medium">
                 Image Link <span className="text-red-500">*</span>
                 <p>
-                  (upload image to Google Drive and use format below, check{' '}
+                  (upload image to{' '}
+                  <a
+                    className="text-blue-700 underline"
+                    href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Google Drive
+                  </a>{' '}
+                  and use format below, check{' '}
                   <a
                     className="text-blue-700 underline"
                     href="https://github.com/Viet-Vibe-Foundation/main-web/wiki/Media-Editors-Content-Creators-Ultimate-Guide#b-post-important-tips"
@@ -346,6 +359,23 @@ const SponsorsManager = ({
               )}
             </div>
 
+            {/* Sponsor URL */}
+            <div>
+              <label
+                htmlFor="sponsorUrl"
+                className="mb-1 block text-sm font-medium"
+              >
+                URL (optional)
+              </label>
+              <Input
+                id="sponsorUrl"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://www.example.com"
+              />
+            </div>
+
+            {/* Sponsor Description */}
             <div>
               <label
                 htmlFor="sponsorDescription"
@@ -362,6 +392,7 @@ const SponsorsManager = ({
               />
             </div>
 
+            {/* Associated Events */}
             <div>
               <div className="mb-2 block text-sm font-medium">
                 Associated Events <span className="text-red-500">*</span>
@@ -402,6 +433,7 @@ const SponsorsManager = ({
               )}
             </div>
 
+            {/* Submit Button */}
             <div className="flex items-center justify-between pt-2">
               <Button
                 type="button"

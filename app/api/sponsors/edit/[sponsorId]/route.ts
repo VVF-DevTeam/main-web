@@ -27,6 +27,7 @@ export const PUT = async (
         imgUrl: values.imgUrl,
         description: values.description,
         displayName: values.displayName,
+        url: values.url,
         event: {
           set: values.eventIds.map((id: string) => ({ id })),
         },

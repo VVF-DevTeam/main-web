@@ -12,6 +12,7 @@ export const POST = async (request: Request) => {
         imgUrl: values.imgUrl,
         description: values.description,
         displayName: values.displayName,
+        url: values.url,
         event: {
           connect: values.eventIds.map((id: string) => ({ id })),
         },
