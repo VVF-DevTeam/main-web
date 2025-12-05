@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Event, EventSponsor } from '@prisma/client'
+import { Event, EventSponsor, SponsorTier } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus, Edit, X } from 'lucide-react'
@@ -14,8 +14,25 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Image from 'next/image'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
-type SponsorWithEvents = EventSponsor & { event: Event[] }
+type SponsorOnEvent = {
+  eventId: string
+  tier: SponsorTier
+  order: number | null
+  event: {
+    id: string
+    title: string
+  }
+}
+
+type SponsorWithEvents = EventSponsor & { events: SponsorOnEvent[] }
 
 interface SponsorsManagerProps {
   sponsors: SponsorWithEvents[]
@@ -34,7 +51,9 @@ const SponsorsManager = ({
   const [imgUrl, setImgUrl] = useState('')
   const [description, setDescription] = useState('')
   const [displayName, setDisplayName] = useState(false)
-  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
+  const [selectedEventTiers, setSelectedEventTiers] = useState<
+    Record<string, { tier: SponsorTier; order: number }>
+  >({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [url, setUrl] = useState('')
   const currentDateTime = getCurrentDateTime()
@@ -45,7 +64,7 @@ const SponsorsManager = ({
     setImgUrl('')
     setDescription('')
     setDisplayName(false)
-    setSelectedEventIds([])
+    setSelectedEventTiers({})
     setUrl('')
   }
 
@@ -56,15 +75,56 @@ const SponsorsManager = ({
     setUrl(sponsor.url ?? '')
     setDescription(sponsor.description ?? '')
     setDisplayName(sponsor.displayName)
-    setSelectedEventIds(sponsor.event.map((e) => e.id))
+
+    // Build the selectedEventTiers object from sponsor.events
+    const eventTiers: Record<string, { tier: SponsorTier; order: number }> = {}
+    sponsor.events.forEach((sponsorEvent) => {
+      eventTiers[sponsorEvent.eventId] = {
+        tier: sponsorEvent.tier,
+        order: sponsorEvent.order ?? 0,
+      }
+    })
+    setSelectedEventTiers(eventTiers)
   }
 
   const toggleEventSelection = (eventId: string) => {
-    setSelectedEventIds((prev) =>
-      prev.includes(eventId)
-        ? prev.filter((id) => id !== eventId)
-        : [...prev, eventId]
-    )
+    setSelectedEventTiers((prev) => {
+      if (prev[eventId]) {
+        // Unselect the event
+        const newState = { ...prev }
+        delete newState[eventId]
+        return newState
+      } else {
+        // Select the event with default tier
+        return {
+          ...prev,
+          [eventId]: {
+            tier: 'Bronze' as SponsorTier,
+            order: 0,
+          },
+        }
+      }
+    })
+  }
+
+  const updateEventTier = (eventId: string, tier: SponsorTier) => {
+    setSelectedEventTiers((prev) => ({
+      ...prev,
+      [eventId]: {
+        ...prev[eventId],
+        tier,
+      },
+    }))
+  }
+
+  const updateEventOrder = (eventId: string, order: number) => {
+    setSelectedEventTiers((prev) => ({
+      ...prev,
+      [eventId]: {
+        ...prev[eventId],
+        order,
+      },
+    }))
   }
 
   const handleSubmit = async () => {
@@ -73,7 +133,9 @@ const SponsorsManager = ({
       return
     }
 
-    if (selectedEventIds.length === 0) {
+    const selectedEvents = Object.entries(selectedEventTiers)
+
+    if (selectedEvents.length === 0) {
       toast.error('Please select at least one event')
       return
     }
@@ -86,7 +148,11 @@ const SponsorsManager = ({
       url: url || null,
       description: description || null,
       displayName,
-      eventIds: selectedEventIds,
+      events: selectedEvents.map(([eventId, data]) => ({
+        eventId,
+        tier: data.tier,
+        order: data.order,
+      })),
     }
 
     try {
@@ -224,17 +290,17 @@ const SponsorsManager = ({
                         </p>
                       )}
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {sponsor.event.length > 0 ? (
+                        {sponsor.events && sponsor.events.length > 0 ? (
                           <>
-                            {sponsor.event.slice(0, 4).map((event) => (
+                            {sponsor.events.slice(0, 4).map((sponsorEvent) => (
                               <span
-                                key={event.id}
+                                key={sponsorEvent.eventId}
                                 className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700"
                               >
-                                {event.title}
+                                {sponsorEvent.event.title} ({sponsorEvent.tier})
                               </span>
                             ))}
-                            {sponsor.event.length > 4 && (
+                            {sponsor.events.length > 4 && (
                               <span className="px-2 py-0.5 text-xs text-muted-foreground">
                                 ...
                               </span>
@@ -399,28 +465,82 @@ const SponsorsManager = ({
               </div>
               {allEvents && allEvents.length > 0 ? (
                 <>
-                  <div className="max-h-[300px] space-y-2 overflow-y-auto rounded-md border p-3">
+                  <div className="max-h-[300px] space-y-3 overflow-y-auto rounded-md border p-3">
                     {allEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <Checkbox
-                          id={event.id}
-                          checked={selectedEventIds.includes(event.id)}
-                          onCheckedChange={() => toggleEventSelection(event.id)}
-                        />
-                        <label
-                          htmlFor={event.id}
-                          className="cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {event.title}
-                        </label>
+                      <div key={event.id} className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id={event.id}
+                            checked={!!selectedEventTiers[event.id]}
+                            onCheckedChange={() =>
+                              toggleEventSelection(event.id)
+                            }
+                          />
+                          <label
+                            htmlFor={event.id}
+                            className="flex-1 cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {event.title}
+                          </label>
+                        </div>
+                        {selectedEventTiers[event.id] && (
+                          <div className="ml-6 flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-medium text-muted-foreground">
+                                Tier:
+                              </label>
+                              <Select
+                                value={selectedEventTiers[event.id].tier}
+                                onValueChange={(value) =>
+                                  updateEventTier(
+                                    event.id,
+                                    value as SponsorTier
+                                  )
+                                }
+                              >
+                                <SelectTrigger className="h-8 w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Platinum">
+                                    Platinum
+                                  </SelectItem>
+                                  <SelectItem value="Gold">Gold</SelectItem>
+                                  <SelectItem value="Silver">Silver</SelectItem>
+                                  <SelectItem value="Bronze">Bronze</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-medium text-muted-foreground">
+                                Order:
+                              </label>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={selectedEventTiers[event.id].order}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value)
+                                  if (!isNaN(value) && value >= 0) {
+                                    updateEventOrder(event.id, value)
+                                  } else if (e.target.value === '') {
+                                    updateEventOrder(event.id, 0)
+                                  }
+                                }}
+                                className="h-8 w-20"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Select which events this sponsor is associated with
+                    Select which events this sponsor is associated with and
+                    choose their tier and display order (lower numbers appear
+                    first)
                   </p>
                 </>
               ) : (
@@ -450,7 +570,7 @@ const SponsorsManager = ({
                   isSubmitting ||
                   !name ||
                   !imgUrl ||
-                  selectedEventIds.length === 0 ||
+                  Object.keys(selectedEventTiers).length === 0 ||
                   allEvents.length === 0
                 }
               >

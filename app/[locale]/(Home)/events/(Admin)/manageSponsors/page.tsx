@@ -20,7 +20,19 @@ const ManageSponsorsPage = async () => {
       name: 'asc',
     },
     include: {
-      event: true,
+      events: {
+        include: {
+          event: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+        orderBy: {
+          tier: 'asc',
+        },
+      },
     },
   }).catch(() => [])
 

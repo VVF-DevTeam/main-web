@@ -77,7 +77,15 @@ const ClassPage = async ({ params }: ClassPageProps) => {
         },
       },
       tickets: true,
-      sponsors: true,
+      sponsors: {
+        include: {
+          sponsor: true,
+        },
+        orderBy: [
+          { tier: 'asc' },
+          { order: 'asc' },
+        ],
+      },
     },
   })
 

@@ -11,10 +11,17 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 import SponsorsList from '../../../_components/SponsorsList'
 
 // Interfaces & Types
-import { EventSchedule, EventTicket, EventSponsor } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import Image from 'next/image'
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
+
+type SponsorOnEvent = {
+  tier: SponsorTier
+  order: number | null
+  sponsor: EventSponsor
+}
+
 interface ClassDescriptionProps {
   description: string
   imageUrl: string
@@ -37,7 +44,7 @@ interface ClassDescriptionProps {
   shouldShowGallery?: boolean
   imageUrls: string[]
   tickets: EventTicket[]
-  sponsors: EventSponsor[]
+  sponsors: SponsorOnEvent[]
 }
 
 const typeMap = {
