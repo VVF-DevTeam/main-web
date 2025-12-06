@@ -1,11 +1,65 @@
+import { NextResponse, type NextRequest, type NextFetchEvent } from 'next/server'
+import { i18nRouter } from 'next-i18n-router'
+import i18nConfig from './i18nConfig'
 import NextAuth from 'next-auth'
 import authConfig from './auth.config'
 
-export default NextAuth(authConfig).auth
+// Patterns for routes that need authentication middleware
+const PROTECTED_PAGE_PATTERNS = [
+  // Profile pages
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/profile(\/.*)?$/,
+  // Admin post management pages
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/posts\/createNewPost(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/posts\/allPosts(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/posts\/editPost(\/.*)?$/,
+  // Admin event management pages
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/allEvents(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/createEvent(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/createEventCategory(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/createEventSeries(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/editEvent(\/.*)?$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/events\/manageSponsors(\/.*)?$/,
+  // Auth pages (to redirect logged-in users away)
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/signIn$/,
+  /^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})\/signUp$/,
+]
+
+function isProtectedRoute(pathname: string): boolean {
+  // API routes always need auth middleware
+  if (pathname.startsWith('/api')) return true
+  // Check protected page patterns
+  return PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(pathname))
+}
+
+// Type for NextAuth middleware function
+type NextAuthMiddleware = (
+  request: NextRequest,
+  event: NextFetchEvent
+) => Promise<Response>
+
+// NextAuth middleware with explicit typing for App Router usage
+// Cast through unknown because NextAuth's overloaded types don't directly match Next.js middleware signature
+const nextAuthMiddleware = NextAuth(authConfig).auth as unknown as NextAuthMiddleware
+
+export default async function middleware(
+  request: NextRequest,
+  event: NextFetchEvent
+): Promise<NextResponse | Response> {
+  const { pathname } = request.nextUrl
+
+  if (isProtectedRoute(pathname)) {
+    // Protected routes: run through NextAuth middleware
+    // This executes the authorized callback in auth.config.ts (handles auth + i18n)
+    return nextAuthMiddleware(request, event)
+  }
+
+  // Public routes: just i18n routing (no auth overhead, bfcache-friendly)
+  return i18nRouter(request, i18nConfig)
+}
 
 export const config = {
   matcher: [
-    '/((?!api|static|.*\\..*|_next).*)', // all non-api paths excluding static files
-    '/api/:path*', // all API routes
+    // Match all paths except static files and Next.js internals
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 }

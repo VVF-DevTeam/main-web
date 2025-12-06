@@ -54,6 +54,9 @@ const SignInForm = () => {
             </span>
           </div>
         ),
+        style: {
+          color: '#ef4444', // green-500 color
+        },
       })
     }
   }, [searchParams])
