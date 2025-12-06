@@ -5,6 +5,8 @@ import React from 'react'
 import SignUpForm from '@/app/[locale]/(auth)/_components/SignUpForm'
 import Image from 'next/image'
 
+export const dynamic = 'force-static'
+
 // Main Component
 async function signUpPage() {
   return (

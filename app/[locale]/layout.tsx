@@ -54,7 +54,7 @@ export default async function RootLayout({
     >
       <html lang="en">
         <body
-          className={`antialiased  ${beVietnamPro.variable} ${lato.variable} min-w-full`}
+          className={`antialiased ${beVietnamPro.variable} ${lato.variable} min-w-full`}
         >
           <main>{children}</main>
           <SonnerToaster />

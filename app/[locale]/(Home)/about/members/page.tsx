@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Members - VVF',
 }
 
+// Force static generation for this route
+export const dynamic = 'force-static'
+
 // Main Component
 const AboutPageDirectors = async({
   params,

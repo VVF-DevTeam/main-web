@@ -317,21 +317,28 @@ export default {
         }
       }
 
-      // extract the locale from the path
-      path = '/' + path.split('/')[2]
+      // extract path without locale: /en/events/allEvents -> /events/allEvents
+      const segments = path.split('/')
+      path = '/' + segments.slice(2).join('/')
 
       // check if user is logged in
       const isLoggedIn = !!auth?.user
 
       // Check if user is trying to access a private path
-      if (PRIVATE_PATHS.includes(path) && !isLoggedIn) {
+      const isPrivatePath = PRIVATE_PATHS.some(
+        (privatePath) => path === privatePath || path.startsWith(privatePath + '/')
+      )
+      if (isPrivatePath && !isLoggedIn) {
         return NextResponse.redirect(
           new URL('/signIn?message=sign-in-required', request.nextUrl.origin)
         )
       }
 
       // Check if user is trying to access an auth path after logged in
-      if (AUTH_PATHS.includes(path) && isLoggedIn) {
+      const isAuthPath = AUTH_PATHS.some(
+        (authPath) => path === authPath || path.startsWith(authPath + '/')
+      )
+      if (isAuthPath && isLoggedIn) {
         return NextResponse.redirect(new URL('/', request.nextUrl.origin))
       }
 

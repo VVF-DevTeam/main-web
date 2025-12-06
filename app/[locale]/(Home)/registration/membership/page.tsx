@@ -5,6 +5,9 @@ import { Separator } from '@/components/ui/separator'
 import { MembershipHeader } from '../_components/_membership/MembershipHeader'
 import { MembershipBenefits } from '../_components/_membership/MembershipBenefits'
 
+// Force static generation
+export const dynamic = 'force-static'
+
 const MembershipPage = async ({
   params,
 }: {

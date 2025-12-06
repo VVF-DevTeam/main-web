@@ -86,6 +86,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
               height={176}
               className="h-[176px] w-auto max-w-full"
               priority
+              fetchPriority="high"
             />
             <div className="absolute top-[170px] right-[60px] rotate-[10deg] whitespace-nowrap rounded-3xl bg-bgColor-secondary400 px-6 py-2 md:right-[220px] md:rotate-[-3deg] lg:right-[330px] lg:rotate-[10deg]">
               <p className="web-body-regular">Guitar Lessons</p>

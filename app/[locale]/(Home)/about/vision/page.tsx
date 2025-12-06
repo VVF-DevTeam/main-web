@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   },
 }
 
+// Force static generation for this route
+export const dynamic = 'force-static'
+
 // Main Component
 const AboutPageVision = async ({
   params,

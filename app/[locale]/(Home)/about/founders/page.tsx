@@ -58,6 +58,9 @@ const foundingStory = [
   },
 ]
 
+// Force static generation for this route
+export const dynamic = 'force-static'
+
 // Main Component
 const Founder = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params
