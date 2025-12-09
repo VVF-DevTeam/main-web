@@ -51,7 +51,7 @@ const JobDescription = async ({
           </p>
           <p>
             {t('startDate')}:{' '}
-            {startDate.toLocaleDateString('en-US', {
+            {new Date(startDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
@@ -60,7 +60,7 @@ const JobDescription = async ({
           {endDate && (
             <p>
               {t('endDate')}:{' '}
-              {endDate.toLocaleDateString('en-US', {
+              {new Date(endDate).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',

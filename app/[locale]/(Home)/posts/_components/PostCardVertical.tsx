@@ -80,7 +80,7 @@ const PostCardVertical = ({
 
         {/* Date */}
         <p className="web-body-small text-[#666667]">
-          {createdAt.toLocaleDateString('en-US', {
+          {new Date(createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
