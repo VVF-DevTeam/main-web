@@ -34,6 +34,7 @@ export const metadata: Metadata = {
 // This allows bfcache to work while keeping data fresh
 // Homepage content (events, posts, reviews) doesn't change frequently
 export const revalidate = 300
+export const dynamic = 'force-static'
 
 // Main Component
 export default async function Home({

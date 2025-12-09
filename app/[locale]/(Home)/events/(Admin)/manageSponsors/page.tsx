@@ -7,6 +7,9 @@ import { redirect } from 'next/navigation'
 import BackButton from '@/components/ui/back-button'
 import SponsorsManager from '../_components/SponsorsManager'
 
+// Need to check for role, has to make dynamic
+export const dynamic = 'force-dynamic'
+
 // Main Component
 const ManageSponsorsPage = async () => {
   // Only ADMIN or HOST can access this page

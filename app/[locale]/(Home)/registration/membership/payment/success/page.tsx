@@ -1,5 +1,7 @@
-import { auth } from '@/auth'
 import PaymentSuccess from '@/components/payment/PaymentSuccess'
+
+// No use of auth() or header or live database, so can be static
+export const dynamic = 'force-static'
 
 // Interfaces
 interface SubscriptionPaymentSuccessPageProps {
@@ -12,20 +14,11 @@ const SubscriptionPaymentSuccessPage = async ({
 }: SubscriptionPaymentSuccessPageProps) => {
   const { locale } = await params
 
-  // get current user name
-  const session = await auth()
-  const userName = session?.user?.name!
-
-  // get current user email
-  const userEmail = session?.user?.email!
-
   return (
     <PaymentSuccess
       title="VVF Membership"
-      userName={userName}
       locale={locale}
       translationWorkspaces={['membership']}
-      userEmail={userEmail}
     />
   )
 }

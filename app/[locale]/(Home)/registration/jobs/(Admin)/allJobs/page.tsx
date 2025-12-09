@@ -8,6 +8,9 @@ import BackButton from '@/components/ui/back-button'
 import { DataTable } from '../../../_components/_jobs/_allJob/data-table'
 import { columns } from '../../../_components/_jobs/_allJob/columns'
 
+// Need to check for role, has to make dynamic
+export const dynamic = 'force-dynamic'
+
 // Main Component
 const AllJobs = async () => {
   // check if the current user is an admin to allow access to the job control page

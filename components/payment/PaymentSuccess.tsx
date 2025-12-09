@@ -1,24 +1,37 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
-import initTranslations from '@/app/i18n'
+import { useTranslation } from 'react-i18next'
+import { useSession } from 'next-auth/react'
 import '@/lib/ui/css/lineAnimation.css'
 
 interface PaymentSuccessProps {
   title: string
-  userName: string
   locale: string
   translationWorkspaces: string[]
-  userEmail: string
 }
 
-const PaymentSuccess = async ({
+const PaymentSuccess = ({
   title,
-  userName,
   locale,
   translationWorkspaces,
-  userEmail,
 }: PaymentSuccessProps) => {
-  const { t } = await initTranslations(locale, translationWorkspaces)
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation(translationWorkspaces)
+  const { data: session, status } = useSession()
+
+  // Show loading state while checking session
+  if (status === 'loading') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center dark:bg-neutral-900">
+        <p className="text-lg text-neutral-700 dark:text-neutral-300">Loading...</p>
+      </div>
+    )
+  }
+
+  const userName = session?.user?.name || ''
+  const userEmail = session?.user?.email || ''
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center dark:bg-neutral-900">

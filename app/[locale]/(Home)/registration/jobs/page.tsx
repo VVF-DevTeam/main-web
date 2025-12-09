@@ -1,11 +1,13 @@
-// Libraries
-import { roleCheck } from '@/lib/actions/user/roleCheck'
-
 // Components
 import HeaderAndBenefit from '../_components/_jobs/HeaderAndBenefit'
 import JobAdminButtons from '../_components/_jobs/JobAdminButtons'
 import JobList from '../_components/_jobs/JobList'
 
+// Enable ISR - revalidate every hour
+export const revalidate = 3600
+export const dynamic = 'force-static'
+
+// Main Component
 const JobsAndVolunteers = async ({
   params,
   searchParams,
@@ -22,7 +24,7 @@ const JobsAndVolunteers = async ({
     <div className="flex flex-col gap-y-6 p-4 text-base md:text-lg">
       <HeaderAndBenefit locale={locale} />
       <JobList title={title} locale={locale} />
-      {(await roleCheck({ role: 'ADMIN' })) ? <JobAdminButtons /> : null}
+      <JobAdminButtons />
     </div>
   )
 }

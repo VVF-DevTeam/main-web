@@ -1,11 +1,16 @@
-import Link from 'next/link'
-import { auth } from '@/auth'
+// Components
 import { ArrowLeft } from 'lucide-react'
-
-import initTranslations from '@/app/i18n'
-
 import BecomeHostForm from '../_components/_becomeHost/BecomeHostForm'
 
+// Libraries
+import { auth } from '@/auth'
+import initTranslations from '@/app/i18n'
+import Link from 'next/link'
+
+// There is a chance that the user data can be manipulated on client side, so need check on server
+export const dynamic = 'force-dynamic'
+
+// Main Component
 const MembershipPage = async ({
   params,
 }: {
@@ -13,7 +18,8 @@ const MembershipPage = async ({
 }) => {
   const { locale } = await params
   const { t } = await initTranslations(locale, ['host', 'common'])
-  // Get the current user's id
+
+  // Get the current user's id (on server side to avoid user data manipulation)
   const session = await auth()
   const userId = session?.user?.id
 

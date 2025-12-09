@@ -4,6 +4,7 @@ import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
+import i18nConfig from '@/i18nConfig'
 
 // Components
 import { Toaster as SonnerToaster } from 'sonner'
@@ -35,6 +36,11 @@ const i18nNamespaces = [
   'post',
   'host',
 ]
+
+// Generate static params for all supported locales
+export function generateStaticParams() {
+  return i18nConfig.locales.map((locale) => ({ locale }))
+}
 
 // Main Component
 export default async function RootLayout({
