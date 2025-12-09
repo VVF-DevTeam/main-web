@@ -45,7 +45,7 @@ const EventListHorizontal = async ({
 
   return (
     <div
-      className={`flex w-full flex-col items-center gap-y-5 py-10 xl:pt-10 bg-bgColor-secondary100`}
+      className={`flex w-full flex-col items-center gap-y-5 bg-bgColor-secondary100 py-10 xl:pt-10`}
     >
       {finished ? (
         <h2 className="web_h1 text-center">{t('header-finishedEvent')}</h2>
@@ -63,7 +63,7 @@ const EventListHorizontal = async ({
           {closestEvent && (
             <div className="flex w-full justify-center">
               <div className="max-w-7xl rounded-lg text-center">
-                <p className="overflow-hidden text-ellipsis web-body-large sm:whitespace-normal">
+                <p className="web-body-large overflow-hidden text-ellipsis sm:whitespace-normal">
                   <Image
                     src="https://drive.google.com/thumbnail?id=1KOA45MZfxUJyqGmNMO7x00U-bYXHJmaU"
                     alt="Penguin icon"
@@ -83,7 +83,8 @@ const EventListHorizontal = async ({
                       }
                     )}
                   {closestEvent.startTime &&
-                    ` ${t('event-at')} ${closestEvent.startTime}`} - 
+                    ` ${t('event-at')} ${closestEvent.startTime}`}{' '}
+                  -
                   {/* {closestEvent.endDate &&
                  new Date(closestEvent.endDate).toLocaleDateString(locale)}
                {closestEvent.endTime && ` at ${closestEvent.endTime}`}  */}{' '}
