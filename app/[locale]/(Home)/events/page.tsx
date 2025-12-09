@@ -9,8 +9,8 @@ import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
 // Enable ISR - revalidate every 300 seconds
+// Note: Cannot use 'force-static' with searchParams - searchParams require dynamic rendering
 export const revalidate = 300
-export const dynamic = 'force-static'
 
 // Main Component
 const EventsPage = async ({
