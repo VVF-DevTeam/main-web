@@ -135,15 +135,15 @@ const ClassDescription = async ({
                     <div className="flex items-center gap-x-3">
                       <CalendarDays className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
                       <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
-                        {startDate.toLocaleDateString('en-US', {
+                        {new Date(startDate).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                         })}
-                        {startDate.getTime() !== endDate.getTime() && (
+                        {new Date(startDate).getTime() !== new Date(endDate).getTime() && (
                           <>
                             {' - '}
-                            {endDate.toLocaleDateString('en-US', {
+                            {new Date(endDate).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
                               day: 'numeric',

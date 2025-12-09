@@ -122,7 +122,7 @@ const JobStartDate = ({ job }: JobStartDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {job.startDate.toLocaleDateString('en-US', {
+            {new Date(job.startDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',

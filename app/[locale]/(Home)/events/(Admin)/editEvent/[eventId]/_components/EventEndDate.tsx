@@ -192,7 +192,7 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {event.endDate.toLocaleDateString('en-US', {
+            {new Date(event.endDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',

@@ -157,7 +157,7 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
           </p>
         ) : (
           <p className="text-muted-foreground">
-            {event.startDate.toLocaleDateString('en-US', {
+            {new Date(event.startDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
