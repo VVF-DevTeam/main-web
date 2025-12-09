@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PATCH = async (
   request: Request,
@@ -28,6 +29,10 @@ export const PATCH = async (
         isPublished: false,
       },
     })
+
+    // Revalidate posts cache
+    revalidateTag('posts')
+
     return NextResponse.json(updatedPost)
   } catch (error) {
     console.log('[PUBLISH POST ERROR]', error)

@@ -114,7 +114,7 @@ const SearchBox = ({ placeholders }: SearchBoxProps) => {
         <div
           id="dynamic-placeholder"
           ref={placeholderRef}
-          className="pointer-events-none absolute left-[68px] top-[9px] animate-placeHolderFade text-slate-600"
+          className="pointer-events-none absolute left-[70px] top-[9px] animate-placeHolderFade text-slate-600"
         >
           <span>{placeholders[index] ? placeholders[index] : ''}</span>
         </div>

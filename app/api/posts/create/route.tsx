@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { revalidateTag } from 'next/cache'
 
 export const POST = async (request: Request) => {
   try {
@@ -14,6 +15,9 @@ export const POST = async (request: Request) => {
         userId: userId,
       },
     })
+
+    // Revalidate posts cache
+    revalidateTag('posts')
 
     return NextResponse.json(post)
   } catch (error) {

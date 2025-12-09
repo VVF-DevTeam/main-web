@@ -1,6 +1,5 @@
 // Libraries
 import { prisma } from '@/lib/db'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 // Components
 import EventListHorizontal from './_components/EventListHorizontal'
@@ -9,25 +8,8 @@ import EventAdminButtons from './_components/EventAdminButtons'
 import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
-// Interfaces & Types
-import { Event, EventCategory, EventTicket } from '@prisma/client'
-
-// Actions
-// import { getPublishedEventsWithFilters } from '@/lib/actions/event/getEvent'
-
-// import { Suspense } from 'react'
-// Simple in-memory cache to reduce API calls
-let eventsCache: {
-  data: (Event & {
-    categories: EventCategory[]
-    tickets?: EventTicket[]
-  })[]
-  timestamp: number
-  locale: string
-  fetchLimit?: number // Track how many posts we attempted to fetch
-} | null = null
-
-const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes
+// Enable ISR - revalidate every 300 seconds
+export const revalidate = 300
 
 // Main Component
 const EventsPage = async ({
@@ -39,41 +21,20 @@ const EventsPage = async ({
 }) => {
   const { locale } = await params
   const { upcomingPage, finishedPage } = await searchParams
-  // Check if user is admin or host
-  const isAdmin = await roleCheck({ role: 'ADMIN' })
-  const isHost = await roleCheck({ role: 'HOST' })
 
-  // Get all events with caching
-  const nowTimestamp = Date.now()
-  const isCacheValid =
-    eventsCache &&
-    eventsCache.locale === locale &&
-    nowTimestamp - eventsCache.timestamp < CACHE_DURATION
-
-  let allEvents
-  if (isCacheValid) {
-    allEvents = eventsCache!.data
-  } else {
-    allEvents = await prisma.event.findMany({
-      where: {
-        isPublished: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        categories: true,
-        tickets: true,
-      },
-    })
-
-    // Update cache
-    eventsCache = {
-      data: allEvents,
-      timestamp: nowTimestamp,
-      locale,
-    }
-  }
+  // Get all published events
+  const allEvents = await prisma.event.findMany({
+    where: {
+      isPublished: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      categories: true,
+      tickets: true,
+    },
+  })
 
   // If no events, return component with message
   if (allEvents.length === 0) {
@@ -122,7 +83,7 @@ const EventsPage = async ({
         totalPages={totalPagesUpcoming}
         totalItems={upcomingEvents.length}
       />
-      {(isAdmin || isHost) && <EventAdminButtons />}
+      <EventAdminButtons />
       <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
         <EventListHorizontal

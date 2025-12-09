@@ -1,4 +1,3 @@
-'use server'
 // Libraries
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { prisma } from '@/lib/db'
@@ -13,35 +12,10 @@ import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
 import EmailComposition from './_components/EmailComposition'
 
-// Main Component
-export default async function ProfilePage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ locale: string }>
-  searchParams: Promise<{ section?: string; page?: string; pageSize?: string }>
-}) {
-  const user = await getCurrentUserInfo()
-  // Get all events
-  const eventList = await prisma.event.findMany({
-    where: {
-      isPublished: true,
-    },
-  })
-
-  const { section, page: pageStr, pageSize: pageSizeStr } = await searchParams
-  const { locale } = await params
-
-  // return if user is not logged in
-  if (!user) {
-    return <p className="mt-10 text-center">No user data available.</p>
-  }
-
-  // get payment history (put here since default page is MyProfile)
-  const paymentHistory = await prisma.payment.findMany({
-    where: {
-      userId: user.id,
-    },
+// Helper to fetch payment history
+const getPaymentHistory = (userId: string) =>
+  prisma.payment.findMany({
+    where: { userId },
     select: {
       id: true,
       pricePaid: true,
@@ -63,23 +37,50 @@ export default async function ProfilePage({
         },
       },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: { createdAt: 'desc' },
   })
 
-  // ✅ Switch component based on searchParams
+// Helper to fetch published events
+const getPublishedEvents = () =>
+  prisma.event.findMany({
+    where: { isPublished: true },
+    orderBy: { startDate: 'desc' },
+  })
+
+// Main Component
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ section?: string; page?: string; pageSize?: string }>
+}) {
+  const [{ section, page: pageStr, pageSize: pageSizeStr }, { locale }, user] =
+    await Promise.all([searchParams, params, getCurrentUserInfo()])
+
+  // Return if user is not logged in
+  if (!user) {
+    return <p className="mt-10 text-center">No user data available.</p>
+  }
+
+  // Switch component based on searchParams
+  // Only fetch data that's needed for each section
   switch (section) {
     case 'update-profile':
       return <UpdateProfileForm user={user} />
+
     case 'change-password':
       return <PasswordForm user={user} />
+
     case 'delete-account':
       return <DeleteForm user={user} />
-    case 'subscription':
+
+    case 'subscription': {
+      const paymentHistory = await getPaymentHistory(user.id)
       return <SubscriptionInfo paymentHistory={paymentHistory} user={user} />
+    }
+
     case 'admin-payment-management':
-      // Only show payment management for hosts
       if (
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
@@ -95,33 +96,37 @@ export default async function ProfilePage({
           You do not have permission to view this page.
         </p>
       )
+
     case 'admin-email-composition':
-      // Only show email composition for hosts and admins
       if (
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-
-        return (
-          <EmailComposition user={user}/>
-        )
+        return <EmailComposition user={user} />
       }
       return (
         <p className="mt-10 text-center">
           You do not have permission to view this page.
         </p>
       )
+
     case 'privacy-policy':
       return <PrivacyPolicy locale={locale} />
-    default:
+
+    default: {
+      // Only fetch events and payment history for the default profile view
+      const [eventList, paymentHistory] = await Promise.all([
+        getPublishedEvents(),
+        getPaymentHistory(user.id),
+      ])
       return (
         <MyProfile
           user={user}
           locale={locale}
-          // events={eventList}
           upcoming_events={eventList}
           paymentHistory={paymentHistory}
         />
       )
+    }
   }
 }

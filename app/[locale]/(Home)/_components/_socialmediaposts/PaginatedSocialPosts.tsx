@@ -4,7 +4,7 @@ import initTranslation from '@/app/i18n'
 // Components
 import SocialPostCard from './SocialPostCard'
 import SocialPostPagination from './SocialPostPagination'
-import { getSocialMediaPostsPaginated } from '@/lib/actions/post/getSocialPost'
+import { getCachedSocialMediaPostsPaginated, getSocialMediaPostsPaginated } from '@/lib/actions/post/getSocialPost'
 
 interface PaginatedSocialPostsProps {
   content: string
@@ -21,7 +21,7 @@ const PaginatedSocialPosts = async ({
   postsPerPage,
 }: PaginatedSocialPostsProps) => {
   const { t } = await initTranslation(locale, ['post', 'common'])
-  const paginationResult = await getSocialMediaPostsPaginated(
+  const paginationResult = await getCachedSocialMediaPostsPaginated(
     locale as 'en' | 'vi' | 'fr', 
     currentPage, 
     postsPerPage,

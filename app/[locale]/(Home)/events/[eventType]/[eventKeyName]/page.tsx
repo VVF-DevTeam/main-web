@@ -4,6 +4,7 @@ import ClassDescription from '../_component/_class/ClassDescription'
 import BackButton from '@/components/ui/back-button'
 import ConcertDescriptions from '../_component/_concert/ConcertDescriptions'
 import ConcertHeaders from '../_component/_concert/ConcertHeaders'
+import NotFound from '../../../not-found'
 
 // Types
 import { SeatingMap } from '../../(Admin)/editEvent/[eventId]/_components/EventSeating'
@@ -90,7 +91,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
   })
 
   if (!publishedClass) {
-    return
+    return <NotFound />
   }
 
   // Check if gallery carousel should be rendered

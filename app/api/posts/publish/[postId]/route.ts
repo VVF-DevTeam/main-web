@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PATCH = async (
   request: Request,
@@ -19,7 +20,7 @@ export const PATCH = async (
       return new NextResponse('Post not found', { status: 404 })
     }
 
-    // Unpublish the post
+    // Publish the post
     const updatedPost = await prisma.post.update({
       where: {
         id: post.id,
@@ -28,6 +29,10 @@ export const PATCH = async (
         isPublished: true,
       },
     })
+
+    // Revalidate posts cache
+    revalidateTag('posts')
+
     return NextResponse.json(updatedPost)
   } catch (error) {
     console.log('[PUBLISH POST ERROR]', error)

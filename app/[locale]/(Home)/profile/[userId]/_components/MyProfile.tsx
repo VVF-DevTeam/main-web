@@ -65,7 +65,7 @@ const MyProfile = async ({
 
         <div className="grid grid-cols-1 gap-8 pb-8 md:pb-5 lg:grid-cols-4">
           {/* Profile Section */}
-          <div className="bg-bgColor-white relative col-span-1 flex flex-col items-center justify-center rounded-lg p-6 shadow-lg lg:items-stretch lg:justify-normal">
+          <div className="relative col-span-1 flex flex-col items-center justify-center rounded-lg bg-bgColor-white p-6 shadow-lg lg:items-stretch lg:justify-normal">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
             <div className="mb-6 flex flex-col items-center">
               <div className="relative">
@@ -121,7 +121,7 @@ const MyProfile = async ({
           </div>
 
           {/* Order History Section */}
-          <div className="bg-bgColor-white relative col-span-1 flex h-full flex-col rounded-lg p-6 shadow-lg lg:col-span-3">
+          <div className="relative col-span-1 flex h-full flex-col rounded-lg bg-bgColor-white p-6 shadow-lg lg:col-span-3">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
@@ -140,7 +140,9 @@ const MyProfile = async ({
                       <th className="px-4 py-3 text-center">{t('end-date')}</th>
                       <th className="px-4 py-3 text-center">{t('location')}</th>
                       <th className="px-4 py-3 text-center">{t('price')}</th>
-                      <th className="px-4 py-3 text-center">{t('quantity')}/{t('seatNumber')}</th>
+                      <th className="px-4 py-3 text-center">
+                        {t('quantity')}/{t('seatNumber')}
+                      </th>
                       <th className="px-4 py-3 text-center">{t('type')}</th>
                       <th className="px-4 py-3 text-center">{t('status')}</th>
                     </tr>
@@ -166,7 +168,7 @@ const MyProfile = async ({
                           return (
                             <tr
                               key={index}
-                              className="bg-bgColor-white cursor-pointer border-b"
+                              className="cursor-pointer border-b bg-bgColor-white"
                             >
                               <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
                                 {payment.type === 'Membership' ? (
@@ -224,7 +226,7 @@ const MyProfile = async ({
                       <tr>
                         <td
                           colSpan={6}
-                          className="px-4 py-3 text-center text-textColor-gray/50"
+                          className="text-textColor-gray/50 px-4 py-3 text-center"
                         >
                           {t('no-event')}
                         </td>
@@ -238,36 +240,37 @@ const MyProfile = async ({
         </div>
 
         {/* Wishlist Section */}
-        <div className="bg-bgColor-white relative mb-8 rounded-lg p-6 shadow-lg">
+        <div className="relative mb-8 rounded-lg bg-bgColor-white p-6 shadow-lg">
           <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
             <FiHeart />
             {t('upcoming-event')}
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {upcoming_events.map((item) => (
-              <div
-                key={item.id}
-                className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl"
+            {upcoming_events.map((event) => (
+              <Link
+                href={`/events/${event.eventType.toLowerCase()}/${event.keyName}`}
+                className="text-center text-textColor-white"
               >
-                <Image
-                  src={item.imgUrl!}
-                  alt={item.title}
-                  width={140}
-                  height={140}
-                  className="h-48 w-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="p-4 text-center text-textColor-white">
-                    <Link
-                      href={`/events/class/${item.id}`}
-                      className="p-4 text-center text-textColor-white"
-                    >
-                      {item.title}
-                    </Link>
+                <div
+                  key={event.id}
+                  className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl group"
+                >
+                  <Image
+                    src={event.imgUrl!}
+                    alt={event.title}
+                    width={140}
+                    height={140}
+                    className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-100">
+                    <div className="p-4 text-center text-textColor-white">
+                      {event.title}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

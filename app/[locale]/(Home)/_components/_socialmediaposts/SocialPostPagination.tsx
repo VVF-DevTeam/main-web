@@ -114,6 +114,31 @@ const SocialPostPagination = ({
         </div>
       )}
 
+      {/* Last Page Message */}
+      {isLastPage && (
+        <div className="text-center text-sm text-muted-foreground mb-2">
+          See older posts on our{' '}
+          <a
+            href="https://www.facebook.com/people/VIET-VIBE/61570910920072/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline transition-colors"
+          >
+            Facebook
+          </a>
+          {' '}and{' '}
+          <a
+            href="https://www.instagram.com/vietvibe.foundation/#"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline transition-colors"
+          >
+            Instagram
+          </a>
+          {' '}pages
+        </div>
+      )}
+
       {/* Main Pagination */}
       <Pagination className={cn(isPending && 'pointer-events-none opacity-50')}>
         <PaginationContent>

@@ -3,11 +3,10 @@
 // Components
 import React from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { ServerActionResponse } from '@/lib/types/serverAction'
 // import { LogIn, LogOut } from 'lucide-react'
 
 // Libraries
-import { signOutAction } from '@/lib/actions/auth/signoutAction'
+import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -37,22 +36,21 @@ const AuthButtons = ({ userExists, mode }: AuthButtonProps) => {
   }
   const logout = async () => {
     try {
-      const response: ServerActionResponse = await signOutAction()
-      if (response.success) {
-        toast.success('Success', {
-          description: (
-            <div className="flex flex-col gap-1">
-              <span>{response.message}</span>
-              <span style={{ color: 'var(--muted-foreground)' }}>
-                {currentDateTime}
-              </span>
-            </div>
-          ),
-          style: {
-            color: '#22c55e', // green-500 color
-          },
-        })
-      }
+      // Use client-side signOut to properly update SessionProvider state
+      await signOut({ redirect: false })
+      toast.success('Success', {
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>Signed out successfully</span>
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          </div>
+        ),
+        style: {
+          color: '#22c55e', // green-500 color
+        },
+      })
       router.refresh()
     } catch (error) {
       console.log(error)
