@@ -6,6 +6,7 @@ import {
   RATING_MAP,
   convertReviewRatingToNumber,
 } from '@/lib/utilFunctions/ratingUtils'
+import { revalidateTag, unstable_cache } from 'next/cache'
 
 export interface CreateReviewData {
   userId: string
@@ -42,6 +43,213 @@ export interface ReviewsPaginationResult {
   currentPage: number
 }
 
+// ========================================
+// CACHED DATA FETCHING FUNCTIONS (for ISR)
+// ========================================
+
+// Cached version of getReviewsPaginated
+export const getCachedReviewsPaginated = unstable_cache(
+  async (
+    page: number = 1,
+    reviewsPerPage: number = 6,
+    searchTerm?: string,
+    eventId?: string,
+    rating?: ReviewRating,
+    removeEmptyComments?: boolean,
+    seriesId?: string
+  ): Promise<ReviewsPaginationResult> => {
+    try {
+      const skip = (page - 1) * reviewsPerPage
+
+      // Build where clause
+      const whereClause: Prisma.ReviewWhereInput = {}
+
+      if (searchTerm) {
+        whereClause.OR = [
+          { comment: { contains: searchTerm, mode: 'insensitive' } },
+          { user: { name: { contains: searchTerm, mode: 'insensitive' } } },
+          { event: { title: { contains: searchTerm, mode: 'insensitive' } } },
+        ]
+      }
+
+      if (eventId) {
+        whereClause.eventId = eventId
+      } else if (seriesId) {
+        // Only filter by series if eventId is not set (eventId is more specific)
+        whereClause.event = {
+          seriesId: seriesId,
+        }
+      }
+
+      if (rating) {
+        whereClause.rating = rating
+      }
+
+      if (removeEmptyComments) {
+        // Exclude comments from specific user
+        whereClause.userId = {
+          not: 'cm5z8p8o90000lt6otnd5ukp8', // account using for uploading reviews
+        }
+
+        whereClause.comment = {
+          not: {
+            in: ['', ' ', '\t', '\n', '\r\n', '  ', '   '],
+          },
+        }
+      }
+
+      // Get reviews with pagination
+      const [reviews, totalCount] = await Promise.all([
+        prisma.review.findMany({
+          where: whereClause,
+          select: {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            eventId: true,
+            rating: true,
+            comment: true,
+            anonymous: true,
+            imageLink: true,
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+            event: {
+              select: {
+                title: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip,
+          take: reviewsPerPage,
+        }),
+        prisma.review.count({ where: whereClause }),
+      ])
+
+      const totalPages = Math.ceil(totalCount / reviewsPerPage)
+
+      return {
+        reviews,
+        totalCount,
+        totalPages,
+        currentPage: page,
+      }
+    } catch (error) {
+      console.error('Error getting reviews:', error)
+      return {
+        reviews: [],
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: page,
+      }
+    }
+  },
+  ['reviews-paginated'], // Cache key prefix
+  {
+    revalidate: 60, // Cache for 60 seconds
+    tags: ['reviews'], // For on-demand revalidation
+  }
+)
+
+// Cached version of getPublishedEventsForReviewsWithSearch
+export const getCachedPublishedEventsForReviews = unstable_cache(
+  async (searchTerm?: string, limit: number = 15) => {
+    try {
+      const events = await prisma.event.findMany({
+        where: {
+          isPublished: true,
+          ...(searchTerm && {
+            title: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          }),
+        },
+        select: {
+          id: true,
+          title: true,
+        },
+        orderBy: {
+          updatedAt: 'desc', // Latest events first
+        },
+        take: limit,
+      })
+
+      return events
+    } catch (error) {
+      console.error(
+        'Error getting published events for reviews with search:',
+        error
+      )
+      return []
+    }
+  },
+  ['published-events-reviews'],
+  {
+    revalidate: 60,
+    tags: ['events', 'reviews'],
+  }
+)
+
+// Cached version of getPublishedSeriesForReviewsWithSearch
+export const getCachedPublishedSeriesForReviews = unstable_cache(
+  async (searchTerm?: string, limit: number = 15) => {
+    try {
+      const series = await prisma.eventSeries.findMany({
+        where: {
+          events: {
+            some: {
+              isPublished: true,
+              Review: {
+                some: {}, // Only series that have events with reviews
+              },
+            },
+          },
+          ...(searchTerm && {
+            name: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          }),
+        },
+        select: {
+          id: true,
+          name: true,
+          keyName: true,
+        },
+        orderBy: {
+          name: 'asc',
+        },
+        take: limit,
+      })
+
+      return series
+    } catch (error) {
+      console.error(
+        'Error getting published series for reviews with search:',
+        error
+      )
+      return []
+    }
+  },
+  ['published-series-reviews'],
+  {
+    revalidate: 60,
+    tags: ['series', 'reviews'],
+  }
+)
+
+// ========================================
+// SERVER ACTIONS (for mutations)
+// ========================================
+
 // Create a new review
 export async function createReview(data: CreateReviewData) {
   try {
@@ -57,6 +265,9 @@ export async function createReview(data: CreateReviewData) {
         imageLink: data.imageLink || null,
       },
     })
+
+    // Revalidate cached reviews
+    revalidateTag('reviews')
 
     return { success: true, review }
   } catch (error) {
@@ -294,6 +505,9 @@ export async function updateReview(
       },
     })
 
+    // Revalidate cached reviews
+    revalidateTag('reviews')
+
     return { success: true }
   } catch (error) {
     console.error('Error updating review:', error)
@@ -309,6 +523,9 @@ export async function deleteReview(reviewId: string) {
         id: reviewId,
       },
     })
+
+    // Revalidate cached reviews
+    revalidateTag('reviews')
 
     return { success: true }
   } catch (error) {

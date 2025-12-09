@@ -1,14 +1,24 @@
+'use client'
+
 // Libraries
-import React from 'react'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
+import { useSession } from 'next-auth/react'
 
 // Components
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-// Interfaces
-const EventAdminButtons = async () => {
-  const isAdmin = await roleCheck({ role: 'ADMIN' })
+const EventAdminButtons = () => {
+  const { data: session, status } = useSession()
+
+  // Don't render anything while loading or if not authenticated
+  if (status === 'loading') return null
+
+  const userRole = session?.user?.role
+  const isAdmin = userRole?.includes('ADMIN')
+  const isHost = userRole?.includes('HOST')
+
+  // Only show buttons for admin or host users
+  if (!isAdmin && !isHost) return null
 
   return (
     <div className="flex-col-end flex-end-md my-6 gap-x-4 gap-y-3 px-6 md:flex-row">
@@ -40,7 +50,7 @@ const EventAdminButtons = async () => {
           </Button>
         </Link>
       )}
-      {/* Create & Edit Series */}
+      {/* Manage Sponsors */}
       {isAdmin && (
         <Link href={'/events/manageSponsors'}>
           <Button size={'lg'} className="bg-bgColor-secondary900 hover:bg-bgColor-secondary400">

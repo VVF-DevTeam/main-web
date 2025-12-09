@@ -15,16 +15,11 @@ import RegisterDoubleSection from '@/app/[locale]/(Home)/_components/registerDou
 // Libraries
 import { Metadata } from 'next'
 
-// Interfaces & Types
-import { Event, EventCategory, EventTicket } from '@prisma/client'
-import { ReviewWithUserAndEvent } from '@/lib/actions/review/reviewActions'
-import { CachedPostItem } from '@/lib/actions/post/getPosts'
-
 // Actions
-import { getReviewsPaginated } from '@/lib/actions/review/reviewActions'
+import { getCachedReviewsPaginated } from '@/lib/actions/review/reviewActions'
 import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 import { getPublishedEventsWithFilters } from '@/lib/actions/event/getEvent'
-import { getPublishedPostsByTitlePaginated } from '@/lib/actions/post/getPosts'
+import { getCachedPostsPaginated } from '@/lib/actions/post/getPosts'
 
 export const metadata: Metadata = {
   title: 'Homepage - Viet Vibe Foundation',
@@ -35,42 +30,10 @@ export const metadata: Metadata = {
   },
 }
 
-// Caches
-let upcomingEventsCache: {
-  data: (Event & {
-    categories: EventCategory[]
-    tickets?: EventTicket[]
-  })[]
-  timestamp: number
-  locale: string
-  fetchLimit?: number // Track how many events we attempted to fetch
-} | null = null
-
-let pastEventsCache: {
-  data: (Event & {
-    categories: EventCategory[]
-    tickets?: EventTicket[]
-  })[]
-  timestamp: number
-  locale: string
-  fetchLimit?: number // Track how many events we attempted to fetch
-} | null = null
-
-let reviewsCache: {
-  data: ReviewWithUserAndEvent[]
-  timestamp: number
-  locale: string
-  fetchLimit?: number // Track how many reviews we attempted to fetch
-} | null = null
-
-let postsCache: {
-  data: CachedPostItem[]
-  timestamp: number
-  locale: string
-  fetchLimit?: number // Track how many posts we attempted to fetch
-} | null = null
-
-const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes
+// Enable ISR - page is cached and revalidated every 5 minutes
+// This allows bfcache to work while keeping data fresh
+// Homepage content (events, posts, reviews) doesn't change frequently
+export const revalidate = 300
 
 // Main Component
 export default async function Home({
@@ -79,105 +42,32 @@ export default async function Home({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const nowTimestamp = Date.now()
 
-  // Get all events with caching
-  const isCacheUpcomingEventValid =
-    upcomingEventsCache &&
-    upcomingEventsCache.locale === locale &&
-    nowTimestamp - upcomingEventsCache.timestamp < CACHE_DURATION
+  // Fetch all data in parallel for better performance
+  const [upcomingThreeEvents, pastThreeEvents, paginatedReviews, paginatedPosts] =
+    await Promise.all([
+      getPublishedEventsWithFilters({
+        numberOfEvents: 3,
+        upcoming: true,
+        finished: false,
+        orderByField: 'createdAt',
+        orderDirection: 'desc',
+        includeCategories: true,
+      }),
+      getPublishedEventsWithFilters({
+        numberOfEvents: 3,
+        upcoming: false,
+        finished: true,
+        orderByField: 'createdAt',
+        orderDirection: 'desc',
+        includeCategories: true,
+      }),
+      getCachedReviewsPaginated(1, 9, '', '', convertStringToReviewRating('5'), true),
+      getCachedPostsPaginated('', 1, 3),
+    ])
 
-  // Get upcoming three events with caching
-  let upcomingThreeEvents
-  if (isCacheUpcomingEventValid) {
-    upcomingThreeEvents = upcomingEventsCache!.data
-  } else {
-    upcomingThreeEvents = await getPublishedEventsWithFilters({
-      numberOfEvents: 3,
-      upcoming: true,
-      finished: false,
-      orderByField: 'createdAt',
-      orderDirection: 'desc',
-      includeCategories: true,
-    })
-    // Update cache
-    upcomingEventsCache = {
-      data: upcomingThreeEvents,
-      timestamp: nowTimestamp,
-      locale,
-    }
-  }
-
-  // Get past three events with caching
-  let pastThreeEvents
-  const isCachePastEventValid =
-    pastEventsCache &&
-    pastEventsCache.locale === locale &&
-    nowTimestamp - pastEventsCache.timestamp < CACHE_DURATION
-  if (isCachePastEventValid) {
-    pastThreeEvents = pastEventsCache!.data
-  } else {
-    pastThreeEvents = await getPublishedEventsWithFilters({
-      numberOfEvents: 3,
-      upcoming: false,
-      finished: true,
-      orderByField: 'createdAt',
-      orderDirection: 'desc',
-      includeCategories: true,
-    })
-    // Update cache
-    pastEventsCache = {
-      data: pastThreeEvents,
-      timestamp: nowTimestamp,
-      locale,
-    }
-  }
-
-  // Get all reviews with caching
-  const isCacheReviewValid =
-    reviewsCache &&
-    reviewsCache.locale === locale &&
-    nowTimestamp - reviewsCache.timestamp < CACHE_DURATION
-  let reviews
-  if (isCacheReviewValid) {
-    reviews = reviewsCache!.data
-  } else {
-    const paginatedReviews = await getReviewsPaginated(
-      1,
-      9,
-      '',
-      '',
-      convertStringToReviewRating('5'),
-      true
-    )
-    reviews = paginatedReviews.reviews
-
-    // Update cache
-    reviewsCache = {
-      data: reviews,
-      timestamp: nowTimestamp,
-      locale,
-    }
-  }
-
-  // Get all posts with caching
-  const isCachePostValid =
-    postsCache &&
-    postsCache.locale === locale &&
-    nowTimestamp - postsCache.timestamp < CACHE_DURATION
-  let posts
-  if (isCachePostValid) {
-    posts = postsCache!.data
-  } else {
-    const paginatedPosts = await getPublishedPostsByTitlePaginated('', 1, 3)
-    posts = paginatedPosts!.posts
-    // Update cache
-    postsCache = {
-      data: posts,
-      timestamp: nowTimestamp,
-      locale,
-    }
-  }
+  const reviews = paginatedReviews.reviews
+  const posts = paginatedPosts!.posts
 
   return (
     <div className="flex flex-col gap-y-12 overflow-hidden">

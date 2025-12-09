@@ -7,6 +7,7 @@ import { Analytics } from '@vercel/analytics/react'
 
 // Components
 import { Toaster as SonnerToaster } from 'sonner'
+import { SessionProvider } from 'next-auth/react'
 
 // CSS and CSS Modules
 import '@/lib/ui/css/globals.css'
@@ -56,8 +57,10 @@ export default async function RootLayout({
         <body
           className={`antialiased ${beVietnamPro.variable} ${lato.variable} min-w-full`}
         >
-          <main>{children}</main>
-          <SonnerToaster />
+          <SessionProvider>
+            <main>{children}</main>
+            <SonnerToaster />
+          </SessionProvider>
           <Analytics />
           <SpeedInsights />
         </body>

@@ -12,13 +12,16 @@ import { auth } from '@/auth'
 import AddReviewButton from '@/components/review/AddReviewButton'
 import ReviewsDisplay from './_components/ReviewsDisplay'
 import {
-  getReviewsPaginated,
-  getPublishedEventsForReviewsWithSearch,
-  getPublishedSeriesForReviewsWithSearch,
+  getCachedReviewsPaginated,
+  getCachedPublishedEventsForReviews,
+  getCachedPublishedSeriesForReviews,
 } from '@/lib/actions/review/reviewActions'
 import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 // import { ReviewRating } from '@prisma/client'
 import ScrollToReviews from './_components/ScrollToReviews'
+
+// Enable ISR - revalidate every 60 seconds
+export const revalidate = 300
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
@@ -70,8 +73,8 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   const currentReviewSeries = reviewSeries || ''
 
 
-  // Fetch reviews data on server side
-  const reviewsResult = await getReviewsPaginated(
+  // Fetch reviews data on server side (cached with ISR)
+  const reviewsResult = await getCachedReviewsPaginated(
     currentReviewPage,
     6, // reviewsPerPage
     currentReviewSearch || undefined,
@@ -83,14 +86,14 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
     currentReviewSeries === 'all' ? undefined : currentReviewSeries || undefined
   )
 
-  // Fetch events for review filtering (latest 15 events)
-  const eventsForReviews = await getPublishedEventsForReviewsWithSearch(
+  // Fetch events for review filtering (latest 15 events) (cached with ISR)
+  const eventsForReviews = await getCachedPublishedEventsForReviews(
     undefined,
     15
   )
 
-  // Fetch series for review filtering
-  const seriesForReviews = await getPublishedSeriesForReviewsWithSearch(
+  // Fetch series for review filtering (cached with ISR)
+  const seriesForReviews = await getCachedPublishedSeriesForReviews(
     undefined,
     15
   )

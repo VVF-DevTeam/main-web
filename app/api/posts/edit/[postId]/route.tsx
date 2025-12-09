@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PUT = async (
   request: Request,
@@ -30,6 +31,9 @@ export const PUT = async (
         ...body,
       },
     })
+
+    // Revalidate posts cache
+    revalidateTag('posts')
 
     return NextResponse.json(updatedPost)
   } catch (error) {
