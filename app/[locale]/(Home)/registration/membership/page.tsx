@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator'
 import { MembershipHeader } from '../_components/_membership/MembershipHeader'
 import { MembershipBenefits } from '../_components/_membership/MembershipBenefits'
 
-// Force static generation
+// No use of auth() or header or live database, so can be static
 export const dynamic = 'force-static'
 
 const MembershipPage = async ({

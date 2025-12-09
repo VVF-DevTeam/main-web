@@ -8,6 +8,9 @@ import BackButton from '@/components/ui/back-button'
 import { DataTable } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/data-table'
 import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/columns'
 
+// Need to check for role, has to make dynamic
+export const dynamic = 'force-dynamic'
+
 // Main Component
 const AllPosts = async () => {
   // check if the current user is an admin to allow access to the post control page

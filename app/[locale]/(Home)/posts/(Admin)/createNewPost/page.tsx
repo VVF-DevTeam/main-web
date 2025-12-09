@@ -3,6 +3,9 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
 
+// Need to check for role, has to make dynamic
+export const dynamic = 'force-dynamic'
+
 const NewPost = async () => {
   // check if the current user is an admin to allow access to the post control page
   const isAdmin = await roleCheck({ role: 'ADMIN' })

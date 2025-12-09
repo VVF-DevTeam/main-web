@@ -7,6 +7,9 @@ import { redirect } from 'next/navigation'
 import SeriesManager from '../_components/SeriesManager'
 import BackButton from '@/components/ui/back-button'
 
+// Need to check for role, has to make dynamic
+export const dynamic = 'force-dynamic'
+
 // Main Component
 const createEventSeriesPage = async () => {
   // check if the current user is an admin to allow access to the post control page
