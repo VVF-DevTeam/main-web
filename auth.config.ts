@@ -317,8 +317,9 @@ export default {
         }
       }
 
-      // extract the locale from the path
-      path = '/' + path.split('/')[2]
+      // extract path without locale: /en/events/allEvents -> /events/allEvents
+      const segments = path.split('/')
+      path = '/' + segments.slice(2).join('/')
 
       // check if user is logged in
       const isLoggedIn = !!auth?.user
