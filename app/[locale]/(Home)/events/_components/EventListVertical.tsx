@@ -29,8 +29,6 @@ const EventListVertical = async ({
 }: EventListVerticalProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
-  // Limit the number of events if maxEvents is provided
-
   return (
     <div className="flex w-full flex-col items-center gap-y-5 bg-bgColor-secondary100 py-10 xl:py-14">
       {/* Header */}

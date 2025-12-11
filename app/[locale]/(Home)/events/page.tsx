@@ -1,5 +1,5 @@
 // Libraries
-import { prisma } from '@/lib/db'
+import { getAllPublishedEventsWithRelations } from '@/lib/actions/event/getEvent'
 
 // Components
 import EventListHorizontal from './_components/EventListHorizontal'
@@ -8,9 +8,8 @@ import EventAdminButtons from './_components/EventAdminButtons'
 import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
 
-// Enable ISR - revalidate every 300 seconds
-// Note: Cannot use 'force-static' with searchParams - searchParams require dynamic rendering
-export const revalidate = 300
+// Note: Pages with searchParams are dynamic and cannot be edge-cached by Vercel
+export const dynamic = 'force-dynamic'
 
 // Main Component
 const EventsPage = async ({
@@ -23,19 +22,8 @@ const EventsPage = async ({
   const { locale } = await params
   const { upcomingPage, finishedPage } = await searchParams
 
-  // Get all published events
-  const allEvents = await prisma.event.findMany({
-    where: {
-      isPublished: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    include: {
-      categories: true,
-      tickets: true,
-    },
-  })
+  // Get all published events with relations (cached)
+  const allEvents = await getAllPublishedEventsWithRelations()
 
   // If no events, return component with message
   if (allEvents.length === 0) {

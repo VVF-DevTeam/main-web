@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PATCH = async (
   request: Request,
@@ -26,6 +27,10 @@ export const PATCH = async (
         isPublished: true,
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
+
     return NextResponse.json(publishedEvent)
   } catch (error) {
     console.log('[PUBLISH ERROR]', error)

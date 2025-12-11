@@ -30,10 +30,9 @@ export const metadata: Metadata = {
   },
 }
 
-// Enable ISR - page is cached and revalidated every 5 minutes
-// This allows bfcache to work while keeping data fresh
-// Homepage content (events, posts, reviews) doesn't change frequently
-export const revalidate = 300
+// Page is static - data fetching uses unstable_cache with revalidateTag for on-demand invalidation
+// All data functions (events, posts, reviews) use unstable_cache with long cache times
+// Cache is invalidated immediately via revalidateTag when content changes
 export const dynamic = 'force-static'
 
 // Main Component

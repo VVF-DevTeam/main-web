@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 
 export const POST = async (
   request: Request,
@@ -22,6 +23,9 @@ export const POST = async (
         },
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
 
     return NextResponse.json(updatedCategories)
   } catch (error) {
@@ -53,6 +57,9 @@ export const DELETE = async (
         },
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
 
     return NextResponse.json(updatedCategories)
   } catch (error) {

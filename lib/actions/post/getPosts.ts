@@ -188,7 +188,7 @@ export const getCachedPostsPaginated = unstable_cache(
   },
   ['posts-paginated'], // Cache key
   {
-    revalidate: 300, // Cache for 5 minutes (same as old cache)
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
     tags: ['posts'],
   }
 )

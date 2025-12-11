@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PUT = async (
   request: Request,
@@ -29,6 +30,10 @@ export const PUT = async (
         seriesId: seriesId || null,
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
+
     return NextResponse.json(updatedEvent)
   } catch (error) {
     console.log('[EDIT EVENT SERIES ERROR]', error)
@@ -63,6 +68,10 @@ export const DELETE = async (
         seriesId: null,
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
+
     return NextResponse.json(updatedEvent)
   } catch (error) {
     console.log('[DELETE EVENT SERIES ERROR]', error)

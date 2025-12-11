@@ -69,7 +69,7 @@ const ReviewCard: React.FC<{
       </div>
 
       <p className="mt-4 text-base">
-        {commentTooLong ? comment.slice(0, 210) + '...' : comment}
+        {commentTooLong ? comment.slice(0, 200) + '...' : comment}
         {commentTooLong && (
           <Link
             href={`/posts?redirectToReviewsSection=true`}

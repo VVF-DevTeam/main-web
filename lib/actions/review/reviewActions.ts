@@ -44,7 +44,7 @@ export interface ReviewsPaginationResult {
 }
 
 // ========================================
-// CACHED DATA FETCHING FUNCTIONS (for ISR)
+// CACHED DATA FETCHING FUNCTIONS
 // ========================================
 
 // Cached version of getReviewsPaginated
@@ -153,7 +153,7 @@ export const getCachedReviewsPaginated = unstable_cache(
   },
   ['reviews-paginated'], // Cache key prefix
   {
-    revalidate: 60, // Cache for 60 seconds
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
     tags: ['reviews'], // For on-demand revalidation
   }
 )
@@ -193,7 +193,7 @@ export const getCachedPublishedEventsForReviews = unstable_cache(
   },
   ['published-events-reviews'],
   {
-    revalidate: 60,
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
     tags: ['events', 'reviews'],
   }
 )
@@ -241,7 +241,7 @@ export const getCachedPublishedSeriesForReviews = unstable_cache(
   },
   ['published-series-reviews'],
   {
-    revalidate: 60,
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
     tags: ['series', 'reviews'],
   }
 )

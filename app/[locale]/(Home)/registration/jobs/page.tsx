@@ -3,9 +3,8 @@ import HeaderAndBenefit from '../_components/_jobs/HeaderAndBenefit'
 import JobAdminButtons from '../_components/_jobs/JobAdminButtons'
 import JobList from '../_components/_jobs/JobList'
 
-// Enable ISR - revalidate every hour
-export const revalidate = 3600
-export const dynamic = 'force-static'
+// Note: Pages with searchParams are dynamic and cannot be edge-cached by Vercel
+export const dynamic = 'force-dynamic'
 
 // Main Component
 const JobsAndVolunteers = async ({

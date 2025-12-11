@@ -20,8 +20,9 @@ import { convertStringToReviewRating } from '@/lib/utilFunctions/ratingUtils'
 // import { ReviewRating } from '@prisma/client'
 import ScrollToReviews from './_components/ScrollToReviews'
 
-// Enable ISR - revalidate every 60 seconds
-export const revalidate = 300
+// Note: Pages with searchParams are dynamic and cannot be edge-cached by Vercel
+export const dynamic = 'force-dynamic'
+
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
