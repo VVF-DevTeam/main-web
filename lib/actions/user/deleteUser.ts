@@ -3,6 +3,7 @@
 import { prisma } from '../../db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { revalidateTag } from 'next/cache'
 
 // Define validation schema
 const deleteUserSchema = z.object({
@@ -49,6 +50,9 @@ export const deleteUser = async (data: { email: string; password: string | null 
     await prisma.user.delete({
       where: { email },
     })
+
+    // Revalidate users cache
+    revalidateTag('users')
 
     return { success: true, message: 'User deleted successfully' }
   } catch (error) {

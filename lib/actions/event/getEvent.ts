@@ -132,6 +132,48 @@ export const getPublishedEventsWithFilters = unstable_cache(
   }
 )
 
+// Cached version to get the closest future event
+export const getClosestFutureEvent = unstable_cache(
+  async () => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      const now = new Date()
+      
+      const closestEvent = await prisma.event.findFirst({
+        where: {
+          isPublished: true,
+          startDate: {
+            gte: now, // Events that start in the future
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          keyName: true,
+          startDate: true,
+          endDate: true,
+          startTime: true,
+          endTime: true,
+          eventType: true,
+        },
+        orderBy: {
+          startDate: 'asc', // Get the closest one first
+        },
+      })
+
+      return closestEvent
+    } catch (error) {
+      console.error('Error getting closest future event:', error)
+      return null
+    }
+  },
+  ['events-closest-future'], // Cache key prefix
+  {
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
+    tags: ['events'], // Tag for revalidation
+  }
+)
+
 export async function getEventsOfHost(userId: string) {
   const { prisma } = await import('@/lib/db')
   try {

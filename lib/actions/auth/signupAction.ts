@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/db'
 import { createToken } from '../token/tokenFunctions'
-
+import { revalidateTag } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { sendVerificationEmail } from '../email/sendVerificationEmail'
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
@@ -93,6 +93,9 @@ export const signupAction = async (formData: signupActionProps) => {
         type: 'accountVerification',
       })
     }
+
+    // Revalidate users cache
+    revalidateTag('users')
 
     return {
       message:

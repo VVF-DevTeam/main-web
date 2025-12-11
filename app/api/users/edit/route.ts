@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 
 export const PUT = async (request: NextRequest) => {
   try {
@@ -20,6 +21,10 @@ export const PUT = async (request: NextRequest) => {
         image: image ?? savedUser.image,
       },
     })
+
+    // Revalidate users cache
+    revalidateTag('users')
+
     // console.log(updatedUser)
     return NextResponse.json({ data: updatedUser }, { status: 200 })
   } catch (error) {

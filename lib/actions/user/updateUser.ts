@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '../../db'
+import { revalidateTag } from 'next/cache'
 
 export const updateUser = async (data: {
   name?: string | null
@@ -28,7 +29,10 @@ export const updateUser = async (data: {
         image: data.image ?? null, // Include image update if needed
         phoneVerified: data.phoneVerified ?? null, // Handle phone verification status
       },
-    })  
+    })
+
+    // Revalidate users cache
+    revalidateTag('users')
 
     if (updatedUser) {
       return { success: true, data: updatedUser }

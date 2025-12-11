@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { createToken } from '@/lib/actions/token/tokenFunctions'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
@@ -96,6 +97,9 @@ export const POST = async (request: NextRequest) => {
         type: 'accountVerification',
       })
     }
+
+    // Revalidate users cache
+    revalidateTag('users')
 
     return NextResponse.json(
       {

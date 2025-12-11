@@ -36,25 +36,46 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events with filters (numberOfEvents, upcoming, finished, orderByField, etc.)
 
+#### 4. `getClosestFutureEvent`
+- **File**: `lib/actions/event/getEvent.ts`
+- **Cache Key**: `['events-closest-future']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns the closest future published event (ordered by startDate ascending)
+
+#### 5. `getEventById` (via `getCachedEventById`)
+- **File**: `lib/actions/event/getEventById.ts`
+- **Cache Key**: `['event-by-id']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns a single event by ID with relations (hosts, schedules). Time filtering is applied after cache retrieval.
+
+#### 6. `getEventPagination` (via `getCachedEventPagination`)
+- **File**: `lib/actions/event/getEventPagination.ts`
+- **Cache Key**: `['events-pagination']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 3600 seconds (1 hour - shorter due to time-based filtering)
+- **Description**: Returns paginated events with search and filtering. Time filtering is applied after cache retrieval.
+
 ---
 
 ### Reviews
 
-#### 4. `getCachedReviewsPaginated`
+#### 5. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 5. `getCachedPublishedEventsForReviews`
+#### 6. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 6. `getCachedPublishedSeriesForReviews`
+#### 7. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -65,7 +86,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 7. `getCachedPostsPaginated`
+#### 8. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
@@ -76,12 +97,30 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Social Media Posts
 
-#### 8. `getCachedSocialMediaPostsPaginated`
+#### 9. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
 - **Revalidate Time**: 600 seconds (10 minutes)
 - **Description**: Returns paginated social media posts from Facebook and Instagram
+
+---
+
+### Users
+
+#### 10. `getUsersSimple` (via `getCachedUsersSimple`)
+- **File**: `lib/actions/user/getAllUsersSimple.ts`
+- **Cache Key**: `['users-simple']`
+- **Tags**: `['users']`
+- **Revalidate Time**: 3600 seconds (1 hour)
+- **Description**: Returns list of users with optional count limit and name search
+
+#### 11. `getUsersWithRole` (via `getCachedUsersWithRole`)
+- **File**: `lib/actions/user/getUsersWithRole.ts`
+- **Cache Key**: `['users-with-role']`
+- **Tags**: `['users']`
+- **Revalidate Time**: 3600 seconds (1 hour)
+- **Description**: Returns users filtered by role with optional name search
 
 ---
 
@@ -93,6 +132,9 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getAllPublishedEvents`
 - `getAllPublishedEventsWithRelations`
 - `getPublishedEventsWithFilters`
+- `getClosestFutureEvent`
+- `getEventById` (via `getCachedEventById`)
+- `getEventPagination` (via `getCachedEventPagination`)
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -221,23 +263,67 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Tag: `'users'`
+
+**Cached Functions Affected:**
+- `getUsersSimple` (via `getCachedUsersSimple`)
+- `getUsersWithRole` (via `getCachedUsersWithRole`)
+
+**Functions Calling `revalidateTag('users')`:**
+
+1. **`app/api/users/edit/route.ts`**
+   - Function: `PUT`
+   - Line: After user update
+   - Action: Updates user information (name, age, phone, address, image)
+
+2. **`app/api/users/phone-verified/route.ts`**
+   - Function: `POST`
+   - Line: After phone verification update
+   - Action: Updates user phone verification status
+
+3. **`lib/actions/user/updateUser.ts`**
+   - Function: `updateUser` (server action)
+   - Line: After user update
+   - Action: Updates user profile information
+
+4. **`lib/actions/user/deleteUser.ts`**
+   - Function: `deleteUser` (server action)
+   - Line: After user deletion
+   - Action: Deletes a user account
+
+5. **`lib/actions/auth/signupAction.ts`**
+   - Function: `signupAction` (server action)
+   - Line: After user creation
+   - Action: Creates a new user account
+
+6. **`app/api/auth/m/signup/route.ts`**
+   - Function: `POST`
+   - Line: After user creation
+   - Action: Creates a new user account via API
+
+---
+
 ## Summary by Tag
 
 ### Complete Tag Coverage
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 4 functions | 8 API routes | ✅ Fully covered |
+| `events` | 7 functions | 8 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 1 function | 5 API routes | ✅ Fully covered |
 | `series` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
+| `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
 
 ---
 
 ## Notes
 
-1. **Cache Duration**: Most cached functions use a 7-day cache (604800 seconds), except for social media posts which use 10 minutes (600 seconds) due to external API calls.
+1. **Cache Duration**: Most cached functions use a 7-day cache (604800 seconds), except for:
+   - Social media posts: 10 minutes (600 seconds) due to external API calls
+   - User-related functions: 1 hour (3600 seconds) due to more frequent data changes
+   - Event pagination: 1 hour (3600 seconds) due to time-based filtering
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 
@@ -253,5 +339,6 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
 - When creating or updating series, always call `revalidateTag('series')`
+- When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - Social media posts cache automatically refreshes every 10 minutes
 

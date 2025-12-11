@@ -12,7 +12,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 // Actions
-import { getClosestFutureEvent } from '@/lib/actions/event/getClosestEvent'
+import { getClosestFutureEvent } from '@/lib/actions/event/getEvent'
 
 // Interfaces & Types
 interface EventListHorizontalProps {
