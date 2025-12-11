@@ -198,7 +198,16 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getCachedPublishedSeriesForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('series')`:**
-- **None found** - This tag is used but no explicit revalidation calls were found in the codebase. Consider adding revalidation when series data changes.
+
+1. **`app/api/series/create/route.ts`**
+   - Function: `POST`
+   - Line: After series creation
+   - Action: Creates a new event series
+
+2. **`app/api/series/edit/[seriesId]/route.ts`**
+   - Function: `PUT`
+   - Line: After series update
+   - Action: Updates an existing event series
 
 ---
 
@@ -221,7 +230,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `events` | 4 functions | 8 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 1 function | 5 API routes | ✅ Fully covered |
-| `series` | 1 function | 0 revalidation points | ⚠️ Missing revalidation |
+| `series` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 
 ---
@@ -232,7 +241,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 
-3. **Missing Revalidation**: The `'series'` tag has no revalidation points. Consider adding `revalidateTag('series')` when series data is modified.
+3. **Series Revalidation**: The `'series'` tag is now properly revalidated when series are created or updated via the API routes.
 
 4. **External Data**: Social media posts fetch from external APIs (Facebook/Instagram), so manual revalidation may not be necessary, but the cache will auto-refresh every 10 minutes.
 
@@ -243,6 +252,6 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating, updating, or deleting events, always call `revalidateTag('events')`
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
-- Consider adding `revalidateTag('series')` when series data changes
+- When creating or updating series, always call `revalidateTag('series')`
 - Social media posts cache automatically refreshes every 10 minutes
 
