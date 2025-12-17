@@ -136,7 +136,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
           <span className="font-mono text-xs">
             https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
             <br/> 
-            https://drive.google.com/thumbnail?id=FILE_ID (refer above)
+            https://drive.google.com/thumbnail?id=FILE_ID (refer above on how to get image id)
           </span> <br />
           Please upload them to Google Drive {' '}
           <a

@@ -291,8 +291,8 @@ const EditEventPage = async ({
             <p>
               Please note that if you use your own registration form, the Stripe
               payment section will be replaced. Make sure to include your own
-              payment options in the form. (E-transfer option will still be
-              available)
+              payment options in the form (E-transfer option will still be
+              available). *NOTE*: ZEFFY form link can also be used here
             </p>
             <EventFormLink event={event} />
           </div>

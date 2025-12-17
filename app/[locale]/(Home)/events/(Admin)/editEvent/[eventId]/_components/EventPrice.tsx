@@ -740,7 +740,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                         <FormControl>
                           <Input
                             type="url"
-                            placeholder="FOLLOW SECTION XVIII"
+                            placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => {
