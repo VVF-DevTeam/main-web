@@ -78,7 +78,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
   const { t } = await initTranslation(locale, ['about', 'common'])
 
   return (
-    <div className="flex-col-center py-20">
+    <div className="flex flex-col items-center justify-center py-20">
       {/* Header */}
       <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
         {t('header-directors-aboutUs')}
@@ -116,15 +116,15 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
         </p>
 
         <p>
-          Julia Nguyen (Project Manager), Luna Nguyen (Former CHRO), Minh Tue
-          Nguyen (Co-founder), Khue Le (Co-founder), Sally Nam (Designer Lead),
-          Jayant Puri, Elena Trinh, Nguyen Uyen Nguyen, Vu Tram Anh, Tran Chi
-          Dat, Tran Quyet Tien, Le Hong Ngoc, Vi Do, Nam Phuong Luu, Huy Phan,
-          Phu Loc, Thanh Hang Nguyen, Thao Pham, Le Duc Hieu, Duc Anh Do, Thi
-          Phuong Thao Nguyen, Pham Bao Tran, Nguyen Ngoc Thuy Nguyen, Pham Gia
-          Tri, Dao Gia An, Van Le, Tang Phuong Minh, Luong Quoc Trung, Doan Thu
-          Tra, Vinh Bao Phu, Bui Gia Khanh, Bill V, Felix Nguyen, Jerry Diep,
-          Loc Pham, Nguyen Tran Le Phan, Tony Huynh.
+          Julia Nguyen (Project Manager), Minh Tue Nguyen (Co-founder), Sally
+          Nam (Designer Lead), Elena Trinh (Dance Lead), Tony Huynh, Nguyen Tran
+          Le Phan, Loc Pham, Jerry Diep, Felix Nguyen, Bill Vo, Bui Gia Khanh,
+          Vinh Bao Phu, Doan Thu Tra, Luong Quoc Trung, Tang Phuong Minh, Van
+          Le, Dao Gia An, Pham Gia Tri, Nguyen Ngoc Thuy Nguyen, Pham Bao Tran,
+          Thi Phuong Thao Nguyen, Duc Anh Do, Le Duc Hieu, Thao Pham, Thanh Hang
+          Nguyen, Phu Loc, Huy Phan, Nam Phuong Luu, Vi Do, Le Hong Ngoc, Tran
+          Quyet Tien, Tran Chi Dat, Vu Tram Anh, Nguyen Uyen Nguyen, Jayant
+          Puri, Luna Nguyen (Former CHRO), Khue Le (Former Co-founder).
         </p>
       </div>
     </div>

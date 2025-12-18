@@ -11,17 +11,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-static'
 
 // Main Component
-const AboutPageDirectors = async({
+const AboutPageDirectors = async ({
   params,
 }: {
   params: Promise<{ locale: string }>
 }) => {
   const { locale } = await params
-  return (
-    <div className="h-full w-full">
-      <OrgMembers locale={locale}/>
-    </div>
-  )
+  return <OrgMembers locale={locale} />
 }
 
 export default AboutPageDirectors

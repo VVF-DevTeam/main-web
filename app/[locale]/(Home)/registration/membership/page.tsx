@@ -16,7 +16,7 @@ const MembershipPage = async ({
   const { locale } = await params
 
   return (
-    <div className="flex flex-col gap-y-6 p-4 md:pb-8 text-base md:text-lg pt-12">
+    <div className="flex min-h-[calc(100vh-120px)] flex-col items-center justify-center gap-y-6 px-4 text-base p-4 md:text-lg">
       <MembershipHeader locale={locale} />
       <Separator className="my-4" />
       <MembershipBenefits locale={locale} />

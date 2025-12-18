@@ -35,7 +35,7 @@ const About = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['about', 'common'])
 
   return (
-    <div className="flex-center">
+    <div className="flex min-h-[calc(100vh-120px)] items-center justify-center">
       <div className="flex-col-center width-max-default p-12">
         <div className="flex-col-center default-gap mb-2 pt-0">
           <h2 className="cursor-default lg:text-5xl tracking-wider text-textColor-brandDark900 header-font-default header-sub">
