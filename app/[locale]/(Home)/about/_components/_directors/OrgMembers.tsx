@@ -118,7 +118,7 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
         <p>
           Julia Nguyen (Project Manager), Minh Tue Nguyen (Co-founder), Sally
           Nam (Designer Lead), Elena Trinh (Dance Lead), Stephanie Le, Jerry
-          Diep, Dat Tran Tuan, Phong Tran, Tony Huynh, Nhi Nguyen, Nguyen Tran
+          Diep, Ca Heo (Bach), Dat Tran Tuan, Phong Tran, Tony Huynh, Nhi Nguyen, Nguyen Tran
           Le Phan, Loc Pham, Tin Truong, Minh Anh, Jerry Diep, Hoang Pham, Felix
           Nguyen, Bill Vo, Bui Gia Khanh, Vinh Bao Phu, Doan Thu Tra, Luong Quoc
           Trung, Tang Phuong Minh, Van Le, Dao Gia An, Pham Gia Tri, Nguyen Ngoc
