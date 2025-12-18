@@ -117,14 +117,16 @@ const OrgMembers = async ({ locale }: OrgMembersProps) => {
 
         <p>
           Julia Nguyen (Project Manager), Minh Tue Nguyen (Co-founder), Sally
-          Nam (Designer Lead), Elena Trinh (Dance Lead), Tony Huynh, Nguyen Tran
-          Le Phan, Loc Pham, Jerry Diep, Felix Nguyen, Bill Vo, Bui Gia Khanh,
-          Vinh Bao Phu, Doan Thu Tra, Luong Quoc Trung, Tang Phuong Minh, Van
-          Le, Dao Gia An, Pham Gia Tri, Nguyen Ngoc Thuy Nguyen, Pham Bao Tran,
-          Thi Phuong Thao Nguyen, Duc Anh Do, Le Duc Hieu, Thao Pham, Thanh Hang
-          Nguyen, Phu Loc, Huy Phan, Nam Phuong Luu, Vi Do, Le Hong Ngoc, Tran
-          Quyet Tien, Tran Chi Dat, Vu Tram Anh, Nguyen Uyen Nguyen, Jayant
-          Puri, Luna Nguyen (Former CHRO), Khue Le (Former Co-founder).
+          Nam (Designer Lead), Elena Trinh (Dance Lead), Stephanie Le, Jerry
+          Diep, Dat Tran Tuan, Phong Tran, Tony Huynh, Nhi Nguyen, Nguyen Tran
+          Le Phan, Loc Pham, Tin Truong, Minh Anh, Jerry Diep, Hoang Pham, Felix
+          Nguyen, Bill Vo, Bui Gia Khanh, Vinh Bao Phu, Doan Thu Tra, Luong Quoc
+          Trung, Tang Phuong Minh, Van Le, Dao Gia An, Pham Gia Tri, Nguyen Ngoc
+          Thuy Nguyen, Pham Bao Tran, Thi Phuong Thao Nguyen, Duc Anh Do, Le Duc
+          Hieu, Thao Pham, Thanh Hang Nguyen, Phu Loc, Huy Phan, Nam Phuong Luu,
+          Vi Do, Le Hong Ngoc, Tran Quyet Tien, Tran Chi Dat, Vu Tram Anh,
+          Nguyen Uyen Nguyen, Jayant Puri, Luna Nguyen (Former CHRO), Khue Le
+          (Former Co-founder).
         </p>
       </div>
     </div>

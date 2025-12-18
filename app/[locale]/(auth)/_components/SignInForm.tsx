@@ -129,11 +129,18 @@ const SignInForm = () => {
   }
 
   return (
-    <div className="mt-8 flex w-full flex-col px-6 py-12 lg:px-14 xl:px-20">
+    <div className="mt-8 flex w-full flex-col px-6 py-4 md:py-12 lg:px-14 xl:px-20">
       {/* Form Header */}
-      <div className="flex-center header-font-black mb-24 gap-x-4 lg:mb-36">
-        <CustomIcon height={100} width={100} />
-        <h1 className="text-3xl">Viet Vibe Foundation</h1>
+      <div className="flex-center header-font-black mb-8 gap-x-4 md:mb-16 lg:mb-28">
+        {/* Small screens: smaller icon */}
+        <div className="block md:hidden">
+          <CustomIcon height={72} width={72} />
+        </div>
+        {/* Medium and above: larger icon */}
+        <div className="hidden md:block">
+          <CustomIcon height={100} width={100} />
+        </div>
+        <h1 className="text-2xl md:text-3xl">Viet Vibe Foundation</h1>
       </div>
       <h1 className="header-font-default text-4xl font-semibold text-textColor-brand900">
         {t('login')}
@@ -213,7 +220,7 @@ const SignInForm = () => {
             <div className="flex-center mt-2 flex-col gap-y-4 self-stretch">
               <Link
                 href="/forgotPassword"
-                className="place-self-end text-sm text-textColor-brand900 hover:underline hover:text-textColor-brand900/80"
+                className="place-self-end text-sm text-textColor-brand900 hover:text-textColor-brand900/80 hover:underline"
               >
                 {t('forgotPassword')}
               </Link>
@@ -230,7 +237,7 @@ const SignInForm = () => {
                 {t('noAccount')}{' '}
                 <Link
                   href="/signUp"
-                  className="text-textColor-brand900 decoration-2 transition-all hover:text-textColor-brand/70 hover:underline"
+                  className="hover:text-textColor-brand/70 text-textColor-brand900 decoration-2 transition-all hover:underline"
                 >
                   {t('signUp')}
                 </Link>
