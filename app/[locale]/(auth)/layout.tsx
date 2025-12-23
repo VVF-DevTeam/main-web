@@ -15,7 +15,7 @@ const Layout = async ({
   return (
     <div className="relative h-full min-h-fit w-full min-w-full bg-bgColor-secondary200 bg-cover bg-center bg-no-repeat">
       <Header />
-      <Navbar locale={locale} />
+      <Navbar />
       <div className="min-h-[calc(100vh-120px)] content-center">{children}</div>
       <div className="mt-auto">
         <Footer locale={locale} />
