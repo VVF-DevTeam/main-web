@@ -6,7 +6,7 @@ import { MembershipHeader } from '../_components/_membership/MembershipHeader'
 import { MembershipBenefits } from '../_components/_membership/MembershipBenefits'
 
 // No use of auth() or header or live database, so can be static
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 const MembershipPage = async ({
   params,
