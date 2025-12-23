@@ -187,9 +187,7 @@ export default function EventSingleCheckOut({
       {isLoading ? (
         <Button disabled>Loading...</Button>
       ) : !hasTickets ? (
-        <p className="text-sm text-red-600">
-          {t('no-ticket-selected')}
-        </p>
+        <p className="text-sm text-red-600">{t('no-ticket-selected')}</p>
       ) : (
         <>
           {!isSubscribed && (
@@ -213,7 +211,7 @@ export default function EventSingleCheckOut({
                 isSubscribed && ticket.subscribedStripePriceId
                   ? ticket.subscribedStripePriceId
                   : ticket.stripePriceId
-              
+
               if (!stripePriceIdForUser || !ticket.stripeProductId) {
                 return null
               }
@@ -265,8 +263,8 @@ export default function EventSingleCheckOut({
                         {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
                           // Full course: Show total sessions and per-session price
                           <span className="text-xs text-gray-500 drop-shadow-sm">
-                            {t('total')} {ticket.payTotalNumber} {t('sessions')} -
-                            ${perSessionPrice.toFixed(2)} {t('each')}
+                            {t('total')} {ticket.payTotalNumber} {t('sessions')}{' '}
+                            - ${perSessionPrice.toFixed(2)} {t('each')}
                           </span>
                         ) : (
                           // Drop-in: Show per-session price only
@@ -277,12 +275,13 @@ export default function EventSingleCheckOut({
                         )}
                       </>
                     )}
-                    {memberPrice !== null && (
+                    {memberPrice !== null ? (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
-                        {isSubscribed &&
-                          `Member price applied: ${currencyLabel} ${memberPrice.toFixed(2)}`}
+                        {isSubscribed
+                          ? `Member price applied: ${currencyLabel} ${memberPrice.toFixed(2)}`
+                          : `Member price: ${currencyLabel} ${memberPrice.toFixed(2)}`}
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Individual checkout button (hidden when using master checkout in cart) */}

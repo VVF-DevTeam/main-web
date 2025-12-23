@@ -55,14 +55,16 @@ export const MembershipBenefits = async ({
           className="relative rounded-lg border p-6 pb-20 shadow-sm transition-shadow hover:shadow-md"
         >
           <h3 className="mb-2 text-2xl font-semibold text-primary">
-            {tier.title} (annually)
+            {tier.title} (Annually)
           </h3>
           <p className="mb-4 text-3xl font-bold">{tier.price} CAD</p>
           <ul className="space-y-3">
             {tier.features.map((feature, featureIndex) => (
               <li key={featureIndex} className="flex items-center">
                 <svg
-                  className="mr-2 h-5 w-5 text-green-500"
+                  className="mr-2 text-green-500 shrink-0"
+                  width="20"
+                  height="20"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
