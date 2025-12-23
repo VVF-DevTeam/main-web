@@ -3,6 +3,7 @@ import initTranslation from '@/app/i18n'
 import NormalCheckoutButton from '@/components/payment/NormalCheckoutButton'
 import { auth } from '@/auth'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
+import Link from 'next/link'
 interface MembershipBenefitsProps {
   locale: string
 }
@@ -19,8 +20,8 @@ export const MembershipBenefits = async ({
   const benefits = [
     {
       title: t('basic-membership'),
-      price: 5,
-      priceId: 'price_1RMFpi06wc04MarVvcc6OXj0',
+      price: 30,
+      priceId: 'price_1ShQKm06wc04MarVL7nZABMs',
       features: [
         t('basic-feature-1'),
         t('basic-feature-2'),
@@ -30,12 +31,9 @@ export const MembershipBenefits = async ({
     },
     {
       title: t('premium-membership'),
-      price: 7,
-      priceId: 'price_1RMdOq06wc04MarVTraVJ0GL',
-      features: [
-        t('premium-feature-1'),
-        t('premium-feature-2')
-      ],
+      price: 35,
+      priceId: 'price_1ShQNl06wc04MarVvGNKWiSH',
+      features: [t('premium-feature-1'), t('premium-feature-2')],
     },
     // {
     //   title: t('vip-membership'),
@@ -57,7 +55,7 @@ export const MembershipBenefits = async ({
           className="relative rounded-lg border p-6 pb-20 shadow-sm transition-shadow hover:shadow-md"
         >
           <h3 className="mb-2 text-2xl font-semibold text-primary">
-            {tier.title} (monthly)
+            {tier.title} (annually)
           </h3>
           <p className="mb-4 text-3xl font-bold">{tier.price} CAD</p>
           <ul className="space-y-3">
@@ -99,7 +97,16 @@ export const MembershipBenefits = async ({
             )
           ) : (
             <div className="absolute bottom-[15px] left-7">
-              <p>{t('become-member-login')}</p>
+              <p>
+                {t('become-member-login-1')}{' '}
+                <Link
+                  href="/signIn"
+                  className="text-blue-500 hover:text-blue-600 hover:underline"
+                >
+                  {t('become-member-login-2')}
+                </Link>{' '}
+                {t('become-member-login-3')}
+              </p>
             </div>
           )}
         </div>

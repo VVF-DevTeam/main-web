@@ -3,6 +3,8 @@ import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
 // import Copyright from './_components/copyright'
 
+export const dynamic = 'force-dynamic'
+
 const Layout = async ({
   children,
   params,
@@ -15,7 +17,7 @@ const Layout = async ({
   return (
     <div className="relative h-full min-h-screen w-full">
       <Header />
-      <Navbar locale={locale} />
+      <Navbar />
 
       <div className="min-h-[calc(100vh-120px)]">{children}</div>
       <div className="mt-auto">

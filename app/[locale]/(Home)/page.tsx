@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 // Page is static - data fetching uses unstable_cache with revalidateTag for on-demand invalidation
 // All data functions (events, posts, reviews) use unstable_cache with long cache times
 // Cache is invalidated immediately via revalidateTag when content changes
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 // Main Component
 export default async function Home({
@@ -44,27 +44,38 @@ export default async function Home({
   const { locale } = await params
 
   // Fetch all data in parallel for better performance
-  const [upcomingThreeEvents, pastThreeEvents, paginatedReviews, paginatedPosts] =
-    await Promise.all([
-      getPublishedEventsWithFilters({
-        numberOfEvents: 3,
-        upcoming: true,
-        finished: false,
-        orderByField: 'createdAt',
-        orderDirection: 'desc',
-        includeCategories: true,
-      }),
-      getPublishedEventsWithFilters({
-        numberOfEvents: 3,
-        upcoming: false,
-        finished: true,
-        orderByField: 'createdAt',
-        orderDirection: 'desc',
-        includeCategories: true,
-      }),
-      getCachedReviewsPaginated(1, 9, '', '', convertStringToReviewRating('5'), true),
-      getCachedPostsPaginated('', 1, 3),
-    ])
+  const [
+    upcomingThreeEvents,
+    pastThreeEvents,
+    paginatedReviews,
+    paginatedPosts,
+  ] = await Promise.all([
+    getPublishedEventsWithFilters({
+      numberOfEvents: 3,
+      upcoming: true,
+      finished: false,
+      orderByField: 'createdAt',
+      orderDirection: 'desc',
+      includeCategories: true,
+    }),
+    getPublishedEventsWithFilters({
+      numberOfEvents: 3,
+      upcoming: false,
+      finished: true,
+      orderByField: 'createdAt',
+      orderDirection: 'desc',
+      includeCategories: true,
+    }),
+    getCachedReviewsPaginated(
+      1,
+      9,
+      '',
+      '',
+      convertStringToReviewRating('5'),
+      true
+    ),
+    getCachedPostsPaginated('', 1, 3),
+  ])
 
   const reviews = paginatedReviews.reviews
   const posts = paginatedPosts!.posts

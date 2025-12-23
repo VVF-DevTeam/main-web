@@ -1,9 +1,10 @@
+'use client'
+
 // Libraries
 import React from 'react'
-import { auth } from '@/auth'
 import { User2 } from 'lucide-react'
 import Link from 'next/link'
-// import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 
 // Components
 import MobileSidebar from './_navbar/mobileSidebar'
@@ -11,13 +12,11 @@ import NavLinks from './_navbar/navLinks'
 import CustomIcon from '@/app/[locale]/components/CustomIcon'
 
 // Main Component
-const Navbar = async ({ locale }: { locale: string }) => {
-  // TODO: Move session to parent component
-  const session = await auth()
+const Navbar = () => {
+  const { data: session } = useSession()
 
   return (
-    <nav className="sticky z-10 top-0 w-full md:px-2 lg:px-6 shadow-md h-[100px] flex items-center bg-white">
-
+    <nav className="sticky top-0 z-10 flex h-[100px] w-full items-center bg-white shadow-md md:px-2 lg:px-6">
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
       {/* <div className="white-overlay"></div>
       <Image
@@ -30,10 +29,10 @@ const Navbar = async ({ locale }: { locale: string }) => {
 
       {/* Nav Links */}
 
-      <div className="flex-between items-center w-full gap-x-4 px-2 md:px-4 lg:px-8">
+      <div className="flex-between w-full items-center gap-x-4 px-2 md:px-4 lg:px-8">
         <div className="flex h-[70px] w-full items-center gap-x-4 pl-2">
           {/* Company Logo with Slogan*/}
-          <Link href="/" className=''>
+          <Link href="/" className="">
             <CustomIcon />
           </Link>
 
@@ -53,10 +52,10 @@ const Navbar = async ({ locale }: { locale: string }) => {
         {/* Nav Links */}
         <div className="flex-center gap-x-3 lg:gap-x-6">
           <div className="hidden sm:block">
-            <NavLinks mode="desktop" locale={locale} />
+            <NavLinks mode="desktop" />
           </div>
           <div className="block sm:hidden">
-            <MobileSidebar locale={locale} />
+            <MobileSidebar />
           </div>
         </div>
       </div>

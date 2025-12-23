@@ -1,9 +1,10 @@
+'use client'
+
 // Libraries
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { navRoutes } from '@/lib/navRoutes'
 import { cn } from '@/lib/utils'
-import initTranslation from '@/app/i18n'
-import { auth } from '@/auth'
 
 // Components
 import NavLink from './navLink'
@@ -22,13 +23,12 @@ import Link from 'next/link'
 type screenSize = 'mobile' | 'desktop'
 interface NavLinkProps {
   mode: screenSize
-  locale: string
 }
 
 // Main Component
-const NavLinks = async ({ mode, locale }: NavLinkProps) => {
-  const session = await auth()
-  const { t } = await initTranslation(locale, ['homePage', 'common'])
+const NavLinks = ({ mode }: NavLinkProps) => {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation(['homePage', 'common'])
 
   // TODO: Concat navroute and auth routes
   return (
@@ -59,7 +59,7 @@ const NavLinks = async ({ mode, locale }: NavLinkProps) => {
         mode={mode}
       />
 
-      <AuthButtons userExists={!!session?.user} mode={mode} />
+      <AuthButtons mode={mode} />
 
       {/* Mobile App Links */}
       {mode === 'mobile' && (
