@@ -141,7 +141,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
           Please upload them to Google Drive {' '}
           <a
             className="text-blue-700 underline"
-            href="https://drive.google.com/drive/u/3/folders/1ckHqzTIwgdfbOjofRKbmx0vejnoejbW9"
+            href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
             target="_blank"
             rel="noreferrer"
           >
