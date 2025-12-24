@@ -126,7 +126,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-bgColor-gray300 px-4 py-6">
+    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex flex-col gap-y-4">
         {/* Notification for Google Drive only */}
         <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">

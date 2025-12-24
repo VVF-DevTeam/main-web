@@ -218,7 +218,7 @@ export default function EventSingleCheckOut({
 
               const paymentTypeValue = resolvePaymentType(type, ticket)
               const perSessionPrice = Number(ticket.price) || 0
-              const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
+              // const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
 
               return (
                 <div
@@ -278,8 +278,8 @@ export default function EventSingleCheckOut({
                     {memberPrice !== null ? (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
                         {isSubscribed
-                          ? `Member price applied: ${currencyLabel} ${memberPrice.toFixed(2)}`
-                          : `Member price: ${currencyLabel} ${memberPrice.toFixed(2)}`}
+                          ? `Member price applied: $${memberPrice.toFixed(2)}`
+                          : `Member price: $${memberPrice.toFixed(2)}`}
                       </span>
                     ) : null}
                   </div>
