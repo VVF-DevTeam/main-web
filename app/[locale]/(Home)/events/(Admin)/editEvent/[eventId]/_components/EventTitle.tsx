@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 
 interface EventTitleProps {
   event: Event
@@ -45,7 +46,7 @@ const EventTitle = ({ event }: EventTitleProps) => {
   })
 
   const onSubmit = async (data: z.infer<typeof EventTitleSchema>) => {
-    const keyName = data.title.replace(/\s+/g, '-').toLowerCase()
+    const keyName = formatKeyName(data.title)
     
     try {
       const response = await axiosInstance.put(

@@ -202,6 +202,7 @@ export async function POST(req: NextRequest) {
         ticketId: string
         seatNumbers: string[]
       }> | null = null
+      
       if (metadata.ticketMetadata) {
         try {
           ticketMetadata = JSON.parse(
@@ -249,7 +250,12 @@ export async function POST(req: NextRequest) {
 
         for (const ticketInfo of ticketMetadata) {
           const ticket = ticketMap.get(ticketInfo.ticketId)
-          if (!ticket) continue
+          if (!ticket) {
+            console.warn(
+              `[WEBHOOK_WARNING] EventTicket with id ${ticketInfo.ticketId} not found in ticketMap. Skipping payment creation.`
+            )
+            continue
+          }
 
           const seatCount = ticketInfo.seatNumbers.length
           const ticketPrice = Number(ticket.price) || 0
@@ -285,11 +291,33 @@ export async function POST(req: NextRequest) {
         }
       } else {
         // Single ticket checkout (backward compatibility)
+        // Validate eventTicketId exists if provided
+        // For Membership payments, eventTicketId should always be null
+        let validEventTicketId: string | null = null
+        if (
+          metadata.type !== 'Membership' &&
+          metadata.eventTicketId &&
+          metadata.eventTicketId.trim() !== ''
+        ) {
+          const ticketExists = await prisma.eventTicket.findUnique({
+            where: { id: metadata.eventTicketId },
+            select: { id: true },
+          })
+          if (ticketExists) {
+            validEventTicketId = metadata.eventTicketId
+          } else {
+            console.warn(
+              `[WEBHOOK_WARNING] EventTicket with id ${metadata.eventTicketId} not found. Creating payment without eventTicketId.`
+            )
+          }
+        }
+        // For Membership or empty/invalid eventTicketId, validEventTicketId remains null
+
         await prisma.payment.create({
           data: {
             userId: metadata.userId,
             eventId: metadata.eventId,
-            eventTicketId: metadata.eventTicketId,
+            eventTicketId: validEventTicketId, // Will be null for Membership or empty strings
             stripePaymentId: paymentId,
             pricePaid: chargedAmount / 100,
             type: metadata.type as PaymentType,

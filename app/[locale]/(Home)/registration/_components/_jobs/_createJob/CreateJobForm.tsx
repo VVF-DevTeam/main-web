@@ -34,6 +34,7 @@ import {
 
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
+import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 
 // Interfaces
 interface CreateJobFormProps {
@@ -65,10 +66,10 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof createJobSchema>) => {
     //Format title to trims whitespaces
-    const title = data.title.replace(/\s+/g, ' ').trim()
+    const title = formatKeyName(data.title)
 
     // Format title to keyName, which is used for pathname
-    const keyName = title.replace(/\s+/g, '-').toLowerCase()
+    const keyName = formatKeyName(title)
     
     try {
       const jobData = {
