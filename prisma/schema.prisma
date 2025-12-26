@@ -54,6 +54,7 @@ model Event {
   tickets            EventTicket[]
   payments           Payment[]
   Review             Review[]
+  form               EventForm[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
   seatingMap         Json?
@@ -137,6 +138,20 @@ model EventTicket {
   eventId   String
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
   payments  Payment[]
+}
+
+model EventForm {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+
+
+  // Relation
+  eventId   String
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Data
+  FormData Json
 }
 
 model User {

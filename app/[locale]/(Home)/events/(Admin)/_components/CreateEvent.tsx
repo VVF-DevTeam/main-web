@@ -34,6 +34,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { axiosInstance } from '@/lib/axios'
+import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 
 // Interfaces
 interface CreateEventFormProps {
@@ -65,10 +66,10 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     //Format title to trims whitespaces
-    const title = data.title.replace(/\s+/g, ' ').trim()
+    const title = formatKeyName(data.title)
 
     // Format title to keyName, which is used for pathname
-    const keyName = title.replace(/\s+/g, '-').toLowerCase()
+    const keyName = formatKeyName(title)
 
     try {
       const eventData = {

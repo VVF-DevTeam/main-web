@@ -31,6 +31,7 @@ import EventSubtitle from './_components/EventSubtitle'
 import EventGallery from './_components/EventGallery'
 import DeleteEventButton from './_components/DeleteEventButton'
 import EventSeating from './_components/EventSeating'
+import EventForm from './_components/EventForm'
 
 // Main Component
 const EditEventPage = async ({
@@ -157,6 +158,7 @@ const EditEventPage = async ({
             <EventTitle event={event} />
             {event.eventType === 'CONCERT' && <EventSubtitle event={event} />}
           </div>
+
           {/* Type */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -164,6 +166,7 @@ const EditEventPage = async ({
             </h2>
             <EventType event={event} />
           </div>
+
           {/* Description */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -172,6 +175,7 @@ const EditEventPage = async ({
             <EditorInstructions />
             <EventDescription event={event} />
           </div>
+
           {/* Price */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -179,6 +183,7 @@ const EditEventPage = async ({
             </h2>
             <EventPrice event={event} />
           </div>
+
           {/* Capacity */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -186,13 +191,19 @@ const EditEventPage = async ({
             </h2>
             <EventCapacity event={event} />
           </div>
+
           {/* Location */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step VI :</span> Location
             </h2>
+            <p>
+              NOTE: Do not use special characters such as &quot; or &apos; or
+              &amp;. Comma can be used.
+            </p>
             <EventLocation event={event} />
           </div>
+
           {/* Images */}
           <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -201,6 +212,7 @@ const EditEventPage = async ({
             <ImageAddInstruction />
             <EventImage event={event} />
           </div>
+
           {/* Start Date */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -208,6 +220,7 @@ const EditEventPage = async ({
             </h2>
             <EventStartDate event={event} />
           </div>
+
           {/* End date */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -215,6 +228,7 @@ const EditEventPage = async ({
             </h2>
             <EventEndDate event={event} />
           </div>
+
           {/* Event Timings */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -222,6 +236,7 @@ const EditEventPage = async ({
             </h2>
             <EventTimings event={event} />
           </div>
+
           {/* Event Days */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -229,6 +244,7 @@ const EditEventPage = async ({
             </h2>
             <EventDays event={event} />
           </div>
+
           {/* End Schedule */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -236,6 +252,7 @@ const EditEventPage = async ({
             </h2>
             <EventSchedule event={event} />
           </div>
+
           {/* Event Hosts */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -243,6 +260,7 @@ const EditEventPage = async ({
             </h2>
             <EventHosts event={event} />
           </div>
+
           {/* Event Categories */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -296,6 +314,7 @@ const EditEventPage = async ({
             </p>
             <EventFormLink event={event} />
           </div>
+
           {/* Event Social Media - Only show for concert events */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -304,6 +323,7 @@ const EditEventPage = async ({
             </h2>
             <EventSocialMedia event={event} />
           </div>
+
           {/* Event Gallery */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -312,6 +332,7 @@ const EditEventPage = async ({
             </h2>
             <EventGallery event={event} />
           </div>
+
           {/* Event Seating */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -320,6 +341,7 @@ const EditEventPage = async ({
             </h2>
             <EventSeating event={event} />
           </div>
+
           {/* Event Sponsors */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -327,7 +349,7 @@ const EditEventPage = async ({
               (Optional)
             </h2>
             <p>
-              Please use this link to manage sponsors: {' '}
+              Please use this link to manage sponsors:{' '}
               <a
                 href="/events/manageSponsors"
                 target="_blank"
@@ -336,6 +358,14 @@ const EditEventPage = async ({
                 here
               </a>
             </p>
+          </div>
+
+          {/* Event Form */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XXI :</span> Event Form
+            </h2>
+            <EventForm event={event} />
           </div>
         </div>
       </div>
