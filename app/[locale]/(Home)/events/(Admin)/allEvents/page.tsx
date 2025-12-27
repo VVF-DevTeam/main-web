@@ -1,7 +1,7 @@
 // Libraries
-import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
+import { getAllEvents } from '@/lib/actions/event/getEvent'
 
 // Components
 import BackButton from '@/components/ui/back-button'
@@ -22,11 +22,8 @@ const AllEvents = async () => {
   }
 
   // Get all published and unpublished events
-  const allEvents = await prisma.event.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  const allEvents = await getAllEvents()
+
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}
@@ -36,7 +33,7 @@ const AllEvents = async () => {
       <h1 className="header-sub">All Events</h1>
       <p className="mb-12 text-sm text-muted-foreground">
         All published and unpublished events appear here. Click on the
-        <span className="font-semibold text-textColor-brand900 transition-all hover:text-textColor-brand/70">
+        <span className="hover:text-textColor-brand/70 font-semibold text-textColor-brand900 transition-all">
           {' '}
           &quot;Edit&quot;
         </span>{' '}

@@ -11,7 +11,7 @@ import { SeatingMap } from '../../(Admin)/editEvent/[eventId]/_components/EventS
 
 // Libraries
 import { Metadata } from 'next'
-import { prisma } from '@/lib/db'
+import { getEventByKeyName } from '@/lib/actions/event/getEventById'
 
 export async function generateMetadata({
   params,
@@ -19,17 +19,7 @@ export async function generateMetadata({
   params: Promise<{ eventKeyName: string }>
 }): Promise<Metadata> {
   const { eventKeyName } = await params
-
-  // TODO: Simplify code to only query once to get data
-  const publishedClass = await prisma.event.findUnique({
-    where: {
-      keyName: eventKeyName,
-    },
-    select: {
-      title: true,
-      imgUrl: true,
-    },
-  })
+  const publishedClass = await getEventByKeyName(eventKeyName)
 
   return {
     title: publishedClass?.title,
@@ -54,41 +44,7 @@ interface ClassPageProps {
 const ClassPage = async ({ params }: ClassPageProps) => {
   const { locale, eventKeyName } = await params
 
-  const publishedClass = await prisma.event.findUnique({
-    where: {
-      keyName: eventKeyName,
-    },
-    include: {
-      schedules: true,
-      categories: true,
-      hosts: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
-      _count: {
-        select: {
-          Review: true,
-        },
-      },
-      series: {
-        select: {
-          id: true,
-        },
-      },
-      tickets: true,
-      sponsors: {
-        include: {
-          sponsor: true,
-        },
-        orderBy: [
-          { tier: 'asc' },
-          { order: 'asc' },
-        ],
-      },
-    },
-  })
+  const publishedClass = await getEventByKeyName(eventKeyName)
 
   if (!publishedClass) {
     return <NotFound />

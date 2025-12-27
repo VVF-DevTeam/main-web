@@ -359,11 +359,13 @@ enum EventType {
 }
 
 enum JobType {
-  Media
-  Operations
-  Event
+  Performance
+  Marketing
+  ProjectManager
   HR
   Tech
+  Finance
+  Volunteer
 }
 
 enum CategoryType {

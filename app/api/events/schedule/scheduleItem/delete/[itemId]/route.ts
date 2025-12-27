@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 
 export const DELETE = async (
   request: Request,
@@ -40,6 +41,9 @@ export const DELETE = async (
         },
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
 
     return NextResponse.json(deletedItem)
   } catch (error) {

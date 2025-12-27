@@ -57,6 +57,20 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 3600 seconds (1 hour - shorter due to time-based filtering)
 - **Description**: Returns paginated events with search and filtering. Time filtering is applied after cache retrieval.
 
+#### 7. `getEventByKeyName`
+- **File**: `lib/actions/event/getEventById.ts`
+- **Cache Key**: `['event-by-keyname']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns a single event by keyName with full relations (schedules, categories, hosts, tickets, sponsors, series). Used for event detail pages and metadata generation.
+
+#### 8. `getAllEvents`
+- **File**: `lib/actions/event/getEvent.ts`
+- **Cache Key**: `['events-all']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all events (published and unpublished) for admin use only. Cache is invalidated when events are created/updated/deleted.
+
 ---
 
 ### Reviews
@@ -135,6 +149,8 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getClosestFutureEvent`
 - `getEventById` (via `getCachedEventById`)
 - `getEventPagination` (via `getCachedEventPagination`)
+- `getEventByKeyName`
+- `getAllEvents`
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -178,6 +194,28 @@ This document provides a comprehensive overview of all functions using `unstable
    - Function: `POST` (line 28)
    - Function: `DELETE` (line 62)
    - Action: Adds or removes categories from an event
+
+9. **`app/api/events/tickets/route.ts`**
+   - Function: `POST` (create ticket)
+   - Function: `PUT` (update ticket)
+   - Function: `DELETE` (delete ticket)
+   - Action: Creates, updates, or deletes event tickets. Tickets are included in cached event queries, so changes must invalidate the cache.
+
+10. **`app/api/events/schedule/scheduleItem/add/route.ts`**
+    - Function: `POST`
+    - Action: Adds a new schedule item to an event. Schedules are included in cached event queries, so changes must invalidate the cache.
+
+11. **`app/api/events/schedule/scheduleItem/edit/[scheduleItemId]/route.ts`**
+    - Function: `PUT`
+    - Action: Updates an existing schedule item. Schedules are included in cached event queries, so changes must invalidate the cache.
+
+12. **`app/api/events/schedule/scheduleItem/delete/[itemId]/route.ts`**
+    - Function: `DELETE`
+    - Action: Deletes a schedule item from an event. Schedules are included in cached event queries, so changes must invalidate the cache.
+
+13. **`app/api/events/forms/[eventId]/route.ts`**
+    - Function: `PUT`
+    - Action: Creates or updates event form data. Event forms are part of event data, so changes must invalidate the cache.
 
 ---
 
@@ -309,7 +347,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 7 functions | 8 API routes | ✅ Fully covered |
+| `events` | 9 functions | 13 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 1 function | 5 API routes | ✅ Fully covered |
 | `series` | 1 function | 2 API routes | ✅ Fully covered |
@@ -336,9 +374,40 @@ This document provides a comprehensive overview of all functions using `unstable
 ## Usage Guidelines
 
 - When creating, updating, or deleting events, always call `revalidateTag('events')`
+- When creating, updating, or deleting event tickets, always call `revalidateTag('events')` (tickets are included in cached event queries)
+- When creating, updating, or deleting event schedules, always call `revalidateTag('events')` (schedules are included in cached event queries)
+- When creating, updating, or deleting event forms, always call `revalidateTag('events')`
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
 - When creating or updating series, always call `revalidateTag('series')`
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - Social media posts cache automatically refreshes every 10 minutes
+
+## Recent Updates
+
+### 2024 - Event Caching Improvements
+
+1. **Added `getEventByKeyName` cached function**
+   - Caches event queries by keyName with full relations
+   - Used for event detail pages and metadata generation
+   - Ensures query only runs once per request even when called from both `generateMetadata` and page component
+
+2. **Added `getAllEvents` cached function**
+   - Caches all events (published and unpublished) for admin use
+   - Previously uncached due to need for fresh data
+   - Now safe to cache because all event mutations properly invalidate the cache
+
+3. **Extended revalidation coverage**
+   - Added `revalidateTag('events')` to tickets API (create, update, delete)
+   - Added `revalidateTag('events')` to schedule item APIs (add, edit, delete)
+   - Ensures cached event data (which includes tickets and schedules) stays fresh when these related entities change
+
+### Why Related Entities Need Revalidation
+
+Event queries often include related data:
+- **Tickets**: Included in `getAllPublishedEventsWithRelations`, `getPublishedEventsWithFilters`, and `getEventByKeyName`
+- **Schedules**: Included in `getEventByKeyName` and `getEventById`
+- **Categories, Hosts, Series**: Included in various cached event queries
+
+When any of these related entities change, the cached event data becomes stale. Therefore, all mutation APIs for these entities must call `revalidateTag('events')` to ensure users see updated data immediately.
 

@@ -41,24 +41,37 @@ interface SendEmailTemplateProps {
 }
 
 const emailMapping: Record<JobType, string[]> = {
-  Media: [
+  Marketing: [
     'hoianh.nguyen@vietvibe.org',
     'trong.nguyen@vietvibe.org',
     'hr@vietvibe.org',
   ],
-  Operations: [
-    'eric.nguyen@vietvibe.org',
+  ProjectManager: [
+    'trong.nguyen@vietvibe.org',
+    'hoianh.nguyen@vietvibe.org',
+    'hr@vietvibe.org',
+  ],
+  Finance: [
     'trong.nguyen@vietvibe.org',
     'hr@vietvibe.org',
   ],
-  Event: [
-    'cherry.nguyen@vietvibe.org',
+  HR: [
     'trong.nguyen@vietvibe.org',
-    'hr@vietvibe.org',
-  ],
-  HR: ['trong.nguyen@vietvibe.org', 'hr@vietvibe.org'],
-  Tech: [
     'khaihung.luong@vietvibe.org',
+    'hoianh.nguyen@vietvibe.org',
+    'hr@vietvibe.org',
+  ],
+  Tech: [
+    'trong.nguyen@vietvibe.org',
+    'khaihung.luong@vietvibe.org',
+    'hr@vietvibe.org',
+  ],
+  Performance: [
+    'trong.nguyen@vietvibe.org',
+    'hr@vietvibe.org',
+    'elena.trinh@vietvibe.org',
+  ],
+  Volunteer: [
     'trong.nguyen@vietvibe.org',
     'hr@vietvibe.org',
   ],
@@ -113,7 +126,8 @@ const EmailTemplate = ({
     <div>
       {isHostApplication ? (
         <h1>
-          {firstName} {lastName}&apos;s Application for hosting event: {teachHost}
+          {firstName} {lastName}&apos;s Application for hosting event:{' '}
+          {teachHost}
         </h1>
       ) : (
         <h1>

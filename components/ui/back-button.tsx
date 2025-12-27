@@ -47,13 +47,9 @@ const eventType = ['concert', 'class', 'camping', 'event']
 const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
   async ({ className, variant, size, asChild = false, ...props }, ref) => {
     const header = await headers()
-    // for (const [key, value] of header.entries()) { // for debugging
-    //   console.log(`${key}: ${value}`)
-    // }
-
     const currentPath = header.get('current-path')
     let parentPath = currentPath?.split('/').slice(0, -1).join('/') || '/'
-
+    console.log('parentPath', parentPath)
     if (parentPath.split('/').at(-1) === 'editPost') {
       // For Edit Post Page, the flow is from allPosts to editPost
       parentPath = parentPath.replace('editPost', 'allPosts')

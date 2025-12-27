@@ -174,6 +174,53 @@ export const getClosestFutureEvent = unstable_cache(
   }
 )
 
+
+// Get all events (published and unpublished) - for admin use only
+// Cached with revalidateTag support - cache is invalidated when events are created/updated/deleted
+export const getAllEvents = unstable_cache(
+  async () => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      const events = await prisma.event.findMany({
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      })
+      return events
+    } catch (error) {
+      console.error('Error getting all events:', error)
+      return []
+    }
+  },
+  ['events-all'], // Cache key prefix
+  {
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
+    tags: ['events'], // Tag for revalidation
+  }
+)
+
+// Get event title by keyName - lightweight cached function for minimal data needs
+export const getEventTitleByKeyName = unstable_cache(
+  async (eventKeyName: string) => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      const event = await prisma.event.findUnique({
+        where: { keyName: eventKeyName },
+        select: { title: true },
+      })
+      return event
+    } catch (error) {
+      console.error('Error getting event title by keyName:', error)
+      return null
+    }
+  },
+  ['event-title-by-keyname'], // Cache key prefix
+  {
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
+    tags: ['events'], // Tag for revalidation
+  }
+)
+
 export async function getEventsOfHost(userId: string) {
   const { prisma } = await import('@/lib/db')
   try {
