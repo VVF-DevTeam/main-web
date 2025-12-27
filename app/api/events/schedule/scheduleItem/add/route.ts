@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 
 export const POST = async (request: Request) => {
   try {
@@ -13,6 +14,8 @@ export const POST = async (request: Request) => {
           ...data,
         },
       })
+      // Revalidate events cache
+      revalidateTag('events')
       return NextResponse.json(newItem)
     }
     // Check if the schedule item exists
@@ -48,6 +51,8 @@ export const POST = async (request: Request) => {
         position: scheduleItemExists.position + 1,
       },
     })
+    // Revalidate events cache
+    revalidateTag('events')
     return NextResponse.json(newItem)
   } catch (error) {
     console.log('[DELETE ERROR]', error)

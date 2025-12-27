@@ -23,9 +23,6 @@ export const DELETE = async (
     }
 
     // Delete the event
-    // EventTicket and Review will be automatically deleted due to cascade delete
-    // Categories and hosts will be automatically disconnected (many-to-many)
-    // Event will not be deleted if it has any payment records
     const deletedEvent = await prisma.event.delete({
       where: {
         id: eventId,

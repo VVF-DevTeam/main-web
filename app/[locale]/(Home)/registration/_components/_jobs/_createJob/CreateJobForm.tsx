@@ -51,7 +51,6 @@ const createJobSchema = z.object({
 
 // Main Component
 const CreateJobForm = ({ author }: CreateJobFormProps) => {
-
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
 
@@ -70,7 +69,7 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
 
     // Format title to keyName, which is used for pathname
     const keyName = formatKeyName(title)
-    
+
     try {
       const jobData = {
         title: title,
@@ -82,13 +81,13 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
       if (response.status === 200) {
         toast.success('Job created successfully', {
           description: (
-            <span style={{ color: "var(--muted-foreground)" }}>
+            <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
             </span>
           ),
           style: {
-            color: '#22c55e' // green-500 color
-          }
+            color: '#22c55e', // green-500 color
+          },
         })
       }
 
@@ -101,50 +100,67 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
           toast.error('Duplicate Job Title', {
             description: (
               <div className="flex flex-col gap-1">
-                <span>There is already a job with this title, please reuse it or delete it</span>
-                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+                <span>
+                  There is already a job with this title, please reuse it or
+                  delete it
+                </span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
               </div>
             ),
             style: {
-              color: '#ef4444' // red-500 color
-            }
+              color: '#ef4444', // red-500 color
+            },
           })
         } else {
           toast.error('Error making request to database', {
             description: (
               <div className="flex flex-col gap-1">
-                <span>{error.response?.data || 'Something went wrong. Please contact the admin'}</span>
-                <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+                <span>
+                  {error.response?.data ||
+                    'Something went wrong. Please contact the admin'}
+                </span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
               </div>
             ),
             style: {
-              color: '#ef4444' // red-500 color
-            }
+              color: '#ef4444', // red-500 color
+            },
           })
         }
       } else if (error instanceof Error) {
-        toast.error(error.message || 'Something went wrong. Please contact the admin.', {
-          description: (
-            <div className="flex flex-col gap-1">
-              <span>Something went wrong. Please contact the admin.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
-            </div>
-          ),
-          style: {
-            color: '#ef4444' // red-500 color
+        toast.error(
+          error.message || 'Something went wrong. Please contact the admin.',
+          {
+            description: (
+              <div className="flex flex-col gap-1">
+                <span>Something went wrong. Please contact the admin.</span>
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
+              </div>
+            ),
+            style: {
+              color: '#ef4444', // red-500 color
+            },
           }
-        })
+        )
       } else {
         toast.error('Error', {
           description: (
             <div className="flex flex-col gap-1">
               <span>Something went wrong. Please contact the admin.</span>
-              <span style={{ color: "var(--muted-foreground)" }}>{currentDateTime}</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
             </div>
           ),
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     }
@@ -203,26 +219,30 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-40">
-                      <DropdownMenuLabel>
-                        Select Department
-                      </DropdownMenuLabel>
+                      <DropdownMenuLabel>Select Department</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuRadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         {...field}
                       >
-                        <DropdownMenuRadioItem value="Media">
-                          Media
+                        <DropdownMenuRadioItem value="Marketing">
+                          Marketing
                         </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="Operations">
-                          Operations
+                        <DropdownMenuRadioItem value="Finance">
+                          Finance
                         </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="Event">
-                          Event
+                        <DropdownMenuRadioItem value="ProjectManager">
+                          ProjectManager
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="HR">
                           HR
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="Tech">
+                          Tech
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="Volunteer">
+                          Volunteer
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="Tech">
                           Tech

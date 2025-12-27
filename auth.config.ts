@@ -45,16 +45,23 @@ export default {
       },
       authorize: async (credentials) => {
         let user = null
+
         // Find user
-        user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email as string,
-          },
-        })
+        try {
+          user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email as string,
+            },
+          })
+        } catch (error) {
+          console.error(error)
+        }
+
         //   Check if user exists
         if (!user) {
           throw new Error('User does not exist')
         }
+
         // Check if password is correct
         const isPasswordCorrect = bcrypt.compareSync(
           credentials.password as string,
@@ -82,7 +89,8 @@ export default {
         token.email = user.email as string
         token.name = user.name as string
         // Set default USER role for new users who don't have roles yet
-        token.role = (user.role && user.role.length > 0) ? user.role as Role[] : ['USER']
+        token.role =
+          user.role && user.role.length > 0 ? (user.role as Role[]) : ['USER']
       }
       return token
     },
@@ -265,7 +273,7 @@ export default {
           if (path.includes('events/tickets')) {
             return NextResponse.next()
           }
-          
+
           // Prevent access to events API without authentication on PC (use Prisma on server side to query the database then pass the data to the client side)
           // Client side will not make GET request to the database, except for some situations like: fetching ticket information, and subscription status
           // On phone, we use JWT token for authentication
@@ -326,7 +334,8 @@ export default {
 
       // Check if user is trying to access a private path
       const isPrivatePath = PRIVATE_PATHS.some(
-        (privatePath) => path === privatePath || path.startsWith(privatePath + '/')
+        (privatePath) =>
+          path === privatePath || path.startsWith(privatePath + '/')
       )
       if (isPrivatePath && !isLoggedIn) {
         return NextResponse.redirect(
@@ -353,25 +362,80 @@ export default {
   },
   events: {
     linkAccount: async ({ user }) => {
-      // Update user
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          emailVerified: new Date(),
-        },
-      })
+      // Update user, retry if fails with exponential backoff
+      const maxRetries = 3
+      const baseDelay = 1000 // 1 second
+      let lastError: Error | unknown
 
-      return
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              emailVerified: new Date(),
+            },
+          })
+          // Success - return early
+          return
+        } catch (error) {
+          lastError = error
+          console.error(
+            `Failed to update emailVerified for user ${user.id} (attempt ${
+              attempt + 1
+            }/${maxRetries + 1}):`,
+            error
+          )
+
+          // If this was the last attempt, throw the error
+          if (attempt === maxRetries) {
+            throw new Error(
+              `Failed to verify email after ${maxRetries + 1} attempts. Please try signing in again.`
+            )
+          }
+
+          // Wait before retrying with exponential backoff
+          const delay = baseDelay * Math.pow(2, attempt)
+          await new Promise((resolve) => setTimeout(resolve, delay))
+        }
+      }
     },
     createUser: async ({ user }) => {
-      // Set USER role for new accounts created through OAuth
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          role: ['USER'],
-        },
-      })
-      return
+      // Set USER role for new accounts created through OAuth, retry if fails with exponential backoff
+      const maxRetries = 3
+      const baseDelay = 1000 // 1 second
+      let lastError: Error | unknown
+
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              role: ['USER'],
+            },
+          })
+          // Success - return early
+          return
+        } catch (error) {
+          lastError = error
+          console.error(
+            `Failed to set USER role for user ${user.id} (attempt ${
+              attempt + 1
+            }/${maxRetries + 1}):`,
+            error
+          )
+
+          // If this was the last attempt, throw the error
+          if (attempt === maxRetries) {
+            throw new Error(
+              `Failed to set user role after ${maxRetries + 1} attempts. Please try signing in again.`
+            )
+          }
+
+          // Wait before retrying with exponential backoff
+          const delay = baseDelay * Math.pow(2, attempt)
+          await new Promise((resolve) => setTimeout(resolve, delay))
+        }
+      }
     },
   },
 } satisfies NextAuthConfig

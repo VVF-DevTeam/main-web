@@ -54,7 +54,14 @@ export default async function middleware(
   }
 
   // Public routes: just i18n routing (no auth overhead, bfcache-friendly)
-  return i18nRouter(request, i18nConfig)
+  const response = i18nRouter(request, i18nConfig)
+  
+  // Set current-path header for public routes too (needed for BackButton component)
+  if (response instanceof NextResponse) {
+    response.headers.set('current-path', pathname)
+  }
+  
+  return response
 }
 
 export const config = {

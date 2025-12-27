@@ -15,6 +15,7 @@ import JobDescription from '../../../../_components/_jobs/_editJob/JobDescriptio
 import JobSummary from '../../../../_components/_jobs/_editJob/JobSummary'
 import JobLocation from '../../../../_components/_jobs/_editJob/JobLocation'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
+import DeleteJobButton from '../../../../_components/_jobs/_editJob/DeleteJobButton'
 
 const EditJobPage = async ({
   params,
@@ -48,6 +49,7 @@ const EditJobPage = async ({
     !!job.summary,
     !!job.description,
     !!job.startDate,
+    !!job.location,
   ]
 
   // check completed fields
@@ -75,14 +77,17 @@ const EditJobPage = async ({
             </span>
           </div>
 
-          {/* Publish Button */}
-          <PublishButton
-            id={job.id}
-            type={'job'}
-            canPublish={canPublish}
-            isPublished={job.isPublished}
-            domain={'jobs'}
-          />
+          {/* Buttons */}
+          <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
+            <DeleteJobButton jobId={job.id} />
+            <PublishButton
+              id={job.id}
+              type={'job'}
+              canPublish={canPublish}
+              isPublished={job.isPublished}
+              domain={'jobs'}
+            />
+          </div>
         </div>
 
         {/* Job Body */}
@@ -109,6 +114,9 @@ const EditJobPage = async ({
               <span className="text-gray-500">Step III :</span> Description
             </h2>
             <EditorInstructions />
+            <p className="italic">
+              NOTE: The first 200 characters of the description will be displayed on the job card outside, so put your most engaging statement on top.
+            </p>
             <JobDescription job={job} />
           </div>
 
@@ -117,6 +125,9 @@ const EditJobPage = async ({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step IV :</span> Summary
             </h2>
+            <p className="italic">
+              NOTE: The maximum length of summary is 100 characters.
+            </p>
             <JobSummary job={job} />
           </div>
           
@@ -139,7 +150,7 @@ const EditJobPage = async ({
           {/* End date */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VII :</span> End Date
+              <span className="text-gray-500">Step VII :</span> End Date (Optional)
             </h2>
             <JobEndDate job={job} />
           </div>

@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db'
 // Components
 import JobCard from './JobCard'
 import SearchBox from '@/app/[locale]/components/SearchBox'
+import { Job } from '@prisma/client'
 
 // Interfaces & Types
 interface JobListProps {
@@ -16,20 +17,25 @@ interface JobListProps {
 // Main Component
 const JobList = async ({ title, locale }: JobListProps) => {
   const { t } = await initTranslations(locale, ['job', 'common'])
+  let allJobs: Job[] = []
 
   // Get all jobs
-  const allJobs = await prisma.job.findMany({
-    where: {
-      isPublished: true,
-      title: {
-        contains: title,
-        mode: 'insensitive',
+  try {
+    allJobs = await prisma.job.findMany({
+      where: {
+        isPublished: true,
+        title: {
+          contains: title,
+          mode: 'insensitive',
+        },
       },
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    })
+  } catch (error) {
+    console.error(error)
+  }
 
   return (
     <div>
@@ -38,7 +44,7 @@ const JobList = async ({ title, locale }: JobListProps) => {
         {/* Header */}
         <div className="flex-col-center">
           <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
-          {t('headerJob')}
+            {t('headerJob')}
           </h1>
 
           {/* Search Bar */}
@@ -46,9 +52,8 @@ const JobList = async ({ title, locale }: JobListProps) => {
         </div>
 
         {/* Job Posts */}
-
         {allJobs.length === 0 ? (
-          <p className="text-center text-xl text-muted-foreground pt-5">
+          <p className="pt-5 text-center text-xl text-muted-foreground">
             {t('noJobsOrVolunteersPosition')}
           </p>
         ) : (

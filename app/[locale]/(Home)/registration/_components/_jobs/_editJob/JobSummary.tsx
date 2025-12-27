@@ -27,7 +27,8 @@ interface JobSummaryProps {
 const JobSummarySchema = z.object({
   summary: z
     .string()
-    .min(6, { message: 'Job summary must be at least 6 characters' }),
+    .min(6, { message: 'Job summary must be at least 6 characters' })
+    .max(100, { message: 'Job summary must be less than 100 characters' }),
 })
 
 const JobSummary = ({ job }: JobSummaryProps) => {

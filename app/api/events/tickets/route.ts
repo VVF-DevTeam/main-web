@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { revalidateTag } from 'next/cache'
 
 // Retrieve an EventTicket by id
 export const GET = async (request: Request) => {
@@ -82,6 +83,9 @@ export const POST = async (request: Request) => {
             : null,
       },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
 
     return NextResponse.json(ticket)
   } catch (error) {
@@ -180,6 +184,9 @@ export const PUT = async (request: Request) => {
       },
     })
 
+    // Revalidate events cache
+    revalidateTag('events')
+
     return NextResponse.json(updated)
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
@@ -222,6 +229,9 @@ export const DELETE = async (request: Request) => {
     await prisma.eventTicket.delete({
       where: { id },
     })
+
+    // Revalidate events cache
+    revalidateTag('events')
 
     return NextResponse.json({ success: true })
   } catch (error) {

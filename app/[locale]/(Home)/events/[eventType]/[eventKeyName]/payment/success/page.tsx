@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db'
 import PaymentSuccess from '@/components/payment/PaymentSuccess'
+import { getEventTitleByKeyName } from '@/lib/actions/event/getEvent'
 
 // No use of auth() or header or live database, so can be static
 export const dynamic = 'force-static'
@@ -15,10 +15,7 @@ const ClassPaymentSuccessPage = async ({
 }: ClassPaymentSuccessPageProps) => {
   const { locale, eventKeyName } = await params
 
-  const publishedClass = await prisma.event.findUnique({
-    where: { keyName: eventKeyName },
-    select: { title: true },
-  })
+  const publishedClass = await getEventTitleByKeyName(eventKeyName)
 
   if (!publishedClass) return null
 

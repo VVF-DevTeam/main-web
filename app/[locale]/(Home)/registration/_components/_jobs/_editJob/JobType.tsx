@@ -26,7 +26,15 @@ interface JobTypeProps {
   job: Job
 }
 
-const zEnum = z.enum(['HR', 'Job', 'Tech', 'Media', 'Operations', 'Event'])
+const zEnum = z.enum([
+  'HR',
+  'Tech',
+  'ProjectManager',
+  'Marketing',
+  'Performance',
+  'Finance',
+  'Volunteer',
+])
 
 const JobTypeSchema = z.object({
   jobType: zEnum,
@@ -49,8 +57,8 @@ const JobType = ({ job }: JobTypeProps) => {
       toast.success('Success', {
         description: 'Job type updated successfully',
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       router.refresh()
     } catch (error) {
@@ -58,8 +66,8 @@ const JobType = ({ job }: JobTypeProps) => {
       toast.error('Error', {
         description: 'Something went wrong',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }
@@ -110,20 +118,26 @@ const JobType = ({ job }: JobTypeProps) => {
                           defaultValue={field.value}
                           {...field}
                         >
-                          <DropdownMenuRadioItem value="Media">
-                            Media
+                          <DropdownMenuRadioItem value="Marketing">
+                            Marketing
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Operations">
-                            Operations
+                          <DropdownMenuRadioItem value="ProjectManager">
+                            ProjectManager
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Event">
-                            Event
+                          <DropdownMenuRadioItem value="Finance">
+                            Finance
                           </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="HR">
                             HR
                           </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="Tech">
                             Tech
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="Performance">
+                            Performance
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="Volunteer">
+                            Volunteer
                           </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                       </DropdownMenuContent>

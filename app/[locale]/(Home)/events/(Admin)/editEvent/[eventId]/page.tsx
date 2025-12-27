@@ -32,6 +32,8 @@ import EventGallery from './_components/EventGallery'
 import DeleteEventButton from './_components/DeleteEventButton'
 import EventSeating from './_components/EventSeating'
 import EventForm from './_components/EventForm'
+import { EventCategory, EventSeries } from '@prisma/client'
+import NotFound from '@/app/[locale]/(Home)/not-found'
 
 // Main Component
 const EditEventPage = async ({
@@ -49,45 +51,53 @@ const EditEventPage = async ({
 
   const { eventId } = await params
 
-  // Fetch the Event data
-  const event = await prisma.event.findUnique({
-    where: {
-      keyName: eventId,
-    },
-    include: {
-      schedules: {
-        orderBy: {
-          position: 'asc',
-        },
-      },
-      categories: true,
-      hosts: {
-        select: {
-          name: true,
-          role: true,
-          id: true,
-        },
-      },
-      series: true,
-      tickets: {
-        orderBy: {
-          createdAt: 'asc',
-        },
-      },
-    },
-  })
+  let event = null
+  let categories: EventCategory[] = []
+  let allSeries: EventSeries[] = []
 
-  // Fetch event categories
-  const categories = await prisma.eventCategory.findMany()
-  // Fetch all event series
-  const allSeries = await prisma.eventSeries.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-  })
-  // TODO: If the event is not found, show a 404 page.
+  try {
+    // Fetch the Event data
+    event = await prisma.event.findUnique({
+      where: {
+        keyName: eventId,
+      },
+      include: {
+        schedules: {
+          orderBy: {
+            position: 'asc',
+          },
+        },
+        categories: true,
+        hosts: {
+          select: {
+            name: true,
+            role: true,
+            id: true,
+          },
+        },
+        series: true,
+        tickets: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
+    })
+
+    // Fetch event categories
+    categories = await prisma.eventCategory.findMany()
+    // Fetch all event series
+    allSeries = await prisma.eventSeries.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    })
+  } catch (error) {
+    console.error(error)
+  }
+
   if (!event) {
-    redirect('/events')
+    return <NotFound />
   }
 
   const eventFields = [
