@@ -77,6 +77,16 @@ const EditEventPage = async ({
         },
         series: true,
         tickets: {
+          include: {
+            payments: {
+              where: {
+                refunded: false,
+              },
+              select: {
+                quantity: true,
+              },
+            },
+          },
           orderBy: {
             createdAt: 'asc',
           },
@@ -186,20 +196,20 @@ const EditEventPage = async ({
             <EventDescription event={event} />
           </div>
 
-          {/* Price */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step IV :</span> Price
-            </h2>
-            <EventPrice event={event} />
-          </div>
-
           {/* Capacity */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step V :</span> Capacity
+              <span className="text-gray-500">Step IV :</span> Capacity
             </h2>
             <EventCapacity event={event} />
+          </div>
+
+          {/* Price */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step V :</span> Price
+            </h2>
+            <EventPrice event={event} />
           </div>
 
           {/* Location */}

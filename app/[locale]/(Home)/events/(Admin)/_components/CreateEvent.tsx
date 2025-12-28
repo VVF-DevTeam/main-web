@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { axiosInstance } from '@/lib/axios'
 import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 // Interfaces
 interface CreateEventFormProps {
@@ -54,7 +55,7 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
   // TODO: Add author field for event
   console.log(author)
   const router = useRouter()
-
+  const currentDateTime = getCurrentDateTime()
   const form = useForm<z.infer<typeof createEventSchema>>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
@@ -79,7 +80,16 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
       }
       const response = await axiosInstance.post('/api/events/create', eventData)
       if (response.status === 200) {
-        toast.success('Event created successfully')
+        toast.success('Event created successfully', {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e', // green-500 color
+          },
+        })
       }
 
       form.reset()

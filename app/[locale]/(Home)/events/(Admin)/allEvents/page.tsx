@@ -2,12 +2,14 @@
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { getAllEvents } from '@/lib/actions/event/getEvent'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 // Components
 import BackButton from '@/components/ui/back-button'
 import { DataTable } from './_components/data-table'
 import { columns } from './_components/columns'
-
+import { PlusCircle } from 'lucide-react'
 // Need to check for role, has to make dynamic
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +32,17 @@ const AllEvents = async () => {
       <BackButton />
 
       {/* Events Table */}
-      <h1 className="header-sub">All Events</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="header-sub">All Events</h1>
+        {/* Create Event */}
+        <Link href={'/events/createEvent'}>
+          <Button variant={'default'} className="flex-center gap-x-2">
+            <PlusCircle className="h-5 w-5" />
+            <span className="text-sm font-medium">Create Event</span>
+          </Button>
+        </Link>
+      </div>
+
       <p className="mb-12 text-sm text-muted-foreground">
         All published and unpublished events appear here. Click on the
         <span className="hover:text-textColor-brand/70 font-semibold text-textColor-brand900 transition-all">

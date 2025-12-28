@@ -31,6 +31,9 @@ export async function POST(req: Request) {
         type: true,
         eventId: true,
         userId: true,
+        eventTicketId: true,
+        quantity: true,
+        refunded: true, // Check if already refunded
       },
     })
 
