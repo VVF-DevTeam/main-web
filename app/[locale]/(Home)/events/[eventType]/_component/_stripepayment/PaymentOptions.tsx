@@ -38,6 +38,7 @@ interface PaymentOptionsProps {
   loggedIn: boolean
   seatingMap?: SeatingMap | null
   tickets?: EventTicket[]
+  isCapacityExceeded?: boolean
 }
 
 const calculateTicketDisplayPrice = (
@@ -73,6 +74,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   loggedIn,
   seatingMap,
   tickets = [],
+  isCapacityExceeded = false,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -501,7 +503,13 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   return (
     <div ref={containerRef} className="w-full text-bgColor-black">
-      {loggedIn ? (
+      {isCapacityExceeded ? (
+        <div className="mb-4 rounded-md border border-red-300 bg-red-50 p-4 text-center">
+          <p className="text-sm font-medium text-red-800">
+            {t('event-full') || 'This event is full. No more tickets available.'}
+          </p>
+        </div>
+      ) : loggedIn ? (
         <Button
           variant="default"
           onClick={() => {

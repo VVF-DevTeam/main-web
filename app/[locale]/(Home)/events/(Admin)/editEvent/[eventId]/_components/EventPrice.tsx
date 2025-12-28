@@ -22,11 +22,24 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { axiosInstance } from '@/lib/axios'
 import { AxiosError } from 'axios'
 
+type TicketWithPayments = EventTicket & {
+  payments: Array<{ quantity: number }>
+}
+
 interface EventPriceProps {
-  event: Event & { tickets?: EventTicket[] }
+  event: Event & {
+    tickets?: TicketWithPayments[]
+  }
 }
 
 interface StripeTicketDataCreate {
@@ -47,7 +60,7 @@ const EventTicketSchema = z
   .object({
     type: z.string().min(1, 'Ticket type is required'),
     price: z.coerce.number().min(0, 'Price must be at least 0'),
-    capacity: z.coerce.number().min(1, 'Capacity must be at least 1'),
+    capacityPerTicket: z.coerce.number().min(1, 'Capacity must be at least 1'),
     currency: z.string().default('CAD'),
     discountMemberPercent: z.coerce
       .number()
@@ -89,11 +102,19 @@ const EventTicketSchema = z
 
 type EventTicketFormData = z.infer<typeof EventTicketSchema>
 
+// Helper function to calculate sold count from payments
+const calculateSoldCount = (
+  payments: Array<{ quantity: number }>
+): number => {
+  return payments.reduce((sum, payment) => sum + payment.quantity, 0)
+}
+
 const EventPrice = ({ event }: EventPriceProps) => {
   const router = useRouter()
   const [editingTicketId, setEditingTicketId] = useState<string | null>(null)
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [isFullEvent, setIsFullEvent] = useState(false)
+  const [showCapacityError, setShowCapacityError] = useState(false)
   const currentDateTime = getCurrentDateTime()
   const tickets = event.tickets || []
 
@@ -103,7 +124,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
     defaultValues: {
       type: '',
       price: 0,
-      capacity: 1,
+      capacityPerTicket: 1,
       currency: 'CAD',
       discountMemberPercent: null,
       validFrom: null,
@@ -117,7 +138,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
     ticketForm.reset({
       type: '',
       price: 0,
-      capacity: 1,
+      capacityPerTicket: 1,
       currency: 'CAD',
       discountMemberPercent: null,
       validFrom: null,
@@ -128,15 +149,28 @@ const EventPrice = ({ event }: EventPriceProps) => {
     setEditingTicketId(null)
     setIsAddingNew(false)
     setIsFullEvent(false)
+    setShowCapacityError(false)
   }
 
-  const loadTicketIntoForm = (ticket: EventTicket) => {
+  const handleAddTicketClick = () => {
+    // Check if event capacity is 0 or null
+    if (!event.capacity || event.capacity === 0) {
+      setShowCapacityError(true)
+      return
+    }
+    // If capacity is set, proceed with adding ticket
+    resetTicketForm()
+    setIsAddingNew(true)
+    setShowCapacityError(false)
+  }
+
+  const loadTicketIntoForm = (ticket: TicketWithPayments) => {
     const hasPayTotalNumber =
       ticket.payTotalNumber !== null && ticket.payTotalNumber !== undefined
     ticketForm.reset({
       type: ticket.type,
       price: Number(ticket.price),
-      capacity: ticket.capacity,
+      capacityPerTicket: ticket.capacityPerTicket,
       currency: ticket.currency,
       discountMemberPercent: ticket.discountMemberPercent ?? null,
       validFrom: ticket.validFrom ? new Date(ticket.validFrom) : null,
@@ -163,10 +197,11 @@ const EventPrice = ({ event }: EventPriceProps) => {
       let subscribedStripePriceId = values.subscribedStripePriceId
 
       // Calculate Stripe price: if payTotalNumber exists, use price * payTotalNumber, else use single ticket price
+      // Also multiply by capacityPerTicket to account for group tickets
       const stripePrice =
         isFullEvent && values.payTotalNumber
-          ? values.price * values.payTotalNumber
-          : values.price
+          ? values.price * values.payTotalNumber * values.capacityPerTicket
+          : values.price * values.capacityPerTicket
 
       // Create or update Stripe product and price
       if (editingTicketId) {
@@ -180,9 +215,11 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
         // Check if price, payTotalNumber, or discount changed
         const existingTicket = tickets.find((t) => t.id === editingTicketId)
-        const existingStripePrice = existingTicket?.payTotalNumber
-          ? Number(existingTicket.price) * existingTicket.payTotalNumber
-          : Number(existingTicket?.price || 0)
+        const existingStripePrice = existingTicket
+          ? existingTicket.payTotalNumber
+            ? Number(existingTicket.price) * existingTicket.payTotalNumber * existingTicket.capacityPerTicket
+            : Number(existingTicket.price || 0) * existingTicket.capacityPerTicket
+          : 0
         const priceChanged =
           existingTicket && existingStripePrice !== stripePrice
         const payTotalNumberChanged =
@@ -247,7 +284,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
         eventId: event.id,
         type: values.type,
         price: values.price,
-        capacity: values.capacity,
+        capacityPerTicket: values.capacityPerTicket,
         currency: values.currency,
         discountMemberPercent: values.discountMemberPercent ?? null,
         validFrom: values.validFrom ? values.validFrom.toISOString() : null,
@@ -452,21 +489,14 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
   return (
     <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Event Pricing</h1>
-      </div>
-
       {/* EventTickets section */}
       <>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Event Tickets</h2>
+          <h1 className="text-xl font-semibold">Event Tickets</h1>
           <div className="flex gap-x-2">
             {!isEditingTicket && (
               <button
-                onClick={() => {
-                  resetTicketForm()
-                  setIsAddingNew(true)
-                }}
+                onClick={handleAddTicketClick}
                 className={cn(
                   'flex items-center gap-x-2 text-sm font-semibold text-[#C54B3E] transition-all hover:text-slate-700'
                 )}
@@ -477,15 +507,26 @@ const EventPrice = ({ event }: EventPriceProps) => {
             )}
           </div>
         </div>
+        
+        <p className="text-sm italic text-muted-foreground text-slate-500">NOTE 1: Avoid changing capacity after there are purchases, it may confuse the customers.</p>
+        <p className="text-sm italic text-muted-foreground text-slate-500">NOTE 2: Ticket will be hidden after the Valid To date.</p>
+
+        {/* Capacity Error Message */}
+        {showCapacityError && !isEditingTicket && (
+          <p className="text-sm font-medium text-red-600">
+            Please add event capacity before adding tickets. Go to Step IV above to set it.
+          </p>
+        )}
 
         {/* Ticket List */}
         {!isEditingTicket && tickets.length > 0 && (
           <div className="flex flex-col gap-y-4">
             {tickets.map((ticket) => {
-              // Calculate display price: if payTotalNumber exists, show price * payTotalNumber, else show single ticket price
+              // Calculate display price: if payTotalNumber exists, show price * payTotalNumber * capacityPerTicket, else show price * capacityPerTicket
               const displayPrice = ticket.payTotalNumber
-                ? Number(ticket.price) * ticket.payTotalNumber
-                : Number(ticket.price)
+                ? Number(ticket.price) * ticket.payTotalNumber * ticket.capacityPerTicket
+                : Number(ticket.price) * ticket.capacityPerTicket
+              const soldCount = calculateSoldCount(ticket.payments || [])
               return (
                 <div
                   key={ticket.id}
@@ -503,7 +544,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                       )}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Capacity: {ticket.capacity} | Sold: {ticket.sold}
+                      Capacity: {ticket.capacityPerTicket} | Sold: {soldCount}
                       {ticket.discountMemberPercent !== null && (
                         <> | Discount: {ticket.discountMemberPercent}%</>
                       )}
@@ -604,14 +645,14 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
                   <FormField
                     control={ticketForm.control}
-                    name="capacity"
+                    name="capacityPerTicket"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacity</FormLabel>
+                        <FormLabel>Capacity (e.g. ticket for group of 5 will be 5, default is 1 for single ticket)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            placeholder="eg: 100"
+                            placeholder="eg: 5 (for group of 5)"
                             {...field}
                           />
                         </FormControl>
@@ -626,9 +667,21 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Currency</FormLabel>
-                        <FormControl>
-                          <Input placeholder="eg: CAD" {...field} />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select currency" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="CAD">CAD</SelectItem>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="VND">VND</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -771,7 +824,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     htmlFor="fullEvent"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Full Event / Group Purchase
+                    Event with multiple sessions
                   </label>
                 </div>
 
@@ -782,7 +835,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     name="payTotalNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Sessions / Group Size</FormLabel>
+                        <FormLabel>Number of Sessions</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

@@ -80,10 +80,14 @@ export const columns: ColumnDef<Event>[] = [
       )
     },
     cell: ({ row }) => {
-      const updatedAt = row.getValue('updatedAt') as Date
+      const updatedAtValue = row.getValue('updatedAt')
+      // Convert to Date if it's a string (happens when data is serialized from server to client)
+      const updatedAt = updatedAtValue
+        ? new Date(updatedAtValue as string | Date)
+        : null
       return (
         <div className="text-center">
-          {updatedAt ? (
+          {updatedAt && !isNaN(updatedAt.getTime()) ? (
             <span className="text-slate-600">
               {updatedAt.getDate()}/{updatedAt.getMonth() + 1}/
               {updatedAt.getFullYear()}

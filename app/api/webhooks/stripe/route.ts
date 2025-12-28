@@ -281,13 +281,6 @@ export async function POST(req: NextRequest) {
             },
           })
 
-          // Update ticket sold count for this ticket type
-          await prisma.eventTicket.update({
-            where: { id: ticketInfo.ticketId },
-            data: {
-              sold: { increment: seatCount },
-            },
-          })
         }
       } else {
         // Single ticket checkout (backward compatibility)
@@ -386,17 +379,6 @@ export async function POST(req: NextRequest) {
                 eventLocation: firstTicket.event.location,
                 eventStartTime: firstTicket.event.startTime,
                 eventEndTime: firstTicket.event.endTime,
-              })
-            }
-          } else if (metadata.eventTicketId) {
-            // update event ticket sold count (only if not already updated in multi-ticket section)
-            // Note: Ticket fetch for email is done later in the single-ticket email section
-            if (!ticketMetadata) {
-              await prisma.eventTicket.update({
-                where: { id: metadata.eventTicketId },
-                data: {
-                  sold: { increment: 1 },
-                },
               })
             }
           }
@@ -521,15 +503,6 @@ export async function POST(req: NextRequest) {
                     endTime: true,
                   },
                 },
-              },
-            })
-
-            // update event ticket sold count (only if not already updated in multi-ticket section)
-            // Note: ticketMetadata is already null here since we're in the single-ticket path
-            await prisma.eventTicket.update({
-              where: { id: metadata.eventTicketId },
-              data: {
-                sold: { increment: 1 },
               },
             })
 

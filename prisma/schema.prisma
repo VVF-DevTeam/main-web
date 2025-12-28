@@ -122,8 +122,7 @@ model EventTicket {
   payTotalNumber Int? // if this field exists, the price is paid in total: price x payTotalNumber
 
   // Capacity just for this tier
-  capacity    Int
-  sold        Int        @default(0)
+  capacityPerTicket Int @default(1)
 
   // Time range
   validFrom   DateTime?

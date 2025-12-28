@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db'
 import { Decimal } from '@prisma/client/runtime/library'
 import Link from 'next/link'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
+import { checkCurrentSoldCapacityById } from '@/lib/actions/event/checkCurrentSoldCapacityById'
 import moment from 'moment-timezone'
 
 // Components
@@ -110,6 +111,10 @@ const ConcertDescriptions = async ({
         },
       })
     : null
+
+  // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
+  const totalSoldCapacity = await checkCurrentSoldCapacityById(event.id)
+  const isCapacityExceeded = event.capacity !== null && totalSoldCapacity >= event.capacity
 
   return (
     <div className="w-full bg-bgColor-secondary200 py-3">
@@ -296,6 +301,7 @@ const ConcertDescriptions = async ({
             loggedIn={author ? true : false}
             seatingMap={seatingMap}
             tickets={event.tickets}
+            isCapacityExceeded={isCapacityExceeded}
           />
         </div>
 

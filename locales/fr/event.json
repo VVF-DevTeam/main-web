@@ -1,5 +1,6 @@
 {
-  "alreadyPaid": "Vous avez déjà payé pour cet événement. Vous pouvez encore réserver pour d'autres. Merci et à bientôt !",
+  "alreadyPaid": "Vous avez déjà payé pour cet événement. Vous pouvez encore réserver pour d'autres. Merci et à bientôt !",
+  "event-full": "Cet événement est complet, hâte de vous voir à la prochaine !",
   "Apr": "Avril",
   "Aug": "Août",
   "buy-tickets": "Acheter des billets",

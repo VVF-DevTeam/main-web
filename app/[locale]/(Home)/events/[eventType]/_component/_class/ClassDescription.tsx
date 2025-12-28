@@ -3,6 +3,7 @@ import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
+import { checkCurrentSoldCapacityById } from '@/lib/actions/event/checkCurrentSoldCapacityById'
 
 // Components
 import ClassScheduleItem from './ClassScheduleItem'
@@ -92,6 +93,10 @@ const ClassDescription = async ({
         },
       })
     : null
+
+  // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
+  const totalSoldCapacity = await checkCurrentSoldCapacityById(classId)
+  const isCapacityExceeded = capacity !== null && totalSoldCapacity >= capacity
 
   return (
     <div className="w-full">
@@ -232,6 +237,7 @@ const ClassDescription = async ({
                 type={typeMap[eventType as keyof typeof typeMap]}
                 loggedIn={author ? true : false}
                 tickets={tickets}
+                isCapacityExceeded={isCapacityExceeded}
               />
 
               {existingPayment && existingPayment.length > 0 && (
