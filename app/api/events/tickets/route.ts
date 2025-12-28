@@ -42,7 +42,7 @@ export const POST = async (request: Request) => {
       eventId,
       type,
       price,
-      capacity,
+      capacityPerTicket,
       currency,
       discountMemberPercent,
       validFrom,
@@ -66,7 +66,10 @@ export const POST = async (request: Request) => {
         eventId,
         type,
         price,
-        capacity,
+        capacityPerTicket:
+          capacityPerTicket !== undefined && capacityPerTicket !== null
+            ? capacityPerTicket
+            : 1,
         currency: currency || 'CAD',
         discountMemberPercent:
           discountMemberPercent !== undefined && discountMemberPercent !== null
@@ -163,7 +166,7 @@ export const PUT = async (request: Request) => {
             : existing.discountMemberPercent,
         subscribedStripePriceId:
           subscribedStripePriceId !== undefined
-            ? subscribedStripePriceId ?? null
+            ? (subscribedStripePriceId ?? null)
             : existing.subscribedStripePriceId,
         payTotalNumber:
           payTotalNumber !== undefined
