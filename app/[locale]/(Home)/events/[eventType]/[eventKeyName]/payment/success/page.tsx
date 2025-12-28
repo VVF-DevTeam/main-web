@@ -2,7 +2,7 @@ import PaymentSuccess from '@/components/payment/PaymentSuccess'
 import { getEventTitleByKeyName } from '@/lib/actions/event/getEvent'
 
 // No use of auth() or header or live database, so can be static
-export const dynamic = 'force-static'
+export const dynamic = 'auto'
 
 // Interfaces
 interface ClassPaymentSuccessPageProps {
