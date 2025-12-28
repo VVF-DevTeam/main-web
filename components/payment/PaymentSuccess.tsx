@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useSession } from 'next-auth/react'
@@ -20,7 +20,15 @@ const PaymentSuccess = ({
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(translationWorkspaces)
   const { data: session, status } = useSession()
+  const [email, setEmail] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
 
+  
+  useEffect(() => {
+    setEmail(session?.user?.email ?? '')
+    setUserName(session?.user?.name ?? '')
+  }, [session])
+    
   // Show loading state while checking session
   if (status === 'loading') {
     return (
@@ -29,9 +37,6 @@ const PaymentSuccess = ({
       </div>
     )
   }
-
-  const userName = session?.user?.name || ''
-  const userEmail = session?.user?.email || ''
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center dark:bg-neutral-900">
@@ -68,7 +73,7 @@ const PaymentSuccess = ({
         {t('paymentSuccess-text')} <strong>{title}</strong>
       </p>
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
-      {t('paymentSuccess-text2')} <strong>{userEmail}</strong>
+      {t('paymentSuccess-text2')} <strong>{email}</strong>
       </p>
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
         Please also check the payment details at{' '}
