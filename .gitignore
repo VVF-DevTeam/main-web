@@ -44,3 +44,5 @@ next-env.d.ts
 
 # visual studio code
 .vscode
+# Sentry Config File
+.env.sentry-build-plugin
