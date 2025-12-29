@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic'
 import React, { useMemo, useState, useEffect } from 'react'
-import { FiPaperclip, FiX } from 'react-icons/fi'
+import { useSearchParams } from 'next/navigation'
+import { FiPaperclip, FiX, FiCopy } from 'react-icons/fi'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios, { AxiosError } from 'axios'
@@ -67,6 +68,7 @@ interface Event {
 // Zod Schema
 const sendEmailSchema = z.object({
   event: z.string(),
+  senderEmail: z.string().min(1, 'Sender email is required'),
   recipients: z
     .array(z.string().email({ message: 'Please enter a valid email' }))
     .min(1, 'At least one recipient required'),
@@ -80,6 +82,7 @@ type SendEmailFormValues = z.infer<typeof sendEmailSchema>
 const EmailComposition = ({ user }: { user: UserInfoProps }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
+  const searchParams = useSearchParams()
 
   //// filter events to show based on user role
   const [events, setEvents] = useState<Event[]>([])
@@ -138,10 +141,12 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
   )
 
   // Form
+  const prefilledEventId = searchParams.get('eventId') || ''
   const form = useForm<SendEmailFormValues>({
     resolver: zodResolver(sendEmailSchema),
     defaultValues: {
-      event: '',
+      event: prefilledEventId,
+      senderEmail: 'default', // Default to admin.tech@vietvibe.org
       recipients: [],
       subject: '',
       content: '',
@@ -149,8 +154,16 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
     },
   })
 
-  const [selectedEvent, setSelectedEvent] = useState('')
+  const [selectedEvent, setSelectedEvent] = useState(prefilledEventId)
   const [loading, setLoading] = useState(false)
+
+  // Update form when prefilled event changes
+  useEffect(() => {
+    if (prefilledEventId) {
+      form.setValue('event', prefilledEventId)
+      setSelectedEvent(prefilledEventId)
+    }
+  }, [prefilledEventId, form])
 
   // Handle event search
   const handleEventSearch = async (searchTerm: string) => {
@@ -182,6 +195,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
       formData.append('recipients', JSON.stringify(data.recipients))
       formData.append('subject', data.subject)
       formData.append('content', data.content)
+      formData.append('senderEmail', data.senderEmail)
       data.attachments?.forEach((file) => formData.append('attachments', file))
 
       const response = await axios.post('/api/admin/sendEmail', formData, {
@@ -249,8 +263,8 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('select-an-event')} />
+                      <SelectTrigger className="border">
+                        <SelectValue placeholder='Select an event' />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -277,6 +291,79 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                           {event.title}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                  {selectedEvent && (
+                    <div className="mt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          const participantEmails = eventParticipants
+                            .filter(
+                              (p: EventParticipants) =>
+                                p.eventId === selectedEvent && p.user?.email
+                            )
+                            .map((p: EventParticipants) => p.user!.email)
+                            .filter((email): email is string => !!email)
+
+                          if (participantEmails.length === 0) {
+                            toast.error('No participants found for this event')
+                            return
+                          }
+
+                          const emailString = participantEmails.join(', ')
+                          
+                          try {
+                            await navigator.clipboard.writeText(emailString)
+                            toast.success('Emails copied to clipboard', {
+                              description: `${participantEmails.length} email(s) copied`,
+                              style: { color: '#22c55e' },
+                            })
+                            // Optionally auto-fill the recipients field
+                            form.setValue('recipients', participantEmails)
+                          } catch (error) {
+                            toast.error('Failed to copy emails to clipboard')
+                          }
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <FiCopy className="h-4 w-4" />
+                        Copy All Participant Emails
+                      </Button>
+                    </div>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            {/* Sender */}
+            <FormField
+              control={form.control}
+              name="senderEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Send From</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="border">
+                        <SelectValue placeholder="Select sender email" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="default">
+                        Default Email (admin.tech@vietvibe.org)
+                      </SelectItem>
+                      {user.email && (
+                        <SelectItem value={user.email}>
+                          My Email ({user.email})
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

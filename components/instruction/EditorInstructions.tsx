@@ -32,7 +32,7 @@ const EditorInstructions = () => {
           rel="noreferrer"
         >
           here
-        </a> {' '}
+        </a>{' '}
         for more info).
         <p className="mt-2">
           To align image, use these buttons:

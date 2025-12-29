@@ -4,6 +4,7 @@ interface SendEmailParams {
   recipients: string[]
   subject: string
   content: string
+  senderEmail: string
   attachments?: File[]
 }
 
@@ -46,9 +47,16 @@ export async function sendEmail({
   recipients,
   subject,
   content,
+  senderEmail,
   attachments,
 }: SendEmailParams) {
   const resend = new Resend(process.env.RESEND_API_KEY_PRODUCTION)
+
+  // Determine sender email
+  const fromEmail =
+    senderEmail === 'default'
+      ? 'VVF Admin <admin.tech@vietvibe.org>'
+      : `VVF Admin <${senderEmail}>`
 
   // Convert attachments to base64
   const preparedAttachments = attachments
@@ -65,7 +73,7 @@ export async function sendEmail({
     : undefined
 
   const { error } = await resend.emails.send({
-    from: 'VVF Admin <admin.tech@vietvibe.org>',
+    from: fromEmail,
     to: recipients,
     subject: subject,
     // html: content,

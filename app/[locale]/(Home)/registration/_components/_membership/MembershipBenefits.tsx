@@ -21,7 +21,7 @@ export const MembershipBenefits = async ({
     {
       title: t('basic-membership'),
       price: 30,
-      priceId: 'price_1ShQKm06wc04MarVL7nZABMs',
+      priceId: 'price_1RMRIL06wc04MarV1S2YkKdS',
       features: [
         t('basic-feature-1'),
         t('basic-feature-2'),

@@ -15,7 +15,7 @@ export const POST = async (request: NextRequest) => {
       },
     })
 
-    // Revalidate series cache
+    // Revalidate series cache (both 'series' and 'event-series' tags for consistency)
     revalidateTag('series')
 
     return NextResponse.json(newSeries)

@@ -71,6 +71,27 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all events (published and unpublished) for admin use only. Cache is invalidated when events are created/updated/deleted.
 
+#### 9. `getAllEventCategories`
+- **File**: `lib/actions/event/getEventCategories.ts`
+- **Cache Key**: `['event-categories-all']`
+- **Tags**: `['event-categories']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all event categories ordered by title. Categories are relatively static reference data, perfect for caching.
+
+#### 10. `getAllEventSeries`
+- **File**: `lib/actions/event/getEventSeries.ts`
+- **Cache Key**: `['event-series-all']`
+- **Tags**: `['series']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all event series ordered by name. Series are relatively static reference data, perfect for caching. Uses 'series' tag for consistency with existing series cache.
+
+#### 11. `getAllEventSponsors`
+- **File**: `lib/actions/event/getEventSponsors.ts`
+- **Cache Key**: `['event-sponsors-all']`
+- **Tags**: `['event-sponsors']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all event sponsors with their associated events, ordered by name. Sponsors are relatively static reference data, perfect for caching.
+
 ---
 
 ### Reviews
@@ -146,6 +167,13 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
+
+#### 13. `getEventPayments`
+- **File**: `app/[locale]/(Home)/profile/[userId]/_components/getEventPayments.ts`
+- **Cache Key**: `['event-payments-${eventId}']` (per event)
+- **Tags**: `['payments']`
+- **Revalidate Time**: 86400 seconds (1 day)
+- **Description**: Returns all non-refunded payments for a specific event with user and event details. Used by Event Manager to display sold tickets table and calculate statistics. Cached per event to reduce loading time when switching between events.
 
 ---
 
@@ -287,18 +315,57 @@ This document provides a comprehensive overview of all functions using `unstable
 
 **Cached Functions Affected:**
 - `getCachedPublishedSeriesForReviews` (also tagged with 'reviews')
+- `getAllEventSeries`
 
 **Functions Calling `revalidateTag('series')`:**
 
 1. **`app/api/series/create/route.ts`**
    - Function: `POST`
-   - Line: After series creation
+   - Line: 19
    - Action: Creates a new event series
 
 2. **`app/api/series/edit/[seriesId]/route.ts`**
    - Function: `PUT`
-   - Line: After series update
+   - Line: 36
    - Action: Updates an existing event series
+
+---
+
+### Tag: `'event-categories'`
+
+**Cached Functions Affected:**
+- `getAllEventCategories`
+
+**Functions Calling `revalidateTag('event-categories')`:**
+
+1. **`app/api/categories/create/route.tsx`**
+   - Function: `POST`
+   - Line: After category creation
+   - Action: Creates a new event category
+
+2. **`app/api/categories/edit/[categoryId]/route.ts`**
+   - Function: `PUT`
+   - Line: After category update
+   - Action: Updates an existing event category
+
+---
+
+### Tag: `'event-sponsors'`
+
+**Cached Functions Affected:**
+- `getAllEventSponsors`
+
+**Functions Calling `revalidateTag('event-sponsors')`:**
+
+1. **`app/api/sponsors/create/route.ts`**
+   - Function: `POST`
+   - Line: After sponsor creation
+   - Action: Creates a new event sponsor
+
+2. **`app/api/sponsors/edit/[sponsorId]/route.ts`**
+   - Function: `PUT`
+   - Line: After sponsor update
+   - Action: Updates an existing event sponsor (including event associations)
 
 ---
 
@@ -382,7 +449,9 @@ This document provides a comprehensive overview of all functions using `unstable
 | `events` | 9 functions | 13 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 1 function | 5 API routes | ✅ Fully covered |
-| `series` | 1 function | 2 API routes | ✅ Fully covered |
+| `series` | 2 functions | 2 API routes | ✅ Fully covered |
+| `event-categories` | 1 function | 2 API routes | ✅ Fully covered |
+| `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
 | `payments` | 1 function | 3 mutation points | ✅ Fully covered |
@@ -413,6 +482,8 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
 - When creating or updating series, always call `revalidateTag('series')`
+- When creating or updating event categories, always call `revalidateTag('event-categories')`
+- When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - Social media posts cache automatically refreshes every 10 minutes
 

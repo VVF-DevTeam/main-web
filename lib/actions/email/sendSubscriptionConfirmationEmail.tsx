@@ -106,7 +106,7 @@ const EmailTemplateSubscriptionConfirmation = ({
                     marginBottom: '12px',
                   }}
                 >
-                  {currencyLabel} ${formattedPrice}
+                  {currencyLabel} {formattedPrice}
                 </div>
 
                 {expiryDateDisplay && (

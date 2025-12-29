@@ -32,7 +32,7 @@ export const PUT = async (
       },
     })
 
-    // Revalidate series cache
+    // Revalidate series cache (both 'series' and 'event-series' tags for consistency)
     revalidateTag('series')
 
     return NextResponse.json(updatedSeries)

@@ -40,6 +40,10 @@ import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 // Interfaces
 interface CreateEventFormProps {
   author: string
+  redirectToProfile?: {
+    locale: string
+    userId: string
+  }
 }
 // TODO: Abstract the createEventSchema to a separate file
 const createEventSchema = z.object({
@@ -51,7 +55,10 @@ const createEventSchema = z.object({
 })
 
 // Main Component
-const CreateEventForm = ({ author }: CreateEventFormProps) => {
+const CreateEventForm = ({
+  author,
+  redirectToProfile,
+}: CreateEventFormProps) => {
   // TODO: Add author field for event
   console.log(author)
   const router = useRouter()
@@ -94,7 +101,15 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
 
       form.reset()
       router.refresh()
-      router.push(`/events/editEvent/${response.data.keyName}`)
+      
+      // Redirect to profile edit page if redirectToProfile is provided
+      if (redirectToProfile) {
+        router.push(
+          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-event&eventId=${response.data.keyName}`
+        )
+      } else {
+        router.push(`/events/editEvent/${response.data.keyName}`)
+      }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
@@ -219,7 +234,13 @@ const CreateEventForm = ({ author }: CreateEventFormProps) => {
             >
               Create Event
             </Button>
-            <Link href={'/events'}>
+            <Link
+              href={
+                redirectToProfile
+                  ? `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-all-events`
+                  : '/events'
+              }
+            >
               <Button
                 variant={'ghost'}
                 size={'lg'}
