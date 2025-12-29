@@ -66,16 +66,102 @@ async function getCheckoutSessionQuantity(sessionId: string) {
 
 async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | null> {
   try {
-    const invoice = await stripe.invoices.retrieve(invoiceId)
-    console.log('invoice gotten from stripe', invoice)
+    // With Basil API, we need to expand payments to get payment_intent
+    const invoice = await stripe.invoices.retrieve(invoiceId, {
+      expand: ['payments.data.payment.payment_intent'],
+    })
+    console.log('invoice gotten from getPaymentIntentFromInvoice', invoice)
+    // Try to get payment_intent from expanded payments
+    // @ts-ignore - payments exists on Invoice but structure may vary
+    if (invoice.payments && invoice.payments.data && invoice.payments.data.length > 0) {
+      const payment = invoice.payments.data[0]
+      // @ts-ignore - payment structure may vary
+      if (payment.payment && payment.payment.payment_intent) {
+        const paymentIntent = payment.payment.payment_intent
+        if (typeof paymentIntent === 'string') {
+          return paymentIntent
+        } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
+          return paymentIntent.id as string
+        }
+      }
+    }
+    
+    // Fallback: check if payment_intent exists directly (for older API versions or non-subscription invoices)
     // @ts-ignore - payment_intent exists on Invoice but not in type definition
     if (invoice.payment_intent) {
       // @ts-ignore
       return invoice.payment_intent as string
     }
-    return null
+    
+    // Alternative: check for charge (used in some subscription scenarios)
+    // @ts-ignore - charge exists on Invoice but not in type definition
+    if (invoice.charge) {
+      // @ts-ignore
+      const chargeId = invoice.charge as string
+      // Try to retrieve the charge to get payment_intent
+      try {
+        const charge = await stripe.charges.retrieve(chargeId)
+        // @ts-ignore - payment_intent exists on Charge but not in type definition
+        if (charge.payment_intent) {
+          // @ts-ignore
+          return charge.payment_intent as string
+        }
+        // If no payment_intent on charge, use charge ID as fallback
+        return chargeId
+      } catch (chargeError) {
+        console.error('[GET_CHARGE_ERROR]', chargeError)
+      }
+    }
+    
+    // If we still can't find payment_intent, use invoice ID as fallback identifier
+    // This can happen with subscription invoices in Basil API where payment_intent
+    // is not directly accessible. The invoice ID is still a unique payment identifier.
+    console.warn(`[PAYMENT_INTENT_NOT_FOUND] Using invoice ID as fallback: ${invoiceId}`)
+    return invoiceId
   } catch (error) {
     console.error('[GET_PAYMENT_INTENT_FROM_INVOICE_ERROR]', error)
+    return null
+  }
+}
+
+async function getPaymentIntentFromSubscription(subscriptionId: string): Promise<string | null> {
+  try {
+    // Retrieve subscription with latest_invoice expanded
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ['latest_invoice.payments.data.payment.payment_intent'],
+    })
+    console.log('subscription gotten from getPaymentIntentFromSubscription', subscription)
+    // @ts-ignore - latest_invoice exists on Subscription
+    if (subscription.latest_invoice) {
+      const latestInvoice = subscription.latest_invoice
+      if (typeof latestInvoice === 'object' && latestInvoice !== null) {
+        // Try to get payment_intent from the expanded invoice
+        // @ts-ignore
+        if (latestInvoice.payments && latestInvoice.payments.data && latestInvoice.payments.data.length > 0) {
+          // @ts-ignore
+          const payment = latestInvoice.payments.data[0]
+          // @ts-ignore
+          if (payment.payment && payment.payment.payment_intent) {
+            // @ts-ignore
+            const paymentIntent = payment.payment.payment_intent
+            if (typeof paymentIntent === 'string') {
+              return paymentIntent
+            } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
+              return paymentIntent.id as string
+            }
+          }
+        }
+        
+        // If latest_invoice is an object with an id, try to get payment intent from it
+        if ('id' in latestInvoice && typeof latestInvoice.id === 'string') {
+          return await getPaymentIntentFromInvoice(latestInvoice.id)
+        }
+      }
+    }
+    
+    return null
+  } catch (error) {
+    console.error('[GET_PAYMENT_INTENT_FROM_SUBSCRIPTION_ERROR]', error)
     return null
   }
 }
@@ -177,23 +263,28 @@ export async function POST(req: NextRequest) {
       quantity = (await getCheckoutSessionQuantity(paymentData.id)) ?? 1
       
       // For subscription mode checkout sessions, payment_intent is null on the session
-      // We need to get it from the invoice instead
+      // We need to get it from the invoice or subscription instead
       if (paymentData.payment_intent) {
         // Regular payment mode - payment_intent is directly on the session
         paymentId = paymentData.payment_intent as string
-      } else if (paymentData.invoice) {
-        // Subscription mode - payment_intent is on the invoice
-        paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
-      }
-
-      // if the payment is for a subscription, handled the first time payment
-      if (paymentData.subscription) {
+      } else if (paymentData.subscription) {
+        // Subscription mode - try to get payment_intent from subscription's latest invoice
         subscriptionId = paymentData.subscription as string
+        paymentId = await getPaymentIntentFromSubscription(subscriptionId)
+        
+        // If that didn't work, try the invoice from the checkout session
+        if (!paymentId && paymentData.invoice) {
+          paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
+        }
+        
         const subscriptionDetails = await getSubscriptionDetails(subscriptionId)
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
           // stripePriceId = subscriptionDetails.stripePriceId
         }
+      } else if (paymentData.invoice) {
+        // Fallback: try invoice directly (shouldn't happen for subscriptions, but just in case)
+        paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
       }
     } else {
       return NextResponse.json(
