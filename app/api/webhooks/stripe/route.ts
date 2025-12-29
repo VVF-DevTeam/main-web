@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
-import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
+import { revalidateTag } from 'next/cache'
 import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -64,25 +64,31 @@ async function getCheckoutSessionQuantity(sessionId: string) {
   return session.line_items.data.map((item) => item.quantity)[0] ?? null
 }
 
-async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | null> {
+async function getPaymentIntentFromInvoice(
+  invoiceId: string
+): Promise<string | null> {
   try {
     // With Basil API, expand payments (max 4 levels deep)
     const invoice = await stripe.invoices.retrieve(invoiceId, {
       expand: ['payments.data.payment'],
     })
     console.log('invoice gotten from getPaymentIntentFromInvoice', invoice)
-    
+
     // Try to get payment_intent from expanded payments
     // @ts-ignore - payments exists on Invoice but structure may vary
-    if (invoice.payments && invoice.payments.data && invoice.payments.data.length > 0) {
+    if (
+      invoice.payments &&
+      invoice.payments.data &&
+      invoice.payments.data.length > 0
+    ) {
       const payment = invoice.payments.data[0]
       console.log('payment from invoice.payments.data[0]', payment)
-      
+
       // @ts-ignore - payment structure may vary
       if (payment.payment) {
         const paymentObj = payment.payment
         console.log('payment.payment object', paymentObj)
-        
+
         // Check if payment_intent is a string ID or an expanded object
         // @ts-ignore
         if (paymentObj.payment_intent) {
@@ -90,11 +96,15 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
           const paymentIntent = paymentObj.payment_intent
           if (typeof paymentIntent === 'string') {
             return paymentIntent
-          } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
+          } else if (
+            paymentIntent &&
+            typeof paymentIntent === 'object' &&
+            'id' in paymentIntent
+          ) {
             return paymentIntent.id as string
           }
         }
-        
+
         // If payment_intent is not expanded, try to retrieve it
         // @ts-ignore - payment might have a payment_intent ID we can retrieve
         if (typeof paymentObj === 'string') {
@@ -107,7 +117,7 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
           }
         }
       }
-      
+
       // Check if payment itself has payment_intent directly
       // @ts-ignore
       if (payment.payment_intent) {
@@ -115,19 +125,23 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
         const paymentIntent = payment.payment_intent
         if (typeof paymentIntent === 'string') {
           return paymentIntent
-        } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
+        } else if (
+          paymentIntent &&
+          typeof paymentIntent === 'object' &&
+          'id' in paymentIntent
+        ) {
           return paymentIntent.id as string
         }
       }
     }
-    
+
     // Fallback: check if payment_intent exists directly (for older API versions or non-subscription invoices)
     // @ts-ignore - payment_intent exists on Invoice but not in type definition
     if (invoice.payment_intent) {
       // @ts-ignore
       return invoice.payment_intent as string
     }
-    
+
     // Alternative: Try to list invoice payments separately to get payment_intent
     try {
       // @ts-ignore - payments might have a list method or we can query separately
@@ -136,7 +150,7 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
     } catch (listError) {
       // Expected to fail, that's okay
     }
-    
+
     // Try to get payment intent from invoice's payment collection
     // In Basil API, we might need to query invoice payments differently
     try {
@@ -151,7 +165,8 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
             // @ts-ignore
             const pi = paymentItem.payment_intent
             if (typeof pi === 'string') return pi
-            if (pi && typeof pi === 'object' && 'id' in pi) return pi.id as string
+            if (pi && typeof pi === 'object' && 'id' in pi)
+              return pi.id as string
           }
           // @ts-ignore
           if (paymentItem.id && typeof paymentItem.id === 'string') {
@@ -168,7 +183,7 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
     } catch (paymentError) {
       console.log('[PAYMENT_ITERATION_ERROR]', paymentError)
     }
-    
+
     // Alternative: check for charge (used in some subscription scenarios)
     // @ts-ignore - charge exists on Invoice but not in type definition
     if (invoice.charge) {
@@ -188,11 +203,13 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
         console.error('[GET_CHARGE_ERROR]', chargeError)
       }
     }
-    
+
     // If we still can't find payment_intent, use invoice ID as fallback identifier
     // This can happen with subscription invoices in Basil API where payment_intent
     // is not directly accessible. The invoice ID is still a unique payment identifier.
-    console.warn(`[PAYMENT_INTENT_NOT_FOUND] Using invoice ID as fallback: ${invoiceId}`)
+    console.warn(
+      `[PAYMENT_INTENT_NOT_FOUND] Using invoice ID as fallback: ${invoiceId}`
+    )
     return invoiceId
   } catch (error) {
     console.error('[GET_PAYMENT_INTENT_FROM_INVOICE_ERROR]', error)
@@ -200,21 +217,31 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
   }
 }
 
-async function getPaymentIntentFromSubscription(subscriptionId: string): Promise<string | null> {
+async function getPaymentIntentFromSubscription(
+  subscriptionId: string
+): Promise<string | null> {
   try {
     // Retrieve subscription with latest_invoice expanded (max 4 levels)
     const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
       expand: ['latest_invoice'],
     })
-    console.log('subscription gotten from getPaymentIntentFromSubscription', subscription)
-    
+    console.log(
+      'subscription gotten from getPaymentIntentFromSubscription',
+      subscription
+    )
+
     // @ts-ignore - latest_invoice exists on Subscription
     if (subscription.latest_invoice) {
       const latestInvoice = subscription.latest_invoice
-      
+
       // If latest_invoice is an object with an id, get payment intent from it
-      if (typeof latestInvoice === 'object' && latestInvoice !== null && 'id' in latestInvoice) {
-        const invoiceId = typeof latestInvoice.id === 'string' ? latestInvoice.id : null
+      if (
+        typeof latestInvoice === 'object' &&
+        latestInvoice !== null &&
+        'id' in latestInvoice
+      ) {
+        const invoiceId =
+          typeof latestInvoice.id === 'string' ? latestInvoice.id : null
         if (invoiceId) {
           return await getPaymentIntentFromInvoice(invoiceId)
         }
@@ -223,7 +250,7 @@ async function getPaymentIntentFromSubscription(subscriptionId: string): Promise
         return await getPaymentIntentFromInvoice(latestInvoice)
       }
     }
-    
+
     return null
   } catch (error) {
     console.error('[GET_PAYMENT_INTENT_FROM_SUBSCRIPTION_ERROR]', error)
@@ -326,7 +353,7 @@ export async function POST(req: NextRequest) {
       chargedAmount = paymentData.amount_total ?? 0
       metadata = paymentData.metadata as Record<string, string>
       quantity = (await getCheckoutSessionQuantity(paymentData.id)) ?? 1
-      
+
       // For subscription mode checkout sessions, payment_intent is null on the session
       // We need to get it from the invoice or subscription instead
       if (paymentData.payment_intent) {
@@ -336,12 +363,14 @@ export async function POST(req: NextRequest) {
         // Subscription mode - try to get payment_intent from subscription's latest invoice
         subscriptionId = paymentData.subscription as string
         paymentId = await getPaymentIntentFromSubscription(subscriptionId)
-        
+
         // If that didn't work, try the invoice from the checkout session
         if (!paymentId && paymentData.invoice) {
-          paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
+          paymentId = await getPaymentIntentFromInvoice(
+            paymentData.invoice as string
+          )
         }
-        
+
         const subscriptionDetails = await getSubscriptionDetails(subscriptionId)
         if (subscriptionDetails) {
           subscriptionEnd = subscriptionDetails.current_period_end
@@ -349,7 +378,9 @@ export async function POST(req: NextRequest) {
         }
       } else if (paymentData.invoice) {
         // Fallback: try invoice directly (shouldn't happen for subscriptions, but just in case)
-        paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
+        paymentId = await getPaymentIntentFromInvoice(
+          paymentData.invoice as string
+        )
       }
     } else {
       return NextResponse.json(
@@ -386,7 +417,7 @@ export async function POST(req: NextRequest) {
         ticketId: string
         seatNumbers: string[]
       }> | null = null
-      
+
       if (metadata.ticketMetadata) {
         try {
           ticketMetadata = JSON.parse(
@@ -464,7 +495,6 @@ export async function POST(req: NextRequest) {
               seatNumber: ticketInfo.seatNumbers.join(', '),
             },
           })
-
         }
       } else {
         // Single ticket checkout (backward compatibility)
@@ -505,232 +535,268 @@ export async function POST(req: NextRequest) {
         })
       }
 
-      // Send payment confirmation email for event tickets (not Membership)
-      if (metadata.type !== 'Membership' && metadata.eventId) {
+      // Send payment confirmation email
+      // - For event tickets: detailed ticket email
+      // - For memberships: generic membership confirmation email
+      if (metadata.eventId || metadata.type === 'Membership') {
         try {
-          // Fetch user data
+          // Fetch user data (used for both tickets and membership)
           const user = await prisma.user.findUnique({
             where: { id: metadata.userId },
             select: { name: true, email: true },
           })
 
-          // Handle multi-ticket checkout
-          if (ticketMetadata && ticketMetadata.length > 0) {
-            // For multi-ticket, send one email with all ticket types
-            // Fetch all tickets
-            const ticketIds = ticketMetadata.map((t) => t.ticketId)
-            const tickets = await prisma.eventTicket.findMany({
-              where: { id: { in: ticketIds } },
-              include: {
-                event: {
-                  select: {
-                    title: true,
-                    startDate: true,
-                    endDate: true,
-                    location: true,
-                    days: true,
-                    startTime: true,
-                    endTime: true,
-                  },
-                },
-              },
-            })
-
-            // Use the first ticket for event details (they're all from the same event)
-            const firstTicket = tickets[0]
-            if (user && user.email && firstTicket) {
-              const pricePaid = chargedAmount / 100
-              const firstName = user.name?.split(' ')[0] || 'Valued Customer'
-              const allSeatNumbers = ticketMetadata
-                .flatMap((t) => t.seatNumbers)
-                .join(', ')
-
-              // Send email with combined information
-              await sendPaymentConfirmationEmail({
-                firstName,
-                to: user.email,
-                ticketType: tickets.map((t) => t.type).join(', '), // Combined ticket types
-                pricePaid,
-                quantity: quantity || allSeatNumbers.split(',').length,
-                currency: firstTicket.currency || 'CAD',
-                ticketImageUrl: firstTicket.imageUrl,
-                perSessionPrice: Number(firstTicket.price) || 0,
-                payTotalNumber: firstTicket.payTotalNumber,
-                eventTitle: firstTicket.event.title,
-                seatNumber: allSeatNumbers,
-                eventStartDate: firstTicket.event.startDate,
-                eventEndDate: firstTicket.event.endDate,
-                eventLocation: firstTicket.event.location,
-                eventStartTime: firstTicket.event.startTime,
-                eventEndTime: firstTicket.event.endTime,
-              })
-            }
-          }
-
-          // update event seatingMap - handle both single and multiple seats
-          // Get seat numbers from ticketMetadata if available, otherwise from metadata
-          const seatNumbersToUpdate: string[] = []
-          if (ticketMetadata && ticketMetadata.length > 0) {
-            // Use seat numbers from ticketMetadata (multi-ticket checkout)
-            ticketMetadata.forEach((ticketInfo) => {
-              seatNumbersToUpdate.push(...ticketInfo.seatNumbers)
-            })
-          } else if (metadata.seatNumbers) {
-            // Multiple seats (backward compatibility)
-            try {
-              const parsed = JSON.parse(metadata.seatNumbers as string)
-              if (Array.isArray(parsed)) {
-                seatNumbersToUpdate.push(...parsed)
-              }
-            } catch (e) {
-              console.error('Error parsing seatNumbers:', e)
-            }
-          } else if (metadata.seatNumber) {
-            // Single seat (backward compatibility)
-            seatNumbersToUpdate.push(metadata.seatNumber as string)
-          }
-
-          if (seatNumbersToUpdate.length > 0) {
-            const event = await prisma.event.findUnique({
-              where: { id: metadata.eventId },
-              select: {
-                seatingMap: true,
-              },
-            })
-
-            if (!event) {
-              console.error(
-                'Event not found, could not update seatingMap',
-                metadata.eventId
-              )
-              // Don't return error here - log and continue, as this shouldn't fail the webhook
-            } else if (event.seatingMap) {
-              try {
-                // Parse the seatingMap from JSON (if it's a string) or use directly (if already an object)
-                const seatingMap = (
-                  typeof event.seatingMap === 'string'
-                    ? JSON.parse(event.seatingMap)
-                    : event.seatingMap
-                ) as Array<
-                  Array<{
-                    name?: string
-                    status: number
-                    ticketId?: string
-                    ticketType?: string
-                    price?: number
-                    currency?: string
-                  }>
-                >
-
-                // Find and update all seats with matching seatNumbers
-                const seatsFound: string[] = []
-                for (const seatNumberToUpdate of seatNumbersToUpdate) {
-                  for (
-                    let rowIndex = 0;
-                    rowIndex < seatingMap.length;
-                    rowIndex++
-                  ) {
-                    const row = seatingMap[rowIndex]
-                    if (Array.isArray(row)) {
-                      for (
-                        let colIndex = 0;
-                        colIndex < row.length;
-                        colIndex++
-                      ) {
-                        const seat = row[colIndex]
-                        if (seat && seat.name === seatNumberToUpdate) {
-                          seat.status = 2 // OCCUPIED
-                          seatsFound.push(seatNumberToUpdate)
-                          break
-                        }
-                      }
-                      if (seatsFound.includes(seatNumberToUpdate)) break
-                    }
-                  }
-                }
-                console.log('seats found and updated:', seatsFound)
-
-                // Update the seatingMap in the database if at least one seat was found
-                if (seatsFound.length > 0) {
-                  console.log('updating seatingMap in database')
-                  await prisma.event.update({
-                    where: { id: metadata.eventId },
-                    data: {
-                      seatingMap: seatingMap,
+          // Ticket-based email flow (non-membership with event)
+          if (metadata.type !== 'Membership' && metadata.eventId) {
+            // Handle multi-ticket checkout
+            if (ticketMetadata && ticketMetadata.length > 0) {
+              // For multi-ticket, send one email with all ticket types
+              // Fetch all tickets
+              const ticketIds = ticketMetadata.map((t) => t.ticketId)
+              const tickets = await prisma.eventTicket.findMany({
+                where: { id: { in: ticketIds } },
+                include: {
+                  event: {
+                    select: {
+                      title: true,
+                      startDate: true,
+                      endDate: true,
+                      location: true,
+                      days: true,
+                      startTime: true,
+                      endTime: true,
                     },
-                  })
+                  },
+                },
+              })
+
+              // Use the first ticket for event details (they're all from the same event)
+              const firstTicket = tickets[0]
+              if (user && user.email && firstTicket) {
+                const pricePaid = chargedAmount / 100
+                const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+                const allSeatNumbers = ticketMetadata
+                  .flatMap((t) => t.seatNumbers)
+                  .join(', ')
+
+                // Send email with combined information
+                await sendPaymentConfirmationEmail({
+                  firstName,
+                  to: user.email,
+                  ticketType: tickets.map((t) => t.type).join(', '), // Combined ticket types
+                  pricePaid,
+                  quantity: quantity || allSeatNumbers.split(',').length,
+                  currency: firstTicket.currency || 'CAD',
+                  ticketImageUrl: firstTicket.imageUrl,
+                  perSessionPrice: Number(firstTicket.price) || 0,
+                  payTotalNumber: firstTicket.payTotalNumber,
+                  eventTitle: firstTicket.event.title,
+                  seatNumber: allSeatNumbers,
+                  eventStartDate: firstTicket.event.startDate,
+                  eventEndDate: firstTicket.event.endDate,
+                  eventLocation: firstTicket.event.location,
+                  eventStartTime: firstTicket.event.startTime,
+                  eventEndTime: firstTicket.event.endTime,
+                })
+              }
+            }
+
+            // update event seatingMap - handle both single and multiple seats
+            // Get seat numbers from ticketMetadata if available, otherwise from metadata
+            const seatNumbersToUpdate: string[] = []
+            if (ticketMetadata && ticketMetadata.length > 0) {
+              // Use seat numbers from ticketMetadata (multi-ticket checkout)
+              ticketMetadata.forEach((ticketInfo) => {
+                seatNumbersToUpdate.push(...ticketInfo.seatNumbers)
+              })
+            } else if (metadata.seatNumbers) {
+              // Multiple seats (backward compatibility)
+              try {
+                const parsed = JSON.parse(metadata.seatNumbers as string)
+                if (Array.isArray(parsed)) {
+                  seatNumbersToUpdate.push(...parsed)
                 }
-              } catch (parseError) {
+              } catch (e) {
+                console.error('Error parsing seatNumbers:', e)
+              }
+            } else if (metadata.seatNumber) {
+              // Single seat (backward compatibility)
+              seatNumbersToUpdate.push(metadata.seatNumber as string)
+            }
+
+            if (seatNumbersToUpdate.length > 0) {
+              const event = await prisma.event.findUnique({
+                where: { id: metadata.eventId },
+                select: {
+                  seatingMap: true,
+                },
+              })
+
+              if (!event) {
                 console.error(
-                  'Error parsing or updating seatingMap:',
-                  parseError
+                  'Event not found, could not update seatingMap',
+                  metadata.eventId
                 )
-                // Don't fail the webhook if seating map update fails
+                // Don't return error here - log and continue, as this shouldn't fail the webhook
+              } else if (event.seatingMap) {
+                try {
+                  // Parse the seatingMap from JSON (if it's a string) or use directly (if already an object)
+                  const seatingMap = (
+                    typeof event.seatingMap === 'string'
+                      ? JSON.parse(event.seatingMap)
+                      : event.seatingMap
+                  ) as Array<
+                    Array<{
+                      name?: string
+                      status: number
+                      ticketId?: string
+                      ticketType?: string
+                      price?: number
+                      currency?: string
+                    }>
+                  >
+
+                  // Find and update all seats with matching seatNumbers
+                  const seatsFound: string[] = []
+                  for (const seatNumberToUpdate of seatNumbersToUpdate) {
+                    for (
+                      let rowIndex = 0;
+                      rowIndex < seatingMap.length;
+                      rowIndex++
+                    ) {
+                      const row = seatingMap[rowIndex]
+                      if (Array.isArray(row)) {
+                        for (
+                          let colIndex = 0;
+                          colIndex < row.length;
+                          colIndex++
+                        ) {
+                          const seat = row[colIndex]
+                          if (seat && seat.name === seatNumberToUpdate) {
+                            seat.status = 2 // OCCUPIED
+                            seatsFound.push(seatNumberToUpdate)
+                            break
+                          }
+                        }
+                        if (seatsFound.includes(seatNumberToUpdate)) break
+                      }
+                    }
+                  }
+                  console.log('seats found and updated:', seatsFound)
+
+                  // Update the seatingMap in the database if at least one seat was found
+                  if (seatsFound.length > 0) {
+                    console.log('updating seatingMap in database')
+                    await prisma.event.update({
+                      where: { id: metadata.eventId },
+                      data: {
+                        seatingMap: seatingMap,
+                      },
+                    })
+                  }
+                } catch (parseError) {
+                  console.error(
+                    'Error parsing or updating seatingMap:',
+                    parseError
+                  )
+                  // Don't fail the webhook if seating map update fails
+                }
+              }
+            }
+
+            // Handle single ticket checkout email (if not already handled in multi-ticket section)
+            if (
+              !ticketMetadata &&
+              metadata.eventTicketId &&
+              metadata.type !== 'Membership'
+            ) {
+              // Single ticket checkout (backward compatibility)
+              const ticket = await prisma.eventTicket.findUnique({
+                where: { id: metadata.eventTicketId },
+                include: {
+                  event: {
+                    select: {
+                      title: true,
+                      startDate: true,
+                      endDate: true,
+                      location: true,
+                      days: true,
+                      startTime: true,
+                      endTime: true,
+                    },
+                  },
+                },
+              })
+
+              console.log('user', user)
+              console.log('ticket', ticket)
+              // send email confirmation for single ticket
+              if (user && user.email && ticket) {
+                const pricePaid = chargedAmount / 100
+                const perSessionPrice = Number(ticket.price) || 0
+                const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+
+                console.log('sending email confirmation')
+                await sendPaymentConfirmationEmail({
+                  firstName,
+                  to: user.email,
+                  ticketType: ticket.type,
+                  pricePaid,
+                  quantity: quantity || 1,
+                  currency: ticket.currency || 'CAD',
+                  ticketImageUrl: ticket.imageUrl,
+                  perSessionPrice,
+                  payTotalNumber: ticket.payTotalNumber,
+                  eventTitle: ticket.event.title,
+                  seatNumber: (() => {
+                    if (metadata.seatNumbers) {
+                      try {
+                        const parsed = JSON.parse(
+                          metadata.seatNumbers as string
+                        )
+                        return Array.isArray(parsed)
+                          ? parsed.join(', ')
+                          : metadata.seatNumber
+                      } catch (e) {
+                        console.error('Error parsing seatNumbers in email:', e)
+                        return metadata.seatNumber
+                      }
+                    }
+                    return metadata.seatNumber
+                  })(),
+                  eventStartDate: ticket.event.startDate,
+                  eventEndDate: ticket.event.endDate,
+                  eventLocation: ticket.event.location,
+                  eventStartTime: ticket.event.startTime,
+                  eventEndTime: ticket.event.endTime,
+                })
               }
             }
           }
 
-          // Handle single ticket checkout email (if not already handled in multi-ticket section)
-          if (!ticketMetadata && metadata.eventTicketId) {
-            // Single ticket checkout (backward compatibility)
-            const ticket = await prisma.eventTicket.findUnique({
-              where: { id: metadata.eventTicketId },
-              include: {
-                event: {
-                  select: {
-                    title: true,
-                    startDate: true,
-                    endDate: true,
-                    location: true,
-                    days: true,
-                    startTime: true,
-                    endTime: true,
-                  },
-                },
-              },
+          // Membership confirmation email (no event / ticket details)
+          if (metadata.type === 'Membership' && user && user.email) {
+            const pricePaid = chargedAmount / 100
+            const firstName = user.name?.split(' ')[0] || 'Valued Customer'
+
+            await sendPaymentConfirmationEmail({
+              firstName,
+              to: user.email,
+              ticketType: 'Membership Subscription',
+              pricePaid,
+              quantity: quantity || 1,
+              currency: 'CAD',
+              ticketImageUrl: undefined,
+              perSessionPrice: pricePaid,
+              payTotalNumber: null,
+              eventTitle: 'Membership Subscription',
+              seatNumber: '-',
+              eventStartDate: new Date(),
+              eventEndDate: expiresAt || null,
+              eventLocation: 'Viet Vibe Foundation',
+              eventStartTime: null,
+              eventEndTime: null,
             })
-
-            console.log('user', user)
-            console.log('ticket', ticket)
-            // send email confirmation for single ticket
-            if (user && user.email && ticket) {
-              const pricePaid = chargedAmount / 100
-              const perSessionPrice = Number(ticket.price) || 0
-              const firstName = user.name?.split(' ')[0] || 'Valued Customer'
-
-              console.log('sending email confirmation')
-              await sendPaymentConfirmationEmail({
-                firstName,
-                to: user.email,
-                ticketType: ticket.type,
-                pricePaid,
-                quantity: quantity || 1,
-                currency: ticket.currency || 'CAD',
-                ticketImageUrl: ticket.imageUrl,
-                perSessionPrice,
-                payTotalNumber: ticket.payTotalNumber,
-                eventTitle: ticket.event.title,
-                seatNumber: (() => {
-                  if (metadata.seatNumbers) {
-                    try {
-                      const parsed = JSON.parse(metadata.seatNumbers as string)
-                      return Array.isArray(parsed)
-                        ? parsed.join(', ')
-                        : metadata.seatNumber
-                    } catch (e) {
-                      console.error('Error parsing seatNumbers in email:', e)
-                      return metadata.seatNumber
-                    }
-                  }
-                  return metadata.seatNumber
-                })(),
-                eventStartDate: ticket.event.startDate,
-                eventEndDate: ticket.event.endDate,
-                eventLocation: ticket.event.location,
-                eventStartTime: ticket.event.startTime,
-                eventEndTime: ticket.event.endTime,
-              })
-            }
           }
         } catch (emailError) {
           // Log email error but don't fail the webhook
@@ -739,8 +805,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Update event ticket sold count
-      // Invalidate payment cache after creating new payment
-      invalidatePaymentCache()
+      // Revalidate payment cache after creating new payment
+      revalidateTag('payments')
 
       // add role member to user
       if (metadata.type === 'Membership') {

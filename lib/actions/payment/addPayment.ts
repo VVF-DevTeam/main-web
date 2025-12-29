@@ -1,7 +1,7 @@
 'use server'
 import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
-import { invalidatePaymentCache } from './paymentCache'
+import { revalidateTag } from 'next/cache'
 
 interface AddPaymentParams {
   eventId?: string | null
@@ -39,8 +39,8 @@ export async function addPayment({
       },
     })
 
-    // Invalidate payment cache after creating new payment
-    invalidatePaymentCache()
+    // Revalidate payment cache after creating new payment
+    revalidateTag('payments')
 
     return {
       success: true,

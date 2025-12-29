@@ -138,6 +138,17 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Payments
+
+#### 12. `getPaginatedPayments`
+- **File**: `lib/actions/payment/getPaginatedPayments.ts`
+- **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
+- **Tags**: `['payments']`
+- **Revalidate Time**: 300 seconds (5 minutes)
+- **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
+
+---
+
 ## Tag-Based Revalidation Mapping
 
 ### Tag: `'events'`
@@ -341,6 +352,27 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Tag: `'payments'`
+
+**Cached Functions Affected:**
+- `getPaginatedPayments`
+
+**Functions Calling `revalidateTag('payments')`:**
+
+1. **`app/api/payment/refund/route.ts`**
+   - Function: `POST`
+   - Action: Processes a refund (and cancels a membership subscription when applicable), then revalidates the payments cache so refunded status and subscription changes are reflected in the admin UI.
+
+2. **`lib/actions/payment/addPayment.ts`**
+   - Function: `addPayment` (server action)
+   - Action: Adds a manual payment record from the admin UI and revalidates the payments cache.
+
+3. **`app/api/webhooks/stripe/route.ts`**
+   - Function: `POST`
+   - Action: Handles Stripe webhook events (`checkout.session.completed`, `payment_intent.succeeded`, `invoice.paid`), creates payment records, and revalidates the payments cache after successful creation.
+
+---
+
 ## Summary by Tag
 
 ### Complete Tag Coverage
@@ -353,6 +385,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `series` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
+| `payments` | 1 function | 3 mutation points | ✅ Fully covered |
 
 ---
 

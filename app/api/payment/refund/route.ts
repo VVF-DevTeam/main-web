@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import Stripe from 'stripe'
-import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
+import { sendRefundConfirmationEmail } from '@/lib/actions/email/sendRefundConfirmationEmail'
+import { revalidateTag } from 'next/cache'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -37,7 +38,16 @@ export async function POST(req: Request) {
         user: {
           select: {
             stripeSubscriptionId: true,
+            name: true,
             email: true,
+          },
+        },
+        event: {
+          select: {
+            title: true,
+            startDate: true,
+            endDate: true,
+            location: true,
           },
         },
       },
@@ -90,8 +100,38 @@ export async function POST(req: Request) {
       },
     })
 
-    // Invalidate payment cache after updating payment
-    invalidatePaymentCache()
+    // Revalidate payment cache after updating payment
+    revalidateTag('payments')
+
+    // Send refund confirmation email to the user (best-effort, non-blocking for failure)
+    if (payment.user?.email) {
+      try {
+        const firstName =
+          payment.user.name?.split(' ')[0] || 'Valued Customer'
+
+        const refundedAmount =
+          typeof refund.amount === 'number' ? refund.amount / 100 : 0
+
+        const ticketType =
+          payment.type === 'Membership'
+            ? 'Membership Subscription'
+            : 'Event Ticket'
+
+        await sendRefundConfirmationEmail({
+          firstName,
+          to: payment.user.email,
+          ticketType,
+          refundedAmount,
+          currency: 'CAD',
+          eventTitle: payment.event?.title,
+          eventStartDate: payment.event?.startDate || null,
+          eventEndDate: payment.event?.endDate || null,
+          eventLocation: payment.event?.location || null,
+        })
+      } catch (emailError) {
+        console.error('[REFUND_CONFIRMATION_EMAIL_ERROR]', emailError)
+      }
+    }
 
     // If it's an event payment, remove the user from the event
     // If user has deleted their account, no need to disconnect them from the event

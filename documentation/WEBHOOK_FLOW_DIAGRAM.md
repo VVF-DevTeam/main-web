@@ -134,16 +134,16 @@ ticketMetadata exists    ticketMetadata is null
         └─────────────┬────────────────┘
                       │
         ┌─────────────┴─────────────┐
-        │                           │
+               │                           │
 metadata.type !==          metadata.type ===
 'Membership'?              'Membership'?
         │                           │
         ▼                           ▼
-┌───────────────┐        ┌────────────────────┐
-│  CONTINUE     │        │  SKIP Email        │
-│  TO EMAIL     │        │  & Seat Map         │
-│  HANDLING     │        │  (Membership only) │
-└───────┬───────┘        └────────────────────┘
+┌───────────────┐        ┌──────────────────────────────┐
+│  CONTINUE     │        │  Send Membership Confirmation│
+│  TO TICKET    │        │  Email (no seat map update)  │
+│  EMAIL FLOW   │        └──────────────────────────────┘
+└───────┬───────┘
         │
         ▼
 ┌──────────────────────────────┐
@@ -314,7 +314,8 @@ metadata.type ===          metadata.type !==
    - eventTicketId: null
    - expiresAt: subscriptionEnd
    ↓
-4. SKIP Email Section (Membership check)
+4. Send Membership Confirmation Email
+   - Uses generic membership template (no event / seat details)
    ↓
 5. Update User (lines 562-576)
    - subscribedAt: new Date()

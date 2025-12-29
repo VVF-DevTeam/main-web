@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import { useRouter } from 'next/navigation'
-import { invalidatePaymentCache } from '@/lib/actions/payment/paymentCache'
 
 interface RefundButtonProps {
   paymentId: string
@@ -36,8 +35,7 @@ export default function RefundButton({
         },
       })
       
-      // Invalidate payment cache and refresh the page data
-      invalidatePaymentCache()
+      // Refresh the page data - the refund API already revalidates the cache
       router.refresh()
     } catch (error) {
       toast.error('Failed to process refund', {

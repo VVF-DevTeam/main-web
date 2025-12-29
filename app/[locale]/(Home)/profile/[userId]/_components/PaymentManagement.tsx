@@ -66,6 +66,9 @@ export default async function PaymentManagement({
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-3 text-left">Event</th>
+                <th className="px-4 py-3 text-left max-w-[150px] break-words">
+                  Email
+                </th>
                 <th className="px-4 py-3 text-left">Customer</th>
                 <th className="px-4 py-3 text-left">Start Date</th>
                 <th className="px-4 py-3 text-left">End Date</th>
@@ -99,8 +102,11 @@ export default async function PaymentManagement({
                       <td className="px-4 py-3">
                         {payment.event?.title || '-'}
                       </td>
+                      <td className="px-4 py-3 max-w-[150px] break-words whitespace-normal">
+                        {payment.user?.email || '-'}
+                      </td>
                       <td className="px-4 py-3">
-                        {payment.user?.name || payment.user?.email || '-'}
+                        {payment.user?.name || '-'}
                       </td>
                       <td className="px-4 py-3">
                         {startDate.toLocaleDateString('en-US', {
