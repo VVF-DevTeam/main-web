@@ -34,6 +34,7 @@ async function fetchEventPaymentsData(eventId: string) {
         eventTicket: {
           select: {
             capacityPerTicket: true,
+            type: true,
           },
         },
       },
@@ -41,12 +42,17 @@ async function fetchEventPaymentsData(eventId: string) {
         createdAt: 'desc',
       },
     })
-
     // Convert Decimal to number for client-side compatibility
     return payments.map((payment) => ({
       ...payment,
       pricePaid: Number(payment.pricePaid.toString()),
-      capacityPerTicket: payment.eventTicket?.capacityPerTicket ?? 1,
+      // Map eventTicket to ensure proper structure
+      eventTicket: payment.eventTicket
+        ? {
+            capacityPerTicket: payment.eventTicket.capacityPerTicket,
+            type: payment.eventTicket.type,
+          }
+        : null,
     }))
   } catch (error) {
     console.error('Error fetching event payments:', error)
@@ -55,15 +61,17 @@ async function fetchEventPaymentsData(eventId: string) {
 }
 
 // Cached version of getEventPayments - cached per event
+// Note: If you change the query structure (add/remove fields), increment the cache key version
+// (e.g., v2 → v3) to force a cache refresh, otherwise wait for:
+// 1. Cache expiration (1 day) or 2. Tag revalidation (when payments are created/refunded)
 export async function getEventPayments(eventId: string) {
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
-    [`event-payments-${eventId}`], // Cache key per event
+    [`event-payments-v2-${eventId}`], // Cache key per event (v2 after adding type field)
     {
       revalidate: 86400, // Cache for 1 day (revalidateTag handles on-demand invalidation)
-      tags: ['payments'], // Tag for revalidation - will be invalidated when payments change
+      tags: ['payments'], // Tag for revalidation - automatically invalidated when payments change
     }
   )
   return await cachedFunction()
 }
-

@@ -16,7 +16,7 @@ const Navbar = () => {
   const { data: session } = useSession()
 
   return (
-    <nav className="sticky top-0 z-10 flex h-[100px] w-full items-center bg-white shadow-md md:px-2 lg:px-6">
+    <nav className="sticky top-0 z-50 flex h-[100px] w-full items-center bg-white shadow-md md:px-2 lg:px-6">
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
       {/* <div className="white-overlay"></div>
       <Image

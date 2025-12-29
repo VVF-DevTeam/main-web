@@ -6,6 +6,7 @@ import { revalidateTag } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { sendVerificationEmail } from '../email/sendVerificationEmail'
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
+import { linkGuestPaymentsToUser } from '../payment/linkGuestPayments'
 
 interface signupActionProps {
   firstName: string
@@ -96,6 +97,19 @@ export const signupAction = async (formData: signupActionProps) => {
 
     // Revalidate users cache
     revalidateTag('users')
+
+    // Link any guest payments made with this email to the new user account
+    try {
+      const linkResult = await linkGuestPaymentsToUser(user.id, user.email)
+      if (linkResult.linkedCount > 0) {
+        console.log(
+          `[SIGNUP] Linked ${linkResult.linkedCount} guest payment(s) to new user account`
+        )
+      }
+    } catch (linkError) {
+      // Log error but don't fail signup if linking fails
+      console.error('[SIGNUP] Failed to link guest payments:', linkError)
+    }
 
     return {
       message:

@@ -10,6 +10,14 @@ import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import { EventTicket } from '@prisma/client'
+import GuestInfoForm, { GuestInfo } from '@/components/payment/GuestInfoForm'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -27,7 +35,7 @@ interface SelectedSeatWithTicket {
 
 interface EventMultipleCheckoutProps {
   eventKeyName: string
-  userId: string
+  userId?: string | null
   eventId: string
   email: string
   type: string
@@ -54,14 +62,19 @@ export default function EventMultipleCheckout({
   // Check subscription status for member pricing
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
+  const [showGuestForm, setShowGuestForm] = useState(false)
+
+  const isGuestCheckout = !userId || userId.trim() === ''
 
   useEffect(() => {
     let isMounted = true
     const fetchSubscription = async () => {
       try {
-        const subscribed = await checkSubscription(userId)
-        if (isMounted) {
-          setIsSubscribed(Boolean(subscribed))
+        if (userId) {
+          const subscribed = await checkSubscription(userId)
+          if (isMounted) {
+            setIsSubscribed(Boolean(subscribed))
+          }
         }
       } catch (error) {
         console.error('Error checking subscription:', error)
@@ -71,9 +84,7 @@ export default function EventMultipleCheckout({
         }
       }
     }
-    if (userId) {
-      fetchSubscription()
-    }
+    fetchSubscription()
     return () => {
       isMounted = false
     }
@@ -124,7 +135,7 @@ export default function EventMultipleCheckout({
   }, [selectedSeatsWithTickets, isSubscribed, type])
 
   // Master checkout handler for multiple ticket types
-  const handleMasterCheckout = useCallback(async () => {
+  const handleMasterCheckout = useCallback(async (guestInfo?: GuestInfo) => {
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
     )
@@ -175,11 +186,16 @@ export default function EventMultipleCheckout({
         '/api/payment/checkout-sessions/create-multi',
         {
           eventKeyName,
-          userId,
+          userId: userId || '',
           eventId,
           type,
-          email,
+          email: guestInfo?.email || email,
           checkoutItems,
+          // Guest information (only if userId is not provided)
+          ...(isGuestCheckout && guestInfo && {
+            guestName: guestInfo.name,
+            guestPhone: guestInfo.phone,
+          }),
         }
       )
 
@@ -216,7 +232,21 @@ export default function EventMultipleCheckout({
     eventId,
     type,
     email,
+    isGuestCheckout,
   ])
+
+  const handleCheckoutButtonClick = () => {
+    if (isGuestCheckout) {
+      setShowGuestForm(true)
+    } else {
+      handleMasterCheckout()
+    }
+  }
+
+  const handleGuestFormSubmit = (info: GuestInfo) => {
+    setShowGuestForm(false)
+    handleMasterCheckout(info)
+  }
 
   return (
     <div className="w-full">
@@ -384,7 +414,7 @@ export default function EventMultipleCheckout({
         <div className="mt-4">
           {!isLoadingSubscription && (
             <Button
-              onClick={handleMasterCheckout}
+              onClick={handleCheckoutButtonClick}
               className="group mt-4 w-full"
               disabled={selectedSeatsWithTickets.length === 0}
             >
@@ -393,6 +423,25 @@ export default function EventMultipleCheckout({
             </Button>
           )}
         </div>
+
+        {/* Guest Checkout Form Dialog */}
+        {isGuestCheckout && (
+          <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Guest Checkout</DialogTitle>
+                <DialogDescription>
+                  Please provide your contact information to complete your purchase.
+                </DialogDescription>
+              </DialogHeader>
+              <GuestInfoForm
+                onSubmit={handleGuestFormSubmit}
+                initialEmail={email}
+                buttonText={t('reserve-button') || undefined}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   )
