@@ -92,11 +92,14 @@ export async function POST(req: Request) {
     }
 
     // Update payment in database
+    // For membership refunds, also nullify expiresAt to maintain data consistency
     await prisma.payment.update({
       where: { id: paymentId },
       data: {
         updatedAt: new Date(),
         refunded: true,
+        // If it's a membership payment, nullify expiresAt since subscription is cancelled
+        ...(payment.type === 'Membership' && { expiresAt: null }),
       },
     })
 
