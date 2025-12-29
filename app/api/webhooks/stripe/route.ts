@@ -67,6 +67,7 @@ async function getCheckoutSessionQuantity(sessionId: string) {
 async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | null> {
   try {
     const invoice = await stripe.invoices.retrieve(invoiceId)
+    console.log('invoice gotten from stripe', invoice)
     // @ts-ignore - payment_intent exists on Invoice but not in type definition
     if (invoice.payment_intent) {
       // @ts-ignore
