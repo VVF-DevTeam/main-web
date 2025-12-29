@@ -103,6 +103,8 @@ export async function POST(req: NextRequest) {
     'invoice.paid',
   ]
 
+  console.log('event webhook received', event)
+
   if (successType.includes(event.type)) {
     let paymentData:
       | Stripe.PaymentIntent
@@ -177,7 +179,7 @@ export async function POST(req: NextRequest) {
 
     console.log('metadata', metadata)
     console.log('paymentData', paymentData)
-    
+
     // in case paymentId is not found, set it to an empty string, then admin can ask devs to fix it
     if (!paymentId) {
       paymentId = ''
