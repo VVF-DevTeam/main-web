@@ -1,8 +1,9 @@
 import PaymentSuccess from '@/components/payment/PaymentSuccess'
 import { getEventTitleByKeyName } from '@/lib/actions/event/getEvent'
+import { auth } from '@/auth'
 
-// No use of auth() or header or live database, so can be static
-export const dynamic = 'auto'
+// No use of header or live database, but uses auth() so can be dynamic
+export const dynamic = 'force-dynamic'
 
 // Interfaces
 interface ClassPaymentSuccessPageProps {
@@ -19,11 +20,16 @@ const ClassPaymentSuccessPage = async ({
 
   if (!publishedClass) return null
 
+  // Check if user is authenticated
+  const session = await auth()
+  const isGuestCheckout = !session?.user
+
   return (
     <PaymentSuccess
       title={publishedClass.title}
       locale={locale}
       translationWorkspaces={['event']}
+      isGuestCheckout={isGuestCheckout}
     />
   )
 }
