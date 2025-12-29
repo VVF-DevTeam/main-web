@@ -1,7 +1,7 @@
 // Libraries
-import { prisma } from '@/lib/db'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { redirect } from 'next/navigation'
+import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 
 // Components
 import SeriesManager from '../_components/SeriesManager'
@@ -21,14 +21,10 @@ const createEventSeriesPage = async () => {
     return redirect('/events')
   }
 
-  // Get all event series
+  // Get all event series using cached function
   let eventSeries: EventSeries[] = []
   try {
-    eventSeries = await prisma.eventSeries.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-    })
+    eventSeries = await getAllEventSeries()
   } catch (error) {
     console.error(error)
   }

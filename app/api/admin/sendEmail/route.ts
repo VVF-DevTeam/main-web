@@ -9,12 +9,14 @@ export const POST = async (request: Request) => {
     const recipients = JSON.parse(formData.get('recipients') as string) as string[];
     const subject = formData.get('subject') as string;
     const content = formData.get('content') as string;
+    const senderEmail = formData.get('senderEmail') as string;
     const attachments: File[] = formData.getAll('attachments') as File[];
     // Call your actual sendEmail function
     await sendEmail({
       recipients,
       subject,
       content,
+      senderEmail,
       attachments,
     });
 

@@ -48,7 +48,7 @@ export default async function PaymentManagement({
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
         {/* Headers & Add Record Button */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Payment Management</h1>
+          <h1 className="text-3xl font-bold">All Payments Management</h1>
           <AddPaymentButton user={user} />
         </div>
 

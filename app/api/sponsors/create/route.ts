@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { SponsorTier } from '@prisma/client'
+import { revalidateTag } from 'next/cache'
 
 export const POST = async (request: Request) => {
   try {
@@ -23,6 +24,9 @@ export const POST = async (request: Request) => {
         },
       },
     })
+
+    // Revalidate event sponsors cache
+    revalidateTag('event-sponsors')
 
     return NextResponse.json(created)
   } catch (error) {

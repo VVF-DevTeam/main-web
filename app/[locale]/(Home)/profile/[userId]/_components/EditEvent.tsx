@@ -1,58 +1,52 @@
 // Libraries
 import { prisma } from '@/lib/db'
-import { redirect } from 'next/navigation'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 import Link from 'next/link'
 import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
 import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 
 // Components
 import PublishButton from '@/app/[locale]/components/PublishButton'
-import EventStartDate from './_components/EventStartDate'
-import EventTitle from './_components/EventTitle'
-import EventEndDate from './_components/EventEndDate'
-import EventTimings from './_components/EventTimings'
-import EventSchedule from './_components/EventSchedule'
-import EventCategories from './_components/EventCategories'
-import EventDays from './_components/EventDays'
-import EventImage from './_components/EventImage'
-import EventPrice from './_components/EventPrice'
-import EventLocation from './_components/EventLocation'
-import EventType from './_components/EventType'
-import EventHosts from './_components/EventHosts'
-import EventDescription from './_components/EventDescription'
-import EventCapacity from './_components/EventCapacity'
-// import EventFullDiscount from './_components/EventFullDiscount'
-import EventEditSeries from './_components/EventSeries'
-import BackButton from '@/components/ui/back-button'
+import EventStartDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventStartDate'
+import EventTitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTitle'
+import EventEndDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventEndDate'
+import EventTimings from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTimings'
+import EventSchedule from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSchedule'
+import EventCategories from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventCategories'
+import EventDays from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDays'
+import EventImage from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventImage'
+import EventPrice from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventPrice'
+import EventLocation from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventLocation'
+import EventType from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventType'
+import EventHosts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventHosts'
+import EventDescription from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDescription'
+import EventCapacity from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventCapacity'
+import EventEditSeries from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSeries'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
-import EventFormLink from './_components/EventFormLink'
-import EventSocialMedia from './_components/EventSocialMedia'
-import EventSubtitle from './_components/EventSubtitle'
-import EventGallery from './_components/EventGallery'
-import DeleteEventButton from './_components/DeleteEventButton'
-import EventSeating from './_components/EventSeating'
-import EventForm from './_components/EventForm'
+import EventFormLink from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventFormLink'
+import EventSocialMedia from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSocialMedia'
+import EventSubtitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSubtitle'
+import EventGallery from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventGallery'
+import DeleteEventButton from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/DeleteEventButton'
+import EventSeating from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSeating'
+import EventForm from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventForm'
 import { EventCategory, EventSeries } from '@prisma/client'
 import NotFound from '@/app/[locale]/(Home)/not-found'
 
-// Main Component
-const EditEventPage = async ({
-  params,
-}: {
-  params: Promise<{ eventId: string }>
-}) => {
-  // check if the current user is an admin or host to allow access to the post control page
-  if (
-    !(await roleCheck({ role: 'ADMIN' })) &&
-    !(await roleCheck({ role: 'HOST' }))
-  ) {
-    return redirect('/events')
+interface EditEventProps {
+  eventId: string
+  user: {
+    id: string
+    role: string[]
   }
+  locale: string
+}
 
-  const { eventId } = await params
-
+export default async function EditEvent({
+  eventId,
+  user,
+  locale,
+}: EditEventProps) {
   let event = null
   let categories: EventCategory[] = []
   let allSeries: EventSeries[] = []
@@ -119,7 +113,6 @@ const EditEventPage = async ({
     !!event.startTime && !!event.endTime,
     !!event.startDate,
     !!event.endDate,
-    // !!event.formLink,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
     event.schedules.length === 0 ? false : true,
@@ -132,9 +125,6 @@ const EditEventPage = async ({
 
   return (
     <div className="my-12 p-6 lg:my-20">
-      {/* Back Button To Parent Page */}
-      <BackButton />
-
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -288,7 +278,7 @@ const EditEventPage = async ({
               {' '}
               To add categories, please click{' '}
               <Link
-                href="/events/createEventCategory"
+                href={`/${locale}/profile/${user.id}?section=admin-event-categories`}
                 target="_blank"
                 className="text-textColor-blue underline"
               >
@@ -307,7 +297,7 @@ const EditEventPage = async ({
             <p>
               If you don&apos;t see any series, you can create one{' '}
               <Link
-                href="/events/createEventSeries"
+                href={`/${locale}/profile/${user.id}?section=admin-event-series`}
                 target="_blank"
                 className="text-textColor-blue underline"
               >
@@ -368,13 +358,13 @@ const EditEventPage = async ({
             </h2>
             <p>
               Please use this link to manage sponsors:{' '}
-              <a
-                href="/events/manageSponsors"
+              <Link
+                href={`/${locale}/profile/${user.id}?section=admin-manage-sponsors`}
                 target="_blank"
                 className="text-textColor-blue underline"
               >
                 here
-              </a>
+              </Link>
             </p>
           </div>
 
@@ -391,4 +381,3 @@ const EditEventPage = async ({
   )
 }
 
-export default EditEventPage

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { NextResponse, NextRequest } from 'next/server'
+import { revalidateTag } from 'next/cache'
 
 export const PUT = async (
   request: NextRequest,
@@ -29,6 +30,9 @@ export const PUT = async (
         ...data,
       },
     })
+
+    // Revalidate event categories cache
+    revalidateTag('event-categories')
 
     return NextResponse.json(updatedCategory)
   } catch (error) {

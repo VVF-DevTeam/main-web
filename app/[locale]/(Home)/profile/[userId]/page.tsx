@@ -1,6 +1,7 @@
 // Libraries
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { prisma } from '@/lib/db'
+import { getAllPublishedEvents } from '@/lib/actions/event/getEvent'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -11,6 +12,13 @@ import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
 import EmailComposition from './_components/EmailComposition'
+import EventManagement from './_components/EventManagement'
+import CreateEventForm from './_components/CreateEventForm'
+import EventCategoryManager from './_components/EventCategoryManager'
+import EventSeriesManager from './_components/EventSeriesManager'
+import SponsorsManagement from './_components/SponsorsManagement'
+import EditEvent from './_components/EditEvent'
+import EventStatistics from './_components/EventStatistics'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -41,11 +49,19 @@ const getPaymentHistory = (userId: string) =>
   })
 
 // Helper to fetch published events
-const getPublishedEvents = () =>
-  prisma.event.findMany({
-    where: { isPublished: true },
-    orderBy: { startDate: 'desc' },
+const getPublishedEvents = async () => {
+  return await getAllPublishedEvents({
+    id: true,
+    title: true,
+    keyName: true,
+    eventType: true,
+    startDate: true,
+    endDate: true,
+    location: true,
+    imgUrl: true,
+    price: true,
   })
+}
 
 // Main Component
 export default async function ProfilePage({
@@ -53,10 +69,18 @@ export default async function ProfilePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ section?: string; page?: string; pageSize?: string }>
+  searchParams: Promise<{
+    section?: string
+    page?: string
+    pageSize?: string
+    eventId?: string
+  }>
 }) {
-  const [{ section, page: pageStr, pageSize: pageSizeStr }, { locale }, user] =
-    await Promise.all([searchParams, params, getCurrentUserInfo()])
+  const [
+    { section, page: pageStr, pageSize: pageSizeStr, eventId },
+    { locale },
+    user,
+  ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
 
   // Return if user is not logged in
   if (!user) {
@@ -112,6 +136,95 @@ export default async function ProfilePage({
 
     case 'privacy-policy':
       return <PrivacyPolicy locale={locale} />
+
+    case 'admin-all-events':
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        return <EventManagement user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-create-event':
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        return <CreateEventForm user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-event-categories':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <EventCategoryManager user={user} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-event-series':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <EventSeriesManager user={user} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-manage-sponsors':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <SponsorsManagement user={user} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-event-statistics':
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        return <EventStatistics user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-edit-event':
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        if (!eventId) {
+          return (
+            <p className="mt-10 text-center">
+              Event ID is required to edit an event.
+            </p>
+          )
+        }
+        return <EditEvent eventId={eventId} user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
 
     default: {
       // Only fetch events and payment history for the default profile view

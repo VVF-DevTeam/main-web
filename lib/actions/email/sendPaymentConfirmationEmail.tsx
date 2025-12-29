@@ -142,7 +142,7 @@ const EmailTemplatePaymentConfirmation = ({
                     marginBottom: '12px',
                   }}
                 >
-                  {currencyLabel} ${formattedPrice}
+                  {currencyLabel} {formattedPrice}
                 </div>
 
                 {seatNumber ? (

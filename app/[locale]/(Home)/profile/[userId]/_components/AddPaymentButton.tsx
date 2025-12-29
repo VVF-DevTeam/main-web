@@ -147,8 +147,8 @@ const AddClientModal = ({
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('select-an-event')} />
+                          <SelectTrigger className="border">
+                            <SelectValue placeholder='Select an event' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -182,7 +182,7 @@ const AddClientModal = ({
                           }}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="border">
                               <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                           </FormControl>
@@ -280,7 +280,7 @@ const AddClientModal = ({
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="border">
                             <SelectValue placeholder="Select a payment method" />
                           </SelectTrigger>
                         </FormControl>
@@ -317,7 +317,7 @@ const AddClientModal = ({
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="border">
                             <SelectValue placeholder="Select an event type" />
                           </SelectTrigger>
                         </FormControl>
