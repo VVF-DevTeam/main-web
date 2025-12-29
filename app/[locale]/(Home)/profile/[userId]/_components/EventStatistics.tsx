@@ -39,6 +39,9 @@ interface Payment {
   pricePaid: number | { toString(): string; toNumber(): number }
   quantity: number
   seatNumber: string | null
+  type: string
+  guestName: string | null
+  guestEmail: string | null
   user: {
     name: string | null
     email: string
@@ -145,11 +148,11 @@ export default function EventStatistics({
     return sum + price
   }, 0)
 
-  // Get unique emails for copy functionality
+  // Get unique emails for copy functionality (include guest emails)
   const participantEmails = Array.from(
     new Set(
       payments
-        .map((p) => p.user?.email)
+        .map((p) => p.user?.email || p.guestEmail)
         .filter((email): email is string => !!email)
     )
   )
@@ -365,16 +368,24 @@ export default function EventStatistics({
                       </thead>
                       <tbody className="divide-y">
                         {payments.map((payment) => {
+                          const isGuestCheckout = !payment.user && (payment.guestEmail || payment.guestName)
+                          const displayEmail = payment.user?.email || payment.guestEmail || '-'
+                          const displayName = payment.user?.name || payment.guestName || '-'
+                          const paymentType = payment.eventTicket?.type || '-'
+                          const displayPaymentType = isGuestCheckout 
+                            ? `${paymentType} (Guest Checkout)`
+                            : paymentType
+
                           return (
                             <tr key={payment.id} className="bg-white">
                               <td className="px-4 py-3">
-                                {payment.eventTicket?.type || '-'}
+                                {displayPaymentType}
                               </td>
                               <td className="max-w-[150px] whitespace-normal break-words px-4 py-3">
-                                {payment.user?.email || '-'}
+                                {displayEmail}
                               </td>
                               <td className="px-4 py-3">
-                                {payment.user?.name || '-'}
+                                {displayName}
                               </td>
                               <td className="px-4 py-3">
                                 $

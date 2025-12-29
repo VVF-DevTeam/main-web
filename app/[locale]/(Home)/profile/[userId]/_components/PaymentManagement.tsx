@@ -97,16 +97,24 @@ export default async function PaymentManagement({
                   const status = getPaymentStatus(payment)
                   const statusColor = getStatusColor(status)
 
+                  // Check if this is a guest checkout payment
+                  const isGuestCheckout = !payment.user && (payment.guestEmail || payment.guestName)
+                  const displayEmail = payment.user?.email || payment.guestEmail || '-'
+                  const displayName = payment.user?.name || payment.guestName || '-'
+                  const paymentTypeDisplay = isGuestCheckout
+                    ? `${paymentTypeMap[payment.type]} (Guest Checkout)`
+                    : paymentTypeMap[payment.type]
+
                   return (
                     <tr key={index} className="bg-white">
                       <td className="px-4 py-3">
                         {payment.event?.title || '-'}
                       </td>
                       <td className="px-4 py-3 max-w-[150px] break-words whitespace-normal">
-                        {payment.user?.email || '-'}
+                        {displayEmail}
                       </td>
                       <td className="px-4 py-3">
-                        {payment.user?.name || '-'}
+                        {displayName}
                       </td>
                       <td className="px-4 py-3">
                         {startDate.toLocaleDateString('en-US', {
@@ -134,7 +142,7 @@ export default async function PaymentManagement({
                         {payment.quantity}/{payment.seatNumber || '-'}
                       </td>
                       <td className="px-4 py-3">
-                        {paymentTypeMap[payment.type]}
+                        {paymentTypeDisplay}
                       </td>
                       <td className={`px-4 py-3 font-medium ${statusColor}`}>
                         {status}

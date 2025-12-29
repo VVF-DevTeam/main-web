@@ -16,6 +16,9 @@ async function fetchEventPaymentsData(eventId: string) {
         pricePaid: true,
         quantity: true,
         seatNumber: true,
+        type: true,
+        guestName: true,
+        guestEmail: true,
         user: {
           select: {
             name: true,
