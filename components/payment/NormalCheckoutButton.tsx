@@ -150,12 +150,13 @@ export default function NormalCheckoutButton({
         <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
           <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[425px] sm:w-auto sm:mx-auto rounded-md">
             <DialogHeader>
-              <DialogTitle>Guest Checkout</DialogTitle>
+              <DialogTitle>{t('event:guest-checkout-title')}</DialogTitle>
               <DialogDescription>
-                Please provide your contact information to complete your
-                purchase. However, we strongly encourage you to {' '}
-                <Link href="/signIn" className="text-blue-500 hover:text-blue-600 hover:underline">login</Link> to reserve your seat for
-                easier reservation management.
+                {t('event:guest-checkout-description-with-login')}{' '}
+                <Link href="/signIn" className="text-blue-500 hover:text-blue-600 hover:underline">
+                  {t('event:guest-checkout-login-link')}
+                </Link>{' '}
+                {t('event:guest-checkout-login-text')}
               </DialogDescription>
             </DialogHeader>
             <GuestInfoForm

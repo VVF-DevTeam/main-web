@@ -159,8 +159,7 @@ export default function GuestInfoForm({
       </div>
 
       <p className="text-xs text-muted-foreground text-center">
-        Your information will be used for event records and contact purposes. 
-        If you create an account later with this email, your payment will be automatically linked.
+        {t('event:guest-checkout-disclaimer')}
       </p>
     </form>
   )

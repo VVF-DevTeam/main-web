@@ -429,9 +429,9 @@ export default function EventMultipleCheckout({
           <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Guest Checkout</DialogTitle>
+                <DialogTitle>{t('guest-checkout-title')}</DialogTitle>
                 <DialogDescription>
-                  Please provide your contact information to complete your purchase.
+                  {t('guest-checkout-description')}
                 </DialogDescription>
               </DialogHeader>
               <GuestInfoForm
