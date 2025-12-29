@@ -17,10 +17,10 @@ export async function POST(req: Request) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { paymentId, amount } = await req.json()
+    const { paymentId } = await req.json()
 
-    if (!paymentId || !amount) {
-      return new NextResponse('Missing required fields', { status: 400 })
+    if (!paymentId) {
+      return new NextResponse('Missing paymentId', { status: 400 })
     }
 
     // Get payment details from database
@@ -34,6 +34,12 @@ export async function POST(req: Request) {
         eventTicketId: true,
         quantity: true,
         refunded: true, // Check if already refunded
+        user: {
+          select: {
+            stripeSubscriptionId: true,
+            email: true,
+          },
+        },
       },
     })
 
@@ -45,11 +51,35 @@ export async function POST(req: Request) {
       return new NextResponse('No Stripe payment ID found', { status: 400 })
     }
 
-    // Process refund through Stripe    
+    // Process refund through Stripe
+    // If amount is not specified, Stripe will refund the full amount automatically
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
-      amount: Math.round(amount * 100), // Convert to cents
     })
+
+    // If it's a Membership payment, cancel the subscription immediately
+    if (payment.type === 'Membership' && payment.user?.stripeSubscriptionId) {
+      try {
+        // Cancel the subscription immediately (not at period end)
+        await stripe.subscriptions.cancel(payment.user.stripeSubscriptionId)
+        
+        // Update user's subscription status in database
+        if (payment.userId) {
+          await prisma.user.update({
+            where: { id: payment.userId },
+            data: {
+              stripeSubscriptionId: null,
+              subscribeExpires: null,
+              subscribedAt: null,
+            },
+          })
+        }
+      } catch (subscriptionError) {
+        console.error('Error cancelling subscription:', subscriptionError)
+        // Continue with refund even if subscription cancellation fails
+        // Log the error but don't fail the entire refund process
+      }
+    }
 
     // Update payment in database
     await prisma.payment.update({
