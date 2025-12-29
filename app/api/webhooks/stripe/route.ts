@@ -66,18 +66,53 @@ async function getCheckoutSessionQuantity(sessionId: string) {
 
 async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | null> {
   try {
-    // With Basil API, we need to expand payments to get payment_intent
+    // With Basil API, expand payments (max 4 levels deep)
     const invoice = await stripe.invoices.retrieve(invoiceId, {
-      expand: ['payments.data.payment.payment_intent'],
+      expand: ['payments.data.payment'],
     })
     console.log('invoice gotten from getPaymentIntentFromInvoice', invoice)
+    
     // Try to get payment_intent from expanded payments
     // @ts-ignore - payments exists on Invoice but structure may vary
     if (invoice.payments && invoice.payments.data && invoice.payments.data.length > 0) {
       const payment = invoice.payments.data[0]
+      console.log('payment from invoice.payments.data[0]', payment)
+      
       // @ts-ignore - payment structure may vary
-      if (payment.payment && payment.payment.payment_intent) {
-        const paymentIntent = payment.payment.payment_intent
+      if (payment.payment) {
+        const paymentObj = payment.payment
+        console.log('payment.payment object', paymentObj)
+        
+        // Check if payment_intent is a string ID or an expanded object
+        // @ts-ignore
+        if (paymentObj.payment_intent) {
+          // @ts-ignore
+          const paymentIntent = paymentObj.payment_intent
+          if (typeof paymentIntent === 'string') {
+            return paymentIntent
+          } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
+            return paymentIntent.id as string
+          }
+        }
+        
+        // If payment_intent is not expanded, try to retrieve it
+        // @ts-ignore - payment might have a payment_intent ID we can retrieve
+        if (typeof paymentObj === 'string') {
+          // If payment is just an ID, retrieve it
+          try {
+            const fullPayment = await stripe.paymentIntents.retrieve(paymentObj)
+            return fullPayment.id
+          } catch (e) {
+            // Not a payment intent ID, continue
+          }
+        }
+      }
+      
+      // Check if payment itself has payment_intent directly
+      // @ts-ignore
+      if (payment.payment_intent) {
+        // @ts-ignore
+        const paymentIntent = payment.payment_intent
         if (typeof paymentIntent === 'string') {
           return paymentIntent
         } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
@@ -91,6 +126,47 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
     if (invoice.payment_intent) {
       // @ts-ignore
       return invoice.payment_intent as string
+    }
+    
+    // Alternative: Try to list invoice payments separately to get payment_intent
+    try {
+      // @ts-ignore - payments might have a list method or we can query separately
+      const invoicePayments = await stripe.invoices.listUpcomingLines(invoiceId)
+      // This might not work, but let's try listing payments for the invoice
+    } catch (listError) {
+      // Expected to fail, that's okay
+    }
+    
+    // Try to get payment intent from invoice's payment collection
+    // In Basil API, we might need to query invoice payments differently
+    try {
+      // Check if we can access payments through a different method
+      // @ts-ignore
+      if (invoice.payments && invoice.payments.data) {
+        // @ts-ignore
+        for (const paymentItem of invoice.payments.data) {
+          console.log('Payment item from invoice:', paymentItem)
+          // @ts-ignore - check various possible structures
+          if (paymentItem.payment_intent) {
+            // @ts-ignore
+            const pi = paymentItem.payment_intent
+            if (typeof pi === 'string') return pi
+            if (pi && typeof pi === 'object' && 'id' in pi) return pi.id as string
+          }
+          // @ts-ignore
+          if (paymentItem.id && typeof paymentItem.id === 'string') {
+            // Try to retrieve this as a payment intent
+            try {
+              const pi = await stripe.paymentIntents.retrieve(paymentItem.id)
+              return pi.id
+            } catch (e) {
+              // Not a payment intent, continue
+            }
+          }
+        }
+      }
+    } catch (paymentError) {
+      console.log('[PAYMENT_ITERATION_ERROR]', paymentError)
     }
     
     // Alternative: check for charge (used in some subscription scenarios)
@@ -126,36 +202,25 @@ async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | 
 
 async function getPaymentIntentFromSubscription(subscriptionId: string): Promise<string | null> {
   try {
-    // Retrieve subscription with latest_invoice expanded
+    // Retrieve subscription with latest_invoice expanded (max 4 levels)
     const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-      expand: ['latest_invoice.payments.data.payment.payment_intent'],
+      expand: ['latest_invoice'],
     })
     console.log('subscription gotten from getPaymentIntentFromSubscription', subscription)
+    
     // @ts-ignore - latest_invoice exists on Subscription
     if (subscription.latest_invoice) {
       const latestInvoice = subscription.latest_invoice
-      if (typeof latestInvoice === 'object' && latestInvoice !== null) {
-        // Try to get payment_intent from the expanded invoice
-        // @ts-ignore
-        if (latestInvoice.payments && latestInvoice.payments.data && latestInvoice.payments.data.length > 0) {
-          // @ts-ignore
-          const payment = latestInvoice.payments.data[0]
-          // @ts-ignore
-          if (payment.payment && payment.payment.payment_intent) {
-            // @ts-ignore
-            const paymentIntent = payment.payment.payment_intent
-            if (typeof paymentIntent === 'string') {
-              return paymentIntent
-            } else if (paymentIntent && typeof paymentIntent === 'object' && 'id' in paymentIntent) {
-              return paymentIntent.id as string
-            }
-          }
+      
+      // If latest_invoice is an object with an id, get payment intent from it
+      if (typeof latestInvoice === 'object' && latestInvoice !== null && 'id' in latestInvoice) {
+        const invoiceId = typeof latestInvoice.id === 'string' ? latestInvoice.id : null
+        if (invoiceId) {
+          return await getPaymentIntentFromInvoice(invoiceId)
         }
-        
-        // If latest_invoice is an object with an id, try to get payment intent from it
-        if ('id' in latestInvoice && typeof latestInvoice.id === 'string') {
-          return await getPaymentIntentFromInvoice(latestInvoice.id)
-        }
+      } else if (typeof latestInvoice === 'string') {
+        // If it's just an ID string, retrieve the invoice
+        return await getPaymentIntentFromInvoice(latestInvoice)
       }
     }
     
