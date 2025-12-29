@@ -244,9 +244,9 @@ const EmailTemplatePaymentConfirmation = ({
                   </div>
                 )}
 
-                <span
+                <p
                   style={{
-                    fontSize: '10px',
+                    fontSize: '11px',
                     color: '#111827',
                     marginBottom: '8px',
                     fontStyle: 'italic',
@@ -255,18 +255,19 @@ const EmailTemplatePaymentConfirmation = ({
                   {' '}
                   Please arrive 15 minutes before the event starts so we can
                   check you in, thank you and see you soon!
-                </span>
-                <span
+                </p>
+                <p
                   style={{
-                    fontSize: '6px',
+                    fontSize: '9px',
                     color: '#111827',
                     marginBottom: '8px',
-                    fontStyle: 'italic',
                   }}
                 >
                   {' '}
-                  *Note: There will be an email from Stripe with an invoice and receipt attached for your payment. Please check your spam folder if you don't see it in your inbox.
-                </span>
+                  *Note: There will be an email from Stripe with an invoice and
+                  receipt attached for your payment. Please check your spam
+                  folder if you don't see it in your inbox.
+                </p>
               </td>
 
               {/* Right: image column */}

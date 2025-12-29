@@ -167,7 +167,7 @@ const EmailTemplateRefundConfirmation = ({
                   </div>
                 )}
 
-                <span
+                <p
                   style={{
                     fontSize: '10px',
                     color: '#111827',
@@ -175,10 +175,10 @@ const EmailTemplateRefundConfirmation = ({
                     fontStyle: 'italic',
                   }}
                 >
-                  Please note: Stripe will also send you a separate email with an
+                  *Note: Stripe will also send you a separate email with an
                   official refund receipt. Please check your spam folder if you
                   don't see it in your inbox.
-                </span>
+                </p>
               </td>
             </tr>
           </tbody>

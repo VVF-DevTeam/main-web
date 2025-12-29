@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { PaymentType } from '@prisma/client'
 import { revalidateTag } from 'next/cache'
 import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
+import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -779,23 +780,12 @@ export async function POST(req: NextRequest) {
             const pricePaid = chargedAmount / 100
             const firstName = user.name?.split(' ')[0] || 'Valued Customer'
 
-            await sendPaymentConfirmationEmail({
+            await sendSubscriptionConfirmationEmail({
               firstName,
               to: user.email,
-              ticketType: 'Membership Subscription',
               pricePaid,
-              quantity: quantity || 1,
               currency: 'CAD',
-              ticketImageUrl: undefined,
-              perSessionPrice: pricePaid,
-              payTotalNumber: null,
-              eventTitle: 'Membership Subscription',
-              seatNumber: '-',
-              eventStartDate: new Date(),
-              eventEndDate: expiresAt || null,
-              eventLocation: 'Viet Vibe Foundation',
-              eventStartTime: null,
-              eventEndTime: null,
+              subscriptionExpiresAt: expiresAt || null,
             })
           }
         } catch (emailError) {
