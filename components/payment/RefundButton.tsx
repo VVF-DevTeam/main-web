@@ -30,7 +30,7 @@ export default function RefundButton({
         stripeProductId,
       })
       toast.success('Refund processed successfully', {
-        description: `Payment by ${stripeProductId}`,
+        description: `$${amount.toFixed(2)} will be refunded to user account in 5-7 business days`,
         style: {
           color: '#22c55e', // green-500 color
         },
@@ -41,7 +41,7 @@ export default function RefundButton({
       router.refresh()
     } catch (error) {
       toast.error('Failed to process refund', {
-        description: `Payment by ${stripeProductId}`,
+        description: `Please contact team dev for assistance`,
         style: {
           color: '#ef4444', // red-500 color
         },

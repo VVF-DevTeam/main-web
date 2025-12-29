@@ -1,3 +1,5 @@
+'use server'
+
 export async function getEventParticipants(eventId: string) {
     const { prisma } = await import('@/lib/db')
     try {

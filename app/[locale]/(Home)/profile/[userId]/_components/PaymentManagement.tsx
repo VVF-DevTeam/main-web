@@ -90,7 +90,7 @@ export default async function PaymentManagement({
                       ? payment.expiresAt!
                       : payment.event?.endDate || payment.createdAt
                   )
-                  console.log('payment', payment)
+
                   const status = getPaymentStatus(payment)
                   const statusColor = getStatusColor(status)
 
