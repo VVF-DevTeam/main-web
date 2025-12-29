@@ -64,6 +64,21 @@ async function getCheckoutSessionQuantity(sessionId: string) {
   return session.line_items.data.map((item) => item.quantity)[0] ?? null
 }
 
+async function getPaymentIntentFromInvoice(invoiceId: string): Promise<string | null> {
+  try {
+    const invoice = await stripe.invoices.retrieve(invoiceId)
+    // @ts-ignore - payment_intent exists on Invoice but not in type definition
+    if (invoice.payment_intent) {
+      // @ts-ignore
+      return invoice.payment_intent as string
+    }
+    return null
+  } catch (error) {
+    console.error('[GET_PAYMENT_INTENT_FROM_INVOICE_ERROR]', error)
+    return null
+  }
+}
+
 export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature')
 
@@ -159,7 +174,16 @@ export async function POST(req: NextRequest) {
       chargedAmount = paymentData.amount_total ?? 0
       metadata = paymentData.metadata as Record<string, string>
       quantity = (await getCheckoutSessionQuantity(paymentData.id)) ?? 1
-      paymentId = paymentData.payment_intent as string
+      
+      // For subscription mode checkout sessions, payment_intent is null on the session
+      // We need to get it from the invoice instead
+      if (paymentData.payment_intent) {
+        // Regular payment mode - payment_intent is directly on the session
+        paymentId = paymentData.payment_intent as string
+      } else if (paymentData.invoice) {
+        // Subscription mode - payment_intent is on the invoice
+        paymentId = await getPaymentIntentFromInvoice(paymentData.invoice as string)
+      }
 
       // if the payment is for a subscription, handled the first time payment
       if (paymentData.subscription) {
