@@ -19,6 +19,9 @@ export async function POST(req: Request) {
       email,
       seatNumber,
       eventTicketId,
+      // Guest information (for payments without login)
+      guestName,
+      guestPhone,
     } = await req.json()
 
     // Create single line item for one ticket
@@ -55,13 +58,17 @@ export async function POST(req: Request) {
           : `${origin}/events/class/${eventKeyName}`,
       allow_promotion_codes: true,
       metadata: {
-        userId: userId,
+        userId: userId || '',
         eventId: eventId,
         stripePriceId: stripePriceId,
         stripeProductId: stripeProductId,
         eventTicketId: eventTicketId || '',
         type: type,
         ...(seatNumber && { seatNumber: seatNumber }),
+        // Guest information (only if userId is not provided)
+        ...(guestName && { guestName: guestName }),
+        ...(email && { guestEmail: email }),
+        ...(guestPhone && { guestPhone: guestPhone }),
         description:
           type === 'Membership'
             ? 'Monthly Membership'

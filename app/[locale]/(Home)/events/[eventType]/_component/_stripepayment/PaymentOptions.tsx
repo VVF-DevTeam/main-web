@@ -160,12 +160,15 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     return `${seatName} - Empty seat`
   }
 
-  const getSeatName = useCallback((seat: SeatValue, rowIndex: number, colIndex: number) => {
-    if (seat.name) {
-      return seat.name
-    }
-    return generateSeatName(rowIndex, colIndex)
-  }, [generateSeatName])
+  const getSeatName = useCallback(
+    (seat: SeatValue, rowIndex: number, colIndex: number) => {
+      if (seat.name) {
+        return seat.name
+      }
+      return generateSeatName(rowIndex, colIndex)
+    },
+    [generateSeatName]
+  )
 
   const handleSeatClick = useCallback(
     (seat: SeatValue, rowIndex: number, seatIndex: number) => {
@@ -504,12 +507,13 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   return (
     <div ref={containerRef} className="w-full text-bgColor-black">
       {isCapacityExceeded ? (
-        <div className="mb-4 rounded-md border border-red-300 bg-red-50 p-4 text-center">
-          <p className="text-sm font-medium text-red-800">
-            {t('event-full') || 'This event is full. No more tickets available.'}
+        <div className="mb-4 rounded-md border bg-bgColor-gray300 p-4 text-center">
+          <p className="web_h6 text-red-800">
+            {t('event-full') ||
+              'This event is full. No more tickets available.'}
           </p>
         </div>
-      ) : loggedIn ? (
+      ) : (
         <Button
           variant="default"
           onClick={() => {
@@ -517,20 +521,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             setShowOptions(willOpen)
             // Scroll is handled in useEffect when showOptions transitions to true
           }}
-          className="mb-4 w-full font-semibold h-[40px] md:h-auto"
+          className="mb-4 h-[40px] w-full font-semibold md:h-auto"
         >
           <span className="web_h6">{t('reserve-here')}</span>
           <ChevronRight
             className={`ml-2 h-5 w-5 transition-transform duration-300 ${showOptions ? 'rotate-90' : 'rotate-0'}`}
           />
-        </Button>
-      ) : (
-        <Button
-          variant="default"
-          onClick={() => router.push('/signIn')}
-          className="mb-4 w-full font-semibold"
-        >
-          {t('login-to-reserve')}
         </Button>
       )}
 

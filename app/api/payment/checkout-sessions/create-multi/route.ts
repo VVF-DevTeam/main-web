@@ -15,6 +15,9 @@ export async function POST(req: Request) {
       type,
       email,
       checkoutItems,
+      // Guest information (for payments without login)
+      guestName,
+      guestPhone,
     } = await req.json()
 
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
@@ -117,11 +120,15 @@ export async function POST(req: Request) {
           : `${origin}/events/class/${eventKeyName}`,
       allow_promotion_codes: true,
       metadata: {
-        userId: userId,
+        userId: userId || '',
         eventId: eventId,
         type: type,
         seatNumbers: JSON.stringify(allSeatNumbers),
         ticketMetadata: JSON.stringify(ticketMetadata), // Store which seats belong to which ticket type
+        // Guest information (only if userId is not provided)
+        ...(guestName && { guestName: guestName }),
+        ...(email && { guestEmail: email }),
+        ...(guestPhone && { guestPhone: guestPhone }),
         description:
           type === 'Membership'
             ? 'Monthly Membership'

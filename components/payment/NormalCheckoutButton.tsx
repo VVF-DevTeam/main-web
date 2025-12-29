@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -8,6 +9,15 @@ import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { ArrowRight } from 'lucide-react'
 import { PaymentType } from '@prisma/client'
+import GuestInfoForm, { GuestInfo } from './GuestInfoForm'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import Link from 'next/link'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -17,7 +27,7 @@ interface NormalCheckoutButtonProps {
   stripePriceId: string
   stripeProductId: string
   eventKeyName?: string
-  userId: string
+  userId?: string | null
   eventId?: string
   buttonText: string
   type: PaymentType
@@ -42,8 +52,11 @@ export default function NormalCheckoutButton({
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
+  const [showGuestForm, setShowGuestForm] = useState(false)
 
-  const handleCheckout = async (priceId: string) => {
+  const isGuestCheckout = !userId || userId.trim() === ''
+
+  const handleCheckout = async (priceId: string, guestInfo?: GuestInfo) => {
     const stripe = await stripePromise
 
     try {
@@ -53,13 +66,19 @@ export default function NormalCheckoutButton({
           stripePriceId: priceId,
           stripeProductId: stripeProductId,
           eventKeyName: eventKeyName,
-          userId: userId,
+          userId: userId || '',
           eventId: eventId,
           type: type,
           numberSession: numberSession,
-          email: email,
+          email: guestInfo?.email || email,
           seatNumber: seatNumber,
           eventTicketId: eventTicketId,
+          // Guest information (only if userId is not provided)
+          ...(isGuestCheckout &&
+            guestInfo && {
+              guestName: guestInfo.name,
+              guestPhone: guestInfo.phone,
+            }),
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
@@ -68,43 +87,89 @@ export default function NormalCheckoutButton({
         toast.error('Error', {
           description: `Stripe redirect error: ${result.error.message}`,
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     } catch (error: unknown) {
       if (isAxiosError(error)) {
         toast.error('Error', {
-          description: error.response?.data?.message ||
+          description:
+            error.response?.data?.message ||
             'A network or server error occurred. Please try again.',
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       } else if (error instanceof Error) {
         toast.error('Error', {
           description: error.message || 'Unexpected error occurred.',
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       } else {
         toast.error('Error', {
-          description: 'Unexpected error occurred. Please contact our developer team for support.',
+          description:
+            'Unexpected error occurred. Please contact our developer team for support.',
           style: {
-            color: '#ef4444' // red-500 color
-          }
+            color: '#ef4444', // red-500 color
+          },
         })
       }
     }
   }
 
+  const handleButtonClick = () => {
+    if (isGuestCheckout) {
+      // Show guest form dialog
+      setShowGuestForm(true)
+    } else {
+      // Proceed directly to checkout
+      handleCheckout(stripePriceId)
+    }
+  }
+
+  const handleGuestFormSubmit = (info: GuestInfo) => {
+    setShowGuestForm(false)
+    handleCheckout(stripePriceId, info)
+  }
+
   return (
-    <div className="w-fit">
-      <Button onClick={() => handleCheckout(stripePriceId)} className="group">
-        {buttonText === 'become-member' ? t(`membership:${buttonText}`) : t(buttonText)}
-        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-      </Button>
-    </div>
+    <>
+      <div className="w-fit">
+        <Button onClick={handleButtonClick} className="group">
+          {buttonText === 'become-member'
+            ? t(`membership:${buttonText}`)
+            : t(buttonText)}
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </Button>
+      </div>
+
+      {isGuestCheckout && (
+        <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
+          <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[425px] sm:w-auto sm:mx-auto rounded-md">
+            <DialogHeader>
+              <DialogTitle>Guest Checkout</DialogTitle>
+              <DialogDescription>
+                Please provide your contact information to complete your
+                purchase. However, we strongly encourage you to {' '}
+                <Link href="/signIn" className="text-blue-500 hover:text-blue-600 hover:underline">login</Link> to reserve your seat for
+                easier reservation management.
+              </DialogDescription>
+            </DialogHeader>
+            <GuestInfoForm
+              onSubmit={handleGuestFormSubmit}
+              initialEmail={email}
+              buttonText={
+                buttonText === 'become-member'
+                  ? (t(`membership:${buttonText}`) || undefined)
+                  : (t(buttonText) || undefined)
+              }
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   )
 }

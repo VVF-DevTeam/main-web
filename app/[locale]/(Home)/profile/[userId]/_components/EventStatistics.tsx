@@ -39,7 +39,6 @@ interface Payment {
   pricePaid: number | { toString(): string; toNumber(): number }
   quantity: number
   seatNumber: string | null
-  capacityPerTicket: number
   user: {
     name: string | null
     email: string
@@ -50,6 +49,10 @@ interface Payment {
     endDate: Date | null
     location: string | null
     keyName: string
+  } | null
+  eventTicket: {
+    type: string
+    capacityPerTicket: number
   } | null
 }
 
@@ -101,6 +104,7 @@ export default function EventStatistics({
         setLoading(true)
         try {
           const eventPayments = await getEventPayments(selectedEventId)
+          console.log(eventPayments)
           setPayments(eventPayments)
         } catch (error) {
           console.error('Error fetching payments:', error)
@@ -129,18 +133,17 @@ export default function EventStatistics({
 
   // Calculate statistics
   const totalParticipants = payments.reduce(
-    (sum, payment) => sum + payment.quantity * payment.capacityPerTicket,
+    (sum, payment) =>
+      sum + payment.quantity * (payment.eventTicket?.capacityPerTicket ?? 1),
     0
   )
-  const totalEarned = payments.reduce(
-    (sum, payment) => {
-      const price = typeof payment.pricePaid === 'number' 
-        ? payment.pricePaid 
+  const totalEarned = payments.reduce((sum, payment) => {
+    const price =
+      typeof payment.pricePaid === 'number'
+        ? payment.pricePaid
         : Number(payment.pricePaid.toString())
-      return sum + price
-    },
-    0
-  )
+    return sum + price
+  }, 0)
 
   // Get unique emails for copy functionality
   const participantEmails = Array.from(
@@ -199,14 +202,9 @@ export default function EventStatistics({
 
         {/* Event Selector */}
         <div className="mb-6">
-          <label className="mb-2 block text-sm font-medium">
-            Select Event
-          </label>
-          <Select
-            value={selectedEventId}
-            onValueChange={setSelectedEventId}
-          >
-            <SelectTrigger className="border w-full max-w-md">
+          <label className="mb-2 block text-sm font-medium">Select Event</label>
+          <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+            <SelectTrigger className="w-full max-w-md border">
               <SelectValue placeholder="Select an event" />
             </SelectTrigger>
             <SelectContent>
@@ -253,7 +251,9 @@ export default function EventStatistics({
                           Start Date
                         </p>
                         <p className="text-sm font-medium">
-                          {new Date(payments[0].event.startDate).toLocaleDateString('en-US', {
+                          {new Date(
+                            payments[0].event.startDate
+                          ).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
@@ -267,7 +267,9 @@ export default function EventStatistics({
                           End Date
                         </p>
                         <p className="text-sm font-medium">
-                          {new Date(payments[0].event.endDate).toLocaleDateString('en-US', {
+                          {new Date(
+                            payments[0].event.endDate
+                          ).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
@@ -344,48 +346,54 @@ export default function EventStatistics({
                 </div>
               ) : payments.length > 0 ? (
                 <div className="rounded-lg border bg-white shadow-sm">
-                  <h3 className="px-4 py-3 text-lg font-semibold border-b">
+                  <h3 className="border-b px-4 py-3 text-lg font-semibold">
                     Sold Tickets Table
                   </h3>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="px-4 py-3 text-left max-w-[150px] break-words">
-                          Email
-                        </th>
-                        <th className="px-4 py-3 text-left">Customer</th>
-                        <th className="px-4 py-3 text-left">Amount</th>
-                        <th className="px-4 py-3 text-left">Quantity/Seat</th>
-                        <th className="px-4 py-3 text-left">Capacity Per Ticket</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {payments.map((payment) => {
-                        return (
-                          <tr key={payment.id} className="bg-white">
-                            <td className="px-4 py-3 max-w-[150px] break-words whitespace-normal">
-                              {payment.user?.email || '-'}
-                            </td>
-                            <td className="px-4 py-3">
-                              {payment.user?.name || '-'}
-                            </td>
-                            <td className="px-4 py-3">
-                              ${(typeof payment.pricePaid === 'number' 
-                                ? payment.pricePaid 
-                                : Number(payment.pricePaid.toString())).toFixed(2)}
-                            </td>
-                            <td className="px-4 py-3">
-                              {payment.quantity}/{payment.seatNumber || '-'}
-                            </td>
-                            <td className="px-4 py-3">
-                              {payment.capacityPerTicket}
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="px-4 py-3 text-left">Ticket Name</th>
+                          <th className="max-w-[150px] break-words px-4 py-3 text-left">
+                            Email
+                          </th>
+                          <th className="px-4 py-3 text-left">Customer</th>
+                          <th className="px-4 py-3 text-left">Amount</th>
+                          <th className="px-4 py-3 text-left">Quantity/Seat</th>
+                          <th className="px-4 py-3 text-left">Capacity</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {payments.map((payment) => {
+                          return (
+                            <tr key={payment.id} className="bg-white">
+                              <td className="px-4 py-3">
+                                {payment.eventTicket?.type || '-'}
+                              </td>
+                              <td className="max-w-[150px] whitespace-normal break-words px-4 py-3">
+                                {payment.user?.email || '-'}
+                              </td>
+                              <td className="px-4 py-3">
+                                {payment.user?.name || '-'}
+                              </td>
+                              <td className="px-4 py-3">
+                                $
+                                {(typeof payment.pricePaid === 'number'
+                                  ? payment.pricePaid
+                                  : Number(payment.pricePaid.toString())
+                                ).toFixed(2)}
+                              </td>
+                              <td className="px-4 py-3">
+                                {payment.quantity}/{payment.seatNumber || '-'}
+                              </td>
+                              <td className="px-4 py-3">
+                                {payment.eventTicket?.capacityPerTicket ?? 1}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               ) : (
@@ -410,4 +418,3 @@ export default function EventStatistics({
     </div>
   )
 }
-

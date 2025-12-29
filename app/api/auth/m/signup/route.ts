@@ -5,6 +5,7 @@ import { revalidateTag } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { createToken } from '@/lib/actions/token/tokenFunctions'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
+import { linkGuestPaymentsToUser } from '@/lib/actions/payment/linkGuestPayments'
 
 interface SignupActionProps {
   firstName: string
@@ -100,6 +101,19 @@ export const POST = async (request: NextRequest) => {
 
     // Revalidate users cache
     revalidateTag('users')
+
+    // Link any guest payments made with this email to the new user account
+    try {
+      const linkResult = await linkGuestPaymentsToUser(user.id, user.email)
+      if (linkResult.linkedCount > 0) {
+        console.log(
+          `[MOBILE_SIGNUP] Linked ${linkResult.linkedCount} guest payment(s) to new user account`
+        )
+      }
+    } catch (linkError) {
+      // Log error but don't fail signup if linking fails
+      console.error('[MOBILE_SIGNUP] Failed to link guest payments:', linkError)
+    }
 
     return NextResponse.json(
       {

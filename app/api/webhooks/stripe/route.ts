@@ -398,10 +398,21 @@ export async function POST(req: NextRequest) {
       paymentId = ''
     }
 
-    // filter out the event
-    if (!metadata?.userId) {
+    // Allow guest checkout - userId is optional now
+    // Guest checkout requires guestEmail in metadata or customer_email from checkout session
+    const isGuestCheckout = !metadata?.userId || metadata.userId.trim() === ''
+    
+    // Get customer email from checkout session if available (for guest checkout)
+    let customerEmail: string | null = null
+    if (event.type === 'checkout.session.completed') {
+      const session = paymentData as Stripe.Checkout.Session
+      customerEmail = session.customer_email || null
+    }
+    
+    // For guest checkout, ensure we have an email (from metadata or checkout session)
+    if (isGuestCheckout && !metadata?.guestEmail && !customerEmail) {
       return NextResponse.json(
-        { error: { message: 'Missing userId in metadata', data: paymentData } },
+        { error: { message: 'Missing userId or guestEmail in metadata', data: paymentData } },
         { status: 400 }
       )
     }
@@ -485,7 +496,7 @@ export async function POST(req: NextRequest) {
 
           await prisma.payment.create({
             data: {
-              userId: metadata.userId,
+              userId: metadata.userId && metadata.userId.trim() !== '' ? metadata.userId : null,
               eventId: metadata.eventId,
               eventTicketId: ticketInfo.ticketId,
               stripePaymentId: paymentId,
@@ -494,6 +505,12 @@ export async function POST(req: NextRequest) {
               expiresAt: expiresAt,
               quantity: seatCount,
               seatNumber: ticketInfo.seatNumbers.join(', '),
+              // Guest information (only if userId is not provided)
+              ...(isGuestCheckout && {
+                guestName: metadata.guestName || null,
+                guestEmail: metadata.guestEmail || null,
+                guestPhone: metadata.guestPhone || null,
+              }),
             },
           })
         }
@@ -523,7 +540,7 @@ export async function POST(req: NextRequest) {
 
         await prisma.payment.create({
           data: {
-            userId: metadata.userId,
+            userId: metadata.userId && metadata.userId.trim() !== '' ? metadata.userId : null,
             eventId: metadata.eventId,
             eventTicketId: validEventTicketId, // Will be null for Membership or empty strings
             stripePaymentId: paymentId,
@@ -532,6 +549,12 @@ export async function POST(req: NextRequest) {
             expiresAt: expiresAt,
             quantity: quantity,
             seatNumber: metadata.seatNumber,
+            // Guest information (only if userId is not provided)
+            ...(isGuestCheckout && {
+              guestName: metadata.guestName || null,
+              guestEmail: metadata.guestEmail || null,
+              guestPhone: metadata.guestPhone || null,
+            }),
           },
         })
       }
@@ -542,10 +565,21 @@ export async function POST(req: NextRequest) {
       if (metadata.eventId || metadata.type === 'Membership') {
         try {
           // Fetch user data (used for both tickets and membership)
-          const user = await prisma.user.findUnique({
-            where: { id: metadata.userId },
-            select: { name: true, email: true },
-          })
+          // For guest checkout, use guest info from metadata or checkout session
+          let user: { name: string | null; email: string } | null = null
+          if (isGuestCheckout) {
+            // Use guestEmail from metadata, or fallback to customer_email from checkout session
+            const guestEmail = metadata.guestEmail || customerEmail || ''
+            user = {
+              name: metadata.guestName || null,
+              email: guestEmail,
+            }
+          } else {
+            user = await prisma.user.findUnique({
+              where: { id: metadata.userId },
+              select: { name: true, email: true },
+            })
+          }
 
           // Ticket-based email flow (non-membership with event)
           if (metadata.type !== 'Membership' && metadata.eventId) {

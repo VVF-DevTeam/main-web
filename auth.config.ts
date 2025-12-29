@@ -16,6 +16,7 @@ import i18nConfig from './i18nConfig'
 import { validateSecretToken } from './lib/actions/token/secretToken'
 import { Role } from '@prisma/client'
 import * as jose from 'jose'
+import { linkGuestPaymentsToUser } from './lib/actions/payment/linkGuestPayments'
 
 export default {
   providers: [
@@ -168,11 +169,18 @@ export default {
                 })
               }
             } else if (path.includes('payment')) {
-              // For users API, only logged in user can make payment
-              if (!(await roleCheckToken({ req: request }))) {
-                return new NextResponse('Please log in to make payment.', {
-                  status: 403,
-                })
+              // Allow guest checkout for checkout session creation endpoints
+              const isCheckoutSessionCreate =
+                path.includes('checkout-sessions/create') ||
+                path.includes('checkout-sessions/create-multi')
+
+              if (!isCheckoutSessionCreate) {
+                // For other payment APIs, only logged in user can make payment
+                if (!(await roleCheckToken({ req: request }))) {
+                  return new NextResponse('Please log in to make payment.', {
+                    status: 403,
+                  })
+                }
               }
             }
             return NextResponse.next()
@@ -375,6 +383,28 @@ export default {
               emailVerified: new Date(),
             },
           })
+
+          // Link any guest payments made with this email to the user account
+          if (user.id && user.email) {
+            try {
+              const linkResult = await linkGuestPaymentsToUser(
+                user.id,
+                user.email
+              )
+              if (linkResult.linkedCount > 0) {
+                console.log(
+                  `[OAUTH_LINK_ACCOUNT] Linked ${linkResult.linkedCount} guest payment(s) to user account`
+                )
+              }
+            } catch (linkError) {
+              // Log error but don't fail account linking if payment linking fails
+              console.error(
+                '[OAUTH_LINK_ACCOUNT] Failed to link guest payments:',
+                linkError
+              )
+            }
+          }
+
           // Success - return early
           return
         } catch (error) {
@@ -413,6 +443,28 @@ export default {
               role: ['USER'],
             },
           })
+
+          // Link any guest payments made with this email to the new user account
+          if (user.id && user.email) {
+            try {
+              const linkResult = await linkGuestPaymentsToUser(
+                user.id,
+                user.email
+              )
+              if (linkResult.linkedCount > 0) {
+                console.log(
+                  `[OAUTH_CREATE_USER] Linked ${linkResult.linkedCount} guest payment(s) to new user account`
+                )
+              }
+            } catch (linkError) {
+              // Log error but don't fail user creation if payment linking fails
+              console.error(
+                '[OAUTH_CREATE_USER] Failed to link guest payments:',
+                linkError
+              )
+            }
+          }
+
           // Success - return early
           return
         } catch (error) {

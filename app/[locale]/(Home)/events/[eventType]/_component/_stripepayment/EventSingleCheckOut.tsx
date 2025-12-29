@@ -13,7 +13,7 @@ import { EventTicket, PaymentType } from '@prisma/client'
 interface EventSingleCheckOutProps {
   formLink?: string
   eventKeyName: string
-  userId: string
+  userId?: string | null
   eventId: string
   tickets: EventTicket[]
   email: string
@@ -92,9 +92,11 @@ export default function EventSingleCheckOut({
 
     const fetchSubscription = async () => {
       try {
-        const subscribed = await checkSubscription(userId)
-        if (isMounted) {
-          setIsSubscribed(Boolean(subscribed))
+        if (userId) {
+          const subscribed = await checkSubscription(userId)
+          if (isMounted) {
+            setIsSubscribed(Boolean(subscribed))
+          }
         }
       } catch (error) {
         console.error('Error checking subscription:', error)
