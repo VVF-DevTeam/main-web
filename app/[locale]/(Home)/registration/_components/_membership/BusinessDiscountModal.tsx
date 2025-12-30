@@ -77,7 +77,7 @@ const BusinessDiscountModal = ({
                           <span className="hover:underline">
                             {business.name}
                           </span>
-                          <ArrowUpRight className="h-4 w-4 text-blue-600 transition-transform hover:text-blue-800 group-hover:-translate-y-1 group-hover:translate-x-1" />
+                          <ArrowUpRight className="shrink-0 h-4 w-4 text-blue-600 transition-transform hover:text-blue-800 group-hover:-translate-y-1 group-hover:translate-x-1" />
                         </a>
                       ) : (
                         business.name

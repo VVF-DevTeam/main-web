@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import MembershipBenefit2 from './MembershipBenefit2'
 interface MembershipBenefitsProps {
   locale: string
 }
@@ -56,7 +57,7 @@ const MembershipBenefits = async ({ locale }: MembershipBenefitsProps) => {
                 {t('basic-feature-2')}
               </h3>
             </div>
-            <p className="web-body-regular">{t('membership-benefit-2-description')}</p>
+            <MembershipBenefit2 />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
