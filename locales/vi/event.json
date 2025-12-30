@@ -133,7 +133,7 @@
   "member-price": "Giá thành viên: ${{price}}",
   "spots-available": "{{count}} chỗ còn lại",
   "email-not-verified-warning-prefix": "Email của bạn:",
-  "email-not-verified-warning-suffix": "chưa được xác minh, vui lòng kiểm tra lại hoặc xác minh trong hồ sơ của bạn",
+  "email-not-verified-warning-suffix": "chưa được xác minh, vui lòng xác nhận email bạn hoặc tiến hành xác minh trong trang profile của bạn",
   "verify-in-profile": "tại đây",
-  "verify-email-reason": "để tránh làm mất email xác nhận cho việc đặt chỗ."
+  "verify-email-reason": "để tránh làm mất email xác nhận cho việc đặt chỗ từ VVF."
 }

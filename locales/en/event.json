@@ -133,7 +133,7 @@
   "member-price": "Member price: ${{price}}",
   "spots-available": "{{count}} spots available",
   "email-not-verified-warning-prefix": "Your email:",
-  "email-not-verified-warning-suffix": "has not been verified, please double check it or verify it in your profile",
+  "email-not-verified-warning-suffix": "has not been verified, please double check it or verify it in your profile page",
   "verify-in-profile": "here",
-  "verify-email-reason": "to avoid missing confirmation emails for the reservation/tickets."
+  "verify-email-reason": "to avoid missing confirmation emails for your reservations/tickets from VVF"
 }
