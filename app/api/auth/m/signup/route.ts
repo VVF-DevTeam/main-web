@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import { createToken } from '@/lib/actions/token/tokenFunctions'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
 import { linkGuestPaymentsToUser } from '@/lib/actions/payment/linkGuestPayments'
+import initTranslation from '@/app/i18n'
 
 interface SignupActionProps {
   firstName: string
@@ -16,6 +17,7 @@ interface SignupActionProps {
   address: string
   password: string
   confirmPassword: string
+  locale?: string
 }
 
 export const POST = async (request: NextRequest) => {
@@ -115,10 +117,13 @@ export const POST = async (request: NextRequest) => {
       console.error('[MOBILE_SIGNUP] Failed to link guest payments:', linkError)
     }
 
+    // Get translated message
+    const locale = signUpRequestData.locale || 'en'
+    const { t } = await initTranslation(locale, ['signIn-signUp'])
+
     return NextResponse.json(
       {
-        message:
-          'Account created successfully. A verification link has been sent to your email',
+        message: t('account-created-success'),
       },
       { status: 201 }
     )

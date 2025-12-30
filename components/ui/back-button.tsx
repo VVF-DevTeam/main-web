@@ -49,7 +49,7 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
     const header = await headers()
     const currentPath = header.get('current-path')
     let parentPath = currentPath?.split('/').slice(0, -1).join('/') || '/'
-    console.log('parentPath', parentPath)
+
     if (parentPath.split('/').at(-1) === 'editPost') {
       // For Edit Post Page, the flow is from allPosts to editPost
       parentPath = parentPath.replace('editPost', 'allPosts')

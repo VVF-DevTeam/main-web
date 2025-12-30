@@ -3,6 +3,7 @@
 import { prisma } from '../../db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import initTranslation from '@/app/i18n'
 
 // Define validation schema
 const passwordSchema = z.object({
@@ -12,7 +13,7 @@ const passwordSchema = z.object({
   forgotPassword: z.boolean().optional(),
 })
 
-export const changePassword = async (data: { email: string; currentPassword?: string; newPassword: string; forgotPassword?: boolean }) => {
+export const changePassword = async (data: { email: string; currentPassword?: string; newPassword: string; forgotPassword?: boolean; locale?: string }) => {
   try {
     // Validate input
     const parsedData = passwordSchema.safeParse(data)
@@ -25,6 +26,7 @@ export const changePassword = async (data: { email: string; currentPassword?: st
     }
 
     const { email, currentPassword, newPassword, forgotPassword } = parsedData.data
+    const locale = data.locale
 
     // Fetch user from the database
     const user = await prisma.user.findUnique({
@@ -33,7 +35,11 @@ export const changePassword = async (data: { email: string; currentPassword?: st
     })
 
     if (!user) {
-      return { success: false, message: "User doesn't exist" }
+      // Get translated message
+      const currentLocale = locale || 'en'
+      const { t } = await initTranslation(currentLocale, ['profile'])
+      
+      return { success: false, message: t('user-doesnt-exist') }
     }
 
     // If currentPassword exists in the DB, compare it

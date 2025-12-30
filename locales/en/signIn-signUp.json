@@ -46,5 +46,9 @@
   "social-signup-recommendation": "We recommend this method for quick and secure sign up, especially with Google.",
   "create-account-with-email": "Create account with email",
   "email-signup-description": "Fill in your details to create a new account - An email will be sent to verify your account.",
-  "email-delivery-note": "*Note: It may take up to 10 minutes for the email to arrive due to Google Gmail policies. If you still don't receive an email, please check your spam folder or contact us at"
+  "email-delivery-note": "*Note: It may take up to 10 minutes for the email to arrive due to Google Gmail policies. If you still don't receive an email, please check your spam folder or contact us at",
+  "account-created-success": "Account created successfully. A verification link has been sent to your email",
+  "account-already-exists": "An account with this email or phone number exists",
+  "user-doesnt-exist": "User doesn't exist, please double check your email",
+  "incorrect-password": "Incorrect password, please try again"
 }

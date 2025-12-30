@@ -131,5 +131,9 @@
   "headerSponsors": "Được tài trợ bởi",
   "member-price-applied": "Giá thành viên đã áp dụng: ${{price}}",
   "member-price": "Giá thành viên: ${{price}}",
-  "spots-available": "{{count}} chỗ còn lại"
+  "spots-available": "{{count}} chỗ còn lại",
+  "email-not-verified-warning-prefix": "Email của bạn:",
+  "email-not-verified-warning-suffix": "chưa được xác minh, vui lòng kiểm tra lại hoặc xác minh trong hồ sơ của bạn",
+  "verify-in-profile": "tại đây",
+  "verify-email-reason": "để tránh làm mất email xác nhận cho việc đặt chỗ."
 }

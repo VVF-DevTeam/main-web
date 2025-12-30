@@ -4,13 +4,17 @@ import { signInSchema } from '@/lib/zodSchema/signinSchema'
 import { AuthError } from 'next-auth'
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from '@/lib/db'
-import { sendVerificationEmail } from '../email/sendVerificationEmail'
-import { createToken } from '../token/tokenFunctions'
+import initTranslation from '@/app/i18n'
 
 export const signinAction = async (data: {
   email: string
   password: string
+  locale?: string
 }) => {
+  // Get translated message once at the top
+  const currentLocale = data.locale || 'en'
+  const { t } = await initTranslation(currentLocale, ['signIn-signUp'])
+  
   try {
     const parsedCredentials = signInSchema.safeParse(data)
     if (!parsedCredentials.success) {
@@ -29,25 +33,27 @@ export const signinAction = async (data: {
 
     if (!userExists || !userExists.password) {
       return {
-        message: "User doesn't exist",
+        message: t('user-doesnt-exist'),
         success: false,
       }
     }
+    
 
-    if (!userExists.emailVerified) {
-      const newToken = await createToken(email)
-      sendVerificationEmail({
-        firstName: userExists.name!,
-        to: userExists.email,
-        token: newToken?.id!,
-        type: 'accountVerification',
-      })
+    // We will let the user sign in first and verify later
+    // if (!userExists.emailVerified) {
+    //   const newToken = await createToken(email)
+    //   sendVerificationEmail({
+    //     firstName: userExists.name!,
+    //     to: userExists.email,
+    //     token: newToken?.id!,
+    //     type: 'accountVerification',
+    //   })
 
-      return {
-        message: 'Please verify your account first. A new verification link has been sent to your email',
-        success: false,
-      }
-    }
+    //   return {
+    //     message: 'Please verify your account first. A new verification link has been sent to your email',
+    //     success: false,
+    //   }
+    // }
 
     // Sign in the user
     await signIn('credentials', {
@@ -67,19 +73,38 @@ export const signinAction = async (data: {
       switch (error.type) {
         case 'CredentialsSignin': {
           return {
-            message: 'Invalid credentials',
+            message: t('incorrect-password'),
             success: false,
           }
         }
         case 'CallbackRouteError': {
+          const errorMessage = error.cause?.err?.toString() || ''
+          
+          // Check if it's the incorrect password error
+          if (errorMessage.includes('Incorrect password')) {
+            return {
+              message: t('incorrect-password'),
+              success: false,
+            }
+          }
+          
+          // Check if it's the user doesn't exist error
+          if (errorMessage.includes('User does not exist')) {
+            return {
+              message: t('user-doesnt-exist'),
+              success: false,
+            }
+          }
+          
+          // Default error message
           return {
-            message: error.cause?.err?.toString() || 'Something went wrong',
+            message: errorMessage || t('unexpected-error'),
             success: false,
           }
         }
         default: {
           return {
-            message: 'Something went wrong',
+            message: t('unexpected-error'),
             success: false,
           }
         }

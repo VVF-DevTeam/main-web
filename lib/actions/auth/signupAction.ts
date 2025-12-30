@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs'
 import { sendVerificationEmail } from '../email/sendVerificationEmail'
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { linkGuestPaymentsToUser } from '../payment/linkGuestPayments'
+import initTranslation from '@/app/i18n'
 
 interface signupActionProps {
   firstName: string
@@ -17,6 +18,7 @@ interface signupActionProps {
   address: string
   password: string
   confirmPassword: string
+  locale?: string
 }
 export const signupAction = async (formData: signupActionProps) => {
   try {
@@ -29,6 +31,7 @@ export const signupAction = async (formData: signupActionProps) => {
       address,
       password,
       confirmPassword,
+      locale,
     } = formData
 
     // CHECK IF THE INPUT IS VALID
@@ -61,8 +64,12 @@ export const signupAction = async (formData: signupActionProps) => {
     })
 
     if (existingUser) {
+      // Get translated message
+      const currentLocale = locale || 'en'
+      const { t } = await initTranslation(currentLocale, ['signIn-signUp'])
+      
       return {
-        message: 'An account with this email or phone number exists',
+        message: t('account-already-exists'),
         success: false,
       }
     }
@@ -111,9 +118,12 @@ export const signupAction = async (formData: signupActionProps) => {
       console.error('[SIGNUP] Failed to link guest payments:', linkError)
     }
 
+    // Get translated message
+    const currentLocale = locale || 'en'
+    const { t } = await initTranslation(currentLocale, ['signIn-signUp'])
+
     return {
-      message:
-        'Account created successfully. A verification link has been sent to your email',
+      message: t('account-created-success'),
       success: true,
     }
   } catch (error) {

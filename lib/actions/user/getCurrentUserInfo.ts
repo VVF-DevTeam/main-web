@@ -1,3 +1,5 @@
+'use server'
+
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { UserInfoProps } from '@/lib/types/userInfo'
@@ -29,5 +31,6 @@ export async function getCurrentUserInfo() : Promise<UserInfoProps | null> {
     stripeSubscriptionId: user.stripeSubscriptionId ?? null,
     role: user.role ?? [],
     phoneVerified: user.phoneVerified ?? null,
+    emailVerified: user.emailVerified ?? null,
   }
 }

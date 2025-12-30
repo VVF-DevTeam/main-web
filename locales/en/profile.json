@@ -73,5 +73,13 @@
   "type-delete-title": "Type \"DELETE\":",
   "upcoming-event": "Latest Events",
   "update-profile": "Update Profile",
-  "seatNumber": "Seat Number"
+  "seatNumber": "Seat Number",
+  "resend-verification-email": "Resend Verification Email",
+  "resending": "Sending...",
+  "resend-countdown": "Resend ({{count}}s)",
+  "verification-email-sent": "Verification email sent successfully. Please check your inbox.",
+  "email-already-verified": "Your email is already verified",
+  "verification-email-error": "An error occurred while sending the verification email",
+  "verify-phone-number": "Verify Phone Number",
+  "user-doesnt-exist": "User doesn't exist, please double check your email"
 }
