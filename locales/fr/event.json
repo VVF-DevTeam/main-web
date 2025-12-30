@@ -128,5 +128,8 @@
   "goToCheckout": "Aller au paiement",
   "total": "Total",
   "each": "par séance",
-  "headerSponsors": "Soutenu par"
+  "headerSponsors": "Soutenu par",
+  "member-price-applied": "Prix membre appliqué : ${{price}}",
+  "member-price": "Prix membre : ${{price}}",
+  "spots-available": "{{count}} places disponibles"
 }

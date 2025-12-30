@@ -171,7 +171,7 @@ const ResetPasswordClient = () => {
   }
 
   return (
-    <div className="flex-center relative min-h-screen bg-bgColor-secondary600">
+    <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>
@@ -195,14 +195,14 @@ const ResetPasswordClient = () => {
           <div className="border-bg-white/20 overflow-hidden rounded-2xl border bg-white/80 shadow-2xl backdrop-blur-sm">
             {error ? (
               <div className="p-8 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brand600">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-secondary600">
                   <TriangleAlert className="h-8 w-8 text-textColor-brandDark900" />
                 </div>
                 <h2 className="mb-2 text-xl font-bold text-textColor-brandDark900">
                   {t('verification-failed')}
                 </h2>
                 <p className="leading-relaxed text-textColor-brand900">{error}</p>
-                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-brand600 p-4">
+                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-secondary200 p-4">
                   <p className="text-sm text-textColor-brandDark900">
                     {t('verification-failed-description')}
                   </p>
@@ -315,7 +315,7 @@ const ResetPasswordClient = () => {
                   </form>
                 </Form>
 
-                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-brand600 p-4">
+                <div className="mt-6 rounded-lg border border-bgColor-brand900 bg-bgColor-secondary200 p-4">
                   <div className="flex items-start gap-3">
                     <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brand900" />
                     <div>

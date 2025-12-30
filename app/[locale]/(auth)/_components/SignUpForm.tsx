@@ -123,10 +123,10 @@ const SignUpForm = () => {
       {/* Social Sign Up Section */}
       <div className="mb-4 mt-3">
         <h2 className="mb-3 text-lg font-semibold text-textColor-brand900">
-          Continue with Social Accounts
+          {t('continue-with-social-accounts')}
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          We recommend this method for quick and secure sign up, especially with Google.
+          {t('social-signup-recommendation')}
         </p>
         <ProviderButtons />
       </div>
@@ -140,11 +140,12 @@ const SignUpForm = () => {
       {/* Email Sign Up Section */}
       <div className="mt-6">
         <h2 className="mb-3 text-lg font-semibold text-textColor-brand900">
-          Create Account with Email
+          {t('create-account-with-email')}
         </h2>
         <p className="mb-6 text-sm text-muted-foreground">
-          Fill in your details to create a new account
+          {t('email-signup-description')}
         </p>
+
         {/* Form */}
         <div>
           <Form {...form}>
@@ -382,7 +383,7 @@ const SignUpForm = () => {
         </div>
 
         {/* Have Account? */}
-        <p className="text-sm">
+        <p className="text-sm mb-5">
           {t('alreadyHaveAccount')}{' '}
           <Link
             href="/signIn"
@@ -390,6 +391,11 @@ const SignUpForm = () => {
           >
             {t('login')}
           </Link>
+        </p>
+
+        <p className="mb-6 text-sm text-muted-foreground italic">
+          {t('email-delivery-note')} {' '}
+          <a href="mailto:tech@vietvibe.org" className="text-textColor-brand900 hover:text-textColor-brand900/80 hover:underline">tech@vietvibe.org</a>.
         </p>
       </div>
     </div>

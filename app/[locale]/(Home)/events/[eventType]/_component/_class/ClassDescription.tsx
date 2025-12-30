@@ -197,7 +197,7 @@ const ClassDescription = async ({
                       <div className="flex items-center gap-x-3">
                         <Users className="h-[clamp(0.75rem,2vh,1.25rem)] w-[clamp(0.75rem,2vh,1.25rem)] shrink-0 text-red-600" />
                         <span className="text-[clamp(0.75rem,1.5vh,1rem)]">
-                          {capacity} spots available
+                          {t('spots-available', { count: capacity })}
                         </span>
                       </div>
                     </div>

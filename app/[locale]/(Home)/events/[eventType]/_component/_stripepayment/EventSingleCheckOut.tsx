@@ -280,8 +280,8 @@ export default function EventSingleCheckOut({
                     {memberPrice !== null ? (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
                         {isSubscribed
-                          ? `Member price applied: $${memberPrice.toFixed(2)}`
-                          : `Member price: $${memberPrice.toFixed(2)}`}
+                          ? t('member-price-applied', { price: memberPrice.toFixed(2) })
+                          : t('member-price', { price: memberPrice.toFixed(2) })}
                       </span>
                     ) : null}
                   </div>

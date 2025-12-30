@@ -45,8 +45,13 @@ const VerifyAccountClient = () => {
   }, [])
 
   return (
-    <div className="flex-center relative min-h-screen">
-      <div className="flex-col-center mx-10 my-24 max-w-lg rounded-md bg-white p-8 shadow-lg">
+    <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>
+      </div>
+
+      <div className="relative flex-col-center mx-10 my-24 max-w-lg rounded-2xl border border-bg-white/20 bg-white/80 p-8 shadow-2xl backdrop-blur-sm">
         {loading ? (
           <ClipLoader
             loading={loading}

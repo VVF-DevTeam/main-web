@@ -71,7 +71,7 @@ export default async function RootLayout({
         >
           <SessionProvider>
             <main>{children}</main>
-            <SonnerToaster />
+            <SonnerToaster duration={6000} />
           </SessionProvider>
           <Analytics />
           <SpeedInsights />
