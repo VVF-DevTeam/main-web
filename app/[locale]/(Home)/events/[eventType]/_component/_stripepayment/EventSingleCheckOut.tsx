@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
+import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { EventTicket, PaymentType } from '@prisma/client'
 
@@ -84,22 +85,31 @@ export default function EventSingleCheckOut({
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [emailVerified, setEmailVerified] = useState<Date | null | undefined>(undefined)
   const containerRef = useRef<HTMLDivElement>(null)
   const prevShowFormRef = useRef(false)
 
   useEffect(() => {
     let isMounted = true
 
-    const fetchSubscription = async () => {
+    const fetchUserData = async () => {
       try {
         if (userId) {
-          const subscribed = await checkSubscription(userId)
+          const [subscribed, userInfo] = await Promise.all([
+            checkSubscription(userId),
+            getCurrentUserInfo(),
+          ])
           if (isMounted) {
             setIsSubscribed(Boolean(subscribed))
+            setEmailVerified(userInfo?.emailVerified ?? null)
+          }
+        } else {
+          if (isMounted) {
+            setEmailVerified(null)
           }
         }
       } catch (error) {
-        console.error('Error checking subscription:', error)
+        console.error('Error fetching user data:', error)
       } finally {
         if (isMounted) {
           setIsLoading(false)
@@ -107,7 +117,7 @@ export default function EventSingleCheckOut({
       }
     }
 
-    fetchSubscription()
+    fetchUserData()
 
     return () => {
       isMounted = false
@@ -202,6 +212,21 @@ export default function EventSingleCheckOut({
                 membership
               </Link>
               !
+            </p>
+          )}
+
+          {userId && !emailVerified && (
+            <p className="text-sm text-bgColor-brand900">
+              *{t('email-not-verified-warning-prefix')}{' '}
+              <strong>{email}</strong>{' '}
+              {t('email-not-verified-warning-suffix')}{' '}
+              <Link
+                href={`/profile/${userId}`}
+                className="font-medium underline text-textColor-blue"
+              >
+                {t('verify-in-profile')}
+              </Link>
+              , {t('verify-email-reason')}
             </p>
           )}
 

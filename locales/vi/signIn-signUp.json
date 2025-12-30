@@ -42,9 +42,13 @@
   "token-verification-failed": "Xác minh token thất bại. Điều này có thể xảy ra vì token đã hết hạn.",
   "unexpected-error": "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
   "passwords-dont-match": "Mật khẩu không giống nhau",
-  "continue-with-social-accounts": "Tiếp tục với tài khoản khác",
+  "continue-with-social-accounts": "Tiếp tục với tài khoản bên thứ 3",
   "social-signup-recommendation": "Chúng mình khuyến khích phương thức này để có thể đăng ký nhanh chóng, đặc biệt là Google.",
   "create-account-with-email": "Tạo tài khoản bằng email",
   "email-signup-description": "Điền thông tin của bạn để tạo tài khoản mới - Một email sẽ được gửi để xác minh tài khoản của bạn.",
-  "email-delivery-note": "*Lưu ý: Email có thể mất tới 10 phút để đến do chính sách của Google Gmail. Nếu bạn vẫn không nhận được email, vui lòng kiểm tra thư mục spam hoặc liên hệ với chúng mình tại"
+  "email-delivery-note": "*Lưu ý: Email có thể mất tới 10 phút để đến do chính sách của Google Gmail. Nếu bạn vẫn không nhận được email, vui lòng kiểm tra thư mục spam hoặc liên hệ với chúng mình tại",
+  "account-created-success": "Tài khoản đã được tạo thành công. Một liên kết xác minh đã được gửi đến email của bạn",
+  "account-already-exists": "Đã tồn tại tài khoản với email hoặc số điện thoại này",
+  "user-doesnt-exist": "Người dùng không tồn tại, vui lòng kiểm tra lại email của bạn",
+  "incorrect-password": "Mật khẩu không đúng, vui lòng thử lại"
 }

@@ -46,5 +46,9 @@
   "social-signup-recommendation": "Nous recommandons cette méthode pour une inscription rapide et sécurisée, notamment avec Google.",
   "create-account-with-email": "Créer un compte par e-mail",
   "email-signup-description": "Remplissez vos informations pour créer un nouveau compte - Un e-mail sera envoyé pour vérifier votre compte.",
-  "email-delivery-note": "*Note : L'e-mail peut prendre jusqu'à 10 minutes pour arriver en raison des politiques de Google Gmail. Si vous ne recevez toujours pas d'e-mail, veuillez vérifier votre dossier spam ou nous contacter à"
+  "email-delivery-note": "*Note : L'e-mail peut prendre jusqu'à 10 minutes pour arriver en raison des politiques de Google Gmail. Si vous ne recevez toujours pas d'e-mail, veuillez vérifier votre dossier spam ou nous contacter à",
+  "account-created-success": "Compte créé avec succès. Un lien de vérification a été envoyé à votre adresse e-mail",
+  "account-already-exists": "Un compte avec cet e-mail ou ce numéro de téléphone existe déjà",
+  "user-doesnt-exist": "L'utilisateur n'existe pas, veuillez vérifier votre e-mail",
+  "incorrect-password": "Mot de passe incorrect, veuillez réessayer"
 }

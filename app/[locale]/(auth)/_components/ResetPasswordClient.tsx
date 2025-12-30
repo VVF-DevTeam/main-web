@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, useParams } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/token/verifyToken'
 import {
   TriangleAlert,
@@ -39,6 +39,8 @@ type VerifyTokenResponse = {
 const ResetPasswordClient = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get('token')
@@ -124,6 +126,7 @@ const ResetPasswordClient = () => {
         email: email,
         newPassword: data.password,
         forgotPassword: true,
+        locale: locale,
       })
 
       if (result.success) {

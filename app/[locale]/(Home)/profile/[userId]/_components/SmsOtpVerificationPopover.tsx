@@ -8,6 +8,7 @@ import {
 import SmsOtpVerificationInput from './SmsOtpVerificationInput'
 import { useEffect, useState } from 'react'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
   phoneNumber: string
@@ -15,6 +16,8 @@ type Props = {
 }
 
 function SmsOtpVerificationPopover({ phoneNumber, userId }: Props) {
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation('profile')
   const [open, setOpen] = useState(false)
   const [phoneVerified, setPhoneVerified] = useState<string | boolean>(false)
 
@@ -29,7 +32,7 @@ function SmsOtpVerificationPopover({ phoneNumber, userId }: Props) {
     <div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-            <Button variant='outline' onClick={() => setOpen(true)}>Verify</Button>
+            <Button variant='outline' size='sm' onClick={() => setOpen(true)} className='text-textColor-brand900'>{t('verify-phone-number')}</Button>
         </PopoverTrigger>
         <PopoverContent>
             <SmsOtpVerificationInput phoneNumberVerifyNeeded={phoneNumber} userId={userId} open={open} setPhoneVerified={setPhoneVerified}/>

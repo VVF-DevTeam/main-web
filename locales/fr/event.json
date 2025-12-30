@@ -131,5 +131,9 @@
   "headerSponsors": "Soutenu par",
   "member-price-applied": "Prix membre appliqué : ${{price}}",
   "member-price": "Prix membre : ${{price}}",
-  "spots-available": "{{count}} places disponibles"
+  "spots-available": "{{count}} places disponibles",
+  "email-not-verified-warning-prefix": "Votre e-mail :",
+  "email-not-verified-warning-suffix": "n'a pas été vérifié, veuillez le vérifier à nouveau ou le vérifier dans votre profil",
+  "verify-in-profile": "ici",
+  "verify-email-reason": "pour éviter de manquer les e-mails de confirmation pour la réservation/les billets."
 }

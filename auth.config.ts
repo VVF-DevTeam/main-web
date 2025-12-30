@@ -60,7 +60,7 @@ export default {
 
         //   Check if user exists
         if (!user) {
-          throw new Error('User does not exist')
+          throw new Error('User does not exist, please double check your email')
         }
 
         // Check if password is correct
@@ -71,7 +71,7 @@ export default {
 
         // Throw error if password is incorrect
         if (!isPasswordCorrect) {
-          throw new Error('Invalid password')
+          throw new Error('Incorrect password, please try again')
         }
 
         // Return user

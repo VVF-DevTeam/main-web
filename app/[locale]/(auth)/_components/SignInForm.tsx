@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import { useParams } from 'next/navigation'
 
 import { signinAction } from '@/lib/actions/auth/signinAction'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -33,6 +34,8 @@ import { useTranslation } from 'react-i18next'
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
@@ -79,7 +82,10 @@ const SignInForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
-      const response: ServerActionResponse = await signinAction(data)
+      const response: ServerActionResponse = await signinAction({
+        ...data,
+        locale: locale,
+      })
 
       if (response.success) {
         toast.success(response.message, {

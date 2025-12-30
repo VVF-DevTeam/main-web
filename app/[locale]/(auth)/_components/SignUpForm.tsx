@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import { useParams } from 'next/navigation'
 
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { signupAction } from '@/lib/actions/auth/signupAction'
@@ -37,8 +38,11 @@ import ProviderButtons from './ProviderButtons'
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const [showPassword, setShowPassword] = useState(false)
   const [phoneExtension, setPhoneExtension] = useState<string>('+1')
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -64,9 +68,12 @@ const SignUpForm = () => {
       const response: ServerActionResponse = await signupAction({
         ...data,
         phoneNumber: fullPhone,
+        locale: locale,
       })
       // Check if the account was created
       if (response.success) {
+        setShowSuccessMessage(true)
+        form.reset() // Reset the form after successful submission
         toast.success(response.message, {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
@@ -78,6 +85,7 @@ const SignUpForm = () => {
           },
         })
       } else {
+        setShowSuccessMessage(false)
         toast.error(response.message, {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
@@ -145,6 +153,11 @@ const SignUpForm = () => {
         <p className="mb-6 text-sm text-muted-foreground">
           {t('email-signup-description')}
         </p>
+        {showSuccessMessage && (
+          <p className="mb-6 text-sm font-medium text-green-600">
+            {t('account-created-success')}
+          </p>
+        )}
 
         {/* Form */}
         <div>

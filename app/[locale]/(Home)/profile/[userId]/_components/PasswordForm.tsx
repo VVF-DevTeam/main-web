@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { changePassword } from '@/lib/actions/auth/changePassword'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -32,6 +33,8 @@ const PasswordForm = ({
 }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('profile')
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const currentDateTime = getCurrentDateTime()
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,
@@ -57,6 +60,7 @@ const PasswordForm = ({
         email: user.email,
         currentPassword: user.password ? data.currentPassword : '',
         newPassword: data.newPassword,
+        locale: locale,
       })
 
       if (result.success) {

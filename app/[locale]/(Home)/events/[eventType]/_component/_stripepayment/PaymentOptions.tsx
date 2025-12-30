@@ -78,7 +78,6 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
-  const router = useRouter()
   const [selected, setSelected] = useState<OptionType>('checkout')
   const [showOptions, setShowOptions] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)

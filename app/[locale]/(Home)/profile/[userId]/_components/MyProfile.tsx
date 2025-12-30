@@ -12,6 +12,7 @@ import {
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
 import SmsOtpVerificationPopover from './SmsOtpVerificationPopover'
+import ResendVerificationEmailButton from './ResendVerificationEmailButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
 
 type PaymentHistoryItem = {
@@ -92,24 +93,32 @@ const MyProfile = async ({
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <FiMail className="flex-shrink-0 text-xl text-textColor-gray500" />
-                <span className="flex-1 break-words lg:w-0">{user.email}</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <FiMail className="flex-shrink-0 text-xl text-textColor-gray500" />
+                  <span className="flex-1 break-words lg:w-0">{user.email}</span>
+                </div>
+                {user && !user.emailVerified && (
+                  <div className="ml-8">
+                    <ResendVerificationEmailButton email={user.email} />
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-3">
-                <FiPhone className="flex-shrink-0 text-xl text-textColor-gray500" />
-                <span className="flex-1 break-words lg:w-0">
-                  {user.phone || 'N/A'}
-                </span>
-                <span>
-                  {(user.phone && !user.phoneVerified && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <FiPhone className="flex-shrink-0 text-xl text-textColor-gray500" />
+                  <span className="flex-1 break-words lg:w-0">
+                    {user.phone || 'N/A'}
+                  </span>
+                </div>
+                {user.phone && !user.phoneVerified && (
+                  <div className="ml-8">
                     <SmsOtpVerificationPopover
                       phoneNumber={user.phone}
                       userId={user.id}
                     />
-                  )) ||
-                    null}
-                </span>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <FiMapPin className="flex-shrink-0 text-xl text-textColor-gray500" />

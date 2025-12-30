@@ -73,5 +73,13 @@
   "type-delete-title": "Tapez « SUPPRIMER » :",
   "upcoming-event": "Derniers événements",
   "update-profile": "Mettre à jour le profil",
-  "seatNumber": "Numéro de siège"
+  "seatNumber": "Numéro de siège",
+  "resend-verification-email": "Renvoyer l'e-mail de vérification",
+  "resending": "Envoi...",
+  "resend-countdown": "Renvoyer ({{count}}s)",
+  "verification-email-sent": "E-mail de vérification envoyé avec succès. Veuillez vérifier votre boîte de réception.",
+  "email-already-verified": "Votre e-mail est déjà vérifié",
+  "verification-email-error": "Une erreur s'est produite lors de l'envoi de l'e-mail de vérification",
+  "verify-phone-number": "Vérifier le numéro de téléphone",
+  "user-doesnt-exist": "L'utilisateur n'existe pas, veuillez vérifier votre e-mail"
 }
