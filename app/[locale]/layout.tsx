@@ -51,12 +51,18 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>
 }>) {
   const { locale } = await params
-  const { resources } = await initTranslation(locale, i18nNamespaces)
+  
+  // Validate locale - if invalid, use default locale to prevent errors
+  const validLocale = i18nConfig.locales.includes(locale)
+    ? locale
+    : i18nConfig.defaultLocale
+  
+  const { resources } = await initTranslation(validLocale, i18nNamespaces)
 
   return (
     <TranslationsProvider // Wrap to translate any client side component using useTranslation hook from react-i18next
       namespaces={i18nNamespaces}
-      locale={locale}
+      locale={validLocale}
       resources={resources}
     >
       <html lang="en">

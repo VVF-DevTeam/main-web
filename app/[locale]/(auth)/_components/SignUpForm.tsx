@@ -25,8 +25,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { useTranslation } from 'react-i18next'
-import { Select } from '@/components/ui/select'
 import {
+  Select,
   SelectTrigger,
   SelectValue,
   SelectContent,

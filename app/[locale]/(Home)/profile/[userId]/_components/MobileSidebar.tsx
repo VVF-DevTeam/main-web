@@ -16,7 +16,7 @@ export default function MobileSidebar({
   locale: string
   userId: string
   sections: { [key: string]: string }
-  user: {
+  user?: {
     role: string[]
   }
 }) {
@@ -37,8 +37,8 @@ export default function MobileSidebar({
   const [isEventsDropdownOpen, setIsEventsDropdownOpen] = useState(
     eventManagementSections.includes(currentSection)
   )
-  const isAdmin = user.role.includes('ADMIN')
-  const isHost = user.role.includes('HOST')
+  const isAdmin = user?.role?.includes('ADMIN') ?? false
+  const isHost = user?.role?.includes('HOST') ?? false
   const isAdminOrHost = isAdmin || isHost
 
   return (

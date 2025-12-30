@@ -47,6 +47,14 @@ export default async function middleware(
 ): Promise<NextResponse | Response> {
   const { pathname } = request.nextUrl
 
+  // Exclude common static files from i18n routing
+  // These should be handled as static files, not as locale routes
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sitemap', '/favicon.ico']
+  if (staticFiles.includes(pathname)) {
+    // Let Next.js handle these as static files
+    return NextResponse.next()
+  }
+
   if (isProtectedRoute(pathname)) {
     // Protected routes: run through NextAuth middleware
     // This executes the authorized callback in auth.config.ts (handles auth + i18n)

@@ -54,7 +54,8 @@ const EmailSuggestion = ({ field, emails }: EmailSuggestionProps) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const value = field.value
+  // Ensure value is always an array to prevent "map is not a function" errors
+  const value = Array.isArray(field.value) ? field.value : []
   return (
     <FormItem>
       <FormLabel>{t('To')}</FormLabel>
