@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { verifyToken } from '@/lib/actions/token/verifyToken'
 import {
   TriangleAlert,
@@ -40,6 +40,7 @@ const ResetPasswordClient = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
   const searchParams = useSearchParams()
+  const router = useRouter()
   const token = searchParams.get('token')
   const email = searchParams.get('email')
   const [error, setError] = useState<string | null>(null)
@@ -126,7 +127,7 @@ const ResetPasswordClient = () => {
       })
 
       if (result.success) {
-        toast.success('Password reset successfully', {
+        toast.success('Password reset successfully, redirecting to sign in page...', {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
@@ -136,6 +137,9 @@ const ResetPasswordClient = () => {
             color: '#22c55e',
           },
         })
+        setTimeout(() => {
+          router.push('/signIn')
+        }, 6000)
       } else {
         toast.error('Failed to reset password', {
           description: (
@@ -211,7 +215,7 @@ const ResetPasswordClient = () => {
             ) : (
               <div className="p-8">
                 <div className="mb-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-brand600">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-secondary600">
                     <KeyRound className="h-8 w-8 text-textColor-brand900" />
                   </div>
                   <h1 className="mb-2 text-2xl font-bold text-textColor-brandDark900">
