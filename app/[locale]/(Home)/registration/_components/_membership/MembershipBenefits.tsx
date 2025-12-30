@@ -4,6 +4,7 @@ import NormalCheckoutButton from '@/components/payment/NormalCheckoutButton'
 import { auth } from '@/auth'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import Link from 'next/link'
+import FeatureItem from './FeatureItem'
 interface MembershipBenefitsProps {
   locale: string
 }
@@ -23,17 +24,20 @@ export const MembershipBenefits = async ({
       price: 30,
       priceId: 'price_1RMRIL06wc04MarV1S2YkKdS',
       features: [
-        t('basic-feature-1'),
-        t('basic-feature-2'),
-        t('basic-feature-3'),
-        t('basic-feature-4'),
+        { key: 'basic-feature-1', text: t('basic-feature-1') },
+        { key: 'basic-feature-2', text: t('basic-feature-2') },
+        { key: 'basic-feature-3', text: t('basic-feature-3') },
+        { key: 'basic-feature-4', text: t('basic-feature-4') },
       ],
     },
     {
       title: t('premium-membership'),
       price: 35,
       priceId: 'price_1ShQNl06wc04MarVvGNKWiSH',
-      features: [t('premium-feature-1'), t('premium-feature-2')],
+      features: [
+        { key: 'premium-feature-1', text: t('premium-feature-1') },
+        { key: 'premium-feature-2', text: t('premium-feature-2') },
+      ],
     },
     // {
     //   title: t('vip-membership'),
@@ -60,24 +64,12 @@ export const MembershipBenefits = async ({
           <p className="mb-4 text-3xl font-bold">{tier.price} CAD</p>
           <ul className="space-y-3">
             {tier.features.map((feature, featureIndex) => (
-              <li key={featureIndex} className="flex items-center">
-                <svg
-                  className="mr-2 text-green-500 shrink-0"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                {feature}
-              </li>
+              <FeatureItem
+                key={featureIndex}
+                feature={feature.text}
+                featureKey={feature.key}
+                locale={locale}
+              />
             ))}
           </ul>
           {userId ? (

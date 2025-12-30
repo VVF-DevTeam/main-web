@@ -24,5 +24,9 @@
   "premium-membership": "Premium",
   "homepage-membership-header": "Pro Membership Benefits",
   "homepage-membership-description": "Join with our membership and enjoy more benefits!",
-  "register": "Register"
+  "register": "Register",
+  "view-partners": "(View partners)",
+  "partner-businesses-discounts": "Partner Businesses & Discounts",
+  "business-name": "Business Name",
+  "discount": "Discount"
 }

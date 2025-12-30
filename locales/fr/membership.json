@@ -24,5 +24,9 @@
   "premium-membership": "Prime",
   "homepage-membership-header": "Avantages du Pro Membership",
   "homepage-membership-description": "Rejoignez notre adhésion pour profiter de tous les avantages ci-dessous :",
-  "register": "Inscription"
+  "register": "Inscription",
+  "view-partners": "(Voir les partenaires)",
+  "partner-businesses-discounts": "Entreprises Partenaires & Réductions",
+  "business-name": "Nom de l'Entreprise",
+  "discount": "Réduction"
 }
