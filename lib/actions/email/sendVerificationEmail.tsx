@@ -87,7 +87,7 @@ const EmailTemplateAccountVerification = ({
             style={{
               display: 'inline-block',
               padding: '12px 24px',
-              backgroundColor: '#2563eb',
+              backgroundColor: '#C11233',
               color: '#ffffff',
               textDecoration: 'none',
               borderRadius: '6px',
@@ -187,7 +187,7 @@ const EmailTemplateForgotPassword = ({
             style={{
               display: 'inline-block',
               padding: '12px 24px',
-              backgroundColor: '#2563eb',
+              backgroundColor: '#C11233',
               color: '#ffffff',
               textDecoration: 'none',
               borderRadius: '6px',
