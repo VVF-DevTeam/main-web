@@ -36,7 +36,10 @@ import { useRouter } from 'next/navigation'
 const addPaymentSchema = z
   .object({
     eventId: z.string().min(1, 'This field is required'),
-    userId: z.string().min(1, 'User is required'),
+    userId: z.string().optional(),
+    guestName: z.string().optional(),
+    guestEmail: z.string().email('Invalid email').optional().or(z.literal('')),
+    guestPhone: z.string().optional(),
     pricePaid: z.number().min(1, 'Price must be greater than 0'),
     quantity: z.number().min(1, 'Quantity must be greater than 0'),
     paymentMethod: z.string().min(1, 'Payment method is required'),
@@ -66,6 +69,20 @@ const addPaymentSchema = z
     message: 'Membership end date must be in the future',
     path: ['membershipEndDate'],
   })
+  .refine(
+    (data) => {
+      // Either userId must be provided OR all guest fields must be provided
+      const hasUserId = data.userId && data.userId.trim() !== '' && data.userId !== 'none-user'
+      const hasGuestInfo = data.guestName && data.guestName.trim() !== '' && 
+                          data.guestEmail && data.guestEmail.trim() !== '' &&
+                          data.guestPhone && data.guestPhone.trim() !== ''
+      return hasUserId || hasGuestInfo
+    },
+    {
+      message: 'Either select an existing user to link with or provide all guest information (name, email, phone)',
+      path: ['userId'],
+    }
+  )
 
 // Event Interfaces
 interface Event {
@@ -172,7 +189,7 @@ const AddClientModal = ({
                 name="userId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>User</FormLabel>
+                    <FormLabel>Link with existing User (Optional)</FormLabel>
                     <div className="space-y-2">
                       <FormControl>
                         <Select
@@ -180,6 +197,11 @@ const AddClientModal = ({
                           onValueChange={(value) => {
                             field.onChange(value)
                           }}
+                          disabled={
+                            !!form.watch('guestName') || 
+                            !!form.watch('guestEmail') || 
+                            !!form.watch('guestPhone')
+                          }
                         >
                           <FormControl>
                             <SelectTrigger className="border">
@@ -187,6 +209,7 @@ const AddClientModal = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
+                            <SelectItem value="none-user">None</SelectItem>
                             <div className="pb-2">
                               <Input
                                 type="search"
@@ -222,6 +245,65 @@ const AddClientModal = ({
                         </Select>
                       </FormControl>
                     </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Guest Name */}
+              <FormField
+                control={form.control}
+                name="guestName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Guest Name (if user has no account)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter guest name"
+                        disabled={!!form.watch('userId') && form.watch('userId') !== 'none-user'}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Guest Email */}
+              <FormField
+                control={form.control}
+                name="guestEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Guest Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="Enter guest email"
+                        disabled={!!form.watch('userId') && form.watch('userId') !== 'none-user'}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Guest Phone */}
+              <FormField
+                control={form.control}
+                name="guestPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Guest Phone</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="tel"
+                        placeholder="Enter guest phone"
+                        disabled={!!form.watch('userId') && form.watch('userId') !== 'none-user'}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -415,6 +497,9 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
     defaultValues: {
       eventId: '',
       userId: '',
+      guestName: '',
+      guestEmail: '',
+      guestPhone: '',
       pricePaid: 0,
       quantity: 0,
       paymentMethod: '',
@@ -425,7 +510,13 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
 
   // onSubmit
   const onSubmit = async (data: AddPaymentFormValues) => {
-    const { success, message } = await addPayment(data)
+    // Convert 'none-user' to undefined for the backend
+    const submitData = {
+      ...data,
+      userId: data.userId === 'none-user' ? undefined : data.userId,
+    }
+    
+    const { success, message } = await addPayment(submitData)
     if (success) {
       toast.success('Success', {
         description: 'Payment added successfully',

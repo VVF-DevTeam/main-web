@@ -5,7 +5,10 @@ import { revalidateTag } from 'next/cache'
 
 interface AddPaymentParams {
   eventId?: string | null
-  userId: string
+  userId?: string
+  guestName?: string
+  guestEmail?: string
+  guestPhone?: string
   pricePaid: number
   quantity: number
   paymentMethod: string
@@ -16,6 +19,9 @@ interface AddPaymentParams {
 export async function addPayment({
   eventId,
   userId,
+  guestName,
+  guestEmail,
+  guestPhone,
   pricePaid,
   quantity,
   paymentMethod,
@@ -30,7 +36,10 @@ export async function addPayment({
     const payment = await prisma.payment.create({
       data: {
         eventId,
-        userId,
+        userId: userId || null,
+        guestName: guestName || null,
+        guestEmail: guestEmail || null,
+        guestPhone: guestPhone || null,
         pricePaid,
         quantity,
         stripePaymentId: paymentMethod,
