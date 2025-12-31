@@ -148,7 +148,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       discountMemberPercent: null,
       validFrom: null,
       validTo: null,
-      payTotalNumber: 1,
+      payTotalNumber: null,
       imageUrl: null,
     },
   })
@@ -163,7 +163,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       discountMemberPercent: null,
       validFrom: null,
       validTo: null,
-      payTotalNumber: 1,
+      payTotalNumber: null,
       imageUrl: null,
     })
     setEditingTicketId(null)
@@ -898,8 +898,12 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     checked={isFullEvent}
                     onCheckedChange={(checked) => {
                       setIsFullEvent(checked === true)
-                      if (!checked) {
-                        ticketForm.setValue('payTotalNumber', 1)
+                      if (checked) {
+                        // When checked, set to minimum of 2 sessions
+                        ticketForm.setValue('payTotalNumber', 2)
+                      } else {
+                        // When unchecked, set to null (single session)
+                        ticketForm.setValue('payTotalNumber', null)
                       }
                     }}
                   />
