@@ -75,7 +75,7 @@ const createEventTicketSchema = (eventCapacity: number | null) =>
       stripeProductId: z.string().optional(),
       stripePriceId: z.string().optional(),
       subscribedStripePriceId: z.string().optional(),
-      payTotalNumber: z.coerce.number().min(1).optional().default(1),
+      payTotalNumber: z.coerce.number().min(1).optional().nullable(),
       imageUrl: z
         .string()
         .optional()
@@ -220,7 +220,9 @@ const EventPrice = ({ event }: EventPriceProps) => {
       let subscribedStripePriceId = values.subscribedStripePriceId
 
       // Calculate Stripe price: use price * payTotalNumber * capacityPerTicket
-      const stripePrice = values.price * values.payTotalNumber * values.capacityPerTicket
+      // If payTotalNumber is null/undefined, treat as 1 (single session)
+      const sessions = values.payTotalNumber || 1
+      const stripePrice = values.price * sessions * values.capacityPerTicket
 
       // Create or update Stripe product and price
       if (editingTicketId) {
