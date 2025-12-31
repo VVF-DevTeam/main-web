@@ -44,6 +44,7 @@ export const POST = async (request: Request) => {
       price,
       capacityPerTicket,
       currency,
+      limit,
       discountMemberPercent,
       validFrom,
       validTo,
@@ -51,6 +52,7 @@ export const POST = async (request: Request) => {
       stripePriceId,
       subscribedStripePriceId,
       payTotalNumber,
+      imageUrl,
     } = await request.json()
 
     // Ensure the related event exists
@@ -71,6 +73,10 @@ export const POST = async (request: Request) => {
             ? capacityPerTicket
             : 1,
         currency: currency || 'CAD',
+        limit:
+          limit !== undefined && limit !== null
+            ? Math.round(Number(limit))
+            : null,
         discountMemberPercent:
           discountMemberPercent !== undefined && discountMemberPercent !== null
             ? Math.round(Number(discountMemberPercent))
@@ -84,6 +90,7 @@ export const POST = async (request: Request) => {
           payTotalNumber !== undefined && payTotalNumber !== null
             ? Math.round(Number(payTotalNumber))
             : null,
+        imageUrl: imageUrl || null,
       },
     })
 
@@ -136,19 +143,23 @@ export const PUT = async (request: Request) => {
       validFrom,
       validTo,
       currency,
+      limit,
       discountMemberPercent,
       subscribedStripePriceId,
       price,
       payTotalNumber,
+      imageUrl,
       ...rest
     } = values as {
       validFrom?: string | Date | null
       validTo?: string | Date | null
       currency?: string
+      limit?: number | null
       discountMemberPercent?: number | null
       subscribedStripePriceId?: string | null
       price?: number
       payTotalNumber?: number | null
+      imageUrl?: string | null
       [key: string]: unknown
     }
 
@@ -158,6 +169,12 @@ export const PUT = async (request: Request) => {
         ...rest,
         ...(price !== undefined && { price: price }),
         currency: currency ?? existing.currency,
+        limit:
+          limit !== undefined
+            ? limit !== null
+              ? Math.round(Number(limit))
+              : null
+            : existing.limit,
         discountMemberPercent:
           discountMemberPercent !== undefined
             ? discountMemberPercent !== null
@@ -174,6 +191,10 @@ export const PUT = async (request: Request) => {
               ? Math.round(Number(payTotalNumber))
               : null
             : existing.payTotalNumber,
+        imageUrl:
+          imageUrl !== undefined
+            ? (imageUrl ?? null)
+            : existing.imageUrl,
         validFrom: validFrom
           ? new Date(validFrom)
           : validFrom === null

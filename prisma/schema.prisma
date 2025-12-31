@@ -114,6 +114,7 @@ model EventTicket {
   updatedAt DateTime   @default(now())
   type      String
   imageUrl  String?    // Background for the ticket
+  limit     Int?
 
   // Price and payment mode
   price     Decimal

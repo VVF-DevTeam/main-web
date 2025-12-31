@@ -55,57 +55,75 @@ interface StripeTicketDataEdit {
   newSubscriptionPriceId?: string
 }
 
-// Schema for EventTicket
-const EventTicketSchema = z
-  .object({
-    type: z.string().min(1, 'Ticket type is required'),
-    price: z.coerce.number().min(0, 'Price must be at least 0'),
-    capacityPerTicket: z.coerce.number().min(1, 'Capacity must be at least 1'),
-    currency: z.string().default('CAD'),
-    discountMemberPercent: z.coerce
-      .number()
-      .min(0)
-      .max(100)
-      .optional()
-      .nullable(),
-    validFrom: z.date().optional().nullable(),
-    validTo: z.date().optional().nullable(),
-    stripeProductId: z.string().optional(),
-    stripePriceId: z.string().optional(),
-    subscribedStripePriceId: z.string().optional(),
-    payTotalNumber: z.coerce.number().min(1).optional().nullable(),
-    imageUrl: z
-      .string()
-      .optional()
-      .nullable()
-      .refine(
-        (val) =>
-          !val ||
-          (typeof val === 'string' &&
-            (val.trim() === '' || z.string().url().safeParse(val).success)),
-        { message: 'Must be a valid URL' }
-      ),
-  })
-  .refine(
-    (data) => {
-      // If payTotalNumber is provided, it must be a valid number >= 1
-      if (data.payTotalNumber !== null && data.payTotalNumber !== undefined) {
-        return data.payTotalNumber >= 1
+// Schema factory for EventTicket that includes event capacity validation
+const createEventTicketSchema = (eventCapacity: number | null) =>
+  z
+    .object({
+      type: z.string().min(1, 'Ticket type is required'),
+      price: z.coerce.number().min(0, 'Price must be at least 0'),
+      capacityPerTicket: z.coerce.number().min(1, 'Capacity must be at least 1'),
+      currency: z.string().default('CAD'),
+      limit: z.coerce.number().min(1).optional().nullable(),
+      discountMemberPercent: z.coerce
+        .number()
+        .min(0)
+        .max(100)
+        .optional()
+        .nullable(),
+      validFrom: z.date().optional().nullable(),
+      validTo: z.date().optional().nullable(),
+      stripeProductId: z.string().optional(),
+      stripePriceId: z.string().optional(),
+      subscribedStripePriceId: z.string().optional(),
+      payTotalNumber: z.coerce.number().min(1).optional().nullable(),
+      imageUrl: z
+        .string()
+        .optional()
+        .nullable()
+        .refine(
+          (val) =>
+            !val ||
+            (typeof val === 'string' &&
+              (val.trim() === '' || z.string().url().safeParse(val).success)),
+          { message: 'Must be a valid URL' }
+        ),
+    })
+    .refine(
+      (data) => {
+        // If payTotalNumber is provided, it must be a valid number >= 1
+        if (data.payTotalNumber !== null && data.payTotalNumber !== undefined) {
+          return data.payTotalNumber >= 1
+        }
+        return true
+      },
+      {
+        message: 'Pay Total Number must be at least 1',
+        path: ['payTotalNumber'],
       }
-      return true
-    },
-    {
-      message: 'Pay Total Number must be at least 1',
-      path: ['payTotalNumber'],
-    }
-  )
+    )
+    .refine(
+      (data) => {
+        // If limit is provided and event capacity exists, limit cannot exceed event capacity
+        if (
+          data.limit !== null &&
+          data.limit !== undefined &&
+          eventCapacity !== null &&
+          eventCapacity > 0
+        ) {
+          return data.limit <= eventCapacity
+        }
+        return true
+      },
+      {
+        message: `Limit cannot exceed event capacity${eventCapacity ? ` (${eventCapacity})` : ''}`,
+        path: ['limit'],
+      }
+    )
 
-type EventTicketFormData = z.infer<typeof EventTicketSchema>
+type EventTicketFormData = z.infer<ReturnType<typeof createEventTicketSchema>>
 
 // Helper function to calculate sold count from payments
-const calculateSoldCount = (
-  payments: Array<{ quantity: number }>
-): number => {
+const calculateSoldCount = (payments: Array<{ quantity: number }>): number => {
   return payments.reduce((sum, payment) => sum + payment.quantity, 0)
 }
 
@@ -120,12 +138,13 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
   // Form for EventTicket
   const ticketForm = useForm<EventTicketFormData>({
-    resolver: zodResolver(EventTicketSchema),
+    resolver: zodResolver(createEventTicketSchema(event.capacity)),
     defaultValues: {
       type: '',
       price: 0,
       capacityPerTicket: 1,
       currency: 'CAD',
+      limit: null,
       discountMemberPercent: null,
       validFrom: null,
       validTo: null,
@@ -140,6 +159,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       price: 0,
       capacityPerTicket: 1,
       currency: 'CAD',
+      limit: null,
       discountMemberPercent: null,
       validFrom: null,
       validTo: null,
@@ -172,6 +192,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
       price: Number(ticket.price),
       capacityPerTicket: ticket.capacityPerTicket,
       currency: ticket.currency,
+      limit: ticket.limit ?? null,
       discountMemberPercent: ticket.discountMemberPercent ?? null,
       validFrom: ticket.validFrom ? new Date(ticket.validFrom) : null,
       validTo: ticket.validTo ? new Date(ticket.validTo) : null,
@@ -217,8 +238,11 @@ const EventPrice = ({ event }: EventPriceProps) => {
         const existingTicket = tickets.find((t) => t.id === editingTicketId)
         const existingStripePrice = existingTicket
           ? existingTicket.payTotalNumber
-            ? Number(existingTicket.price) * existingTicket.payTotalNumber * existingTicket.capacityPerTicket
-            : Number(existingTicket.price || 0) * existingTicket.capacityPerTicket
+            ? Number(existingTicket.price) *
+              existingTicket.payTotalNumber *
+              existingTicket.capacityPerTicket
+            : Number(existingTicket.price || 0) *
+              existingTicket.capacityPerTicket
           : 0
         const priceChanged =
           existingTicket && existingStripePrice !== stripePrice
@@ -286,6 +310,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
         price: values.price,
         capacityPerTicket: values.capacityPerTicket,
         currency: values.currency,
+        limit: values.limit ?? null,
         discountMemberPercent: values.discountMemberPercent ?? null,
         validFrom: values.validFrom ? values.validFrom.toISOString() : null,
         validTo: values.validTo ? values.validTo.toISOString() : null,
@@ -507,14 +532,20 @@ const EventPrice = ({ event }: EventPriceProps) => {
             )}
           </div>
         </div>
-        
-        <p className="text-sm italic text-muted-foreground text-slate-500">NOTE 1: Avoid changing capacity after there are purchases, it may confuse the customers.</p>
-        <p className="text-sm italic text-muted-foreground text-slate-500">NOTE 2: Ticket will be hidden after the Valid To date.</p>
+
+        <p className="text-sm italic text-muted-foreground text-slate-500">
+          NOTE 1: Avoid changing capacity after there are purchases, it may
+          confuse the customers.
+        </p>
+        <p className="text-sm italic text-muted-foreground text-slate-500">
+          NOTE 2: Ticket will be hidden after the Valid To date.
+        </p>
 
         {/* Capacity Error Message */}
         {showCapacityError && !isEditingTicket && (
           <p className="text-sm font-medium text-red-600">
-            Please add event capacity before adding tickets. Go to Step IV above to set it.
+            Please add event capacity before adding tickets. Go to Step IV above
+            to set it.
           </p>
         )}
 
@@ -524,7 +555,9 @@ const EventPrice = ({ event }: EventPriceProps) => {
             {tickets.map((ticket) => {
               // Calculate display price: if payTotalNumber exists, show price * payTotalNumber * capacityPerTicket, else show price * capacityPerTicket
               const displayPrice = ticket.payTotalNumber
-                ? Number(ticket.price) * ticket.payTotalNumber * ticket.capacityPerTicket
+                ? Number(ticket.price) *
+                  ticket.payTotalNumber *
+                  ticket.capacityPerTicket
                 : Number(ticket.price) * ticket.capacityPerTicket
               const soldCount = calculateSoldCount(ticket.payments || [])
               return (
@@ -545,6 +578,9 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Capacity: {ticket.capacityPerTicket} | Sold: {soldCount}
+                      {ticket.limit != null && ticket.limit > 0 && (
+                        <> | Limit: {ticket.limit}</>
+                      )}
                       {ticket.discountMemberPercent !== null && (
                         <> | Discount: {ticket.discountMemberPercent}%</>
                       )}
@@ -648,7 +684,10 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     name="capacityPerTicket"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacity (e.g. ticket for group of 5 will be 5, default is 1 for single ticket)</FormLabel>
+                        <FormLabel>
+                          Capacity (e.g. ticket for group of 5 will be 5,
+                          default is 1 for single ticket)
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -689,6 +728,80 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
                   <FormField
                     control={ticketForm.control}
+                    name="limit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Limit (Optional)
+                          {event.capacity && (
+                            <span className="ml-1 text-xs font-normal text-muted-foreground">
+                              (Max: {event.capacity})
+                            </span>
+                          )}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="1"
+                            min="1"
+                            max={event.capacity ?? undefined}
+                            placeholder="eg: 100"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={async (e) => {
+                              const value = e.target.value
+                              field.onChange(
+                                value === '' ? null : Number(value)
+                              )
+                              // Trigger validation after onChange
+                              await ticketForm.trigger('limit')
+                            }}
+                            onBlur={async () => {
+                              field.onBlur()
+                              // Trigger validation on blur as well
+                              await ticketForm.trigger('limit')
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Discount Percentage for Members */}
+                  <FormField
+                    control={ticketForm.control}
+                    name="discountMemberPercent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Discount Percentage for Members (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="1"
+                            min="0"
+                            max="100"
+                            placeholder="eg: 10"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              field.onChange(
+                                value === '' ? null : Number(value)
+                              )
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Valid From Date */}
+                  <FormField
+                    control={ticketForm.control}
                     name="validFrom"
                     render={({ field }) => (
                       <FormItem className="w-full">
@@ -719,6 +832,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     )}
                   />
 
+                  {/* Valid To Date */}
                   <FormField
                     control={ticketForm.control}
                     name="validTo"
@@ -745,36 +859,6 @@ const EventPrice = ({ event }: EventPriceProps) => {
                               </button>
                             )}
                           </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={ticketForm.control}
-                    name="discountMemberPercent"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Discount Percentage for Members (Optional)
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="1"
-                            min="0"
-                            max="100"
-                            placeholder="eg: 10"
-                            {...field}
-                            value={field.value ?? ''}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              field.onChange(
-                                value === '' ? null : Number(value)
-                              )
-                            }}
-                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
