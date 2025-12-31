@@ -1,6 +1,6 @@
 'use server'
 import { prisma } from '@/lib/db'
-import { PaymentType } from '@prisma/client'
+import { PaymentMethod, PaymentType } from '@prisma/client'
 import { revalidateTag } from 'next/cache'
 
 interface AddPaymentParams {
@@ -45,7 +45,7 @@ export async function addPayment({
         guestPhone: guestPhone || null,
         pricePaid,
         quantity,
-        stripePaymentId: paymentMethod,
+        method: paymentMethod as PaymentMethod,
         type: paymentType as PaymentType,
         expiresAt: membershipEndDate,
       },

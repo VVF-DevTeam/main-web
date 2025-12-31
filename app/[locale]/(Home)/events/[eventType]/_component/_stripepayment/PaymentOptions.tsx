@@ -780,6 +780,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     {t('etransfer-description-3')}: <strong>{title}</strong>,{' '}
                     {t('etransfer-description-3_5')}
                   </li>
+                  <li>
+                    {t('etransfer-description-2')}
+                  </li>
                 </ul>
                 {/* <p className="pt-2 text-xs italic">
                   *{t('etransfer-description-7')}

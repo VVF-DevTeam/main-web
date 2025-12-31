@@ -13,9 +13,9 @@
   "description-step03": "Make payments through our secure payment system and receive your reservation confirmation email.",
   "etransfer-description": "To complete your payment via e-transfer:",
   "etransfer-description-1": "Please use this email to send your payment:",
-  "etransfer-description-2": "Use the security question if required (we have set up autodeposit):",
+  "etransfer-description-2": "If you have any problems or any further questions, do not hesitate to contact us through our Facebook or Instagram page. Thank you for choosing VVF!",
   "etransfer-description-3": "Include your full name, seat number (if applicable), and event title",
-  "etransfer-description-3_5": "and any other info we need to know.",
+  "etransfer-description-3_5": "and any other info we need to know such as your preferred contact method or if you have any special requests/conditions.",
   "etransfer-description-4": "Send us a message on our",
   "etransfer-description-5": "so that one of our members can reserve your spot for the event and help you with the payment.",
   "etransfer-description-6": "answer",
@@ -80,6 +80,7 @@
   "saturday": "Sat",
   "Sep": "September",
   "sessions": "sessions",
+  "person": "person",
   "slot-event": "slots",
   "subHeaderSchedule": "May change according to organizers",
   "sunday": "Sun",
@@ -127,7 +128,7 @@
   "remove-from-cart": "Remove from Cart",
   "goToCheckout": "Go to Checkout",
   "total": "Total",
-  "each": "per session",
+  "each": "per person/each session",
   "headerSponsors": "Sponsored By",
   "member-price-applied": "Member price applied: ${{price}}",
   "member-price": "Member price: ${{price}}",
@@ -135,5 +136,8 @@
   "email-not-verified-warning-prefix": "Your email:",
   "email-not-verified-warning-suffix": "has not been verified, please double check it or verify it in your profile",
   "verify-in-profile": "here",
-  "verify-email-reason": "to avoid missing confirmation emails for the reservation/tickets."
+  "verify-email-reason": "to avoid missing confirmation emails for the reservation/tickets.",
+  "valid-until": "Available for selection until",
+  "ticket-expired": "Ticket expired on",
+  "ticket-no-longer-available": "No Longer Available"
 }

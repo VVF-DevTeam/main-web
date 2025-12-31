@@ -85,7 +85,9 @@ export default function EventSingleCheckOut({
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [emailVerified, setEmailVerified] = useState<Date | null | undefined>(undefined)
+  const [emailVerified, setEmailVerified] = useState<Date | null | undefined>(
+    undefined
+  )
   const containerRef = useRef<HTMLDivElement>(null)
   const prevShowFormRef = useRef(false)
 
@@ -157,10 +159,41 @@ export default function EventSingleCheckOut({
   }, [showForm])
 
   const checkoutTickets = useMemo(
-    () =>
-      tickets.filter(
-        (ticket) => ticket.stripePriceId && ticket.stripeProductId
-      ),
+    () => {
+      const currentDate = new Date()
+      currentDate.setHours(0, 0, 0, 0) // Set to start of day
+
+      return tickets
+        .filter((ticket) => ticket.stripePriceId && ticket.stripeProductId)
+        .sort((a, b) => {
+          // Helper function to check if ticket is expired
+          const isTicketExpired = (ticket: EventTicket) => {
+            if (!ticket.validTo) return false
+            const validToDate = new Date(ticket.validTo)
+            validToDate.setHours(0, 0, 0, 0)
+            return validToDate < currentDate
+          }
+
+          const aExpired = isTicketExpired(a)
+          const bExpired = isTicketExpired(b)
+
+          // Non-expired tickets come first
+          if (aExpired !== bExpired) {
+            return aExpired ? 1 : -1
+          }
+
+          // Among tickets with same expiration status, sort by validTo date
+          if (a.validTo && b.validTo) {
+            return new Date(a.validTo).getTime() - new Date(b.validTo).getTime()
+          }
+
+          // Tickets without validTo date come after those with validTo
+          if (a.validTo && !b.validTo) return -1
+          if (!a.validTo && b.validTo) return 1
+
+          return 0
+        })
+    },
     [tickets]
   )
 
@@ -217,12 +250,11 @@ export default function EventSingleCheckOut({
 
           {userId && !emailVerified && (
             <p className="text-sm text-bgColor-brand900">
-              *{t('email-not-verified-warning-prefix')}{' '}
-              <strong>{email}</strong>{' '}
+              *{t('email-not-verified-warning-prefix')} <strong>{email}</strong>{' '}
               {t('email-not-verified-warning-suffix')}{' '}
               <Link
                 href={`/profile/${userId}`}
-                className="font-medium underline text-textColor-blue"
+                className="font-medium text-textColor-blue underline"
               >
                 {t('verify-in-profile')}
               </Link>
@@ -247,10 +279,25 @@ export default function EventSingleCheckOut({
               const perSessionPrice = Number(ticket.price) || 0
               // const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
 
+              // Check if ticket has expired (date only, ignoring time)
+              const currentDate = new Date()
+              currentDate.setHours(0, 0, 0, 0) // Set to start of day
+              
+              let isExpired = false
+              if (ticket.validTo) {
+                const validToDate = new Date(ticket.validTo)
+                validToDate.setHours(0, 0, 0, 0) // Set to start of day
+                isExpired = validToDate < currentDate
+              }
+
               return (
                 <div
                   key={ticket.id}
-                  className="relative flex flex-col gap-3 overflow-hidden rounded-md border bg-white p-4 shadow-sm"
+                  className={`relative flex flex-col gap-3 overflow-hidden rounded-md border p-4 shadow-sm ${
+                    isExpired
+                      ? 'bg-gray-100 opacity-60'
+                      : 'bg-white'
+                  }`}
                 >
                   {/* Background Image - Right Half */}
                   {ticket.imageUrl && (
@@ -266,8 +313,9 @@ export default function EventSingleCheckOut({
                   )}
 
                   {/* Content */}
-                  <div className="relative z-10 flex flex-col gap-1">
+                  <div className="relative z-10 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
+                      {/* Ticket type */}
                       <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
                         {ticket.type}
                       </span>
@@ -294,7 +342,7 @@ export default function EventSingleCheckOut({
                             - ${perSessionPrice.toFixed(2)} {t('each')}
                           </span>
                         ) : (
-                          // Drop-in: Show per-session price only
+                          // Drop-in/Single ticket: Show per-session price only
                           <span className="text-xs text-gray-500 drop-shadow-sm">
                             {/* {currencyLabel}  */} $
                             {perSessionPrice.toFixed(2)} {t('each')}
@@ -302,31 +350,57 @@ export default function EventSingleCheckOut({
                         )}
                       </>
                     )}
+
+                    {/* Member price */}
                     {memberPrice !== null ? (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
                         {isSubscribed
-                          ? t('member-price-applied', { price: memberPrice.toFixed(2) })
-                          : t('member-price', { price: memberPrice.toFixed(2) })}
+                          ? t('member-price-applied', {
+                              price: memberPrice.toFixed(2),
+                            })
+                          : t('member-price', {
+                              price: memberPrice.toFixed(2),
+                            })}
                       </span>
                     ) : null}
+
+                    {/* Valid To Date */}
+                    {ticket.validTo && (
+                      <span className={`text-xs drop-shadow-sm ${
+                        isExpired ? 'font-semibold text-red-600' : 'text-gray-500'
+                      }`}>
+                        {isExpired ? t('ticket-expired') : t('valid-until')}:{' '}
+                        {new Date(ticket.validTo).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    )}
                   </div>
 
                   {/* Individual checkout button (hidden when using master checkout in cart) */}
                   {!hideCheckoutButtons && (
                     <div className="relative z-10 flex items-center justify-between gap-4">
-                      <NormalCheckoutButton
-                        stripePriceId={stripePriceIdForUser}
-                        stripeProductId={ticket.stripeProductId}
-                        eventKeyName={eventKeyName}
-                        userId={userId}
-                        eventId={eventId}
-                        buttonText="reserve-button"
-                        type={paymentTypeValue}
-                        numberSession={ticket.payTotalNumber ?? undefined}
-                        email={email}
-                        seatNumber={seatNumber}
-                        eventTicketId={ticket.id}
-                      />
+                      {isExpired ? (
+                        <Button disabled variant="outline" className="w-full opacity-50">
+                          {t('ticket-no-longer-available')}
+                        </Button>
+                      ) : (
+                        <NormalCheckoutButton
+                          stripePriceId={stripePriceIdForUser}
+                          stripeProductId={ticket.stripeProductId}
+                          eventKeyName={eventKeyName}
+                          userId={userId}
+                          eventId={eventId}
+                          buttonText="reserve-button"
+                          type={paymentTypeValue}
+                          numberSession={ticket.payTotalNumber ?? undefined}
+                          email={email}
+                          seatNumber={seatNumber}
+                          eventTicketId={ticket.id}
+                        />
+                      )}
                     </div>
                   )}
                 </div>

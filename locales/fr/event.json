@@ -13,9 +13,9 @@
   "description-step03": "Effectuez vos paiements via notre système de paiement sécurisé et recevez votre email de confirmation de réservation.",
   "etransfer-description": "Pour finaliser votre paiement par virement électronique :",
   "etransfer-description-1": "Veuillez utiliser cette adresse email pour envoyer votre paiement:",
-  "etransfer-description-2": "Utilisez la question de sécurité si nécessaire (nous avons mis en place le dépôt automatique) :",
+  "etransfer-description-2": "Si vous avez des problèmes ou des questions supplémentaires, n'hésitez pas à nous contacter via notre page Facebook ou Instagram. Merci de choisir VVF!",
   "etransfer-description-3": "Incluez votre nom complet, le numéro de place (si applicable), et le titre de l'événement",
-  "etransfer-description-3_5": "et toute autre information que nous devons connaître.",
+  "etransfer-description-3_5": "et toute autre information que nous devons connaître, comme votre méthode de contact préférée ou si vous avez des demandes/conditions sanitaires spéciales.",
   "etransfer-description-4": "Envoyez-nous un message sur notre",
   "etransfer-description-5": "afin que l'un de nos membres puisse réserver votre place pour l'événement et vous aider avec le paiement.",
   "etransfer-description-6": "répondre",
@@ -80,6 +80,7 @@
   "saturday": "Sam",
   "Sep": "Septembre",
   "sessions": "séances",
+  "person": "personne",
   "slot-event": "emplacements",
   "subHeaderSchedule": "Peut changer selon les organisateurs",
   "sunday": "Dim",
@@ -127,7 +128,7 @@
   "remove-from-cart": "Supprimer du panier",
   "goToCheckout": "Aller au paiement",
   "total": "Total",
-  "each": "par séance",
+  "each": "par personne/par séance",
   "headerSponsors": "Soutenu par",
   "member-price-applied": "Prix membre appliqué : ${{price}}",
   "member-price": "Prix membre : ${{price}}",
@@ -135,5 +136,8 @@
   "email-not-verified-warning-prefix": "Votre e-mail :",
   "email-not-verified-warning-suffix": "n'a pas été vérifié, veuillez le vérifier à nouveau ou le vérifier dans votre profil",
   "verify-in-profile": "ici",
-  "verify-email-reason": "pour éviter de manquer les e-mails de confirmation pour la réservation/les billets."
+  "verify-email-reason": "pour éviter de manquer les e-mails de confirmation pour la réservation/les billets.",
+  "valid-until": "Disponible pour la sélection jusqu'au",
+  "ticket-expired": "Billet expiré le",
+  "ticket-no-longer-available": "Plus Disponible"
 }
