@@ -61,7 +61,9 @@ const createEventTicketSchema = (eventCapacity: number | null) =>
     .object({
       type: z.string().min(1, 'Ticket type is required'),
       price: z.coerce.number().min(0, 'Price must be at least 0'),
-      capacityPerTicket: z.coerce.number().min(1, 'Capacity must be at least 1'),
+      capacityPerTicket: z.coerce
+        .number()
+        .min(1, 'Capacity must be at least 1'),
       currency: z.string().default('CAD'),
       limit: z.coerce.number().min(1).optional().nullable(),
       discountMemberPercent: z.coerce
@@ -92,12 +94,13 @@ const createEventTicketSchema = (eventCapacity: number | null) =>
       (data) => {
         // If payTotalNumber is provided, it must be at least 2 (multiple sessions)
         if (data.payTotalNumber !== null && data.payTotalNumber !== undefined) {
-          return data.payTotalNumber >= 2
+          return data.payTotalNumber >= 1
         }
         return true
       },
       {
-        message: 'Number of Sessions must be at least 2 for multiple session events',
+        message:
+          'Number of Sessions must be at least 2 for multiple session events',
         path: ['payTotalNumber'],
       }
     )
@@ -187,26 +190,35 @@ const EventPrice = ({ event }: EventPriceProps) => {
 
   const loadTicketIntoForm = (ticket: TicketWithPayments) => {
     const hasNumberOfSessions =
-      ticket.payTotalNumber !== null && 
-      ticket.payTotalNumber !== undefined && 
+      ticket.payTotalNumber !== null &&
+      ticket.payTotalNumber !== undefined &&
       ticket.payTotalNumber > 1
-    ticketForm.reset({
-      type: ticket.type,
-      price: Number(ticket.price),
-      capacityPerTicket: ticket.capacityPerTicket,
-      currency: ticket.currency,
-      limit: ticket.limit ?? null,
-      discountMemberPercent: ticket.discountMemberPercent ?? null,
-      validFrom: ticket.validFrom ? new Date(ticket.validFrom) : null,
-      validTo: ticket.validTo ? new Date(ticket.validTo) : null,
-      stripeProductId: ticket.stripeProductId,
-      stripePriceId: ticket.stripePriceId,
-      subscribedStripePriceId: ticket.subscribedStripePriceId ?? undefined,
-      payTotalNumber: ticket.payTotalNumber ?? null,
-      imageUrl: ticket.imageUrl ?? null,
-    }, {
-      keepDefaultValues: false,
-    })
+
+    console.log('hasNumberOfSessions', hasNumberOfSessions)
+    console.log('ticket', ticket)
+    console.log('ticketForm.formState.isValid', ticketForm.formState.isValid)
+    console.log('ticketForm.formState.isSubmitting', ticketForm.formState.isSubmitting)
+
+    ticketForm.reset(
+      {
+        type: ticket.type,
+        price: Number(ticket.price),
+        capacityPerTicket: ticket.capacityPerTicket,
+        currency: ticket.currency,
+        limit: ticket.limit ?? null,
+        discountMemberPercent: ticket.discountMemberPercent ?? null,
+        validFrom: ticket.validFrom ? new Date(ticket.validFrom) : null,
+        validTo: ticket.validTo ? new Date(ticket.validTo) : null,
+        stripeProductId: ticket.stripeProductId,
+        stripePriceId: ticket.stripePriceId,
+        subscribedStripePriceId: ticket.subscribedStripePriceId ?? undefined,
+        payTotalNumber: ticket.payTotalNumber ?? null,
+        imageUrl: ticket.imageUrl ?? null,
+      },
+      {
+        keepDefaultValues: false,
+      }
+    )
     setIsFullEvent(hasNumberOfSessions)
     setEditingTicketId(ticket.id)
     setIsAddingNew(false)
@@ -557,9 +569,10 @@ const EventPrice = ({ event }: EventPriceProps) => {
           <div className="flex flex-col gap-y-4">
             {tickets.map((ticket) => {
               // Calculate display price, payTotalNumber is number of session this ticket has
-              const displayPrice = Number(ticket.price) *
-                  ticket.payTotalNumber *
-                  ticket.capacityPerTicket
+              const displayPrice =
+                Number(ticket.price) *
+                ticket.payTotalNumber *
+                ticket.capacityPerTicket
 
               const soldCount = calculateSoldCount(ticket.payments || [])
               return (
@@ -903,13 +916,13 @@ const EventPrice = ({ event }: EventPriceProps) => {
                       setIsFullEvent(checked === true)
                       if (checked) {
                         // When checked, set to minimum of 2 sessions
-                        ticketForm.setValue('payTotalNumber', 2, { 
-                          shouldValidate: true 
+                        ticketForm.setValue('payTotalNumber', 2, {
+                          shouldValidate: true,
                         })
                       } else {
                         // When unchecked, set to null (single session)
-                        ticketForm.setValue('payTotalNumber', null, { 
-                          shouldValidate: true 
+                        ticketForm.setValue('payTotalNumber', null, {
+                          shouldValidate: true,
                         })
                       }
                     }}
@@ -929,7 +942,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     name="payTotalNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Sessions</FormLabel>
+                        <FormLabel>Number of Sessions (Should be at least 2)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
