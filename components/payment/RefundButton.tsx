@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import { useRouter } from 'next/navigation'
+import { PaymentMethod } from '@prisma/client'
 
 interface RefundButtonProps {
   paymentId: string
   amount: number
   disabled?: boolean
-  stripeProductId: string
+  stripeProductId: string | null
+  method: PaymentMethod
 }
 
 export default function RefundButton({
@@ -17,6 +19,7 @@ export default function RefundButton({
   amount,
   disabled = false,
   stripeProductId,
+  method,
 }: RefundButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -62,7 +65,7 @@ export default function RefundButton({
         }
       `}
     >
-      {['etf', 'cash', 'bank-transfer'].includes(stripeProductId) ? `Payment by ${stripeProductId} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
+      {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
     </button>
   )
 } 

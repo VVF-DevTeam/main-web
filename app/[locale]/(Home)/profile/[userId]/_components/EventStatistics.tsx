@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { getEventPayments } from './getEventPayments'
+import { PaymentMethod, PaymentType } from '@prisma/client'
 
 interface EventStatisticsProps {
   user: {
@@ -39,7 +40,9 @@ interface Payment {
   pricePaid: number | { toString(): string; toNumber(): number }
   quantity: number
   seatNumber: string | null
-  type: string
+  type: PaymentType
+  method: PaymentMethod
+  stripePaymentId: string | null
   guestName: string | null
   guestEmail: string | null
   user: {
@@ -107,7 +110,6 @@ export default function EventStatistics({
         setLoading(true)
         try {
           const eventPayments = await getEventPayments(selectedEventId)
-          console.log(eventPayments)
           setPayments(eventPayments)
         } catch (error) {
           console.error('Error fetching payments:', error)
@@ -364,17 +366,25 @@ export default function EventStatistics({
                           <th className="px-4 py-3 text-left">Amount</th>
                           <th className="px-4 py-3 text-left">Quantity/Seat</th>
                           <th className="px-4 py-3 text-left">Capacity</th>
+                          <th className="px-4 py-3 text-left">Payment Method</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {payments.map((payment) => {
-                          const isGuestCheckout = !payment.user && (payment.guestEmail || payment.guestName)
-                          const displayEmail = payment.user?.email || payment.guestEmail || '-'
-                          const displayName = payment.user?.name || payment.guestName || '-'
+                          const isGuestCheckout =
+                            !payment.user &&
+                            (payment.guestEmail || payment.guestName)
+                          const displayEmail =
+                            payment.user?.email || payment.guestEmail || '-'
+                          const displayName =
+                            payment.user?.name || payment.guestName || '-'
                           const paymentType = payment.eventTicket?.type || '-'
-                          const displayPaymentType = isGuestCheckout 
-                            ? `${paymentType} (Guest Checkout)`
-                            : paymentType
+
+                          // Build display payment type with suffixes
+                          let displayPaymentType = paymentType
+                          if (isGuestCheckout) {
+                            displayPaymentType += ' (Guest Checkout)'
+                          }
 
                           return (
                             <tr key={payment.id} className="bg-white">
@@ -384,9 +394,7 @@ export default function EventStatistics({
                               <td className="max-w-[150px] whitespace-normal break-words px-4 py-3">
                                 {displayEmail}
                               </td>
-                              <td className="px-4 py-3">
-                                {displayName}
-                              </td>
+                              <td className="px-4 py-3">{displayName}</td>
                               <td className="px-4 py-3">
                                 $
                                 {(typeof payment.pricePaid === 'number'
@@ -399,6 +407,9 @@ export default function EventStatistics({
                               </td>
                               <td className="px-4 py-3">
                                 {payment.eventTicket?.capacityPerTicket ?? 1}
+                              </td>
+                              <td className="px-4 py-3">
+                                {payment.method}
                               </td>
                             </tr>
                           )

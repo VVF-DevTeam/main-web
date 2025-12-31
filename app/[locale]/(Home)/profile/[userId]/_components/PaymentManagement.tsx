@@ -38,7 +38,7 @@ export default async function PaymentManagement({
     page,
     pageSize
   )
-
+  console.log(payments)
   if (!payments) {
     return <div>Error loading payments</div>
   }
@@ -154,14 +154,15 @@ export default async function PaymentManagement({
                             payment.eventTicket?.stripeProductId ||
                             payment.stripePaymentId
                           }
+                          method={payment.method}
                           amount={Number(payment.pricePaid)}
                           disabled={
                             status === 'Expired' ||
                             status === 'Past' ||
                             status === 'Refunded' ||
-                            payment.stripePaymentId === 'etf' ||
-                            payment.stripePaymentId === 'cash' ||
-                            payment.stripePaymentId === 'bank-transfer'
+                            payment.method === 'ETF' ||
+                            payment.method === 'Cash' ||
+                            payment.method === 'BankTransfer'
                           }
                         />
                       </td>

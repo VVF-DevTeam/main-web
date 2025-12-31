@@ -463,9 +463,9 @@ const AddClientModal = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="etf">E-transfer</SelectItem>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="bank-transfer">
+                          <SelectItem value="ETF">E-transfer</SelectItem>
+                          <SelectItem value="Cash">Cash</SelectItem>
+                          <SelectItem value="BankTransfer">
                             Bank Transfer
                           </SelectItem>
                         </SelectContent>

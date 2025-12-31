@@ -1,4 +1,4 @@
-import { PaymentType } from "@prisma/client"
+import { PaymentMethod, PaymentType } from "@prisma/client"
 import { Decimal } from "@prisma/client/runtime/library"
 
 export type PaymentWithRelations = {
@@ -9,7 +9,8 @@ export type PaymentWithRelations = {
   expiresAt: Date | null
   quantity: number
   refunded: boolean
-  stripePaymentId: string
+  method: PaymentMethod
+  stripePaymentId: string | null
   seatNumber: string | null
   guestName: string | null
   guestEmail: string | null

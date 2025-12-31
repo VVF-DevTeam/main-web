@@ -30,6 +30,7 @@ async function fetchPaymentsData(
           type: true,
           expiresAt: true,
           quantity: true,
+          method: true,
           refunded: true,
           stripePaymentId: true,
           seatNumber: true,
@@ -97,6 +98,7 @@ async function fetchPaymentsData(
           type: true,
           expiresAt: true,
           quantity: true,
+          method: true,
           refunded: true,
           stripePaymentId: true,
           user: {
