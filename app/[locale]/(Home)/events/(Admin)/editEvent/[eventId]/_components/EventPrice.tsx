@@ -139,6 +139,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
   // Form for EventTicket
   const ticketForm = useForm<EventTicketFormData>({
     resolver: zodResolver(createEventTicketSchema(event.capacity)),
+    mode: 'all',
     defaultValues: {
       type: '',
       price: 0,
@@ -203,6 +204,8 @@ const EventPrice = ({ event }: EventPriceProps) => {
       subscribedStripePriceId: ticket.subscribedStripePriceId ?? undefined,
       payTotalNumber: ticket.payTotalNumber ?? null,
       imageUrl: ticket.imageUrl ?? null,
+    }, {
+      keepDefaultValues: false,
     })
     setIsFullEvent(hasNumberOfSessions)
     setEditingTicketId(ticket.id)
@@ -900,10 +903,14 @@ const EventPrice = ({ event }: EventPriceProps) => {
                       setIsFullEvent(checked === true)
                       if (checked) {
                         // When checked, set to minimum of 2 sessions
-                        ticketForm.setValue('payTotalNumber', 2)
+                        ticketForm.setValue('payTotalNumber', 2, { 
+                          shouldValidate: true 
+                        })
                       } else {
                         // When unchecked, set to null (single session)
-                        ticketForm.setValue('payTotalNumber', null)
+                        ticketForm.setValue('payTotalNumber', null, { 
+                          shouldValidate: true 
+                        })
                       }
                     }}
                   />
