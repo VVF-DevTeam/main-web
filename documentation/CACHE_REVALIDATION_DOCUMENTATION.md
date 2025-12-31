@@ -92,25 +92,32 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all event sponsors with their associated events, ordered by name. Sponsors are relatively static reference data, perfect for caching.
 
+#### 12. `getEventTickets`
+- **File**: `lib/actions/ticket/getEventTickets.ts`
+- **Cache Key**: `['event-tickets-by-event']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all tickets for a specific event with id, type, and price, ordered by price ascending. Used in AddPaymentButton component to populate ticket selection dropdown. Tagged with 'events' since tickets are part of event data and should be revalidated when events or tickets change.
+
 ---
 
 ### Reviews
 
-#### 5. `getCachedReviewsPaginated`
+#### 13. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 6. `getCachedPublishedEventsForReviews`
+#### 14. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 7. `getCachedPublishedSeriesForReviews`
+#### 15. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -121,7 +128,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 8. `getCachedPostsPaginated`
+#### 16. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
@@ -132,7 +139,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Social Media Posts
 
-#### 9. `getCachedSocialMediaPostsPaginated`
+#### 17. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
@@ -143,14 +150,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Users
 
-#### 10. `getUsersSimple` (via `getCachedUsersSimple`)
+#### 18. `getUsersSimple` (via `getCachedUsersSimple`)
 - **File**: `lib/actions/user/getAllUsersSimple.ts`
 - **Cache Key**: `['users-simple']`
 - **Tags**: `['users']`
 - **Revalidate Time**: 3600 seconds (1 hour)
 - **Description**: Returns list of users with optional count limit and name search
 
-#### 11. `getUsersWithRole` (via `getCachedUsersWithRole`)
+#### 19. `getUsersWithRole` (via `getCachedUsersWithRole`)
 - **File**: `lib/actions/user/getUsersWithRole.ts`
 - **Cache Key**: `['users-with-role']`
 - **Tags**: `['users']`
@@ -161,14 +168,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Payments
 
-#### 12. `getPaginatedPayments`
+#### 20. `getPaginatedPayments`
 - **File**: `lib/actions/payment/getPaginatedPayments.ts`
 - **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
-#### 13. `getEventPayments`
+#### 21. `getEventPayments`
 - **File**: `app/[locale]/(Home)/profile/[userId]/_components/getEventPayments.ts`
 - **Cache Key**: `['event-payments-${eventId}']` (per event)
 - **Tags**: `['payments']`
@@ -190,6 +197,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getEventPagination` (via `getCachedEventPagination`)
 - `getEventByKeyName`
 - `getAllEvents`
+- `getEventTickets` (via `getCachedEventTickets`)
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -446,7 +454,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 9 functions | 13 API routes | ✅ Fully covered |
+| `events` | 10 functions | 13 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 1 function | 5 API routes | ✅ Fully covered |
 | `series` | 2 functions | 2 API routes | ✅ Fully covered |
@@ -454,7 +462,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
-| `payments` | 1 function | 3 mutation points | ✅ Fully covered |
+| `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
 
 ---
 
@@ -486,32 +494,4 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - Social media posts cache automatically refreshes every 10 minutes
-
-## Recent Updates
-
-### 2024 - Event Caching Improvements
-
-1. **Added `getEventByKeyName` cached function**
-   - Caches event queries by keyName with full relations
-   - Used for event detail pages and metadata generation
-   - Ensures query only runs once per request even when called from both `generateMetadata` and page component
-
-2. **Added `getAllEvents` cached function**
-   - Caches all events (published and unpublished) for admin use
-   - Previously uncached due to need for fresh data
-   - Now safe to cache because all event mutations properly invalidate the cache
-
-3. **Extended revalidation coverage**
-   - Added `revalidateTag('events')` to tickets API (create, update, delete)
-   - Added `revalidateTag('events')` to schedule item APIs (add, edit, delete)
-   - Ensures cached event data (which includes tickets and schedules) stays fresh when these related entities change
-
-### Why Related Entities Need Revalidation
-
-Event queries often include related data:
-- **Tickets**: Included in `getAllPublishedEventsWithRelations`, `getPublishedEventsWithFilters`, and `getEventByKeyName`
-- **Schedules**: Included in `getEventByKeyName` and `getEventById`
-- **Categories, Hosts, Series**: Included in various cached event queries
-
-When any of these related entities change, the cached event data becomes stale. Therefore, all mutation APIs for these entities must call `revalidateTag('events')` to ensure users see updated data immediately.
 

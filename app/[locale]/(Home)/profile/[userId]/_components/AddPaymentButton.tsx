@@ -31,16 +31,18 @@ import { getUsersSimple } from '@/lib/actions/user/getAllUsersSimple'
 import { UserInfoProps, UserInfoSimpleProps } from '@/lib/types/userInfo'
 import { Input } from '@/components/ui/input'
 import { addPayment } from '@/lib/actions/payment/addPayment'
+import { getEventTickets, EventTicket } from '@/lib/actions/ticket/getEventTickets'
 import { useRouter } from 'next/navigation'
 
 const addPaymentSchema = z
   .object({
-    eventId: z.string().min(1, 'This field is required'),
+    eventId: z.string().optional(),
+    eventTicketId: z.string().optional(),
     userId: z.string().optional(),
     guestName: z.string().optional(),
     guestEmail: z.string().email('Invalid email').optional().or(z.literal('')),
     guestPhone: z.string().optional(),
-    pricePaid: z.number().min(1, 'Price must be greater than 0'),
+    pricePaid: z.number().optional(),
     quantity: z.number().min(1, 'Quantity must be greater than 0'),
     paymentMethod: z.string().min(1, 'Payment method is required'),
     paymentType: z.string().min(1, 'Payment type is required'),
@@ -50,13 +52,14 @@ const addPaymentSchema = z
   })
   .refine(
     (data) => {
-      if (data.paymentType === 'Membership') {
-        return data.eventId === 'none'
+      // eventId is required for non-Membership payments
+      if (data.paymentType !== 'Membership') {
+        return data.eventId && data.eventId.trim() !== ''
       }
       return true
     },
     {
-      message: 'Event must be "None" for Membership payments',
+      message: 'Event is required for non-Membership payments',
       path: ['eventId'],
     }
   )
@@ -71,16 +74,27 @@ const addPaymentSchema = z
   })
   .refine(
     (data) => {
-      // Either userId must be provided OR all guest fields must be provided
+      // Either userId must be provided OR guest name and email must be provided (phone is optional)
       const hasUserId = data.userId && data.userId.trim() !== '' && data.userId !== 'none-user'
       const hasGuestInfo = data.guestName && data.guestName.trim() !== '' && 
-                          data.guestEmail && data.guestEmail.trim() !== '' &&
-                          data.guestPhone && data.guestPhone.trim() !== ''
+                          data.guestEmail && data.guestEmail.trim() !== ''
       return hasUserId || hasGuestInfo
     },
     {
-      message: 'Either select an existing user to link with or provide all guest information (name, email, phone)',
+      message: 'Either select an existing user to link with or provide guest information (name and email required)',
       path: ['userId'],
+    }
+  )
+  .refine(
+    (data) => {
+      // Either eventTicketId OR pricePaid must be provided
+      const hasTicket = data.eventTicketId && data.eventTicketId.trim() !== ''
+      const hasPrice = data.pricePaid && data.pricePaid > 0
+      return hasTicket || hasPrice
+    },
+    {
+      message: 'Either select an event ticket or enter a price manually',
+      path: ['pricePaid'],
     }
   )
 
@@ -101,6 +115,8 @@ const AddClientModal = ({
   setSearchTerm,
   setShowAddClientModal,
   onSubmit,
+  eventTickets,
+  setEventTickets,
 }: {
   form: UseFormReturn<AddPaymentFormValues>
   events: Event[]
@@ -111,6 +127,8 @@ const AddClientModal = ({
   setSearchTerm: (searchTerm: string) => void
   setShowAddClientModal: (show: boolean) => void
   onSubmit: (data: AddPaymentFormValues) => void
+  eventTickets: EventTicket[]
+  setEventTickets: (tickets: EventTicket[]) => void
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
@@ -134,12 +152,24 @@ const AddClientModal = ({
         {/* Modal Header */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold">Add Payment Record</h2>
-          <button
-            onClick={() => setShowAddClientModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                form.reset()
+                setEventTickets([])
+              }}
+              className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              Clear Form
+            </button>
+            <button
+              onClick={() => setShowAddClientModal(false)}
+              className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Form for adding a client */}
@@ -155,17 +185,37 @@ const AddClientModal = ({
                 name="eventId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Event</FormLabel>
+                    <FormLabel>
+                      Event{form.watch('paymentType') === 'Membership' ? ' (Optional)' : ''}
+                    </FormLabel>
                     <FormControl>
                       <Select
                         value={field.value}
-                        onValueChange={(value) => {
+                        onValueChange={async (value) => {
                           field.onChange(value)
+                          // Fetch tickets for the selected event
+                          if (value && value !== 'none') {
+                            try {
+                              const tickets = await getEventTickets(value)
+                              setEventTickets(tickets)
+                            } catch (error) {
+                              console.error('Error fetching event tickets in AddPaymentButton:', error)
+                              setEventTickets([])
+                            }
+                          } else {
+                            setEventTickets([])
+                          }
+                          // Clear ticket selection when event changes
+                          form.setValue('eventTicketId', '')
                         }}
                       >
                         <FormControl>
                           <SelectTrigger className="border">
-                            <SelectValue placeholder='Select an event' />
+                            <SelectValue placeholder={
+                              form.watch('paymentType') === 'Membership' 
+                                ? 'Select an event (optional)'
+                                : 'Select an event'
+                            } />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -177,6 +227,71 @@ const AddClientModal = ({
                           ))}
                         </SelectContent>
                       </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Event Ticket (Optional) */}
+              <FormField
+                control={form.control}
+                name="eventTicketId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Ticket (Optional)</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          // Clear price when ticket is selected
+                          if (value) {
+                            form.setValue('pricePaid', 0)
+                          }
+                        }}
+                        disabled={!form.watch('eventId') || form.watch('eventId') === 'none' || eventTickets.length === 0}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="border">
+                            <SelectValue placeholder={
+                              !form.watch('eventId') || form.watch('eventId') === 'none'
+                                ? 'Select an event to see event ticket'
+                                : eventTickets.length === 0 
+                                ? 'No tickets available' 
+                                : 'Select a ticket (or enter price manually)'
+                            } />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {eventTickets.map((ticket: EventTicket) => (
+                            <SelectItem key={ticket.id} value={ticket.id}>
+                              {ticket.type} - ${Number(ticket.price).toFixed(2)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Price Paid */}
+              <FormField
+                control={form.control}
+                name="pricePaid"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price Paid (CAD)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        disabled={!!form.watch('eventTicketId')}
+                        placeholder={form.watch('eventTicketId') ? 'Calculated from ticket' : 'Enter price manually'}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -302,25 +417,6 @@ const AddClientModal = ({
                         type="tel"
                         placeholder="Enter guest phone"
                         disabled={!!form.watch('userId') && form.watch('userId') !== 'none-user'}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Price Paid */}
-              <FormField
-                control={form.control}
-                name="pricePaid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price Paid (CAD)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        value={field.value}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -462,6 +558,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
   const [users, setUsers] = useState<UserInfoSimpleProps[]>([])
   const [filteredUsers, setFilteredUsers] = useState<UserInfoSimpleProps[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [eventTickets, setEventTickets] = useState<EventTicket[]>([])
   const router = useRouter()
   // get events according to user role
   useEffect(() => {
@@ -496,6 +593,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
     resolver: zodResolver(addPaymentSchema),
     defaultValues: {
       eventId: '',
+      eventTicketId: '',
       userId: '',
       guestName: '',
       guestEmail: '',
@@ -510,10 +608,35 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
 
   // onSubmit
   const onSubmit = async (data: AddPaymentFormValues) => {
-    // Convert 'none-user' to undefined for the backend
+    let pricePaid = 0
+    
+    // If eventTicketId is provided, calculate price from ticket
+    if (data.eventTicketId && data.eventTicketId.trim() !== '') {
+      const selectedTicket = eventTickets.find(ticket => ticket.id === data.eventTicketId)
+      
+      if (!selectedTicket) {
+        toast.error('Error', {
+          description: 'Please select a valid event ticket',
+          style: {
+            color: '#ef4444', // red-500 color
+          },
+        })
+        return
+      }
+      
+      pricePaid = selectedTicket.price * data.quantity
+    } else {
+      // Otherwise, use the manual pricePaid input
+      pricePaid = data.pricePaid || 0
+    }
+    
+    // Convert 'none-user' and 'none' eventId to undefined for the backend
     const submitData = {
       ...data,
+      pricePaid,
+      eventId: data.eventId === 'none' || !data.eventId ? undefined : data.eventId,
       userId: data.userId === 'none-user' ? undefined : data.userId,
+      eventTicketId: data.eventTicketId || undefined,
     }
     
     const { success, message } = await addPayment(submitData)
@@ -553,6 +676,8 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
           setSearchTerm={setSearchTerm}
           setShowAddClientModal={setShowAddClientModal}
           onSubmit={onSubmit}
+          eventTickets={eventTickets}
+          setEventTickets={setEventTickets}
         />
       )}
     </>
