@@ -402,7 +402,6 @@ export default function EventSingleCheckOut({
                           email={email}
                           seatNumber={seatNumber}
                           eventTicketId={ticket.id}
-                          capacityPerTicket={ticket.capacityPerTicket}
                         />
                       )}
                     </div>

@@ -31,11 +31,10 @@ interface NormalCheckoutButtonProps {
   eventId?: string
   buttonText: string
   type: PaymentType
-  numberSession: number
+  numberSession?: number | null
   email: string
   seatNumber?: string
   eventTicketId?: string
-  capacityPerTicket: number
 }
 
 export default function NormalCheckoutButton({
@@ -50,7 +49,6 @@ export default function NormalCheckoutButton({
   email,
   seatNumber,
   eventTicketId,
-  capacityPerTicket,
 }: NormalCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
