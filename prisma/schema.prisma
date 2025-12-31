@@ -120,7 +120,7 @@ model EventTicket {
   price     Decimal
   currency  String     @default("CAD")
   discountMemberPercent Int?
-  payTotalNumber Int? // if this field exists, the price is paid in total: price x payTotalNumber
+  payTotalNumber Int  @default(1) // this field represents the number of session this ticket has
 
   // Capacity just for this tier
   capacityPerTicket Int @default(1)

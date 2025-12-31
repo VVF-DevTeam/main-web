@@ -89,7 +89,7 @@ export const POST = async (request: Request) => {
         payTotalNumber:
           payTotalNumber !== undefined && payTotalNumber !== null
             ? Math.round(Number(payTotalNumber))
-            : null,
+            : 1,
         imageUrl: imageUrl || null,
       },
     })
@@ -189,12 +189,10 @@ export const PUT = async (request: Request) => {
           payTotalNumber !== undefined
             ? payTotalNumber !== null
               ? Math.round(Number(payTotalNumber))
-              : null
+              : 1
             : existing.payTotalNumber,
         imageUrl:
-          imageUrl !== undefined
-            ? (imageUrl ?? null)
-            : existing.imageUrl,
+          imageUrl !== undefined ? (imageUrl ?? null) : existing.imageUrl,
         validFrom: validFrom
           ? new Date(validFrom)
           : validFrom === null

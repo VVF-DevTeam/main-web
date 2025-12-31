@@ -46,8 +46,8 @@ const EventLocation = ({ event }: EventLocationProps) => {
       toast.success('Success', {
         description: 'Event location updated successfully',
         style: {
-          color: '#22c55e' // green-500 color
-        }
+          color: '#22c55e', // green-500 color
+        },
       })
       router.refresh()
     } catch (error) {
@@ -55,8 +55,8 @@ const EventLocation = ({ event }: EventLocationProps) => {
       toast.error('Error', {
         description: 'Something went wrong',
         style: {
-          color: '#ef4444' // red-500 color
-        }
+          color: '#ef4444', // red-500 color
+        },
       })
     }
   }

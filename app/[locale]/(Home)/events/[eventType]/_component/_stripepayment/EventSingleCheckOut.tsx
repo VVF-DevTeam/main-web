@@ -25,12 +25,15 @@ interface EventSingleCheckOutProps {
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
   const basePrice = Number(ticket.price) || 0
+  const capacity = ticket.capacityPerTicket || 1
 
+  // If payTotalNumber exists, this is a full course/event ticket
   if (ticket.payTotalNumber && ticket.payTotalNumber > 0) {
-    return basePrice * ticket.payTotalNumber
+    return basePrice * capacity * ticket.payTotalNumber
   }
 
-  return basePrice
+  // Otherwise, it's a single-session/drop-in ticket
+  return basePrice * capacity
 }
 
 const calculateMemberPrice = (
@@ -335,8 +338,8 @@ export default function EventSingleCheckOut({
                     ) : (
                       // NO SEAT: Show session pricing (for Class events without assigned seats)
                       <>
-                        {ticket.payTotalNumber && ticket.payTotalNumber > 0 ? (
-                          // Full course: Show total sessions and per-session price
+                        {ticket.payTotalNumber && ticket.payTotalNumber > 1 ? (
+                          // Full course: Show total sessions and per-session price (only if > 1 session)
                           <span className="text-xs text-gray-500 drop-shadow-sm">
                             {t('total')} {ticket.payTotalNumber} {t('sessions')}{' '}
                             - ${perSessionPrice.toFixed(2)} {t('each')}
@@ -399,6 +402,7 @@ export default function EventSingleCheckOut({
                           email={email}
                           seatNumber={seatNumber}
                           eventTicketId={ticket.id}
+                          capacityPerTicket={ticket.capacityPerTicket}
                         />
                       )}
                     </div>
