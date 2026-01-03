@@ -45,7 +45,7 @@ const EventType = ({ event }: EventTypeProps) => {
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventTypeSchema>) => {
-    console.log(values)
+
     try {
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)

@@ -21,10 +21,12 @@ async function fetchEventPaymentsData(eventId: string) {
         stripePaymentId: true,
         guestName: true,
         guestEmail: true,
+        guestPhone: true,
         user: {
           select: {
             name: true,
             email: true,
+            phone: true,
           },
         },
         event: {
@@ -72,7 +74,7 @@ async function fetchEventPaymentsData(eventId: string) {
 export async function getEventPayments(eventId: string) {
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
-    [`event-payments-v4-${eventId}`], // Cache key per event (v4 after adding method field)
+    [`event-payments-v5-${eventId}`], // Cache key per event (v5 after adding phone field)
     {
       revalidate: 86400, // Cache for 1 day (revalidateTag handles on-demand invalidation)
       tags: ['payments'], // Tag for revalidation - automatically invalidated when payments change

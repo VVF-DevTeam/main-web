@@ -117,6 +117,7 @@ const AddClientModal = ({
   onSubmit,
   eventTickets,
   setEventTickets,
+  preSelectedEventId,
 }: {
   form: UseFormReturn<AddPaymentFormValues>
   events: Event[]
@@ -129,6 +130,7 @@ const AddClientModal = ({
   onSubmit: (data: AddPaymentFormValues) => void
   eventTickets: EventTicket[]
   setEventTickets: (tickets: EventTicket[]) => void
+  preSelectedEventId?: string
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('profile')
@@ -187,6 +189,7 @@ const AddClientModal = ({
                   <FormItem>
                     <FormLabel>
                       Event{form.watch('paymentType') === 'Membership' ? ' (Optional)' : ''}
+                      {preSelectedEventId && ' (Fixed)'}
                     </FormLabel>
                     <FormControl>
                       <Select
@@ -208,6 +211,7 @@ const AddClientModal = ({
                           // Clear ticket selection when event changes
                           form.setValue('eventTicketId', '')
                         }}
+                        disabled={!!preSelectedEventId}
                       >
                         <FormControl>
                           <SelectTrigger className="border">
@@ -552,7 +556,12 @@ const AddClientModal = ({
 
 type AddPaymentFormValues = z.infer<typeof addPaymentSchema>
 
-const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
+interface AddPaymentButtonProps {
+  user: UserInfoProps
+  preSelectedEventId?: string // Optional: pre-select an event and disable event selection
+}
+
+const AddPaymentButton = ({ user, preSelectedEventId }: AddPaymentButtonProps) => {
   const [showAddClientModal, setShowAddClientModal] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [users, setUsers] = useState<UserInfoSimpleProps[]>([])
@@ -592,7 +601,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
   const form = useForm<AddPaymentFormValues>({
     resolver: zodResolver(addPaymentSchema),
     defaultValues: {
-      eventId: '',
+      eventId: preSelectedEventId || '',
       eventTicketId: '',
       userId: '',
       guestName: '',
@@ -605,6 +614,22 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
       membershipEndDate: new Date(),
     },
   })
+
+  // Load tickets for pre-selected event
+  useEffect(() => {
+    if (preSelectedEventId) {
+      const loadTickets = async () => {
+        try {
+          const tickets = await getEventTickets(preSelectedEventId)
+          setEventTickets(tickets)
+        } catch (error) {
+          console.error('Error fetching event tickets for pre-selected event:', error)
+          setEventTickets([])
+        }
+      }
+      loadTickets()
+    }
+  }, [preSelectedEventId])
 
   // onSubmit
   const onSubmit = async (data: AddPaymentFormValues) => {
@@ -678,6 +703,7 @@ const AddPaymentButton = ({ user }: { user: UserInfoProps }) => {
           onSubmit={onSubmit}
           eventTickets={eventTickets}
           setEventTickets={setEventTickets}
+          preSelectedEventId={preSelectedEventId}
         />
       )}
     </>

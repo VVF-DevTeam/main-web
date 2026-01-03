@@ -38,7 +38,7 @@ export default async function PaymentManagement({
     page,
     pageSize
   )
-  console.log(payments)
+
   if (!payments) {
     return <div>Error loading payments</div>
   }

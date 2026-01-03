@@ -20,13 +20,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { getEventPayments } from './getEventPayments'
 import { PaymentMethod, PaymentType } from '@prisma/client'
+import AddPaymentButton from './AddPaymentButton'
+import { UserInfoProps } from '@/lib/types/userInfo'
 
 interface EventStatisticsProps {
-  user: {
-    id: string
-    role: string[]
-    email: string
-  }
+  user: UserInfoProps
   locale: string
 }
 
@@ -45,9 +43,11 @@ interface Payment {
   stripePaymentId: string | null
   guestName: string | null
   guestEmail: string | null
+  guestPhone: string | null
   user: {
     name: string | null
     email: string
+    phone: string | null
   } | null
   event: {
     title: string
@@ -315,6 +315,10 @@ export default function EventStatistics({
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
+                  <AddPaymentButton 
+                    user={user} 
+                    preSelectedEventId={selectedEventId}
+                  />
                   <Button
                     onClick={handleSendEmail}
                     className="w-full"
@@ -359,12 +363,13 @@ export default function EventStatistics({
                       <thead>
                         <tr className="bg-gray-100">
                           <th className="px-4 py-3 text-left">Ticket Name</th>
-                          <th className="max-w-[150px] break-words px-4 py-3 text-left">
+                          <th className="max-w-[110px] break-words px-4 py-3 text-left">
                             Email
                           </th>
-                          <th className="px-4 py-3 text-left">Customer</th>
+                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Phone Number</th>
+                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Customer</th>
                           <th className="px-4 py-3 text-left">Amount</th>
-                          <th className="px-4 py-3 text-left">Quantity/Seat</th>
+                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Quantity/Seat</th>
                           <th className="px-4 py-3 text-left">Capacity</th>
                           <th className="px-4 py-3 text-left">Payment Method</th>
                         </tr>
@@ -376,6 +381,8 @@ export default function EventStatistics({
                             (payment.guestEmail || payment.guestName)
                           const displayEmail =
                             payment.user?.email || payment.guestEmail || '-'
+                          const displayPhone =
+                            payment.user?.phone || payment.guestPhone || '-'
                           const displayName =
                             payment.user?.name || payment.guestName || '-'
                           const paymentType = payment.eventTicket?.type || '-'
@@ -391,10 +398,11 @@ export default function EventStatistics({
                               <td className="px-4 py-3">
                                 {displayPaymentType}
                               </td>
-                              <td className="max-w-[150px] whitespace-normal break-words px-4 py-3">
+                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
                                 {displayEmail}
                               </td>
-                              <td className="px-4 py-3">{displayName}</td>
+                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayPhone}</td>
+                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayName}</td>
                               <td className="px-4 py-3">
                                 $
                                 {(typeof payment.pricePaid === 'number'
