@@ -185,7 +185,7 @@ const ConcertDescriptions = async ({
 
           {/* Info Section */}
           <div className="md:pl-[clamp(20px,4vw,100px)]">
-            <h1 className="mb-2 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
+            <h1 className="mb-5 text-xl font-bold md:hidden md:text-3xl lg:text-4xl">
               {t('headerInfo')}
             </h1>
             <div className="sticky top-[120px] z-[5] -mt-5 flex flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)] px-[15px] py-5 md:px-[20px]">
