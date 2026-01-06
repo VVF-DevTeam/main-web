@@ -26,6 +26,7 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import SponsorsList from '../../../_components/SponsorsList'
+import ServerError from '@/components/error/ServerError'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
@@ -114,6 +115,10 @@ const ConcertDescriptions = async ({
 
   // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
   const totalSoldCapacity = await checkCurrentSoldCapacityById(event.id)
+  if (totalSoldCapacity === -1) {
+    return <ServerError showHomeButton={true} />
+  }
+
   const isCapacityExceeded = event.capacity !== null && totalSoldCapacity >= event.capacity
 
   return (

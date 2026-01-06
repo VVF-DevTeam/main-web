@@ -29,9 +29,10 @@ export const GET = async (request: NextRequest) => {
         pageNum,
         pageSize,
       })
+
       event = events.map((item) => ({
         ...item,
-        remainingTicket: (item.capacity || 0), // TODO: calculate total ticket sold
+        remainingTicket: item.capacity || 0
       }))
       totalEvent = total
     } else {

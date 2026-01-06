@@ -10,6 +10,7 @@ import ClassScheduleItem from './ClassScheduleItem'
 import TextPreview from '@/app/[locale]/components/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import SponsorsList from '../../../_components/SponsorsList'
+import ServerError from '@/components/error/ServerError'
 
 // Interfaces & Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
@@ -96,6 +97,11 @@ const ClassDescription = async ({
 
   // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
   const totalSoldCapacity = await checkCurrentSoldCapacityById(classId)
+
+  if (totalSoldCapacity === -1) {
+    return <ServerError showHomeButton={true} />
+  }
+  
   const isCapacityExceeded = capacity !== null && totalSoldCapacity >= capacity
 
   return (

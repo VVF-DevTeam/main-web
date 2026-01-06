@@ -17,45 +17,50 @@ export const getCachedEventPagination = unstable_cache(
     pageSize: number
   }) => {
     const { prisma } = await import('@/lib/db')
-    return Promise.all([
-      prisma.event.findMany({
-        select: {
-          id: true,
-          title: true,
-          location: true,
-          price: true,
-          startDate: true,
-          startTime: true,
-          imgUrl: true,
-          isPublished: true,
-          eventType: true,
-          capacity: true,
-          days: true,
-          endDate: true,
-        },
-        where: {
-          title: {
-            contains: searchTitle,
-            mode: 'insensitive',
+    try {
+      return Promise.all([
+        prisma.event.findMany({
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            price: true,
+            startDate: true,
+            startTime: true,
+            imgUrl: true,
+            isPublished: true,
+            eventType: true,
+            capacity: true,
+            days: true,
+            endDate: true,
           },
-          isPublished: isPublished,
-        },
-        orderBy: {
-          updatedAt: 'desc',
-        },
-        skip: pageNum * pageSize,
-        take: pageSize,
-      }),
-      prisma.event.count({
-        where: {
-          title: {
-            contains: searchTitle,
-            mode: 'insensitive',
+          where: {
+            title: {
+              contains: searchTitle,
+              mode: 'insensitive',
+            },
+            isPublished: isPublished,
           },
-          isPublished: isPublished,
-        },
-      }),
-    ])
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          skip: pageNum * pageSize,
+          take: pageSize,
+        }),
+        prisma.event.count({
+          where: {
+            title: {
+              contains: searchTitle,
+              mode: 'insensitive',
+            },
+            isPublished: isPublished,
+          },
+        }),
+      ])
+    } catch (error) {
+      console.error('Error getting event pagination:', error)
+      return [[], 0] as const
+    }
   },
   ['events-pagination'], // Cache key prefix
   {
@@ -78,17 +83,22 @@ export const getEventPagination = async ({
   pageNum: number
   pageSize: number
 }) => {
-  const [events, total] = await getCachedEventPagination({
-    searchTitle,
-    isPublished,
-    pageNum,
-    pageSize,
-  })
+  try {
+    const [events, total] = await getCachedEventPagination({
+      searchTitle,
+      isPublished,
+      pageNum,
+      pageSize,
+    })
 
-  // Apply time filter after cache retrieval
-  const filteredEvents = events.filter(
-    (event) => new Date(event.endDate) >= requestTime
-  )
+    // Apply time filter after cache retrieval
+    const filteredEvents = events.filter(
+      (event) => new Date(event.endDate) >= requestTime
+    )
 
-  return [filteredEvents, total] as const
+    return [filteredEvents, total] as const
+  } catch (error) {
+    console.error('Error in getEventPagination wrapper:', error)
+    return [[], 0] as const
+  }
 }
