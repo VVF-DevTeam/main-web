@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 
-// Main Component
-export const columns: ColumnDef<Job>[] = [
+// Function to create columns with locale and userId for profile page
+export const createJobColumns = (
+  locale: string,
+  userId: string
+): ColumnDef<Job>[] => [
   {
     accessorKey: 'title',
     header: () => <div className="text-center font-semibold">Title</div>,
@@ -110,13 +113,10 @@ export const columns: ColumnDef<Job>[] = [
       const keyName = row.original.keyName
       return (
         <Link
-          href={`/registration/jobs/editJob/${keyName}`}
+          href={`/${locale}/profile/${userId}?section=admin-edit-job&jobId=${keyName}`}
           className="flex-center"
         >
-          <Button
-            variant={'default'}
-            size={'sm'}
-          >
+          <Button variant={'default'} size={'sm'}>
             Edit
           </Button>
         </Link>
@@ -124,3 +124,4 @@ export const columns: ColumnDef<Job>[] = [
     },
   },
 ]
+

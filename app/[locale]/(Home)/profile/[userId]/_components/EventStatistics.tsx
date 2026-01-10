@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { FiCopy, FiMail, FiEdit } from 'react-icons/fi'
+import { FiCopy, FiMail, FiEdit, FiChevronUp, FiChevronDown } from 'react-icons/fi'
+import { ArrowUpDown } from 'lucide-react'
 import {
   getAllPublishedEvents,
   getEventsOfHost,
@@ -74,6 +75,10 @@ export default function EventStatistics({
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(false)
+  const [sortConfig, setSortConfig] = useState<{
+    column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod' | null
+    order: 'asc' | 'desc' | null
+  }>({ column: null, order: null })
 
   // Initialize from URL params if present
   useEffect(() => {
@@ -154,8 +159,8 @@ export default function EventStatistics({
   const participantEmails = Array.from(
     new Set(
       payments
-        .map((p) => p.user?.email || p.guestEmail)
-        .filter((email): email is string => !!email)
+        .map((p) => (p.user?.email || p.guestEmail)?.trim())
+        .filter((email): email is string => !!email && email.length > 0)
     )
   )
 
@@ -199,6 +204,59 @@ export default function EventStatistics({
       `/${locale}/profile/${user.id}?section=admin-edit-event&eventId=${selectedEventKeyName}`
     )
   }
+
+  const handleSort = (column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod') => {
+    if (sortConfig.column === column) {
+      // Toggle through: asc -> desc -> null
+      if (sortConfig.order === 'asc') {
+        setSortConfig({ column, order: 'desc' })
+      } else if (sortConfig.order === 'desc') {
+        setSortConfig({ column: null, order: null })
+      } else {
+        setSortConfig({ column, order: 'asc' })
+      }
+    } else {
+      // New column, start with asc
+      setSortConfig({ column, order: 'asc' })
+    }
+  }
+
+  // Sort payments based on the selected column
+  const sortedPayments = [...payments].sort((a, b) => {
+    if (sortConfig.column === null || sortConfig.order === null) return 0
+    
+    let valueA = ''
+    let valueB = ''
+    
+    switch (sortConfig.column) {
+      case 'ticketName':
+        valueA = a.eventTicket?.type || ''
+        valueB = b.eventTicket?.type || ''
+        break
+      case 'email':
+        valueA = a.user?.email || a.guestEmail || ''
+        valueB = b.user?.email || b.guestEmail || ''
+        break
+      case 'phone':
+        valueA = a.user?.phone || a.guestPhone || ''
+        valueB = b.user?.phone || b.guestPhone || ''
+        break
+      case 'customer':
+        valueA = a.user?.name || a.guestName || ''
+        valueB = b.user?.name || b.guestName || ''
+        break
+      case 'paymentMethod':
+        valueA = a.method || ''
+        valueB = b.method || ''
+        break
+    }
+    
+    if (sortConfig.order === 'asc') {
+      return valueA.localeCompare(valueB)
+    } else {
+      return valueB.localeCompare(valueA)
+    }
+  })
 
   return (
     <div className="min-h-screen p-4">
@@ -362,20 +420,68 @@ export default function EventStatistics({
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="bg-gray-100">
-                          <th className="px-4 py-3 text-left">Ticket Name</th>
-                          <th className="max-w-[110px] break-words px-4 py-3 text-left">
-                            Email
+                          <th 
+                            className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                            onClick={() => handleSort('ticketName')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Ticket Name
+                              {sortConfig.column !== 'ticketName' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                              {sortConfig.column === 'ticketName' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                              {sortConfig.column === 'ticketName' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                            </div>
                           </th>
-                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Phone Number</th>
-                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Customer</th>
+                          <th 
+                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                            onClick={() => handleSort('email')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Email
+                              {sortConfig.column !== 'email' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                              {sortConfig.column === 'email' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                              {sortConfig.column === 'email' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                            </div>
+                          </th>
+                          <th 
+                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                            onClick={() => handleSort('phone')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Phone Number
+                              {sortConfig.column !== 'phone' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                              {sortConfig.column === 'phone' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                              {sortConfig.column === 'phone' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                            </div>
+                          </th>
+                          <th 
+                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                            onClick={() => handleSort('customer')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Customer
+                              {sortConfig.column !== 'customer' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                              {sortConfig.column === 'customer' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                              {sortConfig.column === 'customer' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                            </div>
+                          </th>
                           <th className="px-4 py-3 text-left">Amount</th>
                           <th className="max-w-[110px] break-words px-4 py-3 text-left">Quantity/Seat</th>
                           <th className="px-4 py-3 text-left">Capacity</th>
-                          <th className="px-4 py-3 text-left">Payment Method</th>
+                          <th 
+                            className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                            onClick={() => handleSort('paymentMethod')}
+                          >
+                            <div className="flex items-center gap-2">
+                              Payment Method
+                              {sortConfig.column !== 'paymentMethod' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                              {sortConfig.column === 'paymentMethod' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                              {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                            </div>
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {payments.map((payment) => {
+                        {sortedPayments.map((payment) => {
                           const isGuestCheckout =
                             !payment.user &&
                             (payment.guestEmail || payment.guestName)

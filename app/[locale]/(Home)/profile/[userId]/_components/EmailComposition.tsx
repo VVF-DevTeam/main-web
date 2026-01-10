@@ -170,7 +170,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
     if (searchTerm === '') {
       setFilteredEvents(events)
     } else {
-      const filtered = await getPublishedEventsForReviewsWithSearch(searchTerm, 15)
+      const filtered = events.filter((event) => event.title.toLowerCase().includes(searchTerm.toLowerCase()))
       setFilteredEvents(filtered)
     }
   }
@@ -272,7 +272,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                         <Input
                           type="search"
                           autoComplete="off"
-                          placeholder="Search for event (if not shown in list)"
+                          placeholder="Search for event (if not shown in list). Press Enter to search."
                           value={eventSearchTerm}
                           onChange={(e) => {
                             setEventSearchTerm(e.target.value)

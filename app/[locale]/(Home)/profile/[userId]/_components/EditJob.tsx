@@ -1,57 +1,56 @@
 // Libraries
-import { roleCheck } from '@/lib/actions/user/roleCheck'
-import React from 'react'
-import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 
 // Components
 import PublishButton from '@/app/[locale]/components/PublishButton'
-import BackButton from '@/components/ui/back-button'
-import JobTitle from '../../../../_components/_jobs/_editJob/JobTitle'
-import JobType from '../../../../_components/_jobs/_editJob/JobType'
-import JobStartDate from '../../../../_components/_jobs/_editJob/JobStartDate'
-import JobEndDate from '../../../../_components/_jobs/_editJob/JobEndDate'
-import JobDescription from '../../../../_components/_jobs/_editJob/JobDescription'
-import JobSummary from '../../../../_components/_jobs/_editJob/JobSummary'
-import JobLocation from '../../../../_components/_jobs/_editJob/JobLocation'
-import JobEvent from '../../../../_components/_jobs/_editJob/JobEvent'
+import JobTitle from '../../../registration/_components/_jobs/_editJob/JobTitle'
+import JobType from '../../../registration/_components/_jobs/_editJob/JobType'
+import JobStartDate from '../../../registration/_components/_jobs/_editJob/JobStartDate'
+import JobEndDate from '../../../registration/_components/_jobs/_editJob/JobEndDate'
+import JobDescription from '../../../registration/_components/_jobs/_editJob/JobDescription'
+import JobSummary from '../../../registration/_components/_jobs/_editJob/JobSummary'
+import JobLocation from '../../../registration/_components/_jobs/_editJob/JobLocation'
+import JobEvent from '../../../registration/_components/_jobs/_editJob/JobEvent'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
-import DeleteJobButton from '../../../../_components/_jobs/_editJob/DeleteJobButton'
+import DeleteJobButton from '../../../registration/_components/_jobs/_editJob/DeleteJobButton'
+import NotFound from '@/app/[locale]/(Home)/not-found'
 
-const EditJobPage = async ({
-  params,
-}: {
-  params: Promise<{ jobKeyName: string }>
-}) => {
-  // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' }))) {
-    return redirect('/jobs')
+interface EditJobProps {
+  jobId: string
+  user: {
+    id: string
+    role: string[]
   }
+  locale: string
+}
 
-  // Get the jobKeyName from the URL
-  const { jobKeyName } = await params
+export default async function EditJob({ jobId, user, locale }: EditJobProps) {
+  let job = null
 
-  // Fetch the Job data
-  const job = await prisma.job.findUnique({
-    where: {
-      keyName: jobKeyName,
-    },
-    include: {
-      event: {
-        select: {
-          id: true,
-          title: true,
+  try {
+    // Fetch the Job data
+    job = await prisma.job.findUnique({
+      where: {
+        keyName: jobId,
+      },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+          },
         },
       },
-    },
-  })
+    })
+  } catch (error) {
+    console.error(error)
+  }
 
-  // TODO: If the job is not found, show a 404 page.
   if (!job) {
-    redirect('/registration/jobs')
-  }  
+    return <NotFound />
+  }
 
-  // useState to check if field is filled
+  // Check if field is filled
   const jobFields = [
     !!job.title,
     !!job.jobType,
@@ -68,9 +67,6 @@ const EditJobPage = async ({
 
   return (
     <div className="my-12 p-6 lg:my-20">
-      {/* Back Button To Parent Page */}
-      <BackButton />
-
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -124,7 +120,9 @@ const EditJobPage = async ({
             </h2>
             <EditorInstructions />
             <p className="italic">
-              NOTE: The first 200 characters of the description will be displayed on the job card outside, so put your most engaging statement on top.
+              NOTE: The first 200 characters of the description will be
+              displayed on the job card outside, so put your most engaging
+              statement on top.
             </p>
             <JobDescription job={job} />
           </div>
@@ -139,7 +137,7 @@ const EditJobPage = async ({
             </p>
             <JobSummary job={job} />
           </div>
-          
+
           {/* Location */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
@@ -159,7 +157,8 @@ const EditJobPage = async ({
           {/* End date */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VII :</span> End Date (Optional)
+              <span className="text-gray-500">Step VII :</span> End Date
+              (Optional)
             </h2>
             <JobEndDate job={job} />
           </div>
@@ -167,18 +166,14 @@ const EditJobPage = async ({
           {/* Link to Event */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VIII :</span> Link to Event (Optional)
+              <span className="text-gray-500">Step VIII :</span> Link to Event
+              (Optional)
             </h2>
-            <p className="italic">
-              NOTE: You can optionally link this job to an event for better organization and visibility.
-            </p>
             <JobEvent job={job} />
           </div>
-
         </div>
       </div>
     </div>
   )
 }
 
-export default EditJobPage

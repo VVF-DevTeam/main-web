@@ -55,6 +55,7 @@ model Event {
   payments           Payment[]
   Review             Review[]
   form               EventForm[]
+  job                Job[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
   seatingMap         Json?
@@ -223,8 +224,11 @@ model Job {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   userId       String
+  eventId      String?
   applications Application[]
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
 
   @@unique([id, userId])
   @@index([id])

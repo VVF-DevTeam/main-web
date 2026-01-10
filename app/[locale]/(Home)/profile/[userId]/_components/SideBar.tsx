@@ -54,6 +54,15 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     eventManagementSections.includes(currentSection)
   )
 
+  const jobManagementSections = [
+    'admin-create-job',
+    'admin-all-jobs',
+    'admin-edit-job',
+  ]
+  const [isJobsDropdownOpen, setIsJobsDropdownOpen] = useState(
+    jobManagementSections.includes(currentSection)
+  )
+
   return (
     <div className="relative w-full bg-bgColor-gray100 p-4 md:w-64 md:p-6">
       {/* Desktop Navigation */}
@@ -186,6 +195,51 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                   </ul>
                 )}
               </li>
+
+              {/* Manage Jobs Dropdown */}
+              {isAdmin && (
+                <li>
+                  <button
+                    onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
+                    className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                  >
+                    <span>Manage Jobs</span>
+                    <ChevronDown
+                      className={`h-5 w-5 transition-transform ${
+                        isJobsDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {isJobsDropdownOpen && (
+                    <ul className="mt-2 space-y-2 pl-4">
+                      <li>
+                        <Link
+                          href={`/${locale}/profile/${userId}?section=admin-create-job`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-create-job'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          Create Job
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={`/${locale}/profile/${userId}?section=admin-all-jobs`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-all-jobs'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          View All Jobs
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              )}
             </ul>
           </>
         )}

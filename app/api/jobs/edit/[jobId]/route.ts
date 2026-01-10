@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const PUT = async (
   request: Request,
@@ -36,6 +36,7 @@ export const PUT = async (
 
     // Revalidate the jobs page to reflect the changes
     revalidatePath('/registration/jobs', 'page')
+    revalidateTag('jobs')
 
     return NextResponse.json(updatedJob)
   } catch (error: unknown) {

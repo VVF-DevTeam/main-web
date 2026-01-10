@@ -1,7 +1,7 @@
 // Libraries
-import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
+import { getAllJobs } from '@/lib/actions/job/getJob'
 
 // Components
 import BackButton from '@/components/ui/back-button'
@@ -19,11 +19,7 @@ const AllJobs = async () => {
   }
 
   // Get all published and unpublished jobs
-  const allJobs = await prisma.job.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  const allJobs = await getAllJobs()
   
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">

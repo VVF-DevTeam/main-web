@@ -39,6 +39,10 @@ import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 // Interfaces
 interface CreateJobFormProps {
   author: string
+  redirectToProfile?: {
+    locale: string
+    userId: string
+  }
 }
 // TODO: Abstract the createEventSchema to a separate file
 const createJobSchema = z.object({
@@ -50,7 +54,7 @@ const createJobSchema = z.object({
 })
 
 // Main Component
-const CreateJobForm = ({ author }: CreateJobFormProps) => {
+const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
 
@@ -65,7 +69,7 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
 
   const onSubmit = async (data: z.infer<typeof createJobSchema>) => {
     //Format title to trims whitespaces
-    const title = formatKeyName(data.title)
+    const title = data.title.trim()
 
     // Format title to keyName, which is used for pathname
     const keyName = formatKeyName(title)
@@ -93,7 +97,13 @@ const CreateJobForm = ({ author }: CreateJobFormProps) => {
 
       form.reset()
       router.refresh()
-      router.push(`/registration/jobs/editJob/${response.data.keyName}`)
+      if (redirectToProfile) {
+        router.push(
+          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-job&jobId=${response.data.keyName}`
+        )
+      } else {
+        router.push(`/registration/jobs/editJob/${response.data.keyName}`)
+      }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {

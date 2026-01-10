@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/db'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -19,6 +19,7 @@ export const POST = async (request: NextRequest) => {
 
     // Revalidate the jobs page to show the new job immediately
     revalidatePath('/registration/jobs', 'page')
+    revalidateTag('jobs')
 
     return NextResponse.json(job)
   } catch (error: unknown) {

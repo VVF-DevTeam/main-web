@@ -37,6 +37,14 @@ export default function MobileSidebar({
   const [isEventsDropdownOpen, setIsEventsDropdownOpen] = useState(
     eventManagementSections.includes(currentSection)
   )
+  const jobManagementSections = [
+    'admin-create-job',
+    'admin-all-jobs',
+    'admin-edit-job',
+  ]
+  const [isJobsDropdownOpen, setIsJobsDropdownOpen] = useState(
+    jobManagementSections.includes(currentSection)
+  )
   const isAdmin = user?.role?.includes('ADMIN') ?? false
   const isHost = user?.role?.includes('HOST') ?? false
   const isAdminOrHost = isAdmin || isHost
@@ -197,6 +205,53 @@ export default function MobileSidebar({
                     </ul>
                   )}
                 </li>
+
+                {/* Manage Jobs Dropdown */}
+                {isAdmin && (
+                  <li>
+                    <button
+                      onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
+                      className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                    >
+                      <span>Manage Jobs</span>
+                      <ChevronDown
+                        className={`h-5 w-5 transition-transform ${
+                          isJobsDropdownOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    {isJobsDropdownOpen && (
+                      <ul className="mt-2 space-y-2 pl-4">
+                        <li>
+                          <Link
+                            href={`/${locale}/profile/${userId}?section=admin-create-job`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-create-job'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            Create Job
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href={`/${locale}/profile/${userId}?section=admin-all-jobs`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-all-jobs'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            View All Jobs
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+                )}
               </ul>
             </>
           )}

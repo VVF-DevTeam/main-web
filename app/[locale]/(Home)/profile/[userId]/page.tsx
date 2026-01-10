@@ -19,6 +19,9 @@ import EventSeriesManager from './_components/EventSeriesManager'
 import SponsorsManagement from './_components/SponsorsManagement'
 import EditEvent from './_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
+import CreateJobForm from './_components/CreateJobForm'
+import EditJob from './_components/EditJob'
+import JobManagement from './_components/JobManagement'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -74,10 +77,11 @@ export default async function ProfilePage({
     page?: string
     pageSize?: string
     eventId?: string
+    jobId?: string
   }>
 }) {
   const [
-    { section, page: pageStr, pageSize: pageSizeStr, eventId },
+    { section, page: pageStr, pageSize: pageSizeStr, eventId, jobId },
     { locale },
     user,
   ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
@@ -219,6 +223,43 @@ export default async function ProfilePage({
           )
         }
         return <EditEvent eventId={eventId} user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-create-job':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <CreateJobForm user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-all-jobs':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <JobManagement user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-edit-job':
+      if (user.role && user.role.includes('ADMIN')) {
+        if (!jobId) {
+          return (
+            <p className="mt-10 text-center">
+              Job ID is required to edit a job.
+            </p>
+          )
+        }
+        return <EditJob jobId={jobId} user={user} locale={locale} />
       }
       return (
         <p className="mt-10 text-center">

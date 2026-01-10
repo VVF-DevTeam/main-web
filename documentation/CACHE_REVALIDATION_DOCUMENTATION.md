@@ -101,6 +101,17 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Jobs
+
+#### 22. `getAllJobs`
+- **File**: `lib/actions/job/getJob.ts`
+- **Cache Key**: `['jobs-all']`
+- **Tags**: `['jobs']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
+
+---
+
 ### Reviews
 
 #### 13. `getCachedReviewsPaginated`
@@ -427,6 +438,40 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Tag: `'jobs'`
+
+**Cached Functions Affected:**
+- `getAllJobs`
+
+**Functions Calling `revalidateTag('jobs')`:**
+
+1. **`app/api/jobs/create/route.ts`**
+   - Function: `POST`
+   - Line: 22
+   - Action: Creates a new job
+
+2. **`app/api/jobs/edit/[jobId]/route.ts`**
+   - Function: `PUT`
+   - Line: 39
+   - Action: Updates an existing job
+
+3. **`app/api/jobs/publish/[jobId]/route.ts`**
+   - Function: `PATCH`
+   - Line: 35
+   - Action: Publishes a job (sets isPublished to true)
+
+4. **`app/api/jobs/unpublish/[jobId]/route.ts`**
+   - Function: `PATCH`
+   - Line: 35
+   - Action: Unpublishes a job (sets isPublished to false)
+
+5. **`app/api/jobs/delete/[jobId]/route.ts`**
+   - Function: `DELETE`
+   - Line: 34
+   - Action: Deletes a job
+
+---
+
 ### Tag: `'payments'`
 
 **Cached Functions Affected:**
@@ -462,6 +507,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
+| `jobs` | 1 function | 5 API routes | ✅ Fully covered |
 | `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
 
 ---
@@ -493,5 +539,6 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating or updating event categories, always call `revalidateTag('event-categories')`
 - When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
+- When creating, updating, publishing, unpublishing, or deleting jobs, always call `revalidateTag('jobs')`
 - Social media posts cache automatically refreshes every 10 minutes
 

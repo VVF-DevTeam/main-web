@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const DELETE = async (
   request: Request,
@@ -31,6 +31,7 @@ export const DELETE = async (
 
     // Revalidate the jobs page to reflect the changes
     revalidatePath('/registration/jobs', 'page')
+    revalidateTag('jobs')
 
     return NextResponse.json(deletedJob)
   } catch (error) {

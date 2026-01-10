@@ -74,7 +74,7 @@ const CreateEventForm = ({
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     //Format title to trims whitespaces
-    const title = formatKeyName(data.title)
+    const title = data.title.trim()
 
     // Format title to keyName, which is used for pathname
     const keyName = formatKeyName(title)
