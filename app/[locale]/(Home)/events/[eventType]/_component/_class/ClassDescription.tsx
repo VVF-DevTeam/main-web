@@ -244,7 +244,7 @@ const ClassDescription = async ({
 
                 {/* Volunteer Section */}
                 {linkedJobs.length > 0 && (
-                  <VolunteerSection locale={locale} eventKeyName={keyName} />
+                  <VolunteerSection locale={locale} eventKeyName={keyName} eventType={eventType} />
                 )}
               </div>
 

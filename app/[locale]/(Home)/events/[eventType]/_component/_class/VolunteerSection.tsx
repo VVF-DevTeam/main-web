@@ -8,19 +8,25 @@ import { useTranslation } from 'react-i18next'
 interface VolunteerSectionProps {
   locale: string
   eventKeyName: string
+  eventType: string
 }
 
-export default function VolunteerSection({ locale, eventKeyName }: VolunteerSectionProps) {
+export default function VolunteerSection({ locale, eventKeyName, eventType }: VolunteerSectionProps) {
   const [isVisible, setIsVisible] = useState(true)
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
 
   if (!isVisible) return null
 
+  const isConcert = eventType === 'CONCERT'
+  const bgClasses = isConcert 
+    ? 'bg-white hover:bg-gray-50' 
+    : 'bg-bgColor-secondary200 hover:bg-bgColor-secondary300'
+
   return (
     <Link 
       href={`/${locale}/registration/jobs?eventKeyName=${eventKeyName}`}
-      className="relative flex items-center justify-between gap-4 bg-bgColor-secondary200 rounded-2xl py-3 px-4 hover:bg-bgColor-secondary300 transition-colors group"
+      className={`relative flex items-center justify-between gap-4 ${bgClasses} rounded-2xl py-3 px-4 transition-colors group`}
       target="_blank"
       rel="noopener noreferrer"
     >

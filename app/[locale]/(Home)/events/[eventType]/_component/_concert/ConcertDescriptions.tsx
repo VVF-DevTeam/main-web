@@ -283,7 +283,7 @@ const ConcertDescriptions = async ({
 
                 {/* Volunteer Section */}
                 {event.jobs.length > 0 && (
-                  <VolunteerSection locale={locale} eventKeyName={event.keyName} />
+                  <VolunteerSection locale={locale} eventKeyName={event.keyName} eventType={event.eventType} />
                 )}
               </div>
 
