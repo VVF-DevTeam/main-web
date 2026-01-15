@@ -55,7 +55,7 @@ model Event {
   payments           Payment[]
   Review             Review[]
   form               EventForm[]
-  job                Job[]
+  jobs               Job[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
   seatingMap         Json?

@@ -18,8 +18,8 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-import Editor from '../../../../../../components/Editor'
-import TextPreview from '../../../../../../components/TextPreview'
+import Editor from '../../../../../../../../components/quill/Editor'
+import TextPreview from '../../../../../../../../components/quill/TextPreview'
 import { axiosInstance } from '@/lib/axios'
 
 interface PostContentProps {

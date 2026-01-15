@@ -28,5 +28,11 @@
   "noJobsOrVolunteersPosition": "No jobs or volunteer positions found. Please check your search or check back later or email us your email at hr@vietvibe.org to apply to your desired department.",
   "startDate": "Start Date",
   "see-more": "See More",
-  "see-less": "See Less"
+  "see-less": "See Less",
+  "filter-by-event": "Filter by Event",
+  "all-events": "All Events",
+  "search-event": "Search for event (if not shown in list)",
+  "clear-filter": "Clear Filter",
+  "search-jobs": "Search Jobs",
+  "search-placeholder": "Search by job title..."
 }

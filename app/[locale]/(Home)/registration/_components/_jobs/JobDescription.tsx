@@ -3,7 +3,7 @@ import React from 'react'
 import initTranslation from '@/app/i18n'
 
 // Components
-import TextPreview from '@/app/[locale]/components/TextPreview'
+import TextPreview from '@/components/quill/TextPreview'
 import JobApplyModal from './_applyJob/JobApplyModal'
 import { auth } from '@/auth'
 

@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Event, EventSchedule } from '@prisma/client'
 import { Pencil } from 'lucide-react'
-import ScheduleItem from '@/app/[locale]/components/ScheduleItem'
+import ScheduleItem from '@/app/[locale]/(Home)/events/_components/ScheduleItem'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'

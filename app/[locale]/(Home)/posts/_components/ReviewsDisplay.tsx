@@ -1,19 +1,11 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Star,
   Search,
-  Filter,
   Trash2,
   Edit,
   Image as ImageIcon,
@@ -31,12 +23,12 @@ import { ReviewWithUserAndEvent } from '@/lib/actions/review/reviewActions'
 import { toast } from 'sonner'
 import { ReviewRating } from '@prisma/client'
 import { useTranslation } from 'react-i18next'
-import useDebounce from '@/hooks/useDebounce'
 import Image from 'next/image'
 import {
   convertReviewRatingToNumber,
   NUMBER_TO_RATING_MAP,
 } from '@/lib/utilFunctions/ratingUtils'
+import SearchAndFilter, { type FilterOption } from '@/components/searchAndFilter/SearchAndFilter'
 
 interface ReviewsDisplayProps {
   currentPage: number
@@ -48,9 +40,9 @@ interface ReviewsDisplayProps {
   initialEvents: Event[]
   initialSeries: Series[]
   initialSearchTerm: string
-  initialSelectedEvent: string
-  initialSelectedRating: string
-  initialSelectedSeries: string
+  initialEventFilter?: string
+  initialRatingFilter?: string
+  initialSeriesFilter?: string
 }
 
 interface Event {
@@ -80,6 +72,10 @@ const generateRandomNumber = (id: string) => {
   return fourDigitNumber.toString()
 }
 
+
+// TODO: refactor this component to use keyName for event, rating and series instead of id
+// Update link inside ClassDescription and ConcertDescription component to use keyName
+
 const ReviewsDisplay = ({
   currentPage,
   reviewsPerPage,
@@ -90,9 +86,9 @@ const ReviewsDisplay = ({
   initialEvents,
   initialSeries,
   initialSearchTerm,
-  initialSelectedEvent,
-  initialSelectedRating,
-  initialSelectedSeries,
+  initialEventFilter,
+  initialRatingFilter,
+  initialSeriesFilter,
 }: ReviewsDisplayProps) => {
   console.log(reviewsPerPage) // Do not remove, will use for later
 
@@ -105,14 +101,6 @@ const ReviewsDisplay = ({
   const loading = false
   const events = initialEvents
   const series = initialSeries
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm)
-  const [selectedEvent, setSelectedEvent] = useState(initialSelectedEvent)
-  const [selectedRating, setSelectedRating] = useState(initialSelectedRating)
-  const [selectedSeries, setSelectedSeries] = useState(initialSelectedSeries)
-  const [filteredEvents, setFilteredEvents] = useState(events)
-  const [filteredSeries, setFilteredSeries] = useState(series)
-  const [eventSearchTerm, setEventSearchTerm] = useState('')
-  const [seriesSearchTerm, setSeriesSearchTerm] = useState('')
   const [editingReview, setEditingReview] = useState<string | null>(null)
   const [editComment, setEditComment] = useState('')
   const [editRating, setEditRating] = useState<ReviewRating | null>(null)
@@ -121,135 +109,31 @@ const ReviewsDisplay = ({
   const [isEditImageLoading, setIsEditImageLoading] = useState(false)
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
 
-  // Debounce search term to avoid too many API calls
-  const debouncedSearchTerm = useDebounce(searchTerm, 500)
-
-  // Track if this is the initial render
-  const isInitialRenderRef = useRef(true)
-
   // Helper function to convert ReviewRating enum to number
   const ratingEnumToNumber = convertReviewRatingToNumber
 
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Update local state when URL parameters change
+  // Sync props with URL params reactively (props for initial render, URL for updates)
+  // This ensures we show current URL state while avoiding hydration mismatch
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(initialSearchTerm)
+  const [selectedEvent, setSelectedEvent] = useState(initialEventFilter || '')
+  const [selectedRating, setSelectedRating] = useState(initialRatingFilter || '')
+  const [selectedSeries, setSelectedSeries] = useState(initialSeriesFilter || '')
+
+  // Sync with URL params when they change (after initial render)
   useEffect(() => {
     const urlSearchTerm = searchParams.get('reviewSearch') || ''
     const urlEvent = searchParams.get('reviewEvent') || ''
     const urlRating = searchParams.get('reviewRating') || ''
     const urlSeries = searchParams.get('reviewSeries') || ''
 
-    // Update local state with URL parameters
-    setSearchTerm(urlSearchTerm)
+    setDebouncedSearchTerm(urlSearchTerm)
     setSelectedEvent(urlEvent)
     setSelectedRating(urlRating)
     setSelectedSeries(urlSeries)
   }, [searchParams])
-
-  const handleSearch = useCallback(
-    (resetPage: boolean = true) => {
-      const params = new URLSearchParams(searchParams)
-
-      // Only reset to first page when it's a filter change, not pagination
-      if (resetPage) {
-        params.set('reviewPage', '1')
-      }
-
-      // Handle search term - set if exists, delete if empty
-      if (debouncedSearchTerm) {
-        params.set('reviewSearch', debouncedSearchTerm)
-      } else {
-        params.delete('reviewSearch')
-      }
-
-      // Handle event filter
-      if (selectedEvent && selectedEvent !== 'all') {
-        params.set('reviewEvent', selectedEvent)
-      } else {
-        params.delete('reviewEvent')
-      }
-
-      // Handle rating filter
-      if (selectedRating && selectedRating !== 'all') {
-        params.set('reviewRating', selectedRating)
-      } else {
-        params.delete('reviewRating')
-      }
-
-      // Handle series filter
-      if (selectedSeries && selectedSeries !== 'all') {
-        params.set('reviewSeries', selectedSeries)
-      } else {
-        params.delete('reviewSeries')
-      }
-
-      router.push(`?${params.toString()}`, { scroll: false })
-    },
-    [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, searchParams, router]
-  )
-
-  // Track previous filter values to detect actual filter changes
-  const prevFiltersRef = useRef({
-    searchTerm: initialSearchTerm,
-    selectedEvent: initialSelectedEvent,
-    selectedRating: initialSelectedRating,
-    selectedSeries: initialSelectedSeries,
-  })
-
-  // Auto-trigger search when filters change (but not when page changes)
-  useEffect(() => {
-    // Skip the initial render
-    if (isInitialRenderRef.current) {
-      isInitialRenderRef.current = false
-      // Update the ref with current values
-      prevFiltersRef.current = {
-        searchTerm: debouncedSearchTerm,
-        selectedEvent,
-        selectedRating,
-        selectedSeries,
-      }
-      return
-    }
-
-    // Check if any filter actually changed
-    const filtersChanged =
-      prevFiltersRef.current.searchTerm !== debouncedSearchTerm ||
-      prevFiltersRef.current.selectedEvent !== selectedEvent ||
-      prevFiltersRef.current.selectedRating !== selectedRating ||
-      prevFiltersRef.current.selectedSeries !== selectedSeries
-
-    if (filtersChanged) {
-      // Update the ref with new values
-      prevFiltersRef.current = {
-        searchTerm: debouncedSearchTerm,
-        selectedEvent,
-        selectedRating,
-        selectedSeries,
-      }
-
-      // Debounce the search to avoid too many API calls
-      const timeoutId = setTimeout(() => {
-        handleSearch(true) // Reset page when filters change
-      }, 300)
-
-      return () => clearTimeout(timeoutId)
-    }
-  }, [debouncedSearchTerm, selectedEvent, selectedRating, selectedSeries, handleSearch])
-
-  const handleClearFilters = useCallback(() => {
-    setSearchTerm('')
-    setSelectedEvent('all')
-    setSelectedRating('all')
-    setSelectedSeries('all')
-    const params = new URLSearchParams(searchParams)
-    params.delete('reviewSearch')
-    params.delete('reviewEvent')
-    params.delete('reviewRating')
-    params.delete('reviewSeries')
-    params.set('reviewPage', '1')
-    router.push(`?${params.toString()}`, { scroll: false })
-  }, [searchParams, router])
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -260,37 +144,22 @@ const ReviewsDisplay = ({
     [searchParams, router]
   )
 
-  // Handle event search
-  const handleEventSearch = useCallback(
-    async (searchTerm: string) => {
-      if (searchTerm === '') {
-        setFilteredEvents(events)
-      } else {
-        const filtered = await getPublishedEventsForReviewsWithSearch(
-          searchTerm,
-          15
-        )
-        setFilteredEvents(filtered)
-      }
-    },
-    [events]
-  )
+  // Async search handlers for SearchAndFilter component
+  const handleEventSearch = async (searchTerm: string): Promise<FilterOption[]> => {
+    const filtered = await getPublishedEventsForReviewsWithSearch(searchTerm, 15)
+    return filtered.map(event => ({
+      value: event.id,
+      label: event.title,
+    }))
+  }
 
-  // Handle series search
-  const handleSeriesSearch = useCallback(
-    async (searchTerm: string) => {
-      if (searchTerm === '') {
-        setFilteredSeries(series)
-      } else {
-        const filtered = await getPublishedSeriesForReviewsWithSearch(
-          searchTerm,
-          15
-        )
-        setFilteredSeries(filtered)
-      }
-    },
-    [series]
-  )
+  const handleSeriesSearch = async (searchTerm: string): Promise<FilterOption[]> => {
+    const filtered = await getPublishedSeriesForReviewsWithSearch(searchTerm, 15)
+    return filtered.map(s => ({
+      value: s.id,
+      label: s.name,
+    }))
+  }
 
   // Handle image modal
   const openImageModal = (imageUrl: string) => {
@@ -422,146 +291,62 @@ const ReviewsDisplay = ({
   return (
     <div className="flex flex-col gap-6">
       {/* Search and Filter Section */}
-      <div className="space-y-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end">
-          <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {t('searchReviews')}
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-              <Input
-                placeholder={t('searchPlaceholder') || ''}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-48">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {t('filterByEvent')}
-            </label>
-            <Select
-              value={selectedEvent}
-              onValueChange={(value) => {
-                setSelectedEvent(value)
-                // Clear series filter when event is selected (they're mutually exclusive)
-                if (value !== 'all') {
-                  setSelectedSeries('all')
-                }
-              }}
-            >
-              <SelectTrigger className="border border-input shadow-sm">
-                <SelectValue placeholder={t('allEvents') || ''} />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="pb-2">
-                  <Input
-                    type="search"
-                    autoComplete="off"
-                    placeholder="Search for event (if not shown in list)"
-                    value={eventSearchTerm}
-                    onChange={(e) => {
-                      setEventSearchTerm(e.target.value)
-                    }}
-                    onKeyDown={async (e) => {
-                      e.stopPropagation()
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        await handleEventSearch(eventSearchTerm)
-                      }
-                    }}
-                  />
-                </div>
-                <SelectItem value="all">{t('allEvents')}</SelectItem>
-                {filteredEvents.map((event) => (
-                  <SelectItem key={event.id} value={event.id}>
-                    {event.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-full md:w-48">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {t('filterByRating')}
-            </label>
-            <Select value={selectedRating} onValueChange={setSelectedRating}>
-              <SelectTrigger className="border border-input shadow-sm">
-                <SelectValue placeholder={t('allRatings') || ''} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('allRatings')}</SelectItem>
-                <SelectItem value="5">5 {t('stars')}</SelectItem>
-                <SelectItem value="4">4 {t('stars')}</SelectItem>
-                <SelectItem value="3">3 {t('stars')}</SelectItem>
-                <SelectItem value="2">2 {t('stars')}</SelectItem>
-                <SelectItem value="1">1 {t('stars')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-full md:w-48">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {t('filterBySeries')}
-            </label>
-            <Select
-              value={selectedSeries}
-              onValueChange={(value) => {
-                setSelectedSeries(value)
-                // Clear event filter when series is selected (they're mutually exclusive)
-                if (value !== 'all') {
-                  setSelectedEvent('all')
-                }
-              }}
-            >
-              <SelectTrigger className="border border-input shadow-sm">
-                <SelectValue placeholder="All Series" />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="pb-2">
-                  <Input
-                    type="search"
-                    autoComplete="off"
-                    placeholder="Search for series (if not shown in list)"
-                    value={seriesSearchTerm}
-                    onChange={(e) => {
-                      setSeriesSearchTerm(e.target.value)
-                    }}
-                    onKeyDown={async (e) => {
-                      e.stopPropagation()
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        await handleSeriesSearch(seriesSearchTerm)
-                      }
-                    }}
-                  />
-                </div>
-                <SelectItem value="all">All Series</SelectItem>
-                {filteredSeries.map((seriesItem) => (
-                  <SelectItem key={seriesItem.id} value={seriesItem.id}>
-                    {seriesItem.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClearFilters}
-              className="flex items-center gap-2"
-            >
-              <Filter className="h-4 w-4" />
-              {t('clear')}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <SearchAndFilter
+        searchLabel={t('searchReviews') || 'Search Reviews'}
+        searchPlaceholder={t('searchPlaceholder') || 'Search by reviewer name or comment...'}
+        searchUrlParam="reviewSearch"
+        initialSearchTerm={initialSearchTerm}
+        initialFilterValues={{
+          event: initialEventFilter || 'all',
+          rating: initialRatingFilter || 'all',
+          series: initialSeriesFilter || 'all',
+        }}
+        filters={[
+          {
+            id: 'event',
+            label: t('filterByEvent') || 'Filter by Event',
+            placeholder: t('allEvents') || 'All Events',
+            urlParam: 'reviewEvent',
+            options: events.map(event => ({
+              value: event.id,
+              label: event.title,
+            })),
+            searchable: true,
+            searchPlaceholder: 'Search for event...',
+            onSearchAsync: handleEventSearch,
+            mutuallyExclusiveWith: ['series'],
+          },
+          {
+            id: 'rating',
+            label: t('filterByRating') || 'Filter by Rating',
+            placeholder: t('allRatings') || 'All Ratings',
+            urlParam: 'reviewRating',
+            options: [
+              { value: '5', label: `5 ${t('stars')}` },
+              { value: '4', label: `4 ${t('stars')}` },
+              { value: '3', label: `3 ${t('stars')}` },
+              { value: '2', label: `2 ${t('stars')}` },
+              { value: '1', label: `1 ${t('stars')}` },
+            ],
+            searchable: false,
+          },
+          {
+            id: 'series',
+            label: t('filterBySeries') || 'Filter by Series',
+            placeholder: 'All Series',
+            urlParam: 'reviewSeries',
+            options: series.map(s => ({
+              value: s.id,
+              label: s.name,
+            })),
+            searchable: true,
+            searchPlaceholder: 'Search for series...',
+            onSearchAsync: handleSeriesSearch,
+            mutuallyExclusiveWith: ['event'],
+          },
+        ]}
+        clearButtonLabel={t('clear') || 'Clear'}
+      />
 
       {/* Results Summary */}
       <div className="text-sm text-gray-600">

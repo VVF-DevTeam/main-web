@@ -139,5 +139,7 @@
   "verify-email-reason": "to avoid missing confirmation emails for the reservation/tickets.",
   "valid-until": "Available for selection until",
   "ticket-expired": "Ticket expired on",
-  "ticket-no-longer-available": "No Longer Available"
+  "ticket-no-longer-available": "No Longer Available",
+  "want-to-help": "Want to help instead?",
+  "volunteer-with-us": "Join or volunteer with us"
 }

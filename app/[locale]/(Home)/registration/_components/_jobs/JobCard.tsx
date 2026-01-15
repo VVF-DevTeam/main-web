@@ -22,7 +22,7 @@ const jobTypeColors: Record<string, string> = {
   HR: 'bg-yellow-600 hover:bg-yellow-500/80',
   Tech: 'bg-pink-800 hover:bg-pink-800/80',
   Performance: 'bg-blue-300 hover:bg-blue-200/80',
-  Volunteer: 'bg-gray-600 hover:bg-gray-500/80',
+  Volunteer: 'bg-gradient-to-r from-bgColor-secondary900 to-bgColor-brand900 hover:from-bgColor-secondary900/80 hover:to-bgColor-brand900/80',
 }
 
 // Main Component

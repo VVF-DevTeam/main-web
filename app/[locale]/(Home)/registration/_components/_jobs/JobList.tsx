@@ -1,40 +1,49 @@
 // Libraries
 import React from 'react'
 import initTranslations from '@/app/i18n'
-import { prisma } from '@/lib/db'
+import { getAllPublishedEvents } from '@/lib/actions/event/getEvent'
+import { getPublishedJobs } from '@/lib/actions/job/getJob'
 
 // Components
 import JobCard from './JobCard'
-import SearchBox from '@/app/[locale]/components/SearchBox'
-import { Job } from '@prisma/client'
+import SearchAndFilter from '@/components/searchAndFilter/SearchAndFilter'
 
 // Interfaces & Types
 interface JobListProps {
-  title: string
+  title?: string
+  eventKeyName?: string
   locale: string
 }
 
-// Main Component
-const JobList = async ({ title, locale }: JobListProps) => {
-  const { t } = await initTranslations(locale, ['job', 'common'])
-  let allJobs: Job[] = []
+interface Event {
+  title: string
+  keyName: string
+}
 
-  // Get all jobs
+// Main Component
+const JobList = async ({ title, eventKeyName, locale }: JobListProps) => {
+  const { t } = await initTranslations(locale, ['job', 'common'])
+  let allJobs: Awaited<ReturnType<typeof getPublishedJobs>> = []
+  let allEvents: Event[] = []
+
+  // Get all published events for filter dropdown using cached function
   try {
-    allJobs = await prisma.job.findMany({
-      where: {
-        isPublished: true,
-        title: {
-          contains: title,
-          mode: 'insensitive',
-        },
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
+    allEvents = await getAllPublishedEvents({
+      title: true,
+      keyName: true,
     })
   } catch (error) {
-    console.error(error)
+    console.error('Error fetching events:', error)
+  }
+
+  // Get published jobs with filters using cached function
+  try {
+    allJobs = await getPublishedJobs({
+      title: title || undefined,
+      eventKeyName: eventKeyName || undefined,
+    })
+  } catch (error) {
+    console.error('Error fetching jobs:', error)
   }
 
   return (
@@ -42,13 +51,38 @@ const JobList = async ({ title, locale }: JobListProps) => {
       {/* Job Posts */}
       <div className="flex w-full flex-col items-center">
         {/* Header */}
-        <div className="flex-col-center">
+        <div className="flex-col-center mb-8">
           <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
             {t('headerJob')}
           </h1>
+        </div>
 
-          {/* Search Bar */}
-          <SearchBox />
+        {/* Search and Filter */}
+        <div className="w-full max-w-6xl px-6 mb-8">
+          <SearchAndFilter
+            searchLabel={t('search-jobs') || 'Search Jobs'}
+            searchPlaceholder={t('search-placeholder') || 'Search by job title...'}
+            searchUrlParam="title"
+            initialSearchTerm={title || ''}
+            initialFilterValues={{
+              event: eventKeyName || 'all',
+            }}
+            filters={[
+              {
+                id: 'event',
+                label: t('filter-by-event') || 'Filter by Event',
+                placeholder: t('all-events') || 'All Events',
+                urlParam: 'eventKeyName',
+                options: allEvents.map(event => ({
+                  value: event.keyName,
+                  label: event.title,
+                })),
+                searchable: true,
+                searchPlaceholder: t('search-event') || 'Search for event...',
+              },
+            ]}
+            clearButtonLabel={t('clear-filter') || 'Clear Filter'}
+          />
         </div>
 
         {/* Job Posts */}

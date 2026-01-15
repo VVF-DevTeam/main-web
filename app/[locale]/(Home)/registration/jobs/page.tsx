@@ -13,16 +13,17 @@ const JobsAndVolunteers = async ({
 }: {
   params: Promise<{ locale: string }>
   searchParams: Promise<{
-    title: string
+    title?: string
+    eventKeyName?: string
   }>
 }) => {
   const { locale } = await params
-  const { title } = await searchParams
+  const { title, eventKeyName } = await searchParams
 
   return (
     <div className="flex flex-col gap-y-6 p-4 text-base md:text-lg">
       <HeaderAndBenefit locale={locale} />
-      <JobList title={title} locale={locale} />
+      <JobList title={title} eventKeyName={eventKeyName} locale={locale} />
       <JobAdminButtons />
     </div>
   )

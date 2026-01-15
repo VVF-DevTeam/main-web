@@ -115,6 +115,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             imageUrls={publishedClass.imgUrls as string[]}
             tickets={publishedClass.tickets}
             sponsors={publishedClass.sponsors}
+            linkedJobs={publishedClass.jobs}
           />
         </div>
       )}

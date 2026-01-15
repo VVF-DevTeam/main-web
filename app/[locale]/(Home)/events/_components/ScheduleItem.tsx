@@ -2,7 +2,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 
-import TimePicker from './TimePicker'
+import TimePicker from '../../../../../components/time/TimePicker'
 import { toast } from 'sonner'
 import { CheckIcon, XIcon, PlusIcon } from 'lucide-react'
 
@@ -82,8 +82,7 @@ const ScheduleItem = ({
     }
   }
 
-  // TODO: Remove this function, and when admin add new schedule item, do it on the front end first. 
-  // Then add a save button to save all the schedule items at once (Remove the save button from the form as well).
+
   const addScheduleItem = async (scheduleItemId: string | null) => {
     const data = {
       scheduleItemId: scheduleItemId,

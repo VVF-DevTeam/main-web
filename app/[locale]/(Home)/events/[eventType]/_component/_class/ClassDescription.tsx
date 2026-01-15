@@ -7,13 +7,20 @@ import { checkCurrentSoldCapacityById } from '@/lib/actions/event/checkCurrentSo
 
 // Components
 import ClassScheduleItem from './ClassScheduleItem'
-import TextPreview from '@/app/[locale]/components/TextPreview'
+import TextPreview from '@/components/quill/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
+import VolunteerSection from './VolunteerSection'
 
 // Interfaces & Types
-import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
+import {
+  EventSchedule,
+  EventTicket,
+  EventSponsor,
+  SponsorTier,
+  Job,
+} from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import Image from 'next/image'
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
@@ -47,6 +54,7 @@ interface ClassDescriptionProps {
   imageUrls: string[]
   tickets: EventTicket[]
   sponsors: SponsorOnEvent[]
+  linkedJobs: Job[]
 }
 
 const typeMap = {
@@ -78,6 +86,7 @@ const ClassDescription = async ({
   imageUrls,
   tickets,
   sponsors,
+  linkedJobs,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -101,12 +110,12 @@ const ClassDescription = async ({
   if (totalSoldCapacity === -1) {
     return <ServerError showHomeButton={true} />
   }
-  
+
   const isCapacityExceeded = capacity !== null && totalSoldCapacity >= capacity
 
   return (
     <div className="w-full">
-      <div className="mx-auto mt-5 flex max-w-[1280px] flex-col items-start gap-y-8 p-2 md:mt-10 lg:gap-y-8">
+      <div className="mx-auto mt-5 flex max-w-[1280px] flex-col items-start gap-y-8 p-3 md:mt-10 lg:gap-y-8">
         {/* Event Info Section */}
         <div className="flex w-full flex-col gap-y-8 md:grid md:grid-cols-[1fr_400px] md:justify-between md:gap-x-4 md:gap-y-4 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
           {/* Event Description */}
@@ -138,7 +147,7 @@ const ClassDescription = async ({
               {t('headerInfo')}
             </h1>
             <div className="sticky top-[120px] z-[5] -mt-5 flex max-h-[80vh] flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)] overflow-y-auto px-[15px] py-5 md:px-[20px]">
-              <div className="flex h-[50vh] shrink-0 flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)]">
+              <div className="flex h-[60vh] shrink-0 flex-col gap-y-[clamp(0.5rem,2vh,2.5rem)]">
                 {/* Info Card */}
                 <div className="flex shrink-0 flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,0,0,0.3)]">
                   {/* Date Row */}
@@ -151,7 +160,8 @@ const ClassDescription = async ({
                           month: 'short',
                           day: 'numeric',
                         })}
-                        {new Date(startDate).getTime() !== new Date(endDate).getTime() && (
+                        {new Date(startDate).getTime() !==
+                          new Date(endDate).getTime() && (
                           <>
                             {' - '}
                             {new Date(endDate).toLocaleDateString('en-US', {
@@ -222,14 +232,20 @@ const ClassDescription = async ({
                 </div>
 
                 {/* Map */}
-                <div className="flex min-h-0 flex-1">
+                <div className="flex min-h-[50px] flex-1 md:min-h-[100px]">
                   <iframe
                     src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${location}`}
                     title="Class Location"
-                    className="h-full w-full rounded-2xl"
+                    className="h-full w-full rounded-2xl border-0"
                     allowFullScreen
+                    loading="lazy"
                   ></iframe>
                 </div>
+
+                {/* Volunteer Section */}
+                {linkedJobs.length > 0 && (
+                  <VolunteerSection locale={locale} eventKeyName={keyName} />
+                )}
               </div>
 
               {/* Payment Options */}

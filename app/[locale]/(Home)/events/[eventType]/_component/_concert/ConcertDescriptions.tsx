@@ -21,14 +21,15 @@ import {
 } from '@/components/ui/tooltip'
 import AddReviewButton from '@/components/review/AddReviewButton'
 import ShareButton from '@/components/ui/share-button'
-import TextPreview from '@/app/[locale]/components/TextPreview'
+import TextPreview from '@/components/quill/TextPreview'
 import PaymentOptions from '../_stripepayment/PaymentOptions'
 import ScrollToCheckoutButton from './ScrollToCheckoutButton'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
+import VolunteerSection from '../_class/VolunteerSection'
 // Types
-import { EventSchedule, EventTicket, EventSponsor, SponsorTier } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 
 type SponsorOnEvent = {
@@ -62,6 +63,7 @@ type EventWithRelations = {
   days: string[]
   tickets: EventTicket[]
   sponsors: SponsorOnEvent[]
+  jobs: Job[]
 }
 
 interface ConcertDescriptionsProps {
@@ -278,6 +280,11 @@ const ConcertDescriptions = async ({
                     allowFullScreen
                   ></iframe>
                 </div>
+
+                {/* Volunteer Section */}
+                {event.jobs.length > 0 && (
+                  <VolunteerSection locale={locale} eventKeyName={event.keyName} />
+                )}
               </div>
 
               {/* Go to check out section button */}

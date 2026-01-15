@@ -2,7 +2,7 @@
 import React from 'react'
 
 // Components
-import CustomIcon from '@/app/[locale]/components/CustomIcon'
+import CustomIcon from '@/components/icon/CustomIcon'
 import Link from 'next/link'
 import {
   Tooltip,

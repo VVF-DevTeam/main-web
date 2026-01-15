@@ -124,7 +124,7 @@ export default function MobileSidebar({
                     onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
                     className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
                   >
-                    <span>Manage Events</span>
+                    <span>{t('manage-events')}</span>
                     <ChevronDown
                       className={`h-5 w-5 transition-transform ${
                         isEventsDropdownOpen ? 'rotate-180' : ''
@@ -143,7 +143,7 @@ export default function MobileSidebar({
                           }`}
                           onClick={() => setIsOpen(false)}
                         >
-                          Create Event
+                          {t('create-event')}
                         </Link>
                       </li>
                       <li>
@@ -156,7 +156,7 @@ export default function MobileSidebar({
                           }`}
                           onClick={() => setIsOpen(false)}
                         >
-                          View All Events
+                          {t('view-all-events')}
                         </Link>
                       </li>
                       {isAdmin && (
@@ -171,7 +171,7 @@ export default function MobileSidebar({
                               }`}
                               onClick={() => setIsOpen(false)}
                             >
-                              Create & Edit Tags
+                              {t('create-edit-tags')}
                             </Link>
                           </li>
                           <li>
@@ -184,7 +184,7 @@ export default function MobileSidebar({
                               }`}
                               onClick={() => setIsOpen(false)}
                             >
-                              Create & Edit Series
+                              {t('create-edit-series')}
                             </Link>
                           </li>
                           <li>
@@ -197,7 +197,7 @@ export default function MobileSidebar({
                               }`}
                               onClick={() => setIsOpen(false)}
                             >
-                              Manage Sponsors
+                              {t('manage-sponsors')}
                             </Link>
                           </li>
                         </>
@@ -213,7 +213,7 @@ export default function MobileSidebar({
                       onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
                       className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
                     >
-                      <span>Manage Jobs</span>
+                      <span>{t('manage-jobs')}</span>
                       <ChevronDown
                         className={`h-5 w-5 transition-transform ${
                           isJobsDropdownOpen ? 'rotate-180' : ''
@@ -232,7 +232,7 @@ export default function MobileSidebar({
                             }`}
                             onClick={() => setIsOpen(false)}
                           >
-                            Create Job
+                            {t('create-job')}
                           </Link>
                         </li>
                         <li>
@@ -245,7 +245,7 @@ export default function MobileSidebar({
                             }`}
                             onClick={() => setIsOpen(false)}
                           >
-                            View All Jobs
+                            {t('view-all-jobs')}
                           </Link>
                         </li>
                       </ul>

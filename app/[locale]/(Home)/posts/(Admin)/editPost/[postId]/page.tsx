@@ -9,7 +9,7 @@ import PostSummary from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_
 import { BookType, BookText, FileText, FileImage } from 'lucide-react'
 import PostImage from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ImageForm'
 import PostContent from '@/app/[locale]/(Home)/posts/(Admin)/editPost/[postId]/_components/ContentForm'
-import PublishButton from '@/app/[locale]/components/PublishButton'
+import PublishButton from '@/components/ui/PublishButton'
 import BackButton from '@/components/ui/back-button'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'

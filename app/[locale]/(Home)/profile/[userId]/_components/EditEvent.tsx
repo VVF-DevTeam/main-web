@@ -5,7 +5,7 @@ import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
 import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 
 // Components
-import PublishButton from '@/app/[locale]/components/PublishButton'
+import PublishButton from '@/components/ui/PublishButton'
 import EventStartDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventStartDate'
 import EventTitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTitle'
 import EventEndDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventEndDate'

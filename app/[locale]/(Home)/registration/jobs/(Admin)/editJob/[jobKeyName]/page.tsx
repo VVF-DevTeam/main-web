@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 
 // Components
-import PublishButton from '@/app/[locale]/components/PublishButton'
+import PublishButton from '@/components/ui/PublishButton'
 import BackButton from '@/components/ui/back-button'
 import JobTitle from '../../../../_components/_jobs/_editJob/JobTitle'
 import JobType from '../../../../_components/_jobs/_editJob/JobType'

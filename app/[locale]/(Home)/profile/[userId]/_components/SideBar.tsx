@@ -29,7 +29,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'delete-account': t('delete-account'),
     'admin-payment-management': t('payment-management'),
     'admin-email-composition': t('email-composition'),
-    'admin-event-statistics': 'Event Manager',
+    'admin-event-statistics': t('event-manager'),
     'privacy-policy': t('privacy-policy'),
   }
 
@@ -37,7 +37,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
   const isHost = user.role.includes('HOST')
   const isAdminOrHost = isAdmin || isHost
   const adminSections = [
-    { key: 'admin-event-statistics', label: 'Event Manager' },
+    { key: 'admin-event-statistics', label: t('event-manager') },
     { key: 'admin-payment-management', label: t('payment-management') },
     { key: 'admin-email-composition', label: t('email-composition') },
   ]
@@ -119,7 +119,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                   onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
                   className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
                 >
-                  <span>Manage Events</span>
+                  <span>{t('manage-events')}</span>
                   <ChevronDown
                     className={`h-5 w-5 transition-transform ${
                       isEventsDropdownOpen ? 'rotate-180' : ''
@@ -137,7 +137,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                             : 'text-textColor-black hover:bg-bgColor-white'
                         }`}
                       >
-                        Create Event
+                        {t('create-event')}
                       </Link>
                     </li>
                     <li>
@@ -149,7 +149,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                             : 'text-textColor-black hover:bg-bgColor-white'
                         }`}
                       >
-                        View All Events
+                        {t('view-all-events')}
                       </Link>
                     </li>
                     {isAdmin && (
@@ -163,7 +163,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                                 : 'text-textColor-black hover:bg-bgColor-white'
                             }`}
                           >
-                            Create & Edit Tags
+                            {t('create-edit-tags')}
                           </Link>
                         </li>
                         <li>
@@ -175,7 +175,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                                 : 'text-textColor-black hover:bg-bgColor-white'
                             }`}
                           >
-                            Create & Edit Series
+                            {t('create-edit-series')}
                           </Link>
                         </li>
                         <li>
@@ -187,7 +187,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                                 : 'text-textColor-black hover:bg-bgColor-white'
                             }`}
                           >
-                            Manage Sponsors
+                            {t('manage-sponsors')}
                           </Link>
                         </li>
                       </>
@@ -203,7 +203,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                     onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
                     className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
                   >
-                    <span>Manage Jobs</span>
+                    <span>{t('manage-jobs')}</span>
                     <ChevronDown
                       className={`h-5 w-5 transition-transform ${
                         isJobsDropdownOpen ? 'rotate-180' : ''
@@ -221,7 +221,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                               : 'text-textColor-black hover:bg-bgColor-white'
                           }`}
                         >
-                          Create Job
+                          {t('create-job')}
                         </Link>
                       </li>
                       <li>
@@ -233,7 +233,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                               : 'text-textColor-black hover:bg-bgColor-white'
                           }`}
                         >
-                          View All Jobs
+                          {t('view-all-jobs')}
                         </Link>
                       </li>
                     </ul>
