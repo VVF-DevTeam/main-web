@@ -2,7 +2,7 @@
 import { prisma } from '@/lib/db'
 
 // Components
-import PublishButton from '@/app/[locale]/components/PublishButton'
+import PublishButton from '@/components/ui/PublishButton'
 import JobTitle from '../../../registration/_components/_jobs/_editJob/JobTitle'
 import JobType from '../../../registration/_components/_jobs/_editJob/JobType'
 import JobStartDate from '../../../registration/_components/_jobs/_editJob/JobStartDate'

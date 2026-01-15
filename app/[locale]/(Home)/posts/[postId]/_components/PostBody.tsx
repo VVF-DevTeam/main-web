@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import TextPreview from '../../../../components/TextPreview'
+import TextPreview from '../../../../../../components/quill/TextPreview'
 interface PostBodyProps {
   title: string
   content: string

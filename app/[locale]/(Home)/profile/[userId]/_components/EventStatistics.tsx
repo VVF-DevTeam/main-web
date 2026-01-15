@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { FiCopy, FiMail, FiEdit, FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import { ArrowUpDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   getAllPublishedEvents,
   getEventsOfHost,
@@ -67,6 +68,8 @@ export default function EventStatistics({
   user,
   locale,
 }: EventStatisticsProps) {
+  // @ts-ignore: useTranslation will always throw an error for TypeScript
+  const { t } = useTranslation('profile')
   const router = useRouter()
   const searchParams = useSearchParams()
   const [events, setEvents] = useState<Event[]>([])
@@ -261,7 +264,7 @@ export default function EventStatistics({
   return (
     <div className="min-h-screen p-4">
       <div className="mx-auto w-full max-w-7xl">
-        <h1 className="mb-6 text-3xl font-bold">Event Manager</h1>
+        <h1 className="mb-6 text-3xl font-bold">{t('event-manager')}</h1>
 
         {/* Event Selector */}
         <div className="mb-6">
@@ -275,7 +278,7 @@ export default function EventStatistics({
                 <Input
                   type="search"
                   autoComplete="off"
-                  placeholder="Search for event (if not shown in list)"
+                  placeholder="Input value and press Enter to search"
                   value={eventSearchTerm}
                   onChange={(e) => {
                     setEventSearchTerm(e.target.value)

@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import CustomIcon from '@/app/[locale]/components/CustomIcon'
+import CustomIcon from '@/components/icon/CustomIcon'
 import { Button } from '@/components/ui/button'
 import { Eye } from 'lucide-react'
 import {

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PlusCircle, ArrowRight } from 'lucide-react'
-import SearchBox from '../../components/SearchBox'
+import SearchBox from '../../../../components/searchAndFilter/SearchBox'
 import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
 import { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
@@ -242,9 +242,9 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
               initialEvents={eventsForReviews}
               initialSeries={seriesForReviews}
               initialSearchTerm={currentReviewSearch}
-              initialSelectedEvent={currentReviewEvent}
-              initialSelectedRating={currentReviewRating}
-              initialSelectedSeries={currentReviewSeries}
+              initialEventFilter={currentReviewEvent}
+              initialRatingFilter={currentReviewRating}
+              initialSeriesFilter={currentReviewSeries}
             />
           </Suspense>
         </div>

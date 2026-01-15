@@ -160,7 +160,7 @@ const JobEvent = ({ job }: JobEventProps) => {
                           <Input
                             type="search"
                             autoComplete="off"
-                            placeholder="Search for event (if not shown in list). Press Enter to search."
+                            placeholder="Input value and press Enter to search"
                             value={eventSearchTerm}
                             onChange={(e) => {
                               setEventSearchTerm(e.target.value)

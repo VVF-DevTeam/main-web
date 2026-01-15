@@ -109,6 +109,7 @@ export const getEventByKeyName = unstable_cache(
             },
             orderBy: [{ tier: 'asc' }, { order: 'asc' }],
           },
+          jobs: true,
         },
       })
     } catch (error) {

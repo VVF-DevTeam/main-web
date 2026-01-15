@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react'
 // Components
 import MobileSidebar from './_navbar/mobileSidebar'
 import NavLinks from './_navbar/navLinks'
-import CustomIcon from '@/app/[locale]/components/CustomIcon'
+import CustomIcon from '@/components/icon/CustomIcon'
 
 // Main Component
 const Navbar = () => {

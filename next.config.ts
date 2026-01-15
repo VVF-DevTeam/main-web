@@ -30,7 +30,11 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
+// Check if we're building on AWS Amplify
+const isAmplify = process.env.AWS_APP_ID !== undefined || process.env.AWS_EXECUTION_ENV !== undefined;
+
+// Only enable Sentry if NOT on AWS Amplify
+const exportConfig = isAmplify ? nextConfig : withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
@@ -67,3 +71,5 @@ export default withSentryConfig(nextConfig, {
     },
   },
 });
+
+export default exportConfig;

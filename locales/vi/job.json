@@ -28,5 +28,11 @@
   "noJobsOrVolunteersPosition": "Không tìm thấy việc làm hoặc vị trí tình nguyện bạn mong muốn. Vui lòng kiểm tra nội dung tìm kiếm của bạn hoặc gửi email cho chúng mình theo địa chỉ hr@vietvibe.org để ứng tuyển vào bộ phận bạn mong muốn.",
   "startDate": "Ngày Bắt Đầu",
   "see-more": "Xem Thêm",
-  "see-less": "Thu Gọn"
+  "see-less": "Thu Gọn",
+  "filter-by-event": "Lọc Theo Sự Kiện",
+  "all-events": "Tất Cả Sự Kiện",
+  "search-event": "Tìm kiếm sự kiện (nếu không hiển thị trong danh sách)",
+  "clear-filter": "Xóa Bộ Lọc",
+  "search-jobs": "Tìm Kiếm Công Việc",
+  "search-placeholder": "Tìm kiếm theo tiêu đề công việc..."
 }

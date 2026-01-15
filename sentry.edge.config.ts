@@ -5,10 +5,16 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-Sentry.init({
-  dsn: "https://2e45987640d9603e69f8d5fd7a7e6828@o4510616399708160.ingest.us.sentry.io/4510616401281024",
+// Check if we're running on AWS Amplify
+const isAmplify = process.env.AWS_APP_ID !== undefined || process.env.AWS_EXECUTION_ENV !== undefined;
 
-  // Enable sending user PII (Personally Identifiable Information)
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
-});
+// Only initialize Sentry if NOT on AWS Amplify
+if (!isAmplify) {
+  Sentry.init({
+    dsn: "https://2e45987640d9603e69f8d5fd7a7e6828@o4510616399708160.ingest.us.sentry.io/4510616401281024",
+
+    // Enable sending user PII (Personally Identifiable Information)
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
+    sendDefaultPii: true,
+  });
+}

@@ -110,6 +110,13 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
 
+#### 23. `getPublishedJobs`
+- **File**: `lib/actions/job/getJob.ts`
+- **Cache Key**: `['jobs-published']`
+- **Tags**: `['jobs']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns published jobs with optional filters (title search and event filter). Includes event relation (id, title, keyName) if job is linked to an event. Ordered by updatedAt descending.
+
 ---
 
 ### Reviews
@@ -274,6 +281,11 @@ This document provides a comprehensive overview of all functions using `unstable
 13. **`app/api/events/forms/[eventId]/route.ts`**
     - Function: `PUT`
     - Action: Creates or updates event form data. Event forms are part of event data, so changes must invalidate the cache.
+
+14. **`app/api/jobs/edit/[jobId]/route.ts`**
+    - Function: `PUT` (conditional)
+    - Line: 44
+    - Action: When a job's eventId is changed (linking/unlinking from an event), this triggers event cache revalidation. This is necessary because event queries include linked jobs, and the volunteer section visibility depends on this data.
 
 ---
 
@@ -442,33 +454,43 @@ This document provides a comprehensive overview of all functions using `unstable
 
 **Cached Functions Affected:**
 - `getAllJobs`
+- `getPublishedJobs`
 
 **Functions Calling `revalidateTag('jobs')`:**
 
 1. **`app/api/jobs/create/route.ts`**
    - Function: `POST`
    - Line: 22
-   - Action: Creates a new job
+   - Action: Creates a new job with title, jobType, keyName, and userId
+   - Also calls: `revalidatePath('/registration/jobs', 'page')`
 
 2. **`app/api/jobs/edit/[jobId]/route.ts`**
    - Function: `PUT`
-   - Line: 39
-   - Action: Updates an existing job
+   - Line: 39 (always), Line 44 (conditional)
+   - Action: Updates an existing job (excluding isPublished field, which is handled by publish/unpublish routes)
+   - Also calls: 
+     - `revalidatePath('/registration/jobs', 'page')`
+     - `revalidateTag('events')` - **conditionally called** when eventId changes (linking/unlinking job from event). This ensures event pages immediately show/hide volunteer sections based on linked jobs.
 
 3. **`app/api/jobs/publish/[jobId]/route.ts`**
    - Function: `PATCH`
    - Line: 35
    - Action: Publishes a job (sets isPublished to true)
+   - Also calls: `revalidatePath('/registration/jobs', 'page')`
 
 4. **`app/api/jobs/unpublish/[jobId]/route.ts`**
    - Function: `PATCH`
    - Line: 35
    - Action: Unpublishes a job (sets isPublished to false)
+   - Also calls: `revalidatePath('/registration/jobs', 'page')`
 
 5. **`app/api/jobs/delete/[jobId]/route.ts`**
    - Function: `DELETE`
    - Line: 34
-   - Action: Deletes a job
+   - Action: Deletes a job (with foreign key constraint check for existing applications)
+   - Also calls: `revalidatePath('/registration/jobs', 'page')`
+
+**Note:** The `/api/jobs/apply/[jobId]` and `/api/jobs/apply/host` routes do NOT call `revalidateTag('jobs')` because they create job applications without modifying job data itself.
 
 ---
 
@@ -507,7 +529,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
-| `jobs` | 1 function | 5 API routes | ✅ Fully covered |
+| `jobs` | 2 functions | 5 API routes | ✅ Fully covered |
 | `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
 
 ---
@@ -540,5 +562,9 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - When creating, updating, publishing, unpublishing, or deleting jobs, always call `revalidateTag('jobs')`
+- **Additionally**, call `revalidateTag('events')` when changing a job's eventId (linking/unlinking from event), as events include linked jobs and use this to display volunteer sections
+- Note: Job applications do NOT require `revalidateTag('jobs')` as they don't modify job data
+- When creating, updating, or refunding payments, always call `revalidateTag('payments')`
 - Social media posts cache automatically refreshes every 10 minutes
+
 

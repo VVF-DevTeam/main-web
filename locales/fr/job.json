@@ -28,5 +28,11 @@
   "noJobsOrVolunteersPosition": "Aucun emploi ni poste bénévole trouvé. Veuillez vérifier votre recherche, revenir plus tard ou nous envoyer votre adresse e-mail à hr@vietvibe.org pour postuler au service de votre choix.",
   "startDate": "Date de début",
   "see-more": "Voir plus",
-  "see-less": "Voir moins"
+  "see-less": "Voir moins",
+  "filter-by-event": "Filtrer par événement",
+  "all-events": "Tous les événements",
+  "search-event": "Rechercher un événement (s'il n'est pas affiché dans la liste)",
+  "clear-filter": "Effacer le filtre",
+  "search-jobs": "Rechercher des emplois",
+  "search-placeholder": "Rechercher par titre d'emploi..."
 }

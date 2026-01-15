@@ -4,7 +4,7 @@ import { Event } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
-import TimePicker from '@/app/[locale]/components/TimePicker'
+import TimePicker from '@/components/time/TimePicker'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 import { cn } from '@/lib/utils'

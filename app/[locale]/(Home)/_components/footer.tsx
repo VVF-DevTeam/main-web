@@ -6,7 +6,7 @@ import Image from 'next/image'
 // Components
 // import Link from 'next/link'
 // import { Separator } from '@radix-ui/react-separator'
-import CustomIcon from '@/app/[locale]/components/CustomIcon'
+import CustomIcon from '@/components/icon/CustomIcon'
 import Link from 'next/link'
 
 // Main Component

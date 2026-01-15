@@ -18,6 +18,10 @@ export const PUT = async (
       where: {
         id: jobId,
       },
+      select: {
+        id: true,
+        eventId: true,
+      },
     })
 
     if (!jobExists) {
@@ -37,6 +41,12 @@ export const PUT = async (
     // Revalidate the jobs page to reflect the changes
     revalidatePath('/registration/jobs', 'page')
     revalidateTag('jobs')
+    
+    // If eventId changed (linked/unlinked from event), also revalidate events cache
+    // This ensures event pages immediately show/hide the volunteer section
+    if (jobExists.eventId !== updatedJob.eventId) {
+      revalidateTag('events')
+    }
 
     return NextResponse.json(updatedJob)
   } catch (error: unknown) {
