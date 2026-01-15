@@ -28,7 +28,7 @@ import { FiEdit2 } from 'react-icons/fi'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
-import Loader from './Loader'
+import Loader from '@/components/loader/Loader'
 
 const profileSchema = z.object({
   email: z.string().email('Invalid email').nonempty(),

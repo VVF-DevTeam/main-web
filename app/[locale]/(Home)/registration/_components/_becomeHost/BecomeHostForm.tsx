@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import Loader from '@/components/loader/Loader'
 
 import AvailabilitySelector from './AvailabilitySelector'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -47,6 +48,7 @@ export default function BecomeHostForm({
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['host', 'event'])
   const [availability, setAvailability] = useState<Record<string, string[]>>({})
+  const [isLoading, setIsLoading] = useState(false)
 
   const currentDateTime = getCurrentDateTime()
   const form = useForm<z.infer<typeof hostApplicationSchema>>({
@@ -97,6 +99,7 @@ export default function BecomeHostForm({
         userId,
       }
 
+      setIsLoading(true)
       const response = await axios.post(
         '/api/jobs/apply/host',
         JSON.stringify(payload),
@@ -191,11 +194,14 @@ export default function BecomeHostForm({
           },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="min-h-screen py-6 sm:py-8 lg:py-12">
+      {isLoading && <Loader />}
       <div className="flex flex-col gap-y-6 px-4 sm:px-6 lg:px-8">
         {/* Policy Section */}
         <div>
