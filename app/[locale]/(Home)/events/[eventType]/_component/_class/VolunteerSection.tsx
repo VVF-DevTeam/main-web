@@ -22,18 +22,21 @@ export default function VolunteerSection({ locale, eventKeyName, eventType }: Vo
   const bgClasses = isConcert 
     ? 'bg-white hover:bg-gray-50' 
     : 'bg-bgColor-secondary200 hover:bg-bgColor-secondary300'
+  const heartClasses = isConcert
+    ? 'text-textColor-secondary200 fill-bgColor-secondary200'
+    : 'text-white fill-white'
 
   return (
     <Link 
       href={`/${locale}/registration/jobs?eventKeyName=${eventKeyName}`}
-      className={`relative flex items-center justify-between gap-4 ${bgClasses} rounded-2xl py-3 px-4 transition-colors group`}
+      className={`relative flex items-center justify-between gap-4 ${bgClasses} rounded-2xl py-3 px-4 shadow-md hover:shadow-lg transition-all group`}
       target="_blank"
       rel="noopener noreferrer"
     >
       <div className="flex items-center gap-4">
         {/* Icon volunteer */}
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-bgColor-brand600 flex-shrink-0">
-          <Heart className="h-4 w-4 text-white fill-white" />
+          <Heart className={`h-4 w-4 ${heartClasses}`} />
         </div>
         
         {/* Text */}
