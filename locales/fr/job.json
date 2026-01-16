@@ -34,5 +34,8 @@
   "search-event": "Rechercher un événement (s'il n'est pas affiché dans la liste)",
   "clear-filter": "Effacer le filtre",
   "search-jobs": "Rechercher des emplois",
-  "search-placeholder": "Rechercher par titre d'emploi..."
+  "search-placeholder": "Rechercher par titre d'emploi...",
+  "please-login": "Veuillez vous connecter",
+  "here": "ici",
+  "to-apply": "pour postuler à cet emploi"
 }

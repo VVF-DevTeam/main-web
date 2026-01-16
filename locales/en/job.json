@@ -34,5 +34,8 @@
   "search-event": "Search for event (if not shown in list)",
   "clear-filter": "Clear Filter",
   "search-jobs": "Search Jobs",
-  "search-placeholder": "Search by job title..."
+  "search-placeholder": "Search by job title...",
+  "please-login": "Please log in",
+  "here": "here",
+  "to-apply": "to apply for this job"
 }

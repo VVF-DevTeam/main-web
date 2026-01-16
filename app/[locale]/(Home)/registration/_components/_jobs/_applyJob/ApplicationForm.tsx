@@ -7,6 +7,10 @@ import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import { useSession } from 'next-auth/react'
+import { useTranslation } from 'react-i18next'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 // Components
 import {
@@ -38,6 +42,10 @@ const ApplicationForm = ({
   keyName,
   jobType,
 }: ApplicationProps) => {
+  const { data: session } = useSession()
+  // @ts-ignore: useTranslation will always throw an error for typescript
+  const { t } = useTranslation('job')
+
   const form = useForm<z.infer<typeof createApplicationSchema>>({
     resolver: zodResolver(createApplicationSchema),
     defaultValues: {
@@ -54,6 +62,24 @@ const ApplicationForm = ({
   })
 
   const currentDateTime = getCurrentDateTime()
+
+  // Check if user is logged in
+  if (!session?.user?.id) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <p className="text-textColor text-center">
+          {t('please-login')}{' '}
+          <Link
+            href={`/signIn`}
+            className="text-textColor-brand900 underline hover:text-textColor-brand700"
+          >
+            {t('here')}
+          </Link>{' '}
+          {t('to-apply')}
+        </p>
+      </div>
+    )
+  }
 
   const onSubmit = async (data: z.infer<typeof createApplicationSchema>) => {
     try {

@@ -56,7 +56,7 @@ const JobPage = async ({ params }: JobPageProps) => {
 
   return (
     <div>
-      <div className="gap-y-26 flex flex-col md:gap-y-10 lg:gap-y-0">
+      <div className="gap-y-26 flex flex-col md:gap-y-5 lg:gap-y-0">
         <BackButton />
 
         <JobHeader

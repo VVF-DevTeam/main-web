@@ -34,5 +34,8 @@
   "search-event": "Tìm kiếm sự kiện (nếu không hiển thị trong danh sách)",
   "clear-filter": "Xóa Bộ Lọc",
   "search-jobs": "Tìm Kiếm Công Việc",
-  "search-placeholder": "Tìm kiếm theo tiêu đề công việc..."
+  "search-placeholder": "Tìm kiếm theo tiêu đề công việc...",
+  "please-login": "Vui lòng đăng nhập",
+  "here": "tại đây",
+  "to-apply": "để apply vào công việc này"
 }

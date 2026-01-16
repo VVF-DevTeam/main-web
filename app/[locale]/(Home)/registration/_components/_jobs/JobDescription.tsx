@@ -39,7 +39,7 @@ const JobDescription = async ({
   const author = session?.user?.id!
 
   return (
-    <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-6 md:p-12 lg:gap-y-8 lg:p-16">
+    <div className="mx-auto flex max-w-[1100px] flex-col items-start gap-y-8 p-2 md:p-12 md:pt-4 lg:gap-y-8 lg:p-16 lg:pt-8">
       {/* Time and Location */}
       <div className="grid w-full justify-between gap-x-4 gap-y-4 md:flex">
         <div className="flex flex-col gap-y-2">

@@ -11,7 +11,7 @@ const JobHeader = ({ title, summary }: JobHeaderProps) => {
     <div className='flex-col-center gap-y-6 p-4 pt-32'>
       {/* Title */}
       <h1 className="web_h1 header-font-black">{title}</h1>
-      <h2 className="header-text header-font-black">{summary}</h2>
+      <h2 className="text-lg tracking-wide md:max-w-[80vw] md:text-2xl lg:max-w-[60vw]">{summary}</h2>
     </div>
   )
 }

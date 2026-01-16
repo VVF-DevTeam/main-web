@@ -47,11 +47,7 @@ const JobApplyModal = ({
   return (
     <div>
       {/* Apply Button */}
-      {author ? (
-        <Button onClick={openModal}>{t('apply-button')}</Button>
-      ) : (
-        'Please log in to apply for this job'
-      )}
+      <Button onClick={openModal} className="-mt-12">{t('apply-button')}</Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="scrollbar-thumb-rounded-full flex h-[80vh] max-h-[600px] w-[80vw] flex-col overflow-hidden overflow-x-clip rounded-xl bg-bgColor p-0">
           <DialogHeader className="sticky top-0 overflow-x-visible border-b-2 border-bgColor-black bg-bgColor px-6 pt-6">

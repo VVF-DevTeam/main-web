@@ -30,11 +30,12 @@ const nextConfig: NextConfig = {
   },
 }
 
-// Check if we're building on AWS Amplify
+// Check if we're building on AWS Amplify or in development
 const isAmplify = process.env.AWS_APP_ID !== undefined || process.env.AWS_EXECUTION_ENV !== undefined;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Only enable Sentry if NOT on AWS Amplify
-const exportConfig = isAmplify ? nextConfig : withSentryConfig(nextConfig, {
+// Only enable Sentry if NOT on AWS Amplify and NOT in development
+const exportConfig = (isAmplify || isDevelopment) ? nextConfig : withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
