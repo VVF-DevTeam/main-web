@@ -7,6 +7,7 @@ import { ArrowBigRightDash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import PostStats from './PostStats'
 import Link from 'next/link'
+import moment from 'moment-timezone'
 
 // Interfaces
 interface PostCardHorizontalProps {
@@ -35,8 +36,11 @@ const PostCardHorizontal = ({
   hasViewed,
   userId,
 }: PostCardHorizontalProps) => {
+  const createdAtVancouver = moment(createdAt).tz('America/Vancouver')
+
+
   return (
-    <div className="flex flex-col justify-center items-center w-full gap-y-1 overflow-hidden rounded-md border bg-[#FEFAF4] shadow-lg hover:bg-[#F2E3D5] lg:grid lg:grid-cols-[28%_1fr] lg:gap-x-8 lg:gap-y-6 xl:gap-x-10">
+    <div className="flex flex-col justify-center items-center w-full gap-y-1 overflow-hidden rounded-md border bg-bgColor-secondary100 shadow-lg hover:bg-bgColor-secondary200 lg:grid lg:grid-cols-[28%_1fr] lg:gap-x-8 lg:gap-y-6 xl:gap-x-10">
       {/*Column1 - Image */}
       <div className="relative aspect-video h-full w-full overflow-hidden">
         <Image
@@ -55,12 +59,12 @@ const PostCardHorizontal = ({
           {title}
         </h2>
         <p className="text-sm text-muted-foreground">
-          {createdAt.toLocaleString()}
+          {createdAtVancouver.format('MMM D, YYYY')}
         </p>
-        <p className="mt-1 text-wrap break-words text-textColor-gray500 md:mt-2 md:max-w-[90%]">
+        <p className="mt-1 text-wrap break-words text-textColor-black md:mt-2 md:max-w-[90%]">
           {summary}
         </p>
-        <div className="flex-between">
+        <div className="flex-between gap-x-2">
           {/* Post stats */}
           <PostStats
             postLikes={postLikes}
@@ -74,7 +78,8 @@ const PostCardHorizontal = ({
           <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-4 lg:pr-2 xl:pr-4">
             <Button
               variant={'default'}
-              className="flex-center gap-x-2 text-sm md:text-base"
+              className="flex-center gap-x-2 text-sm md:text-base md:h-9 md:px-4 md:py-2"
+              size={'sm'}
             >
               <span>Read More</span>
               <ArrowBigRightDash className="h-5 w-5 duration-100 ease-in group-hover:translate-x-1" />

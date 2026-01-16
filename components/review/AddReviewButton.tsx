@@ -405,7 +405,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
     if (user?.id) {
       setShowAddReviewModal(true)
     } else {
-      toast.error('Error', {
+      toast.error('You must be logged in to submit a review', {
         description: (
           <div className="flex flex-col gap-2">
             <span>Please log in to submit a review, thank you.</span>

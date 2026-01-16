@@ -14,7 +14,7 @@ const Footer = async ({ locale }: { locale: string }) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <footer className="bg-[#FEFAF4] py-6 pt-10 px-5 sm:px-12 md:px-[60px] lg:px-[120px]">
+    <footer className="bg-bgColor-secondary100 py-6 pt-10 px-5 sm:px-12 md:px-[60px] lg:px-[120px]">
       <div className="flex flex-col">
         <div className="flex w-[179px] gap-x-1 pb-5">
           <CustomIcon width={30} height={30} className="self-start" />
