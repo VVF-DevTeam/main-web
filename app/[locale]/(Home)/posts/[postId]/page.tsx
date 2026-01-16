@@ -67,6 +67,7 @@ const PostPage = async ({ params }: PostPageProps) => {
       <BackButton variant={'responsive'} />
       <PostBody
         title={post.title}
+        summary={post.summary!}
         createdAt={post.createdAt}
         content={post.content!}
         imageUrl={post.imgUrl!}

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import TextPreview from '../../../../../../components/quill/TextPreview'
 interface PostBodyProps {
   title: string
+  summary: string
   content: string
   imageUrl: string
   createdAt: Date
@@ -11,6 +12,7 @@ interface PostBodyProps {
 
 const PostBody = ({
   title,
+  summary,
   content,
   imageUrl,
   author,
@@ -18,9 +20,12 @@ const PostBody = ({
 }: PostBodyProps) => {
   return (
     <div className="flex-col-center gap-y-4 p-6 md:p-12 lg:p-16">
-      <h1 className="mb-2 text-4xl font-bold text-textColor hover:text-textColor/80 md:text-5xl lg:text-6xl">
+      <h1 className="mb-2 text-4xl font-bold text-textColor hover:text-textColor/80 md:text-5xl lg:text-6xl text-center">
         {title}
       </h1>
+      <p className="md:text-lg lg:text-xl text-muted-foreground text-center">
+        {summary}
+      </p>
       <span className="text-sm text-muted-foreground">
         {createdAt.toLocaleString()}
       </span>
