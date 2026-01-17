@@ -27,19 +27,20 @@ model Event {
   location           String?
   startTime          String?
   endTime            String?
+  startDate          DateTime?       @default(now())
+  endDate            DateTime        @default(now())
   capacity           Int?
+
+
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   days               String[]
-  endDate            DateTime        @default(now())
   eventType          EventType
   formLink           String?
-  fullCourseDiscount Int?
   imgUrl             String?
   isPublished        Boolean         @default(false)
   keyName            String          @unique
   price              Decimal?        @default(0)
-  startDate          DateTime?       @default(now())
   stripePriceId      String?
   stripeProductId    String?
   subscribedPriceId  String?
@@ -47,6 +48,10 @@ model Event {
   subtitle           String?
   subImgUrls         Json?
   imgUrls            Json?
+  seatingMap         Json?
+  eventHosts         Json?
+  
+  // Relations
   seriesId           String?
   sponsors           SponsorOnEvent[]
   series             EventSeries?    @relation(fields: [seriesId], references: [id])
@@ -58,8 +63,6 @@ model Event {
   jobs               Job[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
-  seatingMap         Json?
-  eventHosts         Json?
 
   @@unique([title, eventType])
   @@index([id])

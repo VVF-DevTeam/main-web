@@ -55,7 +55,6 @@ type EventWithRelations = {
   subscribedPriceId: string | null
   formLink: string | null
   keyName: string
-  fullCourseDiscount: number | null
   hosts: { name: string | null }[]
   schedules: EventSchedule[]
   eventType: string

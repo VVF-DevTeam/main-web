@@ -1,17 +1,12 @@
-'use client'
-
 // Libraries
-import { useSession } from 'next-auth/react'
+import { auth } from '@/auth'
 
 // Components
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-const EventAdminButtons = () => {
-  const { data: session, status } = useSession()
-
-  // Don't render anything while loading or if not authenticated
-  if (status === 'loading') return null
+const EventAdminButtons = async () => {
+  const session = await auth()
 
   const userRole = session?.user?.role
   const isAdmin = userRole?.includes('ADMIN')

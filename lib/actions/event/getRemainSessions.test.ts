@@ -14,17 +14,8 @@ beforeEach(() => {
 
 describe('Testing getRemainSessions function', () => {
   test('should return 0 if the event has already ended', async () => {
+    // Mock only returns the fields selected in the actual function
     prisma.event.findUnique.mockResolvedValue({
-      id: 'testingGetRemainSessions',
-      title: 'Test Event',
-      subtitle: null,
-      description: null,
-      location: null,
-      startTime: null,
-      endTime: null,
-      capacity: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
       days: [
         'SUNDAY',
         'MONDAY',
@@ -35,23 +26,7 @@ describe('Testing getRemainSessions function', () => {
         'SATURDAY',
       ],
       endDate: new Date('2024-02-01'),
-      eventType: 'CONCERT',
-      formLink: null,
-      fullCourseDiscount: null,
-      imgUrl: null,
-      subImgUrls: null,
-      imgUrls: null,
-      isPublished: false,
-      keyName: 'test-event',
-      price: null,
-      startDate: new Date('2024-01-01'),
-      stripePriceId: null,
-      stripeProductId: null,
-      subscribedPriceId: null,
-      socialLinks: null,
-      seriesId: null,
-      seatingMap: null,
-    })
+    } as any)
 
     const eventId = 'testingGetRemainSessions'
     const remainSessions = await getRemainSessions(eventId)
