@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
+import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import { EventTicket } from '@prisma/client'
@@ -63,6 +64,7 @@ export default function EventMultipleCheckout({
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
   const [showGuestForm, setShowGuestForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const isGuestCheckout = !userId || userId.trim() === ''
 
@@ -147,6 +149,7 @@ export default function EventMultipleCheckout({
     }
 
     try {
+      setIsLoading(true)
       // Prepare checkout items: group by ticket type with seat numbers
       const checkoutItems: Array<{
         ticketId: string
@@ -223,6 +226,8 @@ export default function EventMultipleCheckout({
             'Unexpected error occurred. Please contact our developer team for support.',
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }, [
     seatsByTicketType,
@@ -249,9 +254,11 @@ export default function EventMultipleCheckout({
   }
 
   return (
-    <div className="w-full">
-      <h3 className="web_h3 mb-2 font-semibold text-gray-900">Cart</h3>
-      <div className=" ">
+    <>
+      {isLoading && <Loader />}
+      <div className="w-full">
+        <h3 className="web_h3 mb-2 font-semibold text-gray-900">Cart</h3>
+        <div className=" ">
         {/* Cart Header */}
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -262,6 +269,7 @@ export default function EventMultipleCheckout({
             size="sm"
             onClick={onClearCart}
             className="text-sm text-red-600 hover:text-gray-700"
+            disabled={isLoading}
           >
             {t('clear-all')}
           </Button>
@@ -320,6 +328,7 @@ export default function EventMultipleCheckout({
                     onClick={() => onRemoveSeat(item.rowIndex, item.seatIndex)}
                     className="h-6 w-6 rounded p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
                     aria-label={`Remove ${item.seatName}`}
+                    disabled={isLoading}
                   >
                     ×
                   </Button>
@@ -416,7 +425,7 @@ export default function EventMultipleCheckout({
             <Button
               onClick={handleCheckoutButtonClick}
               className="group mt-4 w-full"
-              disabled={selectedSeatsWithTickets.length === 0}
+              disabled={selectedSeatsWithTickets.length === 0 || isLoading}
             >
               {t('reserve-button')}{' '}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -443,6 +452,7 @@ export default function EventMultipleCheckout({
           </Dialog>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }

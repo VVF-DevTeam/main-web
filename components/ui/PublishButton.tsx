@@ -1,10 +1,11 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface PublishButtonProps {
   id: string
@@ -13,7 +14,7 @@ interface PublishButtonProps {
   type: 'post' | 'event' | 'class' | 'job'
   domain: 'posts' | 'events' | 'classes' | 'jobs'
 }
-// TODO: Add the types to a different file.
+
 const PublishButton = ({
   id,
   canPublish,
@@ -24,9 +25,11 @@ const PublishButton = ({
   const router = useRouter()
   const action = isPublished ? 'Unpublish' : 'Publish'
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const publishOrUnpublish = async (action: 'Unpublish' | 'Publish') => {
     try {
+      setIsLoading(true)
       await axiosInstance.patch(`/api/${domain}/${action.toLowerCase()}/${id}`)
       toast.success(`Successfully ${action.toLowerCase()}ed ${type}`, {
         description: (
@@ -52,16 +55,21 @@ const PublishButton = ({
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
   return (
-    <Button
-      onClick={() => publishOrUnpublish(action)}
-      variant={'black'}
-      disabled={!canPublish}
-    >
-      {action}
-    </Button>
+    <>
+      {isLoading && <Loader />}
+      <Button
+        onClick={() => publishOrUnpublish(action)}
+        variant={'black'}
+        disabled={!canPublish || isLoading}
+      >
+        {action}
+      </Button>
+    </>
   )
 }
 

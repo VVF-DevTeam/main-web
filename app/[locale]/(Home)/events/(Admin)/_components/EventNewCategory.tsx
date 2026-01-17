@@ -19,6 +19,7 @@ import PreviewBadge from './PreviewBadge'
 
 import 'react-color-palette/css'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventNewCategoryProps {
   categoryId?: string
@@ -47,6 +48,7 @@ const EventNewCategory = ({
   const [isBold, setIsBold] = useState(initialIsBold || false)
   const [bgcolor, setBgColor] = useColor(initialBgColor || '#ffff')
   const [titleColor, setTitleColor] = useColor(initialTextColor || '#1A1A1A')
+  const [isLoading, setIsLoading] = useState(false)
 
   const router = useRouter()
 
@@ -101,6 +103,7 @@ const EventNewCategory = ({
     }
 
     try {
+      setIsLoading(true)
       if (isEditMode) {
         // Update existing category
         const response = await axiosInstance.put(`/api/categories/edit/${categoryId}`, data)
@@ -132,11 +135,15 @@ const EventNewCategory = ({
     } catch (error) {
       console.log(error)
       toast.error('Something went wrong', { description: 'Please try again later' })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="relative grid grid-cols-1 justify-items-center gap-y-12 md:grid-cols-2 md:place-items-start md:justify-items-start md:gap-x-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="relative grid grid-cols-1 justify-items-center gap-y-12 md:grid-cols-2 md:place-items-start md:justify-items-start md:gap-x-6">
       {/* ------------------ Row 1 -------------------------*/}
 
       {/* ------------------ Column 1 -------------------------*/}
@@ -149,6 +156,7 @@ const EventNewCategory = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Eg: #category1"
+            disabled={isLoading}
             className="max-w-[250px] bg-slate-100 text-gray-800"
           />
         </div>
@@ -156,7 +164,7 @@ const EventNewCategory = ({
           <h3 className="mb-6 font-semibold text-gray-600 md:text-xl">
             STEP II: Choose category type.
           </h3>
-          <Select onValueChange={setCategoryType} value={categoryType}>
+          <Select onValueChange={setCategoryType} value={categoryType} disabled={isLoading}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Choose type" />
             </SelectTrigger>
@@ -175,12 +183,14 @@ const EventNewCategory = ({
             <Checkbox
               checked={isItalic}
               onCheckedChange={() => setIsItalic(!isItalic)}
+              disabled={isLoading}
               id="itallic"
             />
             <Label htmlFor="bold">Bold</Label>
             <Checkbox
               checked={isBold}
               onCheckedChange={() => setIsBold(!isBold)}
+              disabled={isLoading}
               id="bold"
             />
           </div>
@@ -198,7 +208,7 @@ const EventNewCategory = ({
           color={bgcolor}
           hideInput={['rgb', 'hsv']}
           onChange={setBgColor}
-          disabled={false}
+          disabled={isLoading}
         />
       </div>
 
@@ -215,7 +225,7 @@ const EventNewCategory = ({
           color={titleColor}
           hideInput={['rgb', 'hsv']}
           onChange={setTitleColor}
-          disabled={false}
+          disabled={isLoading}
         />
       </div>
 
@@ -233,11 +243,12 @@ const EventNewCategory = ({
       <Button
         onClick={() => saveCategory()}
         className="mt-6 md:absolute md:bottom-0 md:right-0"
-        disabled={isDisabled}
+        disabled={isDisabled || isLoading}
       >
         {isEditMode ? 'Update Category' : 'Save Changes'}
       </Button>
     </div>
+    </>
   )
 }
 

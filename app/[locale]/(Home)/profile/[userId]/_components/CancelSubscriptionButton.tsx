@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import axios from 'axios'
+import { axiosInstance } from '@/lib/axios'
 import { useRouter } from 'next/navigation'
+import Loader from '@/components/loader/Loader'
 
 interface CancelSubscriptionButtonProps {
   subscriptionId: string | null
@@ -23,7 +24,7 @@ export default function CancelSubscriptionButton({
       if (!subscriptionId) return
 
       try {
-        const { data } = await axios.get(`/api/subscriptions/${subscriptionId}/status`)
+        const { data } = await axiosInstance.get(`/api/subscriptions/${subscriptionId}/status`)
 
         setIsScheduledForCancellation(data.cancel_at_period_end)
       } catch (error) {
@@ -39,7 +40,7 @@ export default function CancelSubscriptionButton({
 
     try {
       setIsLoading(true)
-      const response = await axios.post('/api/subscriptions/cancel', { subscriptionId })
+      const response = await axiosInstance.post('/api/subscriptions/cancel', { subscriptionId })
       if (response.status === 200) {
         setIsScheduledForCancellation(true)
         router.refresh()
@@ -54,7 +55,7 @@ export default function CancelSubscriptionButton({
   const handleReactivateSubscription = async () => {
     try {
       setIsLoading(true)
-      const response = await axios.post('/api/subscriptions/reactivate', { subscriptionId })
+      const response = await axiosInstance.post('/api/subscriptions/reactivate', { subscriptionId })
       if (response.status === 200) {
         setIsScheduledForCancellation(false)
         router.refresh()
@@ -68,23 +69,29 @@ export default function CancelSubscriptionButton({
 
   if (isScheduledForCancellation) {
     return (
-      <button
-        onClick={handleReactivateSubscription}
-        disabled={isLoading}
-        className="mt-4 text-sm font-medium text-green-600 hover:text-green-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-        >
-        {isLoading ? t('reactivating') : t('reactivate-subscription')}
-      </button>
+      <>
+        {isLoading && <Loader />}
+        <button
+          onClick={handleReactivateSubscription}
+          disabled={isLoading}
+          className="mt-4 text-sm font-medium text-green-600 hover:text-green-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+          {isLoading ? t('reactivating') : t('reactivate-subscription')}
+        </button>
+      </>
     )
   }
 
   return (
-    <button
-      onClick={handleCancelSubscription}
-      disabled={isLoading}
-      className="mt-4 text-sm font-medium text-red-600 hover:text-red-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {isLoading ? t('canceling') : t('cancel-subscription')}
-    </button>
+    <>
+      {isLoading && <Loader />}
+      <button
+        onClick={handleCancelSubscription}
+        disabled={isLoading}
+        className="mt-4 text-sm font-medium text-red-600 hover:text-red-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isLoading ? t('canceling') : t('cancel-subscription')}
+      </button>
+    </>
   )
 }

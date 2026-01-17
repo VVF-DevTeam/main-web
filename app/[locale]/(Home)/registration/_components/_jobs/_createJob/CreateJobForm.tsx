@@ -1,12 +1,15 @@
 'use client'
 // Libraries
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios, { AxiosError } from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 // Components
 import Link from 'next/link'
@@ -57,6 +60,7 @@ const createJobSchema = z.object({
 const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
@@ -65,7 +69,7 @@ const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
       jobType: '',
     },
   })
-  const { isValid, isLoading } = form.formState
+  const { isValid } = form.formState
 
   const onSubmit = async (data: z.infer<typeof createJobSchema>) => {
     //Format title to trims whitespaces
@@ -75,13 +79,14 @@ const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
     const keyName = formatKeyName(title)
 
     try {
+      setIsLoading(true)
       const jobData = {
         title: title,
         jobType: data.jobType,
         keyName: keyName,
         userId: author,
       }
-      const response = await axios.post('/api/jobs/create', jobData)
+      const response = await axiosInstance.post('/api/jobs/create', jobData)
       if (response.status === 200) {
         toast.success('Job created successfully', {
           description: (
@@ -173,15 +178,19 @@ const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
           },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-y-8">
-      <div className="flex flex-col items-center gap-y-2">
-        <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
-          Give a title to your job posting
-        </h1>
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col items-center gap-y-8">
+        <div className="flex flex-col items-center gap-y-2">
+          <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
+            Give a title to your job posting
+          </h1>
         <p className="text-sm text-muted-foreground">
           What would you like to name your job posting? Do not worry, you can
           change this later.
@@ -288,7 +297,8 @@ const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
           </div>
         </form>
       </Form>
-    </div>
+      </div>
+    </>
   )
 }
 

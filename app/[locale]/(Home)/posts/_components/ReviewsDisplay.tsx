@@ -12,7 +12,8 @@ import {
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { FiEdit2 } from 'react-icons/fi'
-import axios from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 import {
   deleteReview,
   updateReview,
@@ -108,6 +109,7 @@ const ReviewsDisplay = ({
   const [editImagePreview, setEditImagePreview] = useState('')
   const [isEditImageLoading, setIsEditImageLoading] = useState(false)
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Helper function to convert ReviewRating enum to number
   const ratingEnumToNumber = convertReviewRatingToNumber
@@ -187,15 +189,16 @@ const ReviewsDisplay = ({
       const formData = new FormData()
       formData.append('file', file)
       try {
-        const response = await axios.post('/api/reviews/images', formData)
+        const response = await axiosInstance.post('/api/reviews/images', formData)
         if (response.status === 200) {
           setEditImagePreview(response.data.url)
         }
       } catch (error) {
         console.error('Error uploading image:', error)
         toast.error('Failed to upload image')
+      } finally {
+        setIsEditImageLoading(false)
       }
-      setIsEditImageLoading(false)
     }
   }
 
@@ -214,6 +217,7 @@ const ReviewsDisplay = ({
     }
 
     try {
+      setIsLoading(true)
       const { success } = await updateReview(reviewId, {
         comment: editComment.trim(),
         rating: editRating,
@@ -236,6 +240,8 @@ const ReviewsDisplay = ({
     } catch (error) {
       console.error('Error updating review:', error)
       toast.error(t('reviewUpdateError'))
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -252,6 +258,7 @@ const ReviewsDisplay = ({
     if (currentUserId !== review.userId) return
 
     try {
+      setIsLoading(true)
       const { success } = await deleteReview(review.id)
       if (success) {
         toast.success(t('reviewDeleted'))
@@ -263,6 +270,8 @@ const ReviewsDisplay = ({
     } catch (error) {
       console.error('Error deleting review:', error)
       toast.error(t('deleteError'))
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -289,7 +298,9 @@ const ReviewsDisplay = ({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-6">
       {/* Search and Filter Section */}
       <SearchAndFilter
         searchLabel={t('searchReviews') || 'Search Reviews'}
@@ -429,6 +440,7 @@ const ReviewsDisplay = ({
                           t('enterComment') || 'Enter your comment...'
                         }
                         className="w-full"
+                        disabled={isLoading}
                       />
 
                       {/* Anonymous Toggle */}
@@ -438,6 +450,7 @@ const ReviewsDisplay = ({
                           <Switch
                             checked={editAnonymous}
                             onCheckedChange={setEditAnonymous}
+                            disabled={isLoading}
                           />
                           <span className="text-sm text-gray-600">
                             {editAnonymous ? 'Yes' : 'No'}
@@ -502,6 +515,7 @@ const ReviewsDisplay = ({
                               size="sm"
                               onClick={() => setEditImagePreview('')}
                               className="mt-2 text-red-600 hover:text-red-800"
+                              disabled={isLoading}
                             >
                               Remove Image
                             </Button>
@@ -515,6 +529,7 @@ const ReviewsDisplay = ({
                           size="sm"
                           onClick={() => handleSaveEdit(review.id)}
                           className="bg-green-600 hover:bg-green-700"
+                          disabled={isLoading}
                         >
                           Save
                         </Button>
@@ -522,6 +537,7 @@ const ReviewsDisplay = ({
                           size="sm"
                           variant="outline"
                           onClick={handleCancelEdit}
+                          disabled={isLoading}
                         >
                           Cancel
                         </Button>
@@ -628,6 +644,7 @@ const ReviewsDisplay = ({
                         size="sm"
                         onClick={() => handleEditReview(review)}
                         className="text-textColor-blue hover:bg-blue-50 hover:text-blue-800"
+                        disabled={isLoading}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -636,6 +653,7 @@ const ReviewsDisplay = ({
                         size="sm"
                         onClick={() => handleDeleteReview(review)}
                         className="text-red-600 hover:bg-red-50 hover:text-red-800"
+                        disabled={isLoading}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -700,6 +718,7 @@ const ReviewsDisplay = ({
         </div>
       )}
     </div>
+    </>
   )
 }
 

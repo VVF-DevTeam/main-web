@@ -80,8 +80,7 @@ const EventCardHorizontal = async ({
         <div className="flex items-center gap-2">
           <Ticket className="h-4 w-4 flex-shrink-0 rotate-45 text-bgColor-brand900 md:h-5 md:w-5" />
           <span>
-            {getEventPrices(event.tickets, Number(event.price))}
-            {/* {event.priceMember ? '/$' + event.priceMember : null} */}
+            {getEventPrices(event.tickets)}
           </span>
         </div>
       </div>

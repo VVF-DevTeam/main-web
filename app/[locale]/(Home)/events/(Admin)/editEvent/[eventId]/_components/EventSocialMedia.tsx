@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface EventSocialMediaProps {
   event: Event
@@ -26,6 +27,7 @@ const socialMediaOptions = [
 const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>(
     event.socialLinks as { platform: string; url: string }[] || []
   )
@@ -48,6 +50,7 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
 
   const handleSubmit = async () => {
     try {
+      setIsLoading(true)
       // Filter out incomplete social links
       const completeLinks = socialLinks.filter(link => link.platform && link.url)
       
@@ -76,11 +79,15 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex flex-col gap-y-4">
         {socialLinks.map((link, index) => (
           <div key={index} className="flex items-end gap-x-4">
@@ -114,6 +121,7 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
             <Button
               variant="destructive"
               onClick={() => handleRemoveLink(index)}
+              disabled={isLoading}
               className="mb-[2px]"
             >
               Remove
@@ -122,12 +130,13 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
         ))}
       </div>
       <div className="flex gap-x-4">
-        <Button onClick={handleAddLink} variant="outline">
+        <Button onClick={handleAddLink} variant="outline" disabled={isLoading}>
           Add Social Media Link
         </Button>
-        <Button onClick={handleSubmit}>Save Changes</Button>
+        <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
       </div>
     </div>
+    </>
   )
 }
 

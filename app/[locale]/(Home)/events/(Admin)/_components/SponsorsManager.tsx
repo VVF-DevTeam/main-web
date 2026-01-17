@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus, Edit, X } from 'lucide-react'
 
+import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -245,10 +246,12 @@ const SponsorsManager = ({
   }
 
   return (
-    <div className="mt-8 flex flex-col gap-10">
-      <h1 className="mb-4 text-center text-2xl font-semibold md:text-3xl lg:text-4xl">
-        Manage Sponsors
-      </h1>
+    <>
+      {isSubmitting && <Loader />}
+      <div className="mt-8 flex flex-col gap-10">
+        <h1 className="mb-4 text-center text-2xl font-semibold md:text-3xl lg:text-4xl">
+          Manage Sponsors
+        </h1>
 
       {/* Sponsors list and form */}
       <div className="flex flex-col gap-6 rounded-xl bg-slate-100 p-6 lg:flex-row lg:items-start">
@@ -256,7 +259,7 @@ const SponsorsManager = ({
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">All Sponsors</h2>
-            <Button size="sm" onClick={resetForm} className="gap-2">
+            <Button size="sm" onClick={resetForm} className="gap-2" disabled={isSubmitting}>
               <Plus className="h-4 w-4" />
               New Sponsor
             </Button>
@@ -267,8 +270,8 @@ const SponsorsManager = ({
               {sponsors.map((sponsor) => (
                 <Card
                   key={sponsor.id}
-                  className={`cursor-pointer p-4 transition-shadow hover:shadow-md ${sponsor.name === editingSponsor?.name ? 'bg-bgColor-secondary200' : ''}`}
-                  onClick={() => handleEditClick(sponsor)}
+                  className={`p-4 transition-shadow ${!isSubmitting ? 'cursor-pointer hover:shadow-md' : 'cursor-not-allowed opacity-60'} ${sponsor.name === editingSponsor?.name ? 'bg-bgColor-secondary200' : ''}`}
+                  onClick={() => !isSubmitting && handleEditClick(sponsor)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded bg-slate-200">
@@ -333,7 +336,7 @@ const SponsorsManager = ({
               {editingSponsor ? 'Edit Sponsor' : 'Add New Sponsor'}
             </h2>
             {editingSponsor && (
-              <Button size="sm" variant="ghost" onClick={resetForm}>
+              <Button size="sm" variant="ghost" onClick={resetForm} disabled={isSubmitting}>
                 <X className="h-4 w-4" />
               </Button>
             )}
@@ -354,6 +357,7 @@ const SponsorsManager = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Eg: Awesome Company Inc."
+                disabled={isSubmitting}
               />
             </div>
 
@@ -365,6 +369,7 @@ const SponsorsManager = ({
                 onCheckedChange={(checked) =>
                   setDisplayName(checked as boolean)
                 }
+                disabled={isSubmitting}
               />
               <label
                 htmlFor="displayName"
@@ -405,6 +410,7 @@ const SponsorsManager = ({
                 value={imgUrl}
                 onChange={(e) => setImgUrl(e.target.value)}
                 placeholder="https://drive.google.com/thumbnail?id=xxx"
+                disabled={isSubmitting}
               />
               {/* Image preview when user inputs image link */}
               {imgUrl && (
@@ -438,6 +444,7 @@ const SponsorsManager = ({
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://www.example.com"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -455,6 +462,7 @@ const SponsorsManager = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Short description about the sponsor..."
                 className="min-h-[100px]"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -475,6 +483,7 @@ const SponsorsManager = ({
                             onCheckedChange={() =>
                               toggleEventSelection(event.id)
                             }
+                            disabled={isSubmitting}
                           />
                           <label
                             htmlFor={event.id}
@@ -497,6 +506,7 @@ const SponsorsManager = ({
                                     value as SponsorTier
                                   )
                                 }
+                                disabled={isSubmitting}
                               >
                                 <SelectTrigger className="h-8 w-32">
                                   <SelectValue />
@@ -530,6 +540,7 @@ const SponsorsManager = ({
                                 }}
                                 className="h-8 w-20"
                                 placeholder="0"
+                                disabled={isSubmitting}
                               />
                             </div>
                           </div>
@@ -580,7 +591,8 @@ const SponsorsManager = ({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

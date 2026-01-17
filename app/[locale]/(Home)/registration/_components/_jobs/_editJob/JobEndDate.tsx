@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
+import Loader from '@/components/loader/Loader'
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -32,6 +33,7 @@ const JobEndDateSchema = z.object({
 const JobEndDate = ({ job }: JobEndDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [noEndDate, setNoEndDate] = useState(false) // NEW STATE
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const form = useForm<z.infer<typeof JobEndDateSchema>>({
@@ -63,6 +65,7 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
     }
 
     try {
+      setIsLoading(true)
       const response = await axiosInstance.put(`/api/jobs/edit/${job.id}`, {
         endDate,
       })
@@ -83,101 +86,108 @@ const JobEndDate = ({ job }: JobEndDateProps) => {
           color: '#ef4444', // red-500 color
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold">Job End Date</h3>
-        <Button
-          variant={null}
-          onClick={() => setIsEditing(!isEditing)}
-          className={cn(
-            isEditing
-              ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
-              : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
-          )}
-        >
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold">Job End Date</h3>
+          <Button
+            variant={null}
+            onClick={() => setIsEditing(!isEditing)}
+            className={cn(
+              isEditing
+                ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
+                : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
+            )}
+            disabled={isLoading}
+          >
+            {isEditing ? (
+              'Cancel'
+            ) : (
+              <span className="flex gap-x-2">
+                Edit <Pencil className="h-5 w-5" />
+              </span>
+            )}
+          </Button>
+        </div>
+
+        {/* FORM */}
+        <div>
           {isEditing ? (
-            'Cancel'
-          ) : (
-            <span className="flex gap-x-2">
-              Edit <Pencil className="h-5 w-5" />
-            </span>
-          )}
-        </Button>
-      </div>
+            <>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <FormField
+                    name="endDate"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <DatePicker
+                            value={field.value ?? undefined}
+                            onChange={field.onChange}
+                            disabled={noEndDate || isLoading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      {/* FORM */}
-      <div>
-        {isEditing ? (
-          <>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  name="endDate"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <DatePicker
-                          value={field.value ?? undefined}
-                          onChange={field.onChange}
-                          disabled={noEndDate}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <div className="mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setNoEndDate(!noEndDate)
+                        if (!noEndDate) {
+                          form.setValue('endDate', null)
+                        }
+                      }}
+                      disabled={isLoading}
+                    >
+                      {noEndDate ? 'Have End Date' : 'No End Date'}
+                    </Button>
+                  </div>
 
-                <div className="mt-2">
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {noEndDate
+                      ? 'End Date will be removed.'
+                      : 'Use the calendar above to pick your desired end date.'}
+                  </p>
+
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setNoEndDate(!noEndDate)
-                      if (!noEndDate) {
-                        form.setValue('endDate', null)
-                      }
-                    }}
+                    variant={'default'}
+                    className="mt-6"
+                    disabled={!isValid || isSubmitting || isLoading}
                   >
-                    {noEndDate ? 'Have End Date' : 'No End Date'}
+                    Save
                   </Button>
-                </div>
-
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {noEndDate
-                    ? 'End Date will be removed.'
-                    : 'Use the calendar above to pick your desired end date.'}
-                </p>
-
-                <Button
-                  variant={'default'}
-                  className="mt-6"
-                  disabled={!isValid || isSubmitting}
-                >
-                  Save
-                </Button>
-              </form>
-            </Form>
-          </>
-        ) : !job.endDate ? (
-          <p className="italic text-muted-foreground text-slate-500">
-            No End Date set for this job.
-          </p>
-        ) : (
-          <p className="text-muted-foreground">
-            {new Date(job.endDate).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </p>
-        )}
+                </form>
+              </Form>
+            </>
+          ) : !job.endDate ? (
+            <p className="italic text-muted-foreground text-slate-500">
+              No End Date set for this job.
+            </p>
+          ) : (
+            <p className="text-muted-foreground">
+              {new Date(job.endDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

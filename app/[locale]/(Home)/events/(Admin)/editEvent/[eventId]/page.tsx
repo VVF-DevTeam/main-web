@@ -112,14 +112,15 @@ const EditEventPage = async ({
     !!event.title,
     !!event.eventType,
     !!event.description,
-    !!event.price,
     !!event.capacity,
+
     !!event.location,
     !!event.imgUrl,
     !!event.startTime && !!event.endTime,
     !!event.startDate,
     !!event.endDate,
     // !!event.formLink,
+    event.tickets.length === 0 ? false : true,
     event.hosts.length === 0 ? false : true,
     event.days.length === 0 ? false : true,
     event.schedules.length === 0 ? false : true,
@@ -205,7 +206,7 @@ const EditEventPage = async ({
           {/* Price */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step V :</span> Price
+              <span className="text-gray-500">Step V :</span> Tickets
             </h2>
             <EventPrice event={event} />
           </div>
@@ -302,7 +303,7 @@ const EditEventPage = async ({
           {/* Event Series */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XV :</span> Event Series
+              <span className="text-gray-500">Step XV :</span> Event Series (Optional)
             </h2>
             <p>
               If you don&apos;t see any series, you can create one{' '}
@@ -381,7 +382,7 @@ const EditEventPage = async ({
           {/* Event Form */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XXI :</span> Event Form
+              <span className="text-gray-500">Step XXI :</span> Event Form (Optional)
             </h2>
             <EventForm event={event} />
           </div>

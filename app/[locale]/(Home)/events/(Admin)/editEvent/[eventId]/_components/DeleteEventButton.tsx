@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface DeleteEventButtonProps {
   eventId: string
@@ -70,7 +71,9 @@ const DeleteEventButton = ({ eventId }: DeleteEventButtonProps) => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
+      {isDeleting && <Loader />}
+      <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={'destructive'}>Delete Event</Button>
       </DialogTrigger>
@@ -100,6 +103,7 @@ const DeleteEventButton = ({ eventId }: DeleteEventButtonProps) => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    </>
   )
 }
 

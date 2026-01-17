@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventCapacityProps {
   event: Event
@@ -33,6 +34,7 @@ const EventCapacitySchema = z.object({
 const EventCapacity = ({ event }: EventCapacityProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof EventCapacitySchema>>({
     resolver: zodResolver(EventCapacitySchema),
     defaultValues: {
@@ -42,6 +44,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventCapacitySchema>) => {
     try {
+      setIsLoading(true)
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast.success('Success', {
@@ -59,15 +62,20 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Capacity</h1>
         <button
           onClick={() => setEditing(!editing)}
+          disabled={isLoading}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
             !editing && 'text-[#C54B3E] hover:text-slate-700'
@@ -100,7 +108,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
+            <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
           </form>
         </Form>
       ) : !event?.capacity ? (
@@ -111,6 +119,7 @@ const EventCapacity = ({ event }: EventCapacityProps) => {
         <div className="text-muted-foreground">{event.capacity}</div>
       )}
     </div>
+    </>
   )
 }
 

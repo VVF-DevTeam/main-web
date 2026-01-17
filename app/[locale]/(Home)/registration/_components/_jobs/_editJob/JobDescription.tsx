@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
+import Loader from '@/components/loader/Loader'
 import Editor from '@/components/quill/Editor'
 import TextPreview from '@/components/quill/TextPreview'
 import { cn } from '@/lib/utils'
@@ -35,6 +36,7 @@ const JobDescriptionSchema = z.object({
 const JobDescription = ({ job }: JobDescriptionProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof JobDescriptionSchema>>({
     resolver: zodResolver(JobDescriptionSchema),
     defaultValues: {
@@ -44,67 +46,84 @@ const JobDescription = ({ job }: JobDescriptionProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof JobDescriptionSchema>) => {
     try {
+      setIsLoading(true)
       await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
-      toast.success('Job description updated successfully')
+      toast.success('Job description updated successfully', {
+        description: 'Job description updated successfully',
+        style: {
+          color: '#22c55e' // green-500 color
+        }
+      })
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast.error('Something went wrong', { description: 'Please try again later' })
+      toast.error('Something went wrong', {
+        description: 'Please try again later',
+        style: {
+          color: '#ef4444' // red-500 color
+        }
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Job Description</h1>
-        <button
-          onClick={() => setEditing(!editing)}
-          className={cn(
-            'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-textColor-brand900 hover:text-slate-700'
-          )}
-        >
-          {editing ? (
-            <span>Cancel</span>
-          ) : (
-            <span className="flex items-center justify-center gap-x-2">
-              Edit Description <Pencil className="h-4 w-4" />
-            </span>
-          )}
-        </button>
-      </div>
-      {editing ? (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-20 md:space-y-16"
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Job Description</h1>
+          <button
+            onClick={() => setEditing(!editing)}
+            className={cn(
+              'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
+              !editing && 'text-textColor-brand900 hover:text-slate-700'
+            )}
+            disabled={isLoading}
           >
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormControl>
-                    <Editor onChange={field.onChange} value={field.value} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
-          </form>
-        </Form>
-      ) : !job?.description ? (
-        <p className="text-sm italic text-muted-foreground text-slate-500">
-          Add a description for this job (At least 100 characters).
-        </p>
-      ) : (
-        <div className="text-muted-foreground">
-          <TextPreview value={job.description} />
+            {editing ? (
+              <span>Cancel</span>
+            ) : (
+              <span className="flex items-center justify-center gap-x-2">
+                Edit Description <Pencil className="h-4 w-4" />
+              </span>
+            )}
+          </button>
         </div>
-      )}
-    </div>
+        {editing ? (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-20 md:space-y-16"
+            >
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Editor onChange={field.onChange} value={field.value} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
+            </form>
+          </Form>
+        ) : !job?.description ? (
+          <p className="text-sm italic text-muted-foreground text-slate-500">
+            Add a description for this job (At least 100 characters).
+          </p>
+        ) : (
+          <div className="text-muted-foreground">
+            <TextPreview value={job.description} />
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 

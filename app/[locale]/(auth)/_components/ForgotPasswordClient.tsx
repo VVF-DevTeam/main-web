@@ -12,14 +12,15 @@ import {
 } from '@/components/ui/form'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { isAxiosError } from 'axios'
 import { Info, KeyRound } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import ClipLoader from 'react-spinners/ClipLoader'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import Loader from '@/components/loader/Loader'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: 'Invalid email format' }),
@@ -55,10 +56,9 @@ const ForgotPasswordClient = () => {
   const onSubmitEmail = async (data: ForgotPasswordFormValues) => {
     try {
       setLoading(true)
-      const response = await axios.post('/api/auth/forgotPassword', {
+      const response = await axiosInstance.post('/api/auth/forgotPassword', {
         email: data.email,
       })
-      setLoading(false)
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
           description: (
@@ -92,9 +92,8 @@ const ForgotPasswordClient = () => {
         }, 1000)
       }
     } catch (error) {
-      setLoading(false)
       console.error('Error:', error)
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.message || 'Failed to send reset email'
         const statusCode = error.response?.status || 500
@@ -121,19 +120,23 @@ const ForgotPasswordClient = () => {
           },
         })
       }
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>
-      </div>
+    <>
+      {loading && <Loader />}
+      <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>
+        </div>
 
-      <div className="relative mx-4 w-full max-w-md">
-        <div className="border-bg-white/20 overflow-hidden rounded-2xl border bg-white/80 shadow-2xl backdrop-blur-sm">
-          <div className="p-8">
+        <div className="relative mx-4 w-full max-w-md">
+          <div className="border-bg-white/20 overflow-hidden rounded-2xl border bg-white/80 shadow-2xl backdrop-blur-sm">
+            <div className="p-8">
             <div className="mb-8 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-bgColor-secondary600">
                 <KeyRound className="mx-auto h-8 w-8 text-textColor-brandDark900" />
@@ -167,6 +170,7 @@ const ForgotPasswordClient = () => {
                           }
                           className="h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900"
                           {...field}
+                          disabled={loading}
                         />
                       </FormControl>
                       <FormMessage className="text-sm" />
@@ -180,17 +184,12 @@ const ForgotPasswordClient = () => {
                   variant="default"
                   className="h-12 w-full"
                 >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <ClipLoader size={20} color="white" />
-                      <span>{t('sending')}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{t('send-reset-email')}</span>
-                      {countDown > 0 && <span>({countDown})</span>}
-                    </div>
-                  )}
+                  <div className="flex items-center justify-center gap-2">
+                    <span>
+                      {loading ? t('sending') : t('send-reset-email')}
+                    </span>
+                    {countDown > 0 && !loading && <span>({countDown})</span>}
+                  </div>
                 </Button>
               </form>
             </Form>
@@ -213,7 +212,8 @@ const ForgotPasswordClient = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

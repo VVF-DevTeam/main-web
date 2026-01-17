@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 // Components
+import Loader from '@/components/loader/Loader'
 import { ThumbsUp } from 'lucide-react'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -121,45 +122,48 @@ const PostStats = ({
     }
   }
   return (
-    <div className="flex items-center gap-x-6 text-sm text-muted-foreground">
-      <div className="flex items-center gap-x-1">
-        <button
-          onClick={() => updateLikes(localHasLiked ? 'unlike' : 'like')}
-          disabled={isLoading}
-          className={cn(
-            'flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black p-[6px] text-sm text-muted-foreground transition-opacity',
-            isLoading && 'cursor-not-allowed opacity-50'
-          )}
-          aria-label={localHasLiked ? 'Unlike post' : 'Like post'}
-        >
-          <ThumbsUp
+    <>
+      {isLoading && <Loader />}
+      <div className="flex items-center gap-x-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-x-1">
+          <button
+            onClick={() => updateLikes(localHasLiked ? 'unlike' : 'like')}
+            disabled={isLoading}
             className={cn(
-              'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg]',
-              localHasLiked
-                ? 'fill-bgColor-brand600/70 group-hover:fill-bgColor-brand900/70'
-                : 'fill-white/70 group-hover:fill-bgColor-brand600/70'
+              'flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black p-[6px] text-sm text-muted-foreground transition-opacity',
+              isLoading && 'cursor-not-allowed opacity-50'
             )}
-          />{' '}
-        </button>
-        <span className="text-xs font-semibold text-foreground mt-1">
-          {localPostLikes}
-        </span>
+            aria-label={localHasLiked ? 'Unlike post' : 'Like post'}
+          >
+            <ThumbsUp
+              className={cn(
+                'h-4 w-4 text-black transition-all duration-100 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[-5deg]',
+                localHasLiked
+                  ? 'fill-bgColor-brand600/70 group-hover:fill-bgColor-brand900/70'
+                  : 'fill-white/70 group-hover:fill-bgColor-brand600/70'
+              )}
+            />{' '}
+          </button>
+          <span className="text-xs font-semibold text-foreground mt-1">
+            {localPostLikes}
+          </span>
+        </div>
+        {/* <div
+          className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray100 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
+          aria-label="Post views"
+        >
+          <ChartNoAxesColumn
+            className={cn(
+              'h-4 w-4 transition-all duration-100 ease-out group-hover:scale-110',
+              hasViewed ? 'text-sky-700' : 'text-black'
+            )}
+          />
+          <span className="text-xs font-semibold text-foreground">
+            {postViews}
+          </span>
+        </div> */}
       </div>
-      {/* <div
-        className="flex-center group gap-x-1 rounded-2xl border-none border-bgColor-black bg-bgColor-gray100 p-[9px] text-sm text-muted-foreground lg:gap-x-2"
-        aria-label="Post views"
-      >
-        <ChartNoAxesColumn
-          className={cn(
-            'h-4 w-4 transition-all duration-100 ease-out group-hover:scale-110',
-            hasViewed ? 'text-sky-700' : 'text-black'
-          )}
-        />
-        <span className="text-xs font-semibold text-foreground">
-          {postViews}
-        </span>
-      </div> */}
-    </div>
+    </>
   )
 }
 

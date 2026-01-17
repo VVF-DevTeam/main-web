@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventNewSeriesProps {
   seriesId?: string
@@ -35,6 +36,7 @@ const EventNewSeries = ({
   const [name, setName] = useState(initialName || '')
   const [description, setDescription] = useState(initialDescription || '')
   const [eventType, setEventType] = useState(initialEventType || '')
+  const [isLoading, setIsLoading] = useState(false)
 
   const router = useRouter()
 
@@ -77,6 +79,7 @@ const EventNewSeries = ({
     }
 
     try {
+      setIsLoading(true)
       if (isEditMode) {
         // Update existing series
         const response = await axiosInstance.put(`/api/series/edit/${seriesId}`, data)
@@ -107,11 +110,15 @@ const EventNewSeries = ({
       const errorMessage =
         error.response?.data || error.message || 'Please try again later'
       toast.error('Something went wrong', { description: errorMessage })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="relative grid grid-cols-1 justify-items-center gap-y-12 md:grid-cols-2 md:place-items-start md:justify-items-start md:gap-x-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="relative grid grid-cols-1 justify-items-center gap-y-12 md:grid-cols-2 md:place-items-start md:justify-items-start md:gap-x-6">
       {/* ------------------ Column 1 -------------------------*/}
       <div className="flex w-full flex-col gap-y-10">
         <div>
@@ -122,6 +129,7 @@ const EventNewSeries = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Eg: Summer Series 2024"
+            disabled={isLoading}
             className="max-w-[350px] bg-slate-100 text-gray-800"
           />
           <p className="mt-2 text-xs text-gray-500">
@@ -133,7 +141,7 @@ const EventNewSeries = ({
           <h3 className="mb-6 font-semibold text-gray-600 md:text-xl">
             STEP II: Choose event type.
           </h3>
-          <Select onValueChange={setEventType} value={eventType}>
+          <Select onValueChange={setEventType} value={eventType} disabled={isLoading}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Choose type" />
             </SelectTrigger>
@@ -157,6 +165,7 @@ const EventNewSeries = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter a description for this series..."
+            disabled={isLoading}
             className="min-h-[150px] max-w-[350px] bg-slate-100 text-gray-800"
           />
         </div>
@@ -166,11 +175,12 @@ const EventNewSeries = ({
       <Button
         onClick={() => saveSeries()}
         className="mt-6 md:absolute md:bottom-0 md:right-0"
-        disabled={isDisabled}
+        disabled={isDisabled || isLoading}
       >
         {isEditMode ? 'Update Series' : 'Save Series'}
       </Button>
     </div>
+    </>
   )
 }
 

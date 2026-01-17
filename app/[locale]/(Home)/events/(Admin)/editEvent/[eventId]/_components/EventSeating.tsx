@@ -38,6 +38,7 @@ import {
 import { axiosInstance } from '@/lib/axios'
 import seatStatusMapping from '@/lib/constants/seatStatusMapping.json'
 import { AxiosError } from 'axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventSeatingProps {
   event: Event & { tickets?: EventTicket[] }
@@ -204,6 +205,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const [isEditingSeats, setIsEditingSeats] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [selectedSeat, setSelectedSeat] = useState<{
     row: number
     col: number
@@ -519,6 +521,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
 
   const onSubmit = async (values: z.infer<typeof EventSeatingSchema>) => {
     try {
+      setIsLoading(true)
       // Use current seating map or generate new one
       let matrix: SeatingMap
       if (
@@ -604,6 +607,8 @@ const EventSeating = ({ event }: EventSeatingProps) => {
           },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -674,7 +679,9 @@ const EventSeating = ({ event }: EventSeatingProps) => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Seating Map</h1>
         <button
@@ -682,6 +689,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
             setEditing(!editing)
             setIsEditingSeats(false)
           }}
+          disabled={isLoading}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
             !editing && 'text-[#C54B3E] hover:text-slate-700'
@@ -959,7 +967,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
               </div>
             )}
 
-            <Button disabled={isSubmitting || !isValid}>
+            <Button disabled={isSubmitting || !isValid || isLoading}>
               Save Seating Map
             </Button>
           </form>
@@ -1139,6 +1147,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   )
 }
 

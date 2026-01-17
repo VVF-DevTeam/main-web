@@ -31,7 +31,7 @@ import { Switch } from '@/components/ui/switch'
 import Image from 'next/image'
 import { ImageIcon } from 'lucide-react'
 import { FiEdit2 } from 'react-icons/fi'
-import axios from 'axios'
+import { axiosInstance } from '@/lib/axios'
 import {
   Tooltip,
   TooltipContent,
@@ -39,6 +39,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useTranslation } from 'react-i18next'
+import Loader from '@/components/loader/Loader'
 
 const addReviewSchema = z.object({
   eventId: z.string().optional(),
@@ -62,11 +63,13 @@ const AddReviewModal = ({
   events,
   setShowAddReviewModal,
   onSubmit,
+  isLoading,
 }: {
   form: UseFormReturn<AddReviewFormValues>
   events: Event[]
   setShowAddReviewModal: (show: boolean) => void
   onSubmit: (data: AddReviewFormValues) => void
+  isLoading: boolean
 }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('post')
@@ -83,7 +86,7 @@ const AddReviewModal = ({
       const formData = new FormData()
       formData.append('file', file)
       try {
-        const response = await axios.post('/api/reviews/images', formData)
+        const response = await axiosInstance.post('/api/reviews/images', formData)
         if (response.status === 200) {
           setImagePreview(response.data.url)
           form.setValue('image', response.data.url)
@@ -91,8 +94,9 @@ const AddReviewModal = ({
       } catch (error) {
         console.error('Error uploading image:', error)
         toast.error('Failed to upload image')
+      } finally {
+        setIsImageLoading(false)
       }
-      setIsImageLoading(false)
     }
   }
 
@@ -107,33 +111,38 @@ const AddReviewModal = ({
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-6 w-6 cursor-pointer transition-colors ${
+        className={`h-6 w-6 transition-colors ${
+          isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+        } ${
           i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
         }`}
-        onClick={() => form.setValue('rating', String(i + 1))}
+        onClick={() => !isLoading && form.setValue('rating', String(i + 1))}
       />
     ))
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-      onClick={handleOverlayClick}
-    >
+    <>
+      {isLoading && <Loader />}
       <div
-        className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        onClick={handleOverlayClick}
       >
-        {/* Modal Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">{t('addReview')}</h2>
-          <button
-            onClick={() => setShowAddReviewModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-        </div>
+        <div
+          className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Modal Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">{t('addReview')}</h2>
+            <button
+              onClick={() => setShowAddReviewModal(false)}
+              disabled={isLoading}
+              className="text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              ✕
+            </button>
+          </div>
 
         {/* Form for adding a review */}
         <Form {...form} key="add-review-form">
@@ -155,9 +164,10 @@ const AddReviewModal = ({
                         onValueChange={(value) => {
                           field.onChange(value)
                         }}
+                        disabled={isLoading}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger disabled={isLoading}>
                             <SelectValue placeholder="Select an event (optional)" />
                           </SelectTrigger>
                         </FormControl>
@@ -211,6 +221,7 @@ const AddReviewModal = ({
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            disabled={isLoading}
                           />
                           <span className="text-sm text-gray-600">
                             {field.value ? 'Yes' : 'No'}
@@ -235,6 +246,7 @@ const AddReviewModal = ({
                         className="min-h-[100px]"
                         value={field.value}
                         onChange={field.onChange}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -289,13 +301,14 @@ const AddReviewModal = ({
             </div>
 
             {/* Submit Button */}
-            <Button type="submit" className="mt-4">
-              Submit Review
+            <Button type="submit" className="mt-4" disabled={isLoading}>
+              {isLoading ? 'Submitting...' : 'Submit Review'}
             </Button>
           </form>
         </Form>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -315,6 +328,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
   const { t } = useTranslation('post')
   const [showAddReviewModal, setShowAddReviewModal] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   // get events for review
@@ -346,6 +360,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
   // onSubmit
   const onSubmit = async (data: AddReviewFormValues) => {
     try {
+      setIsLoading(true)
       // Check if user is logged in
       if (!user?.id) {
         toast.error('Error', {
@@ -398,6 +413,8 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
           color: '#ef4444',
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -463,6 +480,7 @@ const AddReviewButton = ({ user, useIcon = false }: AddReviewButtonProps) => {
           events={events}
           setShowAddReviewModal={setShowAddReviewModal}
           onSubmit={onSubmit}
+          isLoading={isLoading}
         />
       )}
     </>

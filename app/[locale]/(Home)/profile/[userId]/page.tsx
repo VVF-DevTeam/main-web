@@ -62,7 +62,6 @@ const getPublishedEvents = async () => {
     endDate: true,
     location: true,
     imgUrl: true,
-    price: true,
   })
 }
 

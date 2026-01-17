@@ -12,6 +12,7 @@ import getUsersWithRole from '@/lib/actions/user/getUsersWithRole'
 import { Host } from '@/lib/types/HostType'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface EventHostsProps {
   event: Event & { hosts: Host[] }
@@ -139,12 +140,15 @@ const EventHosts = ({ event }: EventHostsProps) => {
   }, [debouncedValue])
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <>
+      {loading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Hosts</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={loading}
           className={cn(
             isEditing
               ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
@@ -205,6 +209,7 @@ const EventHosts = ({ event }: EventHostsProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

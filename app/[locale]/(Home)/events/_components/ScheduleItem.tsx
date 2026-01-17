@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import TimePicker from '../../../../../components/time/TimePicker'
@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface ScheduleItemProps {
   eventId: string
@@ -47,6 +48,7 @@ const ScheduleItem = ({
   scheduleItemId,
 }: ScheduleItemProps) => {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof scheduleItemSchema>>({
     resolver: zodResolver(scheduleItemSchema),
@@ -60,6 +62,7 @@ const ScheduleItem = ({
   const deleteScheduleItem = async (itemId: string | null) => {
     if (!itemId) return
     try {
+      setIsLoading(true)
       const response = await axiosInstance.delete(
         `/api/events/schedule/scheduleItem/delete/${itemId}`
       )
@@ -79,6 +82,8 @@ const ScheduleItem = ({
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -89,6 +94,7 @@ const ScheduleItem = ({
     }
     // Make API request to add new item to the db.
     try {
+      setIsLoading(true)
       const response = await axiosInstance.post(
         `/api/events/schedule/scheduleItem/add`,
         data
@@ -109,12 +115,15 @@ const ScheduleItem = ({
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const onSubmit = async (data: z.infer<typeof scheduleItemSchema>) => {
     let response
     try {
+      setIsLoading(true)
       if (scheduleItemId === null) {
         response = await axiosInstance.post(
           `/api/events/schedule/scheduleItem/add`,
@@ -146,13 +155,17 @@ const ScheduleItem = ({
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const { isValid, isLoading, errors } = form.formState
+  const { isValid, errors } = form.formState
 
   return (
-    <Form {...form}>
+    <>
+      {isLoading && <Loader />}
+      <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex items-center gap-x-2 xl:gap-x-4"
@@ -203,7 +216,7 @@ const ScheduleItem = ({
                   placeholder="add..."
                   type="text"
                   required
-                  disabled={!isEditable}
+                  disabled={!isEditable || isLoading}
                   className="h-[43px] w-full"
                   {...field}
                 />
@@ -249,6 +262,7 @@ const ScheduleItem = ({
         )}
       </form>
     </Form>
+    </>
   )
 }
 

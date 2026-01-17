@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Event } from '@prisma/client'
 import { z } from 'zod'
 import { useForm, useFieldArray } from 'react-hook-form'
@@ -28,6 +28,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Plus, Trash2 } from 'lucide-react'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventFormProps {
   event: Event
@@ -90,6 +91,7 @@ const EMPTY_QUESTION: z.infer<typeof QuestionSchema> = {
 }
 
 const EventForm = ({ event }: EventFormProps) => {
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<EventDynamicFormValues>({
     resolver: zodResolver(EventDynamicFormSchema),
     defaultValues: {
@@ -129,6 +131,7 @@ const EventForm = ({ event }: EventFormProps) => {
 
   const onSubmit = async (values: EventDynamicFormValues) => {
     try {
+      setIsLoading(true)
       // If no questions left, clear the form definition on the backend
       if (!values.questions || values.questions.length === 0) {
         await axiosInstance.put(`/api/events/forms/${event.id}`, {
@@ -158,6 +161,8 @@ const EventForm = ({ event }: EventFormProps) => {
     } catch (error) {
       console.error(error)
       toast.error('Unable to save event registration form. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -169,7 +174,9 @@ const EventForm = ({ event }: EventFormProps) => {
     type === 'single_choice' || type === 'multi_choice'
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold">Custom Registration Questions</h3>
@@ -200,6 +207,7 @@ const EventForm = ({ event }: EventFormProps) => {
                       variant="ghost"
                       size="icon"
                       className="text-red-500 hover:text-red-700"
+                      disabled={isLoading}
                       onClick={() => remove(index)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -345,19 +353,21 @@ const EventForm = ({ event }: EventFormProps) => {
               type="button"
               variant="outline"
               onClick={handleAddQuestion}
+              disabled={isLoading}
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
               Add another question
             </Button>
 
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="default" disabled={isLoading}>
               Save form definition
             </Button>
           </div>
         </form>
       </Form>
     </div>
+    </>
   )
 }
 

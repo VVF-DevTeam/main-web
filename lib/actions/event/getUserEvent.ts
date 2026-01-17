@@ -35,7 +35,6 @@ export const getUserEvents = async ({
               id: true,
               title: true,
               location: true,
-              price: true,
               startDate: true,
               startTime: true,
               imgUrl: true,

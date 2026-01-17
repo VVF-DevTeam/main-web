@@ -49,7 +49,6 @@ type EventWithRelations = {
   capacity: number | null
   startDate: Date | null
   endDate: Date
-  price: Decimal | null
   stripePriceId: string | null
   stripeProductId: string | null
   subscribedPriceId: string | null

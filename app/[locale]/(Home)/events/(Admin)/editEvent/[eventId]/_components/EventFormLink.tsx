@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventFormLinkProps {
   event: Event
@@ -40,6 +41,7 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof EventFormLinkSchema>>({
     resolver: zodResolver(EventFormLinkSchema),
@@ -50,6 +52,7 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventFormLinkSchema>) => {
     try {
+      setIsLoading(true)
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
         { formLink: data.formLink || null }
@@ -80,16 +83,21 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Registration Form Link</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isLoading}
           className={cn(
             isEditing
               ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
@@ -127,7 +135,7 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
                     </FormItem>
                   )}
                 />
-                <Button variant={'default'} className="mt-6">
+                <Button variant={'default'} className="mt-6" disabled={isLoading}>
                   Save
                 </Button>
               </form>
@@ -142,6 +150,7 @@ const EventTitle = ({ event }: EventFormLinkProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventTimingsProps {
   event: Event
@@ -34,6 +35,7 @@ const EventTimings = ({ event }: EventTimingsProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof EventTimingsSchema>>({
     resolver: zodResolver(EventTimingsSchema),
@@ -45,6 +47,7 @@ const EventTimings = ({ event }: EventTimingsProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventTimingsSchema>) => {
     try {
+      setIsLoading(true)
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
         data
@@ -75,16 +78,21 @@ const EventTimings = ({ event }: EventTimingsProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Timings</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isLoading}
           className={cn(
             isEditing
               ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
@@ -144,7 +152,7 @@ const EventTimings = ({ event }: EventTimingsProps) => {
                     )}
                   />
                 </div>
-                <Button variant={'default'} className="mt-6">
+                <Button variant={'default'} className="mt-6" disabled={isLoading}>
                   Save
                 </Button>
               </form>
@@ -161,6 +169,7 @@ const EventTimings = ({ event }: EventTimingsProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

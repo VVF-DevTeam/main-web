@@ -1,16 +1,17 @@
 'use client'
 // Libraries
-import React from 'react'
+import React, { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios, { AxiosError } from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from 'react-i18next'
-import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Loader from '@/components/loader/Loader'
 
 // Components
 import {
@@ -45,6 +46,7 @@ const ApplicationForm = ({
   const { data: session } = useSession()
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('job')
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof createApplicationSchema>>({
     resolver: zodResolver(createApplicationSchema),
@@ -83,6 +85,7 @@ const ApplicationForm = ({
 
   const onSubmit = async (data: z.infer<typeof createApplicationSchema>) => {
     try {
+      setIsLoading(true)
       const jobData = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -94,7 +97,7 @@ const ApplicationForm = ({
         phoneNumber: data.phoneNumber,
         resume: data.resume,
       }
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `/api/jobs/apply/${id}`,
         { ...jobData, userId: author, jobType: jobType, keyName: keyName },
         {
@@ -187,12 +190,16 @@ const ApplicationForm = ({
           },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div>
-      <Form {...form}>
+    <>
+      {isLoading && <Loader />}
+      <div>
+        <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex-col-default grid-all-cols-2"
@@ -368,12 +375,14 @@ const ApplicationForm = ({
           <Button
             type="submit"
             variant="default"
+            disabled={isLoading}
           >
-            Apply
+            {isLoading ? 'Applying...' : 'Apply'}
           </Button>
         </form>
       </Form>
-    </div>
+      </div>
+    </>
   )
 }
 

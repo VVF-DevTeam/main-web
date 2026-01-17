@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
+import Loader from '@/components/loader/Loader'
 
 interface EventTitleProps {
   event: Event
@@ -37,7 +38,7 @@ const EventTitle = ({ event }: EventTitleProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
-
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof EventTitleSchema>>({
     resolver: zodResolver(EventTitleSchema),
     defaultValues: {
@@ -49,6 +50,7 @@ const EventTitle = ({ event }: EventTitleProps) => {
     const keyName = formatKeyName(data.title)
     
     try {
+      setIsLoading(true)
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
         { ...data, keyName: keyName }
@@ -118,68 +120,75 @@ const EventTitle = ({ event }: EventTitleProps) => {
           }
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold">Event Title</h3>
-        <Button
-          variant={null}
-          onClick={() => setIsEditing(!isEditing)}
-          className={cn(
-            isEditing
-              ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
-              : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
-          )}
-        >
-          {isEditing ? (
-            'Cancel'
-          ) : (
-            <span className="flex gap-x-2">
-              Edit <Pencil className="h-5 w-5" />
-            </span>
-          )}
-        </Button>
-      </div>
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold">Event Title</h3>
+          <Button
+            variant={null}
+            onClick={() => setIsEditing(!isEditing)}
+            disabled={isLoading}
+            className={cn(
+              isEditing
+                ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
+                : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
+            )}
+          >
+            {isEditing ? (
+              'Cancel'
+            ) : (
+              <span className="flex gap-x-2">
+                Edit <Pencil className="h-5 w-5" />
+              </span>
+            )}
+          </Button>
+        </div>
 
-      {/* FORM */}
-      <div>
-        {isEditing ? (
-          <>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  name="title"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="bg-white p-2 text-gray-900"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button variant={'default'} className="mt-6">
-                  Save
-                </Button>
-              </form>
-            </Form>
-          </>
-        ) : !event.title ? (
-          <p className="italic text-muted-foreground text-slate-500">
-            Add a title for this event.
-          </p>
-        ) : (
-          <p className="text-muted-foreground">{event.title}</p>
-        )}
+        {/* FORM */}
+        <div>
+          {isEditing ? (
+            <>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <FormField
+                    name="title"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            disabled={isLoading}
+                            className="bg-white p-2 text-gray-900"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button variant={'default'} className="mt-6" disabled={isLoading}>
+                    Save
+                  </Button>
+                </form>
+              </Form>
+            </>
+          ) : !event.title ? (
+            <p className="italic text-muted-foreground text-slate-500">
+              Add a title for this event.
+            </p>
+          ) : (
+            <p className="text-muted-foreground">{event.title}</p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

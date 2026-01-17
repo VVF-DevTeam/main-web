@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import { useRouter } from 'next/navigation'
 import { PaymentMethod } from '@prisma/client'
+import Loader from '@/components/loader/Loader'
 
 interface RefundButtonProps {
   paymentId: string
@@ -54,18 +55,21 @@ export default function RefundButton({
   }
 
   return (
-    <button
-      onClick={handleRefund}
-      disabled={disabled || isLoading}
-      className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors
-        ${
-          disabled
-            ? 'cursor-not-allowed bg-gray-100 text-gray-400'
-            : 'bg-red-100 text-red-600 hover:bg-red-200'
-        }
-      `}
-    >
-      {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
-    </button>
+    <>
+      {isLoading && <Loader />}
+      <button
+        onClick={handleRefund}
+        disabled={disabled || isLoading}
+        className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors
+          ${
+            disabled
+              ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+              : 'bg-red-100 text-red-600 hover:bg-red-200'
+          }
+        `}
+      >
+        {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
+      </button>
+    </>
   )
 } 

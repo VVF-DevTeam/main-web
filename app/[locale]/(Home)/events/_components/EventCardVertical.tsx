@@ -128,8 +128,7 @@ const EventCardVertical = async ({ event, locale }: EventCardVerticalProps) => {
           <div className="flex items-center gap-x-2 text-base">
             <span className="flex items-center gap-x-2">
               <Ticket className="h-4 w-4 rotate-[135deg] text-bgColor-brand900 md:h-5 md:w-5" />
-              {getEventPrices(event.tickets, Number(event.price))}
-              {/* {event.priceMember ? '/$' + event.priceMember : null} */}
+              {getEventPrices(event.tickets)}
             </span>
           </div>
 

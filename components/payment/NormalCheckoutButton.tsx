@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { toast } from 'sonner'
+import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import { axiosInstance } from '@/lib/axios'
@@ -53,6 +54,7 @@ export default function NormalCheckoutButton({
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
   const [showGuestForm, setShowGuestForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const isGuestCheckout = !userId || userId.trim() === ''
 
@@ -60,6 +62,7 @@ export default function NormalCheckoutButton({
     const stripe = await stripePromise
 
     try {
+      setIsLoading(true)
       const { data } = await axiosInstance.post(
         '/api/payment/checkout-sessions/create',
         {
@@ -117,6 +120,8 @@ export default function NormalCheckoutButton({
           },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -137,8 +142,9 @@ export default function NormalCheckoutButton({
 
   return (
     <>
+      {isLoading && <Loader />}
       <div className="w-fit">
-        <Button onClick={handleButtonClick} className="group">
+        <Button onClick={handleButtonClick} className="group" disabled={isLoading}>
           {buttonText === 'become-member'
             ? t(`membership:${buttonText}`)
             : t(buttonText)}

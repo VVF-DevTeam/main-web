@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -70,36 +71,39 @@ const DeleteJobButton = ({ jobId }: DeleteJobButtonProps) => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={'destructive'}>Delete Job</Button>
-      </DialogTrigger>
-      <DialogContent className="bg-bgColor-white">
-        <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
-          <DialogDescription className="text-textColor-black">
-            This action cannot be undone. This will permanently delete the job
-            and remove all associated data from the server.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete Job'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      {isDeleting && <Loader />}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant={'destructive'}>Delete Job</Button>
+        </DialogTrigger>
+        <DialogContent className="bg-bgColor-white">
+          <DialogHeader>
+            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogDescription className="text-textColor-black">
+              This action cannot be undone. This will permanently delete the job
+              and remove all associated data from the server.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Job'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 

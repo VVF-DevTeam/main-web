@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventSubtitleProps {
   event: Event
@@ -33,6 +34,7 @@ const EventSubtitle = ({ event }: EventSubtitleProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof EventSubtitleSchema>>({
     resolver: zodResolver(EventSubtitleSchema),
     defaultValues: {
@@ -43,6 +45,7 @@ const EventSubtitle = ({ event }: EventSubtitleProps) => {
 
   const onSubmit = async (values: z.infer<typeof EventSubtitleSchema>) => {
     try {
+      setIsLoading(true)
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast.success('Event subtitle updated successfully', {
@@ -69,15 +72,20 @@ const EventSubtitle = ({ event }: EventSubtitleProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Subtitle (Optional)</h1>
         <button
           onClick={() => setEditing(!editing)}
+          disabled={isLoading}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
             !editing && 'text-[#C54B3E] hover:text-slate-700'
@@ -110,7 +118,7 @@ const EventSubtitle = ({ event }: EventSubtitleProps) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
+            <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
           </form>
         </Form>
       ) : !event?.subtitle ? (
@@ -121,6 +129,7 @@ const EventSubtitle = ({ event }: EventSubtitleProps) => {
         <div className="text-muted-foreground">{event.subtitle}</div>
       )}
     </div>
+    </>
   )
 }
 

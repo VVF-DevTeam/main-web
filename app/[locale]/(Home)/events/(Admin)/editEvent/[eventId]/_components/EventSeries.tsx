@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import useDebounce from '@/hooks/useDebounce'
+import Loader from '@/components/loader/Loader'
 
 interface EventEditSeriesProps {
   event: Event & { series: EventSeries | null }
@@ -138,8 +139,10 @@ const EventEditSeries = ({ event, allSeries }: EventEditSeriesProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <>
+      {loading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Series</h3>
         <Button
           variant={null}
@@ -147,6 +150,7 @@ const EventEditSeries = ({ event, allSeries }: EventEditSeriesProps) => {
             setIsEditing(!isEditing) 
             setVisible(false)
           }}
+          disabled={loading}
           className={cn(
             isEditing
               ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
@@ -265,6 +269,7 @@ const EventEditSeries = ({ event, allSeries }: EventEditSeriesProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

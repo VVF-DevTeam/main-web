@@ -22,9 +22,13 @@ model EventCategory {
 
 model Event {
   id                 String          @id @default(cuid())
+  keyName            String          @unique // keyName is made using title
   title              String          @unique
   description        String?
   location           String?
+  days               String[]
+  eventType          EventType
+
   startTime          String?
   endTime            String?
   startDate          DateTime?       @default(now())
@@ -34,13 +38,10 @@ model Event {
 
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
-  days               String[]
-  eventType          EventType
+
   formLink           String?
   imgUrl             String?
   isPublished        Boolean         @default(false)
-  keyName            String          @unique
-  price              Decimal?        @default(0)
   stripePriceId      String?
   stripeProductId    String?
   subscribedPriceId  String?

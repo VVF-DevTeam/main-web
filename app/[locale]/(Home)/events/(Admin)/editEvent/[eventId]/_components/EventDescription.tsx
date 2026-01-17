@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface EventDescriptionProps {
   event: Event
@@ -53,6 +54,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
   const currentDateTime = getCurrentDateTime()
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof EventDescriptionSchema>>({
     resolver: zodResolver(EventDescriptionSchema),
     defaultValues: {
@@ -63,6 +65,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
 
   const onSubmit = async (values: z.infer<typeof EventDescriptionSchema>) => {
     try {
+      setIsLoading(true)
       // update the event description
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
 
@@ -108,15 +111,20 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
           color: '#ef4444', // red-500 color
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Description</h1>
         <button
           onClick={() => setEditing(!editing)}
+          disabled={isLoading}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
             !editing && 'text-[#C54B3E] hover:text-slate-700'
@@ -149,7 +157,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
+            <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
           </form>
         </Form>
       ) : !event?.description ? (
@@ -162,6 +170,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
         </div>
       )}
     </div>
+    </>
   )
 }
 

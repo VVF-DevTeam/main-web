@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios, { AxiosError } from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
@@ -100,7 +101,7 @@ export default function BecomeHostForm({
       }
 
       setIsLoading(true)
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         '/api/jobs/apply/host',
         JSON.stringify(payload),
         {

@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 interface EventEndDays {
   event: Event
@@ -34,6 +35,7 @@ const EventDays = ({ event }: EventEndDays) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof EventDaysSchema>>({
     resolver: zodResolver(EventDaysSchema),
@@ -62,6 +64,7 @@ const EventDays = ({ event }: EventEndDays) => {
 
   const onSubmit = async (data: z.infer<typeof EventDaysSchema>) => {
     try {
+      setIsLoading(true)
       const response = await axiosInstance.put(
         `/api/events/edit/${event.id}`,
         data
@@ -92,16 +95,21 @@ const EventDays = ({ event }: EventEndDays) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Days</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isLoading}
           className={cn(
             isEditing
               ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
@@ -196,7 +204,7 @@ const EventDays = ({ event }: EventEndDays) => {
                 <Button
                   variant={'default'}
                   className="mt-6"
-                  disabled={!isValid || isSubmitting}
+                  disabled={!isValid || isSubmitting || isLoading}
                 >
                   Save
                 </Button>
@@ -221,6 +229,7 @@ const EventDays = ({ event }: EventEndDays) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

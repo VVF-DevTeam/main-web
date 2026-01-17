@@ -6,10 +6,12 @@ import { useSearchParams } from 'next/navigation'
 import { FiPaperclip, FiX, FiCopy } from 'react-icons/fi'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios, { AxiosError } from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import Loader from '@/components/loader/Loader'
 
 import 'react-quill/dist/quill.snow.css'
 
@@ -35,7 +37,6 @@ import {
   getEventsOfHost,
 } from '@/lib/actions/event/getEvent'
 import { getAllEventParticipants } from '@/lib/actions/event/getEventParticipant'
-import { getPublishedEventsForReviewsWithSearch } from '@/lib/actions/review/reviewActions'
 import EmailSuggestion from './EmailSuggestion'
 
 // Interfaces
@@ -198,7 +199,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
       formData.append('senderEmail', data.senderEmail)
       data.attachments?.forEach((file) => formData.append('attachments', file))
 
-      const response = await axios.post('/api/admin/sendEmail', formData, {
+      const response = await axiosInstance.post('/api/admin/sendEmail', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
@@ -239,11 +240,13 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="mx-auto w-full max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('email-composition')}</h1>
-        </div>
+    <>
+      {loading && <Loader />}
+      <div className="min-h-screen p-4">
+        <div className="mx-auto w-full max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl">
+          <div className="mb-8 flex items-center justify-between">
+            <h1 className="text-3xl font-bold">{t('email-composition')}</h1>
+          </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-y-6">
@@ -498,7 +501,6 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
               <Button
                 type="submit"
                 disabled={loading}
-                className={loading ? 'bg-bgColor-brand900' : ''}
               >
                 {loading ? t('email-sending') : t('email-send')}
               </Button>
@@ -507,6 +509,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
         </Form>
       </div>
     </div>
+    </>
   )
 }
 

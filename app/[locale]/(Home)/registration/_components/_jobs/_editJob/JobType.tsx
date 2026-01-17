@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil } from 'lucide-react'
 
+import Loader from '@/components/loader/Loader'
 import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -43,6 +44,7 @@ const JobTypeSchema = z.object({
 const JobType = ({ job }: JobTypeProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof JobTypeSchema>>({
     resolver: zodResolver(JobTypeSchema),
     defaultValues: {
@@ -52,6 +54,7 @@ const JobType = ({ job }: JobTypeProps) => {
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof JobTypeSchema>) => {
     try {
+      setIsLoading(true)
       await axiosInstance.put(`/api/jobs/edit/${job.id}`, values)
       setEditing(false)
       toast.success('Success', {
@@ -69,94 +72,100 @@ const JobType = ({ job }: JobTypeProps) => {
           color: '#ef4444', // red-500 color
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Job Type</h1>
-        <button
-          onClick={() => setEditing(!editing)}
-          className={cn(
-            'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
-            !editing && 'text-textColor-brand900 hover:text-slate-700'
-          )}
-        >
-          {editing ? (
-            <span>Cancel</span>
-          ) : (
-            <span className="flex items-center justify-center gap-x-2">
-              Edit Type <Pencil className="h-4 w-4" />
-            </span>
-          )}
-        </button>
-      </div>
-      {editing ? (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 md:space-y-12"
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Job Type</h1>
+          <button
+            onClick={() => setEditing(!editing)}
+            className={cn(
+              'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
+              !editing && 'text-textColor-brand900 hover:text-slate-700'
+            )}
+            disabled={isLoading}
           >
-            <FormField
-              control={form.control}
-              name="jobType"
-              render={({ field }) => (
-                <FormItem className="flex items-center justify-center">
-                  <FormControl>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline">
-                          {field.value.length > 1 ? field.value : 'Select'}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        <DropdownMenuLabel>Select Job Type</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          {...field}
-                        >
-                          <DropdownMenuRadioItem value="Marketing">
-                            Marketing
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="ProjectManager">
-                            ProjectManager
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Finance">
-                            Finance
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="HR">
-                            HR
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Tech">
-                            Tech
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Performance">
-                            Performance
-                          </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="Volunteer">
-                            Volunteer
-                          </DropdownMenuRadioItem>
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
-          </form>
-        </Form>
-      ) : !job?.jobType ? (
-        <p className="text-sm italic text-muted-foreground text-slate-500">
-          Add an jobType for this job.
-        </p>
-      ) : (
-        <div className="text-muted-foreground">{job.jobType}</div>
-      )}
-    </div>
+            {editing ? (
+              <span>Cancel</span>
+            ) : (
+              <span className="flex items-center justify-center gap-x-2">
+                Edit Type <Pencil className="h-4 w-4" />
+              </span>
+            )}
+          </button>
+        </div>
+        {editing ? (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 md:space-y-12"
+            >
+              <FormField
+                control={form.control}
+                name="jobType"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-center">
+                    <FormControl>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" disabled={isLoading}>
+                            {field.value.length > 1 ? field.value : 'Select'}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-40">
+                          <DropdownMenuLabel>Select Job Type</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuRadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            {...field}
+                          >
+                            <DropdownMenuRadioItem value="Marketing">
+                              Marketing
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="ProjectManager">
+                              ProjectManager
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="Finance">
+                              Finance
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="HR">
+                              HR
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="Tech">
+                              Tech
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="Performance">
+                              Performance
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="Volunteer">
+                              Volunteer
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
+            </form>
+          </Form>
+        ) : !job?.jobType ? (
+          <p className="text-sm italic text-muted-foreground text-slate-500">
+            Add an jobType for this job.
+          </p>
+        ) : (
+          <div className="text-muted-foreground">{job.jobType}</div>
+        )}
+      </div>
+    </>
   )
 }
 

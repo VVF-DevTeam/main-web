@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 const MAX_PRIMARY_TAGS = 2
 const MAX_SECONDARY_TAGS = 3
@@ -139,12 +140,15 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
+    <>
+      {loading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Categories</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={loading}
           className={cn(
             isEditing
               ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
@@ -374,6 +378,7 @@ const EventCategories = ({ event, categories }: EventCategoriesProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

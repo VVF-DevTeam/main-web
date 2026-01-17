@@ -27,7 +27,7 @@ import {
 import { FiEdit2 } from 'react-icons/fi'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import axios from 'axios'
+import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
 
 const profileSchema = z.object({
@@ -86,7 +86,7 @@ const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
       console.log(file)
       const formData = new FormData()
       formData.append('file', file)
-      const response = await axios.post('/api/users/avatars', formData)
+      const response = await axiosInstance.post('/api/users/avatars', formData)
       if (response.status === 200) {
         setImagePreview(response.data.url)
         form.setValue('image', response.data.url)

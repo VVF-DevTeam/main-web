@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventStartDateProps {
   event: Event
@@ -34,6 +35,7 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof EventStartDateSchema>>({
     resolver: zodResolver(EventStartDateSchema),
@@ -44,6 +46,7 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventStartDateSchema>) => {
     try {
+      setIsLoading(true)
       // Treat the selected date as midnight in Vancouver timezone (replace timezone, don't convert)
       const vancouverTimeZone = 'America/Vancouver'
       const selectedDate = data.startDate
@@ -95,16 +98,21 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event Start Date</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isLoading}
           className={cn(
             isEditing
               ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
@@ -145,7 +153,7 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
                 <p className="mt-3 text-xs text-muted-foreground">
                   Use the calender above to pick your desired start date.
                 </p>
-                <Button variant={'default'} className="mt-6">
+                <Button variant={'default'} className="mt-6" disabled={isLoading}>
                   Save
                 </Button>
               </form>
@@ -166,6 +174,7 @@ const EventStartDate = ({ event }: EventStartDateProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

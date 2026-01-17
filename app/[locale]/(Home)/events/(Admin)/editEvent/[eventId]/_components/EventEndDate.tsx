@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 interface EventEndDateProps {
   event: Event
@@ -33,6 +34,7 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof EventEndDateSchema>>({
     resolver: zodResolver(EventEndDateSchema),
@@ -45,6 +47,7 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
 
   const onSubmit = async (data: z.infer<typeof EventEndDateSchema>) => {
     try {
+      setIsLoading(true)
       // Treat the selected date as midnight in Vancouver timezone (replace timezone, don't convert)
       const vancouverTimeZone = 'America/Vancouver'
       const selectedDate = data.endDate
@@ -126,16 +129,21 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
           color: '#ef4444', // red-500 color
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold">Event End Date</h3>
         <Button
           variant={null}
           onClick={() => setIsEditing(!isEditing)}
+          disabled={isLoading}
           className={cn(
             isEditing
               ? 'text-gray-700transition-all font-semibold duration-75 hover:text-red-700'
@@ -179,7 +187,7 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
                 <Button
                   variant={'default'}
                   className="mt-6"
-                  disabled={!isValid || isSubmitting}
+                  disabled={!isValid || isSubmitting || isLoading}
                 >
                   Save
                 </Button>
@@ -201,6 +209,7 @@ const EventEndDate = ({ event }: EventEndDateProps) => {
         )}
       </div>
     </div>
+    </>
   )
 }
 

@@ -8,6 +8,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js'
+import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axios'
 import { useRouter, usePathname } from 'next/navigation'
@@ -48,6 +49,7 @@ function QuickCheckoutForm({
   const router = useRouter()
   const pathname = usePathname()
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Check if the user is subscribed to the class and get remaining sessions
   useEffect(() => {
@@ -70,6 +72,7 @@ function QuickCheckoutForm({
     if (!stripe || !elements) return
 
     try {
+      setIsLoading(true)
       const { data } = await axiosInstance.post('/api/payment/intents/create', {
         amount: isSubscribed ? price * 0.8 * 100 : price * 100,
         eventId,
@@ -104,33 +107,38 @@ function QuickCheckoutForm({
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-      <div className="rounded-md border border-gray-300 bg-white p-3">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#32325d',
-                '::placeholder': {
-                  color: '#a0aec0',
+    <>
+      {isLoading && <Loader />}
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+        <div className="rounded-md border border-gray-300 bg-white p-3">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#32325d',
+                  '::placeholder': {
+                    color: '#a0aec0',
+                  },
+                },
+                invalid: {
+                  color: '#e53e3e',
                 },
               },
-              invalid: {
-                color: '#e53e3e',
-              },
-            },
-          }}
-        />
-      </div>
-      <Button type="submit" disabled={!stripe}>
-        Pay ${isSubscribed ? price * 0.8 : price}
-      </Button>
-    </form>
+            }}
+          />
+        </div>
+        <Button type="submit" disabled={!stripe || isLoading}>
+          Pay ${isSubscribed ? price * 0.8 : price}
+        </Button>
+      </form>
+    </>
   )
 }
 

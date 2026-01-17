@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/select'
 import { axiosInstance } from '@/lib/axios'
 import { AxiosError } from 'axios'
+import Loader from '@/components/loader/Loader'
 
 type TicketWithPayments = EventTicket & {
   payments: Array<{ quantity: number }>
@@ -136,6 +137,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [isFullEvent, setIsFullEvent] = useState(false)
   const [showCapacityError, setShowCapacityError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const currentDateTime = getCurrentDateTime()
   const tickets = event.tickets || []
 
@@ -227,6 +229,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
   // Handle EventTicket submission
   const onTicketSubmit = async (values: EventTicketFormData) => {
     try {
+      setIsLoading(true)
       const ticketTitle = `${event.title} - ${values.type} Ticket`
       const eventUrl = `https://www.vietvibe.org/en/events/${event.eventType.toLowerCase()}/${event.keyName}`
 
@@ -439,6 +442,8 @@ const EventPrice = ({ event }: EventPriceProps) => {
           style: { color: '#ef4444' },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -452,6 +457,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
     }
 
     try {
+      setIsLoading(true)
       await axiosInstance.delete('/api/events/tickets', {
         data: { id: ticketId },
       })
@@ -520,6 +526,8 @@ const EventPrice = ({ event }: EventPriceProps) => {
           style: { color: '#ef4444' },
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -528,7 +536,9 @@ const EventPrice = ({ event }: EventPriceProps) => {
   const isEditingTicket = editingTicketId !== null || isAddingNew
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       {/* EventTickets section */}
       <>
         <div className="flex items-center justify-between">
@@ -537,6 +547,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
             {!isEditingTicket && (
               <button
                 onClick={handleAddTicketClick}
+                disabled={isLoading}
                 className={cn(
                   'flex items-center gap-x-2 text-sm font-semibold text-[#C54B3E] transition-all hover:text-slate-700'
                 )}
@@ -610,6 +621,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                   <div className="flex gap-x-2">
                     <button
                       onClick={() => loadTicketIntoForm(ticket)}
+                      disabled={isLoading}
                       className="rounded p-2 hover:bg-gray-100"
                       title="Edit ticket"
                     >
@@ -617,6 +629,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     </button>
                     <button
                       onClick={() => handleDelete(ticket.id)}
+                      disabled={isLoading}
                       className="rounded p-2 text-red-600 hover:bg-red-50"
                       title="Delete ticket"
                     >
@@ -645,6 +658,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
               </h3>
               <button
                 onClick={resetTicketForm}
+                disabled={isLoading}
                 className="rounded p-1 hover:bg-gray-100"
               >
                 <X className="h-5 w-5" />
@@ -968,7 +982,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                 <div className="flex gap-x-2">
                   <Button
                     type="submit"
-                    disabled={isTicketSubmitting || !isTicketValid}
+                    disabled={isTicketSubmitting || !isTicketValid || isLoading}
                   >
                     {editingTicketId ? 'Update Ticket' : 'Create Ticket'}
                   </Button>
@@ -976,7 +990,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
                     type="button"
                     variant="outline"
                     onClick={resetTicketForm}
-                    disabled={isTicketSubmitting}
+                    disabled={isTicketSubmitting || isLoading}
                   >
                     Cancel
                   </Button>
@@ -987,6 +1001,7 @@ const EventPrice = ({ event }: EventPriceProps) => {
         )}
       </>
     </div>
+    </>
   )
 }
 

@@ -9,9 +9,11 @@ import { cn } from '@/lib/utils'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import axios, { AxiosError } from 'axios'
+import { axiosInstance } from '@/lib/axios'
+import { AxiosError } from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import Loader from '@/components/loader/Loader'
 import {
   Form,
   FormControl,
@@ -32,6 +34,7 @@ const JobTitleSchema = z.object({
 
 const JobTitle = ({ job }: JobTitleProps) => {
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const form = useForm<z.infer<typeof JobTitleSchema>>({
@@ -43,7 +46,8 @@ const JobTitle = ({ job }: JobTitleProps) => {
 
   const onSubmit = async (data: z.infer<typeof JobTitleSchema>) => {
     try {
-      const response = await axios.put(`/api/jobs/edit/${job.id}`, data)
+      setIsLoading(true)
+      const response = await axiosInstance.put(`/api/jobs/edit/${job.id}`, data)
       toast.success('Success', {
         description: 'Job title updated successfully',
         style: {
@@ -85,31 +89,36 @@ const JobTitle = ({ job }: JobTitleProps) => {
           }
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold">Job Title</h3>
-        <Button
-          variant={null}
-          onClick={() => setIsEditing(!isEditing)}
-          className={cn(
-            isEditing
-              ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
-              : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
-          )}
-        >
-          {isEditing ? (
-            'Cancel'
-          ) : (
-            <span className="flex gap-x-2">
-              Edit <Pencil className="h-5 w-5" />
-            </span>
-          )}
-        </Button>
-      </div>
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold">Job Title</h3>
+          <Button
+            variant={null}
+            onClick={() => setIsEditing(!isEditing)}
+            disabled={isLoading}
+            className={cn(
+              isEditing
+                ? 'font-semibold text-gray-700 transition-all duration-75 hover:text-red-700'
+                : 'font-semibold text-red-700 transition-all duration-75 hover:text-gray-700'
+            )}
+          >
+            {isEditing ? (
+              'Cancel'
+            ) : (
+              <span className="flex gap-x-2">
+                Edit <Pencil className="h-5 w-5" />
+              </span>
+            )}
+          </Button>
+        </div>
 
       {/* FORM */}
       <div>
@@ -126,13 +135,14 @@ const JobTitle = ({ job }: JobTitleProps) => {
                         <Input
                           {...field}
                           className="bg-white p-2 text-gray-900"
+                          disabled={isLoading}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button variant={'default'} className="mt-6">
+                <Button variant={'default'} className="mt-6" disabled={isLoading}>
                   Save
                 </Button>
               </form>
@@ -146,7 +156,8 @@ const JobTitle = ({ job }: JobTitleProps) => {
           <p className="text-muted-foreground">{job.title}</p>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

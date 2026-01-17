@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
+import Loader from '@/components/loader/Loader'
 
 // Interfaces and Types
 interface EventTypeProps {
@@ -37,6 +38,7 @@ const EventTypeSchema = z.object({
 const EventType = ({ event }: EventTypeProps) => {
   const router = useRouter()
   const [editing, setEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof EventTypeSchema>>({
     resolver: zodResolver(EventTypeSchema),
     defaultValues: {
@@ -47,6 +49,7 @@ const EventType = ({ event }: EventTypeProps) => {
   const onSubmit = async (values: z.infer<typeof EventTypeSchema>) => {
 
     try {
+      setIsLoading(true)
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
       setEditing(false)
       toast.success('Success', {
@@ -64,15 +67,20 @@ const EventType = ({ event }: EventTypeProps) => {
           color: '#ef4444' // red-500 color
         }
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex w-full flex-col gap-y-6 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Event Type</h1>
         <button
           onClick={() => setEditing(!editing)}
+          disabled={isLoading}
           className={cn(
             'text-sm font-semibold text-slate-700 transition-all hover:text-red-700',
             !editing && 'text-[#C54B3E] hover:text-slate-700'
@@ -132,7 +140,7 @@ const EventType = ({ event }: EventTypeProps) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting || !isValid}>Save</Button>
+            <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
           </form>
         </Form>
       ) : !event?.eventType ? (
@@ -143,6 +151,7 @@ const EventType = ({ event }: EventTypeProps) => {
         <div className="text-muted-foreground">{event.eventType}</div>
       )}
     </div>
+    </>
   )
 }
 

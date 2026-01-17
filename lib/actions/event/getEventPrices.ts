@@ -32,7 +32,7 @@ export function getEventPrices(
     return `$${minPrice.toFixed(0)} - $${maxPrice.toFixed(0)}`
   }
 
-  // Fallback to event.price if no tickets
+  // Fallback to specified price if no tickets
   if (fallbackPrice !== undefined && fallbackPrice !== null) {
     return fallbackPrice === 0 ? 'Free' : `$${Number(fallbackPrice).toFixed(0)}`
   }

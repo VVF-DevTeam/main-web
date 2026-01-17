@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Image from 'next/image'
+import Loader from '@/components/loader/Loader'
 
 interface EventGalleryProps {
   event: Event
@@ -49,6 +50,7 @@ function getValidImageUrl(url: string): string | null {
 const EventGallery = ({ event }: EventGalleryProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
   const [galleryImages, setGalleryImages] = useState<string[]>(
     (event.imgUrls as string[]) || []
   )
@@ -71,6 +73,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
 
   const handleSubmit = async () => {
     try {
+      setIsLoading(true)
       // Filter out empty image URLs and convert to valid Google Drive URLs
       const completeImages = galleryImages
         .map((url) => getValidImageUrl(url))
@@ -122,11 +125,15 @@ const EventGallery = ({ event }: EventGalleryProps) => {
           color: 'hsl(var(--text-red))', // Using CSS variable for red
         },
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
       <div className="flex flex-col gap-y-4">
         {/* Notification for Google Drive only */}
         <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">
@@ -162,6 +169,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
             <Button
               variant="destructive"
               onClick={() => handleRemoveImage(index)}
+              disabled={isLoading}
               className="mb-[2px]"
             >
               Remove
@@ -209,12 +217,13 @@ const EventGallery = ({ event }: EventGalleryProps) => {
       )}
 
       <div className="flex gap-x-4">
-        <Button onClick={handleAddImage} variant="outline">
+        <Button onClick={handleAddImage} variant="outline" disabled={isLoading}>
           Add Gallery Image
         </Button>
-        <Button onClick={handleSubmit}>Save Changes</Button>
+        <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
       </div>
     </div>
+    </>
   )
 }
 

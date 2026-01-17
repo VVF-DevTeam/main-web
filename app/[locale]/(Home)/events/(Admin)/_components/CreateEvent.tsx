@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useState } from 'react'
 
 // Components
 import Link from 'next/link'
@@ -36,6 +37,7 @@ import { Separator } from '@radix-ui/react-separator'
 import { axiosInstance } from '@/lib/axios'
 import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import Loader from '@/components/loader/Loader'
 
 // Interfaces
 interface CreateEventFormProps {
@@ -63,6 +65,7 @@ const CreateEventForm = ({
   console.log(author)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof createEventSchema>>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
@@ -70,7 +73,7 @@ const CreateEventForm = ({
       eventType: '',
     },
   })
-  const { isValid, isLoading } = form.formState
+  const { isValid } = form.formState
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     //Format title to trims whitespaces
@@ -80,6 +83,7 @@ const CreateEventForm = ({
     const keyName = formatKeyName(title)
 
     try {
+      setIsLoading(true)
       const eventData = {
         title: title,
         eventType: data.eventType,
@@ -135,11 +139,15 @@ const CreateEventForm = ({
           description: 'Something went wrong. Please contact the admin.',
         })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-y-8">
+    <>
+      {isLoading && <Loader />}
+      <div className="flex flex-col items-center gap-y-8">
       <div className="flex flex-col items-center gap-y-2">
         <h1 className="mb-2 text-2xl font-semibold text-[#1B171A]/80 lg:text-2xl xl:text-3xl">
           Give a title to your Event
@@ -255,6 +263,7 @@ const CreateEventForm = ({
         </form>
       </Form>
     </div>
+    </>
   )
 }
 
