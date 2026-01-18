@@ -45,6 +45,14 @@ export default function MobileSidebar({
   const [isJobsDropdownOpen, setIsJobsDropdownOpen] = useState(
     jobManagementSections.includes(currentSection)
   )
+  const postManagementSections = [
+    'admin-create-post',
+    'admin-all-posts',
+    'admin-edit-post',
+  ]
+  const [isPostsDropdownOpen, setIsPostsDropdownOpen] = useState(
+    postManagementSections.includes(currentSection)
+  )
   const isAdmin = user?.role?.includes('ADMIN') ?? false
   const isHost = user?.role?.includes('HOST') ?? false
   const isAdminOrHost = isAdmin || isHost
@@ -246,6 +254,53 @@ export default function MobileSidebar({
                             onClick={() => setIsOpen(false)}
                           >
                             {t('view-all-jobs')}
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+                )}
+
+                {/* Manage Posts Dropdown */}
+                {isAdmin && (
+                  <li>
+                    <button
+                      onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}
+                      className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                    >
+                      <span>{t('manage-posts')}</span>
+                      <ChevronDown
+                        className={`h-5 w-5 transition-transform ${
+                          isPostsDropdownOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    {isPostsDropdownOpen && (
+                      <ul className="mt-2 space-y-2 pl-4">
+                        <li>
+                          <Link
+                            href={`/${locale}/profile/${userId}?section=admin-create-post`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-create-post'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('create-post')}
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href={`/${locale}/profile/${userId}?section=admin-all-posts`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-all-posts'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('view-all-posts')}
                           </Link>
                         </li>
                       </ul>

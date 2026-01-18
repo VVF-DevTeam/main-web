@@ -110,21 +110,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Jobs
 
-#### 23. `getAllJobs`
+#### 14. `getAllJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-all']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 24. `getPublishedJobs`
+#### 15. `getPublishedJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-published']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published jobs with optional filters (title search and event filter). Includes event relation (id, title, keyName) if job is linked to an event. Ordered by updatedAt descending.
 
-#### 25. `getJobForEditing`
+#### 16. `getJobForEditing`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['job-for-editing']`
 - **Tags**: `['jobs']`
@@ -135,21 +135,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Reviews
 
-#### 14. `getCachedReviewsPaginated`
+#### 17. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 15. `getCachedPublishedEventsForReviews`
+#### 18. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 16. `getCachedPublishedSeriesForReviews`
+#### 19. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -160,18 +160,32 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 17. `getCachedPostsPaginated`
+#### 20. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated posts with search by title
 
+#### 21. `getAllPosts`
+- **File**: `lib/actions/post/getPosts.ts`
+- **Cache Key**: `['posts-all']`
+- **Tags**: `['posts']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all posts (published and unpublished) for admin management, ordered by updatedAt descending
+
+#### 22. `getPostForEditing`
+- **File**: `lib/actions/post/getPosts.ts`
+- **Cache Key**: `['post-for-editing']`
+- **Tags**: `['posts']`
+- **Revalidate Time**: 3600 seconds (1 hour)
+- **Description**: Returns a single post by id specifically for editing. Includes exported `PostForEditing` type inferred from return type using `NonNullable<Awaited<ReturnType<typeof getPostForEditing>>>`. Used in admin edit post pages.
+
 ---
 
 ### Social Media Posts
 
-#### 18. `getCachedSocialMediaPostsPaginated`
+#### 23. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
@@ -182,14 +196,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Users
 
-#### 19. `getUsersSimple` (via `getCachedUsersSimple`)
+#### 24. `getUsersSimple` (via `getCachedUsersSimple`)
 - **File**: `lib/actions/user/getAllUsersSimple.ts`
 - **Cache Key**: `['users-simple']`
 - **Tags**: `['users']`
 - **Revalidate Time**: 3600 seconds (1 hour)
 - **Description**: Returns list of users with optional count limit and name search
 
-#### 20. `getUsersWithRole` (via `getCachedUsersWithRole`)
+#### 25. `getUsersWithRole` (via `getCachedUsersWithRole`)
 - **File**: `lib/actions/user/getUsersWithRole.ts`
 - **Cache Key**: `['users-with-role']`
 - **Tags**: `['users']`
@@ -200,14 +214,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Payments
 
-#### 21. `getPaginatedPayments`
+#### 26. `getPaginatedPayments`
 - **File**: `lib/actions/payment/getPaginatedPayments.ts`
 - **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
-#### 22. `getEventPayments`
+#### 27. `getEventPayments`
 - **File**: `app/[locale]/(Home)/profile/[userId]/_components/getEventPayments.ts`
 - **Cache Key**: `['event-payments-${eventId}']` (per event)
 - **Tags**: `['payments']`
@@ -327,6 +341,8 @@ This document provides a comprehensive overview of all functions using `unstable
 
 **Cached Functions Affected:**
 - `getCachedPostsPaginated`
+- `getAllPosts`
+- `getPostForEditing`
 
 **Functions Calling `revalidateTag('posts')`:**
 
@@ -539,7 +555,7 @@ This document provides a comprehensive overview of all functions using `unstable
 |-----|-----------------|---------------------|--------|
 | `events` | 11 functions | 13 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
-| `posts` | 1 function | 5 API routes | ✅ Fully covered |
+| `posts` | 3 functions | 5 API routes | ✅ Fully covered |
 | `series` | 2 functions | 2 API routes | ✅ Fully covered |
 | `event-categories` | 1 function | 2 API routes | ✅ Fully covered |
 | `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
@@ -558,6 +574,7 @@ This document provides a comprehensive overview of all functions using `unstable
    - Event pagination: 1 hour (3600 seconds) due to time-based filtering
    - Event for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Job for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
+   - Post for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 

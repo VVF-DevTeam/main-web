@@ -192,3 +192,53 @@ export const getCachedPostsPaginated = unstable_cache(
     tags: ['posts'],
   }
 )
+
+// Get all posts (both published and unpublished) for admin management
+export const getAllPosts = unstable_cache(
+  async () => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      const posts = await prisma.post.findMany({
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      })
+      return posts
+    } catch (error) {
+      console.error('Error getting all posts:', error)
+      return []
+    }
+  },
+  ['posts-all'], // Cache key prefix
+  {
+    revalidate: 604800, // Cache for 7 days (revalidateTag handles on-demand invalidation)
+    tags: ['posts'], // Tag for revalidation
+  }
+)
+
+// Get post by id specifically for editing
+export const getPostForEditing = unstable_cache(
+  async (postId: string) => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      return await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      })
+    } catch (error) {
+      console.error('Error getting post for editing:', error)
+      return null
+    }
+  },
+  ['post-for-editing'], // Cache key prefix
+  {
+    revalidate: 3600, // Cache for 1 hour (shorter since this is for editing)
+    tags: ['posts'], // Tag for revalidation
+  }
+)
+
+// Type inference: Extract the return type of getPostForEditing and unwrap Promise and null
+export type PostForEditing = NonNullable<
+  Awaited<ReturnType<typeof getPostForEditing>>
+>

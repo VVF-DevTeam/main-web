@@ -16,6 +16,7 @@
   "create-edit-tags": "Create & Edit Tags",
   "create-event": "Create Event",
   "create-job": "Create Job",
+  "create-post": "Create Post",
   "current-password": "Current Password",
   "currentpassword-warning": "Current password is required",
   "current-plan": "Status",
@@ -41,6 +42,7 @@
   "location": "Location",
   "manage-events": "Manage Events",
   "manage-jobs": "Manage Jobs",
+  "manage-posts": "Manage Posts",
   "manage-sponsors": "Manage Sponsors",
   "my-profile": "My Profile",
   "new-password": "New Password",
@@ -91,5 +93,6 @@
   "verify-phone-number": "Verify Phone Number",
   "view-all-events": "View All Events",
   "view-all-jobs": "View All Jobs",
+  "view-all-posts": "View All Posts",
   "user-doesnt-exist": "User doesn't exist, please double check your email"
 }

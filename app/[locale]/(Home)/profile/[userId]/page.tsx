@@ -6,6 +6,7 @@ import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
 import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
+import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -26,6 +27,9 @@ import EventStatistics from './_components/EventStatistics'
 import CreateJobForm from './_components/CreateJobForm'
 import EditJob from '../../registration/_components/_jobs/_editJob/EditJob'
 import JobManagement from '../../registration/_components/_jobs/_allJob/JobManagement'
+import PostManagement from '../../posts/(Admin)/allPosts/_components/PostManagement'
+import CreatePostForm from './_components/CreatePostForm'
+import EditPost from '../../posts/(Admin)/editPost/_components/EditPost'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -81,10 +85,11 @@ export default async function ProfilePage({
     pageSize?: string
     eventId?: string
     jobId?: string
+    postId?: string
   }>
 }) {
   const [
-    { section, page: pageStr, pageSize: pageSizeStr, eventId, jobId },
+    { section, page: pageStr, pageSize: pageSizeStr, eventId, jobId, postId },
     { locale },
     user,
   ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
@@ -317,6 +322,68 @@ export default async function ProfilePage({
         return (
           <EditJob
             job={job}
+          />
+        )
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-all-posts':
+      if (user.role && user.role.includes('ADMIN')) {
+        const allPosts = await getAllPosts()
+        return (
+          <PostManagement
+            allPosts={allPosts}
+            createPostLink={`/${locale}/profile/${user.id}?section=admin-create-post`}
+            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-post&postId={id}`}
+            showBackButton={false}
+          />
+        )
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-create-post':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <CreatePostForm user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-edit-post':
+      if (user.role && user.role.includes('ADMIN')) {
+        if (!postId) {
+          return (
+            <p className="mt-10 text-center">
+              Post ID is required to edit a post.
+            </p>
+          )
+        }
+
+        // Fetch post data
+        const post = await getPostForEditing(postId)
+
+        if (!post) {
+          return (
+            <p className="mt-10 text-center">
+              Post not found.
+            </p>
+          )
+        }
+
+        return (
+          <EditPost
+            post={post}
+            showBackButton={false}
           />
         )
       }

@@ -16,6 +16,7 @@
   "create-edit-tags": "Créer et modifier des balises",
   "create-event": "Créer un événement",
   "create-job": "Créer un emploi",
+  "create-post": "Créer un article",
   "current-password": "Mot de passe actuel",
   "currentpassword-warning": "Le mot de passe actuel est requis",
   "current-plan": "Statut",
@@ -41,6 +42,7 @@
   "location": "Emplacement",
   "manage-events": "Gérer les événements",
   "manage-jobs": "Gérer les emplois",
+  "manage-posts": "Gérer les articles",
   "manage-sponsors": "Gérer les sponsors",
   "my-profile": "Mon profil",
   "new-password": "Nouveau mot de passe",
@@ -91,5 +93,6 @@
   "verify-phone-number": "Vérifier le numéro de téléphone",
   "view-all-events": "Voir tous les événements",
   "view-all-jobs": "Voir tous les emplois",
+  "view-all-posts": "Voir tous les articles",
   "user-doesnt-exist": "L'utilisateur n'existe pas, veuillez vérifier votre e-mail"
 }

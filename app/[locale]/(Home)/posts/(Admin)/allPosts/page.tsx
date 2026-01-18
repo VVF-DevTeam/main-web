@@ -1,12 +1,10 @@
 // Libraries
-import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
+import { getAllPosts } from '@/lib/actions/post/getPosts'
 
 // Components
-import BackButton from '@/components/ui/back-button'
-import { DataTable } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/data-table'
-import { columns } from '@/app/[locale]/(Home)/posts/(Admin)/allPosts/_components/columns'
+import PostManagement from './_components/PostManagement'
 
 // Need to check for role, has to make dynamic
 export const dynamic = 'force-dynamic'
@@ -19,29 +17,15 @@ const AllPosts = async () => {
   }
 
   // Get all published and unpublished posts
-  const allPosts = await prisma.post.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  const allPosts = await getAllPosts()
 
   return (
-    <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
-      {/* Back Button To Parent Page */}
-      <BackButton />
-
-      {/* Posts Table */}
-      <h1 className="header-sub">All Posts</h1>
-      <p className="mb-12 text-sm text-muted-foreground">
-        All published and unpublished posts appear here. Click on the
-        <span className="font-semibold text-textColor-brand900 transition-all hover:text-textColor-brand/70">
-          {' '}
-          &quot;Edit&quot;
-        </span>{' '}
-        button to edit a post.
-      </p>
-      <DataTable columns={columns} data={allPosts} />
-    </div>
+    <PostManagement
+      allPosts={allPosts}
+      createPostLink="/posts/createNewPost"
+      editLinkPattern="/posts/editPost/{id}"
+      showBackButton={true}
+    />
   )
 }
 

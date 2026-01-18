@@ -26,16 +26,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { axiosInstance } from '@/lib/axios'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 
 // Interfaces
 interface CreatePostFormProps {
   author: string
+  redirectToProfile?: {
+    locale: string
+    userId: string
+  }
 }
 
 // Main Component
-const CreatePostForm = ({ author }: CreatePostFormProps) => {
+const CreatePostForm = ({ author, redirectToProfile }: CreatePostFormProps) => {
   const router = useRouter()
-
+  const currentDateTime = getCurrentDateTime()
   const form = useForm<z.infer<typeof createPostSchema>>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
@@ -54,12 +59,27 @@ const CreatePostForm = ({ author }: CreatePostFormProps) => {
       }
       const response = await axiosInstance.post('/api/posts/create', postData)
       if (response.status === 200) {
-        toast.success('Post created successfully')
+        toast.success('Post created successfully', {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#22c55e', // green-500 color
+          },
+        })
       }
 
       form.reset()
       router.refresh()
-      router.push(`/posts/editPost/${response.data.id}`)
+      if (redirectToProfile) {
+        router.push(
+          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-post&postId=${response.data.id}`
+        )
+      } else {
+        router.push(`/posts/editPost/${response.data.id}`)
+      }
     } catch (error) {
       console.log(error)
       if (error instanceof AxiosError) {

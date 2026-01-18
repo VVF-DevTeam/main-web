@@ -16,6 +16,7 @@
   "create-edit-tags": "Tạo & Chỉnh sửa Tags",
   "create-event": "Tạo sự kiện",
   "create-job": "Tạo việc làm",
+  "create-post": "Tạo bài viết",
   "current-password": "Mật khẩu hiện tại",
   "currentpassword-warning": "Vui lòng nhập mật khẩu hiện tại",
   "current-plan": "Trạng thái",
@@ -41,6 +42,7 @@
   "location": "Vị trí",
   "manage-events": "Quản lý sự kiện",
   "manage-jobs": "Quản lý việc làm",
+  "manage-posts": "Quản lý bài viết",
   "manage-sponsors": "Quản lý nhà tài trợ",
   "my-profile": "Hồ sơ của tôi",
   "new-password": "Mật khẩu mới",
@@ -91,5 +93,6 @@
   "verify-phone-number": "Xác minh số điện thoại",
   "view-all-events": "Xem tất cả sự kiện",
   "view-all-jobs": "Xem tất cả việc làm",
+  "view-all-posts": "Xem tất cả bài viết",
   "user-doesnt-exist": "Người dùng không tồn tại, vui lòng kiểm tra lại email của bạn"
 }

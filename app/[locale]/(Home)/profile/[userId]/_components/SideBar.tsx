@@ -63,6 +63,15 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     jobManagementSections.includes(currentSection)
   )
 
+  const postManagementSections = [
+    'admin-create-post',
+    'admin-all-posts',
+    'admin-edit-post',
+  ]
+  const [isPostsDropdownOpen, setIsPostsDropdownOpen] = useState(
+    postManagementSections.includes(currentSection)
+  )
+
   return (
     <div className="relative w-full bg-bgColor-gray100 p-4 md:w-64 md:p-6">
       {/* Desktop Navigation */}
@@ -234,6 +243,51 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                           }`}
                         >
                           {t('view-all-jobs')}
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              )}
+
+              {/* Manage Posts Dropdown */}
+              {isAdmin && (
+                <li>
+                  <button
+                    onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}
+                    className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                  >
+                    <span>{t('manage-posts')}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 transition-transform ${
+                        isPostsDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {isPostsDropdownOpen && (
+                    <ul className="mt-2 space-y-2 pl-4">
+                      <li>
+                        <Link
+                          href={`/${locale}/profile/${userId}?section=admin-create-post`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-create-post'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          {t('create-post')}
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={`/${locale}/profile/${userId}?section=admin-all-posts`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-all-posts'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          {t('view-all-posts')}
                         </Link>
                       </li>
                     </ul>
