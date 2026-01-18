@@ -1,54 +1,29 @@
 // Libraries
-import { prisma } from '@/lib/db'
+import { JobForEditing } from '@/lib/actions/job/getJob'
 
 // Components
 import PublishButton from '@/components/ui/PublishButton'
-import JobTitle from '../../../registration/_components/_jobs/_editJob/JobTitle'
-import JobType from '../../../registration/_components/_jobs/_editJob/JobType'
-import JobStartDate from '../../../registration/_components/_jobs/_editJob/JobStartDate'
-import JobEndDate from '../../../registration/_components/_jobs/_editJob/JobEndDate'
-import JobDescription from '../../../registration/_components/_jobs/_editJob/JobDescription'
-import JobSummary from '../../../registration/_components/_jobs/_editJob/JobSummary'
-import JobLocation from '../../../registration/_components/_jobs/_editJob/JobLocation'
-import JobEvent from '../../../registration/_components/_jobs/_editJob/JobEvent'
+import BackButton from '@/components/ui/back-button'
+import JobTitle from './JobTitle'
+import JobType from './JobType'
+import JobStartDate from './JobStartDate'
+import JobEndDate from './JobEndDate'
+import JobDescription from './JobDescription'
+import JobSummary from './JobSummary'
+import JobLocation from './JobLocation'
+import JobEvent from './JobEvent'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
-import DeleteJobButton from '../../../registration/_components/_jobs/_editJob/DeleteJobButton'
-import NotFound from '@/app/[locale]/(Home)/not-found'
+import DeleteJobButton from './DeleteJobButton'
 
 interface EditJobProps {
-  jobId: string
-  user: {
-    id: string
-    role: string[]
-  }
-  locale: string
+  job: JobForEditing
+  showBackButton?: boolean
 }
 
-export default async function EditJob({ jobId, user, locale }: EditJobProps) {
-  let job = null
-
-  try {
-    // Fetch the Job data
-    job = await prisma.job.findUnique({
-      where: {
-        keyName: jobId,
-      },
-      include: {
-        event: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    })
-  } catch (error) {
-    console.error(error)
-  }
-
-  if (!job) {
-    return <NotFound />
-  }
+export default function EditJob({
+  job,
+  showBackButton = false,
+}: EditJobProps) {
 
   // Check if field is filled
   const jobFields = [
@@ -67,6 +42,7 @@ export default async function EditJob({ jobId, user, locale }: EditJobProps) {
 
   return (
     <div className="my-12 p-6 lg:my-20">
+      {showBackButton && <BackButton />}
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">

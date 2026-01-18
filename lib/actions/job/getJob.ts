@@ -77,3 +77,39 @@ export const getPublishedJobs = unstable_cache(
     tags: ['jobs'], // Tag for revalidation
   }
 )
+
+// Get job by keyName specifically for editing
+// Includes event relation for the edit job form
+export const getJobForEditing = unstable_cache(
+  async (jobKeyName: string) => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      return await prisma.job.findUnique({
+        where: {
+          keyName: jobKeyName,
+        },
+        include: {
+          event: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Error getting job for editing:', error)
+      return null
+    }
+  },
+  ['job-for-editing'], // Cache key prefix
+  {
+    revalidate: 3600, // Cache for 1 hour (shorter since this is for editing)
+    tags: ['jobs'], // Tag for revalidation
+  }
+)
+
+// Type inference: Extract the return type of getJobForEditing and unwrap Promise and null
+export type JobForEditing = NonNullable<
+  Awaited<ReturnType<typeof getJobForEditing>>
+>

@@ -2,15 +2,11 @@
 import { redirect } from 'next/navigation'
 import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { getAllEvents } from '@/lib/actions/event/getEvent'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 
 // Components
-import BackButton from '@/components/ui/back-button'
-import { DataTable } from './_components/data-table'
-import { columns } from './_components/columns'
-import { PlusCircle } from 'lucide-react'
+import EventManagement from './_components/EventManagement'
 import ServerError from '@/components/error/ServerError'
+
 // Need to check for role, has to make dynamic
 export const dynamic = 'force-dynamic'
 
@@ -26,39 +22,19 @@ const AllEvents = async () => {
 
   // Get all published and unpublished events
   const allEvents = await getAllEvents()
-  
+
   // Check if there was an error (events should not be null)
   if (!allEvents) {
     return <ServerError />
   }
 
   return (
-    <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
-      {/* Back Button To Parent Page */}
-      <BackButton />
-
-      {/* Events Table */}
-      <div className="flex items-center justify-between">
-        <h1 className="header-sub">All Events</h1>
-        {/* Create Event */}
-        <Link href={'/events/createEvent'}>
-          <Button variant={'default'} className="flex-center gap-x-2">
-            <PlusCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Create Event</span>
-          </Button>
-        </Link>
-      </div>
-
-      <p className="mb-12 text-sm text-muted-foreground">
-        All published and unpublished events appear here. Click on the
-        <span className="hover:text-textColor-brand/70 font-semibold text-textColor-brand900 transition-all">
-          {' '}
-          &quot;Edit&quot;
-        </span>{' '}
-        button to edit a event.
-      </p>
-      <DataTable columns={columns} data={allEvents} />
-    </div>
+    <EventManagement
+      allEvents={allEvents}
+      createEventLink="/events/createEvent"
+      editLinkPattern="/events/editEvent/{keyName}"
+      showBackButton={true}
+    />
   )
 }
 

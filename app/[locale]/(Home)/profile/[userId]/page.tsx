@@ -1,7 +1,11 @@
 // Libraries
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { prisma } from '@/lib/db'
-import { getAllPublishedEvents } from '@/lib/actions/event/getEvent'
+import { getAllPublishedEvents, getAllEvents } from '@/lib/actions/event/getEvent'
+import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
+import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
+import { getEventForEditing } from '@/lib/actions/event/getEventById'
+import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -12,16 +16,16 @@ import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
 import EmailComposition from './_components/EmailComposition'
-import EventManagement from './_components/EventManagement'
+import EventManagement from '../../events/(Admin)/allEvents/_components/EventManagement'
 import CreateEventForm from './_components/CreateEventForm'
 import EventCategoryManager from './_components/EventCategoryManager'
 import EventSeriesManager from './_components/EventSeriesManager'
 import SponsorsManagement from './_components/SponsorsManagement'
-import EditEvent from './_components/EditEvent'
+import EditEvent from '../../events/(Admin)/editEvent/[eventId]/_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
 import CreateJobForm from './_components/CreateJobForm'
-import EditJob from './_components/EditJob'
-import JobManagement from './_components/JobManagement'
+import EditJob from '../../registration/_components/_jobs/_editJob/EditJob'
+import JobManagement from '../../registration/_components/_jobs/_allJob/JobManagement'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -145,7 +149,15 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        return <EventManagement user={user} locale={locale} />
+        const allEvents = await getAllEvents()
+        return (
+          <EventManagement
+            allEvents={allEvents}
+            createEventLink={`/${locale}/profile/${user.id}?section=admin-create-event`}
+            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-event&eventId={keyName}`}
+            showBackButton={false}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">
@@ -221,7 +233,31 @@ export default async function ProfilePage({
             </p>
           )
         }
-        return <EditEvent eventId={eventId} user={user} locale={locale} />
+
+        // Fetch event data, categories, and series in parallel
+        const [event, categories, allSeries] = await Promise.all([
+          getEventForEditing(eventId),
+          getAllEventCategories(),
+          getAllEventSeries(),
+        ])
+
+        if (!event) {
+          return (
+            <p className="mt-10 text-center">
+              Event not found.
+            </p>
+          )
+        }
+
+        return (
+          <EditEvent
+            eventId={eventId}
+            user={user}
+            event={event}
+            categories={categories}
+            allSeries={allSeries}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">
@@ -241,7 +277,15 @@ export default async function ProfilePage({
 
     case 'admin-all-jobs':
       if (user.role && user.role.includes('ADMIN')) {
-        return <JobManagement user={user} locale={locale} />
+        const allJobs = await getAllJobs()
+        return (
+          <JobManagement
+            allJobs={allJobs}
+            createJobLink={`/${locale}/profile/${user.id}?section=admin-create-job`}
+            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-job&jobId={keyName}`}
+            showBackButton={false}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">
@@ -258,7 +302,23 @@ export default async function ProfilePage({
             </p>
           )
         }
-        return <EditJob jobId={jobId} user={user} locale={locale} />
+
+        // Fetch job data
+        const job = await getJobForEditing(jobId)
+
+        if (!job) {
+          return (
+            <p className="mt-10 text-center">
+              Job not found.
+            </p>
+          )
+        }
+
+        return (
+          <EditJob
+            job={job}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">

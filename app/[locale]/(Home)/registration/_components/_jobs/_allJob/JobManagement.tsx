@@ -1,34 +1,36 @@
 // Libraries
-import { getAllJobs } from '@/lib/actions/job/getJob'
+import { Job } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { PlusCircle } from 'lucide-react'
 
 // Components
-import JobDataTable from './JobDataTable'
+import BackButton from '@/components/ui/back-button'
+import AllJobsTable from './AllJobsTable'
 
 interface JobManagementProps {
-  user: {
-    id: string
-    role: string[]
-  }
-  locale: string
+  allJobs: Job[]
+  createJobLink: string
+  editLinkPattern: string
+  showBackButton?: boolean
 }
 
-export default async function JobManagement({
-  user,
-  locale,
+export default function JobManagement({
+  allJobs,
+  createJobLink,
+  editLinkPattern,
+  showBackButton = false,
 }: JobManagementProps) {
-  // Get all published and unpublished jobs
-  const allJobs = await getAllJobs()
-
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
+      {/* Back Button To Parent Page */}
+      {showBackButton && <BackButton />}
+
       {/* Jobs Table */}
       <div className="flex items-center justify-between">
         <h1 className="header-sub">All Jobs</h1>
         {/* Create Job */}
-        <Link href={`/${locale}/profile/${user.id}?section=admin-create-job`}>
+        <Link href={createJobLink}>
           <Button variant={'default'} className="flex-center gap-x-2">
             <PlusCircle className="h-5 w-5" />
             <span className="text-sm font-medium">Create Job</span>
@@ -44,9 +46,8 @@ export default async function JobManagement({
         </span>{' '}
         button to edit a job.
       </p>
-      <JobDataTable data={allJobs} locale={locale} userId={user.id} />
+      <AllJobsTable data={allJobs} editLinkPattern={editLinkPattern} />
     </div>
   )
 }
-
 

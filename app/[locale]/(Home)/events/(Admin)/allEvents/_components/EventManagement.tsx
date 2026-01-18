@@ -1,34 +1,36 @@
 // Libraries
-import { getAllEvents } from '@/lib/actions/event/getEvent'
+import { Event } from '@prisma/client'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { PlusCircle } from 'lucide-react'
 
 // Components
-import EventDataTable from './EventDataTable'
+import BackButton from '@/components/ui/back-button'
+import AllEventsTable from './AllEventsTable'
 
 interface EventManagementProps {
-  user: {
-    id: string
-    role: string[]
-  }
-  locale: string
+  allEvents: Event[]
+  createEventLink: string
+  editLinkPattern: string
+  showBackButton?: boolean
 }
 
-export default async function EventManagement({
-  user,
-  locale,
+export default function EventManagement({
+  allEvents,
+  createEventLink,
+  editLinkPattern,
+  showBackButton = false,
 }: EventManagementProps) {
-  // Get all published and unpublished events
-  const allEvents = await getAllEvents()
-
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
+      {/* Back Button To Parent Page */}
+      {showBackButton && <BackButton />}
+
       {/* Events Table */}
       <div className="flex items-center justify-between">
         <h1 className="header-sub">All Events</h1>
         {/* Create Event */}
-        <Link href={`/${locale}/profile/${user.id}?section=admin-create-event`}>
+        <Link href={createEventLink}>
           <Button variant={'default'} className="flex-center gap-x-2">
             <PlusCircle className="h-5 w-5" />
             <span className="text-sm font-medium">Create Event</span>
@@ -44,7 +46,7 @@ export default async function EventManagement({
         </span>{' '}
         button to edit a event.
       </p>
-      <EventDataTable data={allEvents} locale={locale} userId={user.id} />
+      <AllEventsTable data={allEvents} editLinkPattern={editLinkPattern} />
     </div>
   )
 }

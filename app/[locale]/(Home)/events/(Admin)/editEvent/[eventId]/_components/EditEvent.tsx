@@ -1,11 +1,11 @@
 // Libraries
-import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
-import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
+import { EventCategory, EventSeries } from '@prisma/client'
+import { EventForEditing } from '@/lib/actions/event/getEventById'
 
 // Components
 import PublishButton from '@/components/ui/PublishButton'
+import BackButton from '@/components/ui/back-button'
 import EventStartDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventStartDate'
 import EventTitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTitle'
 import EventEndDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventEndDate'
@@ -30,8 +30,6 @@ import EventGallery from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventI
 import DeleteEventButton from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/DeleteEventButton'
 import EventSeating from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSeating'
 import EventForm from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventForm'
-import { EventCategory, EventSeries } from '@prisma/client'
-import NotFound from '@/app/[locale]/(Home)/not-found'
 
 interface EditEventProps {
   eventId: string
@@ -39,68 +37,26 @@ interface EditEventProps {
     id: string
     role: string[]
   }
-  locale: string
+  event: EventForEditing
+  categories: EventCategory[]
+  allSeries: EventSeries[]
+  showBackButton?: boolean
+  categoriesLink?: string
+  seriesLink?: string
+  sponsorsLink?: string
 }
 
-export default async function EditEvent({
+export default function EditEvent({
   eventId,
   user,
-  locale,
+  event,
+  categories,
+  allSeries,
+  showBackButton = false,
+  categoriesLink,
+  seriesLink,
+  sponsorsLink,
 }: EditEventProps) {
-  let event = null
-  let categories: EventCategory[] = []
-  let allSeries: EventSeries[] = []
-
-  try {
-    // Fetch the Event data
-    event = await prisma.event.findUnique({
-      where: {
-        keyName: eventId,
-      },
-      include: {
-        schedules: {
-          orderBy: {
-            position: 'asc',
-          },
-        },
-        categories: true,
-        hosts: {
-          select: {
-            name: true,
-            role: true,
-            id: true,
-          },
-        },
-        series: true,
-        tickets: {
-          include: {
-            payments: {
-              where: {
-                refunded: false,
-              },
-              select: {
-                quantity: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
-      },
-    })
-
-    // Fetch event categories using cached function
-    categories = await getAllEventCategories()
-    // Fetch all event series using cached function
-    allSeries = await getAllEventSeries()
-  } catch (error) {
-    console.error(error)
-  }
-
-  if (!event) {
-    return <NotFound />
-  }
 
   const eventFields = [
     !!event.title,
@@ -125,8 +81,14 @@ export default async function EditEvent({
   const completionText = `(${completedFields} / ${eventFields.length})`
   const canPublish = completedFields === eventFields.length
 
+  // Default links
+  const defaultCategoriesLink = `/profile/${user.id}?section=admin-event-categories`
+  const defaultSeriesLink = `/profile/${user.id}?section=admin-event-series`
+  const defaultSponsorsLink = `/profile/${user.id}?section=admin-manage-sponsors`
+
   return (
     <div className="my-12 p-6 lg:my-20">
+      {showBackButton && <BackButton />}
       <div className="mx-auto my-20 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -280,7 +242,7 @@ export default async function EditEvent({
               {' '}
               To add categories, please click{' '}
               <Link
-                href={`/${locale}/profile/${user.id}?section=admin-event-categories`}
+                href={categoriesLink || defaultCategoriesLink}
                 target="_blank"
                 className="text-textColor-blue underline"
               >
@@ -299,7 +261,7 @@ export default async function EditEvent({
             <p>
               If you don&apos;t see any series, you can create one{' '}
               <Link
-                href={`/${locale}/profile/${user.id}?section=admin-event-series`}
+                href={seriesLink || defaultSeriesLink}
                 target="_blank"
                 className="text-textColor-blue underline"
               >
@@ -361,7 +323,7 @@ export default async function EditEvent({
             <p>
               Please use this link to manage sponsors:{' '}
               <Link
-                href={`/${locale}/profile/${user.id}?section=admin-manage-sponsors`}
+                href={sponsorsLink || defaultSponsorsLink}
                 target="_blank"
                 className="text-textColor-blue underline"
               >

@@ -123,3 +123,62 @@ export const getEventByKeyName = unstable_cache(
     tags: ['events'], // Tag for revalidation
   }
 )
+
+// Cached version to get event by keyName specifically for editing
+// Includes all necessary relations for the edit event form
+export const getEventForEditing = unstable_cache(
+  async (eventKeyName: string) => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      return await prisma.event.findUnique({
+        where: {
+          keyName: eventKeyName,
+        },
+        include: {
+          schedules: {
+            orderBy: {
+              position: 'asc',
+            },
+          },
+          categories: true,
+          hosts: {
+            select: {
+              name: true,
+              role: true,
+              id: true,
+            },
+          },
+          series: true,
+          tickets: {
+            include: {
+              payments: {
+                where: {
+                  refunded: false,
+                },
+                select: {
+                  quantity: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Error getting event for editing:', error)
+      return null
+    }
+  },
+  ['event-for-editing'], // Cache key prefix
+  {
+    revalidate: 3600, // Cache for 1 hour (shorter since this is for editing)
+    tags: ['events'], // Tag for revalidation
+  }
+)
+
+// Type inference: Extract the return type of getEventForEditing and unwrap Promise and null
+export type EventForEditing = NonNullable<
+  Awaited<ReturnType<typeof getEventForEditing>>
+>

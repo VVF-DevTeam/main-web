@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button'
 import { ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 
-// Main Component
-export const columns: ColumnDef<Job>[] = [
+// Function to create columns with optional custom edit link
+export const createJobColumns = (
+  editLinkPattern: string
+): ColumnDef<Job>[] => [
   {
     accessorKey: 'title',
     header: () => <div className="text-center font-semibold">Title</div>,
@@ -108,15 +110,11 @@ export const columns: ColumnDef<Job>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const keyName = row.original.keyName
+      // Replace {keyName} placeholder with actual keyName
+      const href = editLinkPattern.replace('{keyName}', keyName)
       return (
-        <Link
-          href={`/registration/jobs/editJob/${keyName}`}
-          className="flex-center"
-        >
-          <Button
-            variant={'default'}
-            size={'sm'}
-          >
+        <Link href={href} className="flex-center">
+          <Button variant={'default'} size={'sm'}>
             Edit
           </Button>
         </Link>
