@@ -51,7 +51,9 @@ model Event {
   imgUrls            Json?
   seatingMap         Json?
   eventHosts         Json?
-  
+  eventDiscounts     Json?
+  eventCodeDiscounts Json?
+
   // Relations
   seriesId           String?
   sponsors           SponsorOnEvent[]

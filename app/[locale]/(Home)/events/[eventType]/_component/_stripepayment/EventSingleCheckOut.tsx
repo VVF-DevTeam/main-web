@@ -5,11 +5,16 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Plus, Minus } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { EventTicket, PaymentType } from '@prisma/client'
+
+export interface SelectedTicketWithQuantity {
+  ticket: EventTicket
+  quantity: number
+}
 
 interface EventSingleCheckOutProps {
   formLink?: string
@@ -20,7 +25,12 @@ interface EventSingleCheckOutProps {
   email: string
   type: string
   seatNumber?: string
-  hideCheckoutButtons?: boolean // Hide individual checkout buttons (for cart summary)
+  /**
+   * Current selected tickets/quantities from parent (used to react to Clear All)
+   * Only relevant when seatNumber is not provided (non-seated tickets)
+   */
+  selectedTickets?: SelectedTicketWithQuantity[]
+  setSelectedTickets?: (selectedTickets: SelectedTicketWithQuantity[]) => void // Callback to pass selected tickets to parent
 }
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
@@ -81,7 +91,8 @@ export default function EventSingleCheckOut({
   email,
   type,
   seatNumber,
-  hideCheckoutButtons = false,
+  selectedTickets,
+  setSelectedTickets,
 }: EventSingleCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -200,6 +211,53 @@ export default function EventSingleCheckOut({
     [tickets]
   )
 
+  // Quantity handlers (only for non-seated tickets)
+  const handleQuantityChange = useCallback(
+    (ticketId: string, delta: number) => {
+      // Don't allow quantity selection for seated tickets
+      if (seatNumber) return
+      // If no callback from parent, nothing to do
+      if (!setSelectedTickets) return
+
+      const current = selectedTickets ?? []
+      const existing = current.find((st) => st.ticket.id === ticketId)
+      const currentQty = existing?.quantity ?? 0
+      const newQty = Math.max(0, currentQty + delta)
+
+      let next: SelectedTicketWithQuantity[]
+
+      if (newQty === 0) {
+        // Remove ticket from selection
+        next = current.filter((st) => st.ticket.id !== ticketId)
+      } else {
+        const ticket = tickets.find((t) => t.id === ticketId)
+        if (!ticket) return
+
+        if (existing) {
+          // Update existing quantity
+          next = current.map((st) =>
+            st.ticket.id === ticketId ? { ticket, quantity: newQty } : st
+          )
+        } else {
+          // Add new ticket selection
+          next = [...current, { ticket, quantity: newQty }]
+        }
+      }
+
+      setSelectedTickets(next)
+    },
+    [seatNumber, setSelectedTickets, selectedTickets, tickets]
+  )
+
+  const getQuantity = useCallback(
+    (ticketId: string) => {
+      if (!selectedTickets) return 0
+      const found = selectedTickets.find((st) => st.ticket.id === ticketId)
+      return found?.quantity ?? 0
+    },
+    [selectedTickets]
+  )
+
   const hasTickets = checkoutTickets.length > 0
 
   if (formLink) {
@@ -233,7 +291,7 @@ export default function EventSingleCheckOut({
   return (
     <div ref={containerRef} className="flex flex-col gap-4">
       {isLoading ? (
-        <Button disabled>Loading...</Button>
+        <Button disabled>Loading tickets...</Button>
       ) : !hasTickets ? (
         <p className="text-sm text-red-600">{t('no-ticket-selected')}</p>
       ) : (
@@ -329,6 +387,7 @@ export default function EventSingleCheckOut({
                           : totalPrice.toFixed(2)}
                       </span>
                     </div>
+
                     {/* Display seat information - single seat only */}
                     {seatNumber ? (
                       // SINGLE SEAT: Show individual seat number
@@ -380,32 +439,69 @@ export default function EventSingleCheckOut({
                         })}
                       </span>
                     )}
+
+                    {/* Quantity Selector (only for non-seated tickets) */}
+                    {!seatNumber && !isExpired && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-gray-700 drop-shadow-sm">
+                          Add to cart:
+                        </span>
+                        <div className="flex items-center gap-2 rounded-md border border-gray-300">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleQuantityChange(ticket.id, -1)}
+                            className="h-8 w-8 rounded-l-md p-0 hover:bg-gray-100"
+                            disabled={getQuantity(ticket.id) === 0}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="min-w-[2rem] text-center text-sm font-semibold text-gray-900">
+                            {getQuantity(ticket.id)}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleQuantityChange(ticket.id, 1)}
+                            className="h-8 w-8 rounded-r-md p-0 hover:bg-gray-100"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {getQuantity(ticket.id) >= 1 && (
+                          <span className="text-xs text-green-600 drop-shadow-sm">
+                            ✓ Added
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Individual checkout button (hidden when using master checkout in cart) */}
-                  {!hideCheckoutButtons && (
-                    <div className="relative z-10 flex items-center justify-between gap-4">
-                      {isExpired ? (
-                        <Button disabled variant="outline" className="w-full opacity-50">
-                          {t('ticket-no-longer-available')}
-                        </Button>
-                      ) : (
+                  {/* Individual checkout button */}
+                  <div className="relative z-10 flex items-center justify-between gap-4">
+                    {isExpired ? (
+                      <Button disabled variant="outline" className="w-full opacity-50">
+                        {t('ticket-no-longer-available')}
+                      </Button>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700 drop-shadow-sm">Or: </span>
                         <NormalCheckoutButton
                           stripePriceId={stripePriceIdForUser}
                           stripeProductId={ticket.stripeProductId}
                           eventKeyName={eventKeyName}
                           userId={userId}
                           eventId={eventId}
-                          buttonText="reserve-button"
+                          buttonText="purchase-ticket-directly"
                           type={paymentTypeValue}
                           numberSession={ticket.payTotalNumber ?? undefined}
                           email={email}
                           seatNumber={seatNumber}
                           eventTicketId={ticket.id}
                         />
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}

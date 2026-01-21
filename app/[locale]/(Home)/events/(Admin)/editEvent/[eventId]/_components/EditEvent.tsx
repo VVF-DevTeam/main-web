@@ -14,7 +14,8 @@ import EventSchedule from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[event
 import EventCategories from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventCategories'
 import EventDays from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDays'
 import EventImage from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventImage'
-import EventPrice from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventPrice'
+import EventTickets from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTicket'
+import EventDiscounts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDiscount'
 import EventLocation from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventLocation'
 import EventType from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventType'
 import EventHosts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventHosts'
@@ -156,12 +157,20 @@ export default function EditEvent({
             <EventCapacity event={event} />
           </div>
 
-          {/* Price */}
+          {/* Tickets */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step V :</span> Tickets
             </h2>
-            <EventPrice event={event} />
+            <EventTickets event={event} />
+          </div>
+
+          {/* Discounts */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step V.5 :</span> Discounts (Optional)
+            </h2>
+            <EventDiscounts event={event} />
           </div>
 
           {/* Location */}
@@ -176,67 +185,10 @@ export default function EditEvent({
             <EventLocation event={event} />
           </div>
 
-          {/* Images */}
-          <div className="col-span-full flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VII :</span> Image
-            </h2>
-            <ImageAddInstruction />
-            <EventImage event={event} />
-          </div>
-
-          {/* Start Date */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VIII :</span> Start Date
-            </h2>
-            <EventStartDate event={event} />
-          </div>
-
-          {/* End date */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step IX :</span> End Date
-            </h2>
-            <EventEndDate event={event} />
-          </div>
-
-          {/* Event Timings */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step X :</span> Event Timings
-            </h2>
-            <EventTimings event={event} />
-          </div>
-
-          {/* Event Days */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XI :</span> Event Days
-            </h2>
-            <EventDays event={event} />
-          </div>
-
-          {/* End Schedule */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XII :</span> Event Schedule
-            </h2>
-            <EventSchedule event={event} />
-          </div>
-
-          {/* Event Hosts */}
-          <div className="flex flex-col gap-y-8">
-            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XIII :</span> Event Hosts
-            </h2>
-            <EventHosts event={event} />
-          </div>
-
           {/* Event Categories */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XIV :</span> Event Categories
+              <span className="text-gray-500">Step XII :</span> Event Categories
             </h2>
             <p>
               {' '}
@@ -253,10 +205,67 @@ export default function EditEvent({
             <EventCategories event={event} categories={categories} />
           </div>
 
+          {/* Images */}
+          <div className="col-span-full flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step VIII :</span> Image
+            </h2>
+            <ImageAddInstruction />
+            <EventImage event={event} />
+          </div>
+
+          {/* Start Date */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step IX :</span> Start Date
+            </h2>
+            <EventStartDate event={event} />
+          </div>
+
+          {/* End date */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step X :</span> End Date
+            </h2>
+            <EventEndDate event={event} />
+          </div>
+
+          {/* Event Timings */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XI :</span> Event Timings
+            </h2>
+            <EventTimings event={event} />
+          </div>
+
+          {/* Event Days */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XII :</span> Event Days
+            </h2>
+            <EventDays event={event} />
+          </div>
+
+          {/* End Schedule */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XIII :</span> Event Schedule
+            </h2>
+            <EventSchedule event={event} />
+          </div>
+
+          {/* Event Hosts */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step XIV :</span> Event Hosts
+            </h2>
+            <EventHosts event={event} />
+          </div>
+
           {/* Event Series */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XV :</span> Event Series (Optional)
+              <span className="text-gray-500">Step XVI :</span> Event Series (Optional)
             </h2>
             <p>
               If you don&apos;t see any series, you can create one{' '}
@@ -275,7 +284,7 @@ export default function EditEvent({
           {/* Event Registration Form Link */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVI :</span> Event
+              <span className="text-gray-500">Step XVII :</span> Event
               Registration Form (Optional)
             </h2>
             <p>
@@ -290,7 +299,7 @@ export default function EditEvent({
           {/* Event Social Media - Only show for concert events */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVII :</span> Social Media
+              <span className="text-gray-500">Step XVIII :</span> Social Media
               Links (Optional)
             </h2>
             <EventSocialMedia event={event} />
@@ -299,7 +308,7 @@ export default function EditEvent({
           {/* Event Gallery */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XVIII :</span> Event Gallery
+              <span className="text-gray-500">Step XIX :</span> Event Gallery
               (Optional)
             </h2>
             <EventGallery event={event} />
@@ -308,16 +317,19 @@ export default function EditEvent({
           {/* Event Seating */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XIX :</span> Event Seating
+              <span className="text-gray-500">Step XX :</span> Event Seating
               (Optional)
             </h2>
+            <p>
+              Please note that this will add a seating map to your event.
+            </p>
             <EventSeating event={event} />
           </div>
 
           {/* Event Sponsors */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XX :</span> Event Sponsors
+              <span className="text-gray-500">Step XXI :</span> Event Sponsors
               (Optional)
             </h2>
             <p>
@@ -335,7 +347,7 @@ export default function EditEvent({
           {/* Event Form */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XXI :</span> Event Form (Optional)
+              <span className="text-gray-500">Step XXII :</span> Event Form (Optional)
             </h2>
             <EventForm event={event} />
           </div>

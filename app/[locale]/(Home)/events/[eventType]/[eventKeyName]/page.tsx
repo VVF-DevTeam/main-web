@@ -116,6 +116,7 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             tickets={publishedClass.tickets}
             sponsors={publishedClass.sponsors}
             linkedJobs={publishedClass.jobs}
+            discounts={publishedClass.eventDiscounts}
           />
         </div>
       )}

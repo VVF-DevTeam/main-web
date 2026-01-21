@@ -144,7 +144,7 @@ export default function NormalCheckoutButton({
     <>
       {isLoading && <Loader />}
       <div className="w-fit">
-        <Button onClick={handleButtonClick} className="group" disabled={isLoading}>
+        <Button onClick={handleButtonClick} className="group" disabled={isLoading} size="sm">
           {buttonText === 'become-member'
             ? t(`membership:${buttonText}`)
             : t(buttonText)}

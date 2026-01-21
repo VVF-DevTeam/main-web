@@ -37,7 +37,7 @@ type TicketWithPayments = EventTicket & {
   payments: Array<{ quantity: number }>
 }
 
-interface EventPriceProps {
+interface EventTicketsProps {
   event: Event & {
     tickets?: TicketWithPayments[]
   }
@@ -131,7 +131,7 @@ const calculateSoldCount = (payments: Array<{ quantity: number }>): number => {
   return payments.reduce((sum, payment) => sum + payment.quantity, 0)
 }
 
-const EventPrice = ({ event }: EventPriceProps) => {
+const EventTickets = ({ event }: EventTicketsProps) => {
   const router = useRouter()
   const [editingTicketId, setEditingTicketId] = useState<string | null>(null)
   const [isAddingNew, setIsAddingNew] = useState(false)
@@ -1005,4 +1005,4 @@ const EventPrice = ({ event }: EventPriceProps) => {
   )
 }
 
-export default EventPrice
+export default EventTickets
