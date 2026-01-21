@@ -428,6 +428,7 @@ export async function POST(req: NextRequest) {
       let ticketMetadata: Array<{
         ticketId: string
         seatNumbers: string[]
+        quantity?: number // For non-seated tickets when seatNumbers is empty
       }> | null = null
 
       if (metadata.ticketMetadata) {
@@ -437,6 +438,7 @@ export async function POST(req: NextRequest) {
           ) as Array<{
             ticketId: string
             seatNumbers: string[]
+            quantity?: number
           }>
         } catch (e) {
           console.error('Error parsing ticketMetadata:', e)
@@ -484,7 +486,10 @@ export async function POST(req: NextRequest) {
             continue
           }
 
-          const seatCount = ticketInfo.seatNumbers.length
+          // For non-seated tickets, use quantity; for seated tickets, use seatNumbers.length
+          const seatCount = ticketInfo.seatNumbers.length > 0 
+            ? ticketInfo.seatNumbers.length 
+            : (ticketInfo.quantity || 1)
           const ticketPrice = Number(ticket.price) || 0
           const totalTicketPrice =
             ticket.payTotalNumber && ticket.payTotalNumber > 0
@@ -504,7 +509,9 @@ export async function POST(req: NextRequest) {
               type: metadata.type as PaymentType,
               expiresAt: expiresAt,
               quantity: seatCount,
-              seatNumber: ticketInfo.seatNumbers.join(', '),
+              seatNumber: ticketInfo.seatNumbers.length > 0 
+                ? ticketInfo.seatNumbers.join(', ') 
+                : null, // null for non-seated tickets
               // Guest information (only if userId is not provided)
               ...(isGuestCheckout && {
                 guestName: metadata.guestName || null,
@@ -612,7 +619,17 @@ export async function POST(req: NextRequest) {
                 const firstName = user.name?.split(' ')[0] || 'Valued Customer'
                 const allSeatNumbers = ticketMetadata
                   .flatMap((t) => t.seatNumbers)
+                  .filter((s) => s.length > 0) // Filter out empty strings
                   .join(', ')
+                
+                // Calculate total quantity: sum of seatNumbers.length or quantity for non-seated tickets
+                const totalQuantity = ticketMetadata.reduce((sum, t) => {
+                  if (t.seatNumbers.length > 0) {
+                    return sum + t.seatNumbers.length
+                  } else {
+                    return sum + (t.quantity || 1)
+                  }
+                }, 0)
 
                 // Send email with combined information
                 await sendPaymentConfirmationEmail({
@@ -620,13 +637,13 @@ export async function POST(req: NextRequest) {
                   to: user.email,
                   ticketType: tickets.map((t) => t.type).join(', '), // Combined ticket types
                   pricePaid,
-                  quantity: quantity || allSeatNumbers.split(',').length,
+                  quantity: quantity || totalQuantity,
                   currency: firstTicket.currency || 'CAD',
                   ticketImageUrl: firstTicket.imageUrl,
                   perSessionPrice: Number(firstTicket.price) || 0,
                   payTotalNumber: firstTicket.payTotalNumber,
                   eventTitle: firstTicket.event.title,
-                  seatNumber: allSeatNumbers,
+                  seatNumber: allSeatNumbers || undefined, // undefined for non-seated tickets
                   eventStartDate: firstTicket.event.startDate,
                   eventEndDate: firstTicket.event.endDate,
                   eventLocation: firstTicket.event.location,

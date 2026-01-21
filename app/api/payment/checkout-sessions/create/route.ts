@@ -29,15 +29,6 @@ export async function POST(req: Request) {
       {
         price: stripePriceId,
         quantity: 1,
-        ...(type === 'Membership'
-          ? {}
-          : {
-              adjustable_quantity: {
-                enabled: true,
-                minimum: 1,
-                maximum: 10,
-              },
-            }),
       },
     ]
 

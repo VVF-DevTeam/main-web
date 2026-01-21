@@ -20,10 +20,12 @@ import {
   EventSponsor,
   SponsorTier,
   Job,
+  Payment
 } from '@prisma/client'
 import EventGalleryCarousel from '../EventGalleryCarousel'
 import Image from 'next/image'
 import { CalendarDays, Ticket, Users, MapPin, Clock } from 'lucide-react'
+import { JsonValue } from '@prisma/client/runtime/library'
 
 type SponsorOnEvent = {
   tier: SponsorTier
@@ -55,6 +57,7 @@ interface ClassDescriptionProps {
   tickets: EventTicket[]
   sponsors: SponsorOnEvent[]
   linkedJobs: Job[]
+  discounts: JsonValue
 }
 
 const typeMap = {
@@ -87,6 +90,7 @@ const ClassDescription = async ({
   tickets,
   sponsors,
   linkedJobs,
+  discounts,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -96,13 +100,19 @@ const ClassDescription = async ({
   const email = session?.user?.email!
 
   // Check if user has already paid for this class
-  const existingPayment = author
-    ? await prisma.payment.findMany({
+  let existingPayment: Payment[] | null = null
+  if (author) {
+    try {
+      existingPayment = await prisma.payment.findMany({
         where: {
           AND: [{ userId: author }, { eventId: classId }],
         },
       })
-    : null
+    } catch (error) {
+      console.error(`Error fetching existing payments in ClassDescription of event ${title}:`, error)
+      existingPayment = null
+    }
+  }
 
   // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
   const totalSoldCapacity = await checkCurrentSoldCapacityById(classId)
@@ -162,15 +172,15 @@ const ClassDescription = async ({
                         })}
                         {new Date(startDate).getTime() !==
                           new Date(endDate).getTime() && (
-                          <>
-                            {' - '}
-                            {new Date(endDate).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </>
-                        )}
+                            <>
+                              {' - '}
+                              {new Date(endDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </>
+                          )}
                       </span>
                     </div>
                     <div className="absolute bottom-0 left-1/2 w-[93%] -translate-x-1/2 border-b border-gray-200"></div>
@@ -260,6 +270,7 @@ const ClassDescription = async ({
                 loggedIn={author ? true : false}
                 tickets={tickets}
                 isCapacityExceeded={isCapacityExceeded}
+                discounts={discounts}
               />
 
               {existingPayment && existingPayment.length > 0 && (

@@ -106,25 +106,32 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all tickets for a specific event with id, type, and price, ordered by price ascending. Used in AddPaymentButton component to populate ticket selection dropdown. Tagged with 'events' since tickets are part of event data and should be revalidated when events or tickets change.
 
+#### 14. `getEventDiscountsAndTickets`
+- **File**: `lib/actions/event/getEventDiscountsAndTickets.ts`
+- **Cache Key**: `['event-discounts-tickets']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns event discounts (eventDiscounts) and tickets (id, price, discountMemberPercent, capacityPerTicket, payTotalNumber) for a specific event. Used in checkout session creation to calculate discounts. Tagged with 'events' since discounts and tickets are part of event data and should be revalidated when events, discounts, or tickets change.
+
 ---
 
 ### Jobs
 
-#### 14. `getAllJobs`
+#### 15. `getAllJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-all']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 15. `getPublishedJobs`
+#### 16. `getPublishedJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-published']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published jobs with optional filters (title search and event filter). Includes event relation (id, title, keyName) if job is linked to an event. Ordered by updatedAt descending.
 
-#### 16. `getJobForEditing`
+#### 17. `getJobForEditing`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['job-for-editing']`
 - **Tags**: `['jobs']`
@@ -135,21 +142,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Reviews
 
-#### 17. `getCachedReviewsPaginated`
+#### 18. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 18. `getCachedPublishedEventsForReviews`
+#### 19. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 19. `getCachedPublishedSeriesForReviews`
+#### 20. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -160,21 +167,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 20. `getCachedPostsPaginated`
+#### 21. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated posts with search by title
 
-#### 21. `getAllPosts`
+#### 22. `getAllPosts`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-all']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all posts (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 22. `getPostForEditing`
+#### 23. `getPostForEditing`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['post-for-editing']`
 - **Tags**: `['posts']`
@@ -185,7 +192,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Social Media Posts
 
-#### 23. `getCachedSocialMediaPostsPaginated`
+#### 24. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
@@ -196,14 +203,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Users
 
-#### 24. `getUsersSimple` (via `getCachedUsersSimple`)
+#### 25. `getUsersSimple` (via `getCachedUsersSimple`)
 - **File**: `lib/actions/user/getAllUsersSimple.ts`
 - **Cache Key**: `['users-simple']`
 - **Tags**: `['users']`
 - **Revalidate Time**: 3600 seconds (1 hour)
 - **Description**: Returns list of users with optional count limit and name search
 
-#### 25. `getUsersWithRole` (via `getCachedUsersWithRole`)
+#### 26. `getUsersWithRole` (via `getCachedUsersWithRole`)
 - **File**: `lib/actions/user/getUsersWithRole.ts`
 - **Cache Key**: `['users-with-role']`
 - **Tags**: `['users']`
@@ -214,14 +221,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Payments
 
-#### 26. `getPaginatedPayments`
+#### 27. `getPaginatedPayments`
 - **File**: `lib/actions/payment/getPaginatedPayments.ts`
 - **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
-#### 27. `getEventPayments`
+#### 28. `getEventPayments`
 - **File**: `app/[locale]/(Home)/profile/[userId]/_components/getEventPayments.ts`
 - **Cache Key**: `['event-payments-${eventId}']` (per event)
 - **Tags**: `['payments']`
@@ -245,6 +252,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getEventForEditing`
 - `getAllEvents`
 - `getEventTickets` (via `getCachedEventTickets`)
+- `getEventDiscountsAndTickets`
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -311,7 +319,12 @@ This document provides a comprehensive overview of all functions using `unstable
     - Function: `PUT`
     - Action: Creates or updates event form data. Event forms are part of event data, so changes must invalidate the cache.
 
-14. **`app/api/jobs/edit/[jobId]/route.ts`**
+14. **`app/api/events/discounts/[eventId]/route.ts`**
+    - Function: `PUT`
+    - Line: 66
+    - Action: Creates or updates event discounts data (stored in eventDiscounts JSON field). Event discounts are part of event data, so changes must invalidate the cache.
+
+15. **`app/api/jobs/edit/[jobId]/route.ts`**
     - Function: `PUT` (conditional)
     - Line: 44
     - Action: When a job's eventId is changed (linking/unlinking from an event), this triggers event cache revalidation. This is necessary because event queries include linked jobs, and the volunteer section visibility depends on this data.
@@ -553,7 +566,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 11 functions | 13 API routes | ✅ Fully covered |
+| `events` | 12 functions | 14 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 3 functions | 5 API routes | ✅ Fully covered |
 | `series` | 2 functions | 2 API routes | ✅ Fully covered |
@@ -590,6 +603,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating, updating, or deleting event tickets, always call `revalidateTag('events')` (tickets are included in cached event queries)
 - When creating, updating, or deleting event schedules, always call `revalidateTag('events')` (schedules are included in cached event queries)
 - When creating, updating, or deleting event forms, always call `revalidateTag('events')`
+- When creating or updating event discounts, always call `revalidateTag('events')` (discounts are stored in the event's eventDiscounts JSON field)
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
 - When creating or updating series, always call `revalidateTag('series')`

@@ -835,7 +835,7 @@ const EventSeating = ({ event }: EventSeatingProps) => {
                   variant={isEditingSeats ? 'default' : 'outline'}
                   onClick={() => setIsEditingSeats(!isEditingSeats)}
                 >
-                  {isEditingSeats ? 'Stop Editing Seats' : 'Edit Seats'}
+                  {isEditingSeats ? 'Stop Editing Seats' : 'Assign Ticket to Seats'}
                 </Button>
                 {isEditingSeats && tickets.length === 0 && (
                   <p className="text-sm text-amber-600">

@@ -4,7 +4,6 @@ import React from 'react'
 import initTranslation from '@/app/i18n'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
-import { Decimal } from '@prisma/client/runtime/library'
 import Link from 'next/link'
 import { getEventPrices } from '@/lib/actions/event/getEventPrices'
 import { checkCurrentSoldCapacityById } from '@/lib/actions/event/checkCurrentSoldCapacityById'
@@ -29,8 +28,9 @@ import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
 import VolunteerSection from '../_class/VolunteerSection'
 // Types
-import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job } from '@prisma/client'
+import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+import { JsonValue } from '@prisma/client/runtime/library'
 
 type SponsorOnEvent = {
   tier: SponsorTier
@@ -62,6 +62,7 @@ type EventWithRelations = {
   tickets: EventTicket[]
   sponsors: SponsorOnEvent[]
   jobs: Job[]
+  eventDiscounts: JsonValue
 }
 
 interface ConcertDescriptionsProps {
@@ -105,13 +106,19 @@ const ConcertDescriptions = async ({
     endDateVancouver.format('YYYY-MM-DD')
 
   // Check if user has already paid for this event
-  const existingPayment = author
-    ? await prisma.payment.findMany({
+  let existingPayment: Payment[] | null = null
+  if (author) {
+    try {
+      existingPayment = await prisma.payment.findMany({
         where: {
           AND: [{ userId: author }, { eventId: event.id }],
         },
       })
-    : null
+    } catch (error) {
+      console.error(`Error fetching existing payments in ConcertDescriptions of event ${event.title}:`, error)
+      existingPayment = null
+    }
+  }
 
   // Calculate total sold capacity: sum of (payment.quantity * ticket.capacityPerTicket) for all non-refunded payments
   const totalSoldCapacity = await checkCurrentSoldCapacityById(event.id)
@@ -312,6 +319,7 @@ const ConcertDescriptions = async ({
             seatingMap={seatingMap}
             tickets={event.tickets}
             isCapacityExceeded={isCapacityExceeded}
+            discounts={event.eventDiscounts}
           />
         </div>
 

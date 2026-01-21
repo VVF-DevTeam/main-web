@@ -10,6 +10,7 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   function (config) {
     if (config.method === 'get') {
+      // For all get requests, add the secret token to the headers to prevent unauthorized access to the GET APIs
       const secretToken = createSecretToken()
       config.headers.set('secret', secretToken)
     }

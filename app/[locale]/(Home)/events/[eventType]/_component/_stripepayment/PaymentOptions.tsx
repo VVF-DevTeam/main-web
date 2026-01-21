@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import EventSingleCheckOut from './EventSingleCheckOut'
-import EventMultipleCheckout from './EventMultipleCheckout'
+import EventSingleCheckOut, { SelectedTicketWithQuantity } from './EventSingleCheckOut'
+import EventCartCheckout from './EventCartCheckout'
+import EventSeatingMap from './EventSeatingMap'
 // import EventQuickCheckout from './EventQuickCheckout'
 import { Button } from '@/components/ui/button'
-import { ChevronRight, Armchair } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
@@ -14,7 +14,6 @@ import {
   SeatingMap,
   SeatValue,
 } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
-import { cn } from '@/lib/utils'
 import {
   Sheet,
   SheetContent,
@@ -27,6 +26,7 @@ import {
   SEAT_STATUS_USER,
 } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 import { EventTicket } from '@prisma/client'
+import { JsonValue } from '@prisma/client/runtime/library'
 interface PaymentOptionsProps {
   formLink: string
   eventKeyName: string
@@ -39,6 +39,7 @@ interface PaymentOptionsProps {
   seatingMap?: SeatingMap | null
   tickets?: EventTicket[]
   isCapacityExceeded?: boolean
+  discounts: JsonValue
 }
 
 const calculateTicketDisplayPrice = (
@@ -75,6 +76,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   seatingMap,
   tickets = [],
   isCapacityExceeded = false,
+  discounts,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -96,6 +98,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       seatIndex: number
     }>
   >([])
+
+  // Selected tickets from EventSingleCheckOut (non-seated tickets with quantities)
+  const [selectedTickets, setSelectedTickets] = useState<SelectedTicketWithQuantity[]>([])
 
   // Close options when user logs out
   useEffect(() => {
@@ -302,30 +307,29 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
     const displayPrice = hasTicket ? selectedTicketDisplayPrice : null
     const priceDisplay = hasTicket
       ? ticket && displayPrice !== null
-        ? `${selectedTicketCurrency} $${displayPrice.toFixed(2)}${
-            ticket.payTotalNumber
-              ? ` (Full Event: ${ticket.payTotalNumber} sessions)`
-              : ''
-          }`
+        ? `${selectedTicketCurrency} $${displayPrice.toFixed(2)}${ticket.payTotalNumber
+          ? ` (Full Event: ${ticket.payTotalNumber} sessions)`
+          : ''
+        }`
         : 'N/A'
       : 'N/A'
     const secondaryDetails = hasTicket
       ? ticket
         ? [
-            { label: 'ticket-type', value: seat.ticketType || 'N/A' },
-            {
-              label: 'price',
-              value: priceDisplay,
-            },
-            ...(ticket.payTotalNumber
-              ? [
-                  {
-                    label: 'Sessions',
-                    value: `${ticket.payTotalNumber}`,
-                  },
-                ]
-              : []),
-          ]
+          { label: 'ticket-type', value: seat.ticketType || 'N/A' },
+          {
+            label: 'price',
+            value: priceDisplay,
+          },
+          ...(ticket.payTotalNumber
+            ? [
+              {
+                label: 'Sessions',
+                value: `${ticket.payTotalNumber}`,
+              },
+            ]
+            : []),
+        ]
         : [{ label: 'Ticket', value: 'No ticket information available' }]
       : [{ label: 'Ticket', value: 'No ticket assigned' }]
 
@@ -543,19 +547,19 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 <button
                   key={option.id}
                   onClick={() => setSelected(option.id)}
-                  className={`rounded border px-4 py-2 font-medium transition-all ${
-                    selected === option.id
-                      ? 'bg-primary text-white shadow'
-                      : 'border-gray-300 bg-white hover:bg-gray-100'
-                  }`}
+                  className={`rounded border px-4 py-2 font-medium transition-all ${selected === option.id
+                    ? 'bg-primary text-white shadow'
+                    : 'border-gray-300 bg-white hover:bg-gray-100'
+                    }`}
                 >
                   {t(option.label)}
                 </button>
               ))}
             </div>
 
+            {/* Choose between normal checkout and seating map */}
             {selected === 'checkout' &&
-            (!seatingMap || seatingMap.length === 0) ? (
+              (!seatingMap || seatingMap.length === 0) ? (
               <div className="w-full">
                 {/* Show normal checkout for Class event */}
                 <EventSingleCheckOut
@@ -566,184 +570,47 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   tickets={tickets}
                   email={email}
                   type={type}
+                  selectedTickets={selectedTickets}
+                  setSelectedTickets={setSelectedTickets}
                 />
               </div>
             ) : seatingMap && seatingMap.length > 0 ? (
               // Show seating map for Concert event
-              <div className="w-full">
-                <div className="rounded-md border bg-white p-4">
-                  <h3 className="web_h3 mb-2 text-center text-base font-semibold sm:text-lg md:text-xl">
-                    Seating Map
-                  </h3>
-                  <div className="w-full overflow-x-auto">
-                    <div className="flex w-full md:justify-center">
-                      <div className="inline-block rounded-lg border-2 border-gray-300 bg-gray-50 p-3">
-                        {/* Stage */}
-                        <div className="mb-4 flex justify-center">
-                          <div className="flex items-center justify-center rounded-md border-2 border-amber-600 bg-amber-100 px-6 py-1">
-                            <span className="text-sm font-semibold text-amber-900">
-                              STAGE
-                            </span>
-                          </div>
-                        </div>
-                        {/* Divider */}
-                        <div className="mb-4 flex justify-center">
-                          <div className="h-px w-full bg-gray-400"></div>
-                        </div>
-                        {/* Seating */}
-                        <div className="flex flex-col gap-1.5">
-                          {/* Column Headers */}
-                          <div className="flex justify-center md:gap-1">
-                            <div className="h-6 w-6 flex-shrink-0 sm:h-8 sm:w-7"></div>
-                            {seatingMap[0]?.map((_, colIndex) => (
-                              <div
-                                key={colIndex}
-                                className="flex h-6 w-6 items-center justify-center text-[10px] font-semibold text-gray-700 sm:h-8 sm:w-7 sm:text-xs"
-                              >
-                                {columnNames[colIndex] || String(colIndex + 1)}
-                              </div>
-                            ))}
-                          </div>
-                          {/* Rows with Row Labels */}
-                          {seatingMap.map((row, rowIndex) => (
-                            <div
-                              key={rowIndex}
-                              className="flex justify-center md:gap-1"
-                            >
-                              {/* Row Label */}
-                              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center text-[10px] font-semibold text-gray-700 sm:h-8 sm:w-7 sm:text-xs">
-                                {rowNames[rowIndex] ||
-                                  String.fromCharCode(65 + rowIndex)}
-                              </div>
-                              {/* Seats */}
-                              {row.map((seat, seatIndex) => {
-                                const isActiveSeat =
-                                  selectedSeat?.rowIndex === rowIndex &&
-                                  selectedSeat?.seatIndex === seatIndex
-                                const isSeatUnavailable =
-                                  seat.status === SEAT_STATUS.OCCUPIED
-                                const isInCart = isSeatSelected(
-                                  rowIndex,
-                                  seatIndex
-                                )
-                                return (
-                                  <div
-                                    key={seatIndex}
-                                    role="button"
-                                    tabIndex={isSeatUnavailable ? -1 : 0}
-                                    aria-pressed={isActiveSeat || isInCart}
-                                    aria-disabled={isSeatUnavailable}
-                                    aria-label={getSeatTitle(
-                                      seat,
-                                      rowIndex,
-                                      seatIndex
-                                    )}
-                                    onClick={() => {
-                                      if (isSeatUnavailable) return
-                                      handleSeatClick(seat, rowIndex, seatIndex)
-                                    }}
-                                    onKeyDown={
-                                      isSeatUnavailable
-                                        ? undefined
-                                        : (event) =>
-                                            handleSeatKeyDown(
-                                              event,
-                                              seat,
-                                              rowIndex,
-                                              seatIndex
-                                            )
-                                    }
-                                    className={cn(
-                                      'relative flex h-6 w-6 items-center justify-center rounded p-0.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 sm:h-7 sm:w-7',
-                                      isSeatUnavailable
-                                        ? 'cursor-not-allowed'
-                                        : 'cursor-pointer hover:bg-gray-300',
-                                      isActiveSeat ? 'bg-gray-200' : '',
-                                      isInCart
-                                        ? 'bg-primary/10 ring-2 ring-primary ring-offset-1'
-                                        : ''
-                                    )}
-                                    title={getSeatTitle(
-                                      seat,
-                                      rowIndex,
-                                      seatIndex
-                                    )}
-                                  >
-                                    <Armchair
-                                      className={cn(
-                                        'h-4 w-4 sm:h-5 sm:w-5',
-                                        getSeatColor(seat),
-                                        isInCart && 'scale-110'
-                                      )}
-                                      strokeWidth={isInCart ? 2.5 : 2}
-                                    />
-                                    {isInCart && (
-                                      <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm">
-                                        ✓
-                                      </span>
-                                    )}
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-                    {seatLegendItems.map((item) => (
-                      <div
-                        key={item.key}
-                        className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2 py-1"
-                      >
-                        <div
-                          className={cn(
-                            'flex h-6 w-6 items-center justify-center rounded md:h-8 md:w-8',
-                            item.wrapperClass
-                          )}
-                        >
-                          <Armchair
-                            className={cn(
-                              'h-4 w-4 md:h-5 md:w-5',
-                              item.iconClass
-                            )}
-                          />
-                        </div>
-                        <div className="flex flex-col leading-tight">
-                          <span className="font-medium text-gray-800">
-                            {item.label}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {item.description}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <EventSeatingMap
+                seatingMap={seatingMap}
+                columnNames={columnNames}
+                rowNames={rowNames}
+                selectedSeat={selectedSeat}
+                isSeatSelected={isSeatSelected}
+                handleSeatClick={handleSeatClick}
+                handleSeatKeyDown={handleSeatKeyDown}
+                getSeatTitle={getSeatTitle}
+                getSeatColor={getSeatColor}
+                seatLegendItems={seatLegendItems}
+              />
             ) : (
               <div></div>
             )}
 
-            {/* Multi-seat cart summary */}
-            {selected === 'checkout' &&
-              seatingMap &&
-              seatingMap.length > 0 &&
-              selectedSeatsWithTickets.length >= 0 && (
-                <EventMultipleCheckout
-                  eventKeyName={eventKeyName}
-                  userId={userId}
-                  eventId={eventId}
-                  email={email}
-                  type={type}
-                  selectedSeatsWithTickets={selectedSeatsWithTickets}
-                  seatsByTicketType={seatsByTicketType}
-                  onClearCart={() => setSelectedSeats([])}
-                  onRemoveSeat={handleRemoveFromCart}
-                />
-              )}
+            {/* Cart summary */}
+            {selected === 'checkout' && !formLink && (
+              <EventCartCheckout
+                eventKeyName={eventKeyName}
+                userId={userId}
+                eventId={eventId}
+                email={email}
+                type={type}
+                selectedSeatsWithTickets={selectedSeatsWithTickets}
+                seatsByTicketType={seatsByTicketType}
+                onClearCart={() => {
+                  setSelectedSeats([])
+                  setSelectedTickets([])
+                }}
+                onRemoveSeat={handleRemoveFromCart}
+                selectedTickets={selectedTickets}
+                discounts={discounts}
+              />
+            )}
 
             {selected === 'etransfer' && (
               <div className="rounded border bg-white p-4 text-sm leading-relaxed dark:bg-gray-800">
@@ -803,10 +670,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
             <SheetDescription>
               {selectedSeat
                 ? `${t('details-for-seat')} ${getSeatName(
-                    selectedSeat.seat,
-                    selectedSeat.rowIndex,
-                    selectedSeat.seatIndex
-                  )}.`
+                  selectedSeat.seat,
+                  selectedSeat.rowIndex,
+                  selectedSeat.seatIndex
+                )}.`
                 : t('select-seat-to-view-details')}
             </SheetDescription>
           </SheetHeader>
