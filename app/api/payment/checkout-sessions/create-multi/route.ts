@@ -27,12 +27,13 @@ export async function POST(req: Request) {
       userId,
       eventId,
       type,
-      email,
+      mainEmail,
       checkoutItems,
       discountCode, // Only the code - will be re-verified server-side
       // Guest information (for payments without login)
       guestName,
       guestPhone,
+      otherGuestsInfo, // Array of other guests' information
     } = await req.json()
 
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
           const stripePrice = await stripe.prices.retrieve(item.stripePriceId)
           stripePriceCache.set(item.stripePriceId, stripePrice)
         } catch (error) {
-          console.error('Failed to retrieve Stripe price:', error)
+          console.error('Failed to retrieve Stripe price:', error) 
           continue
         }
       }
@@ -137,7 +138,7 @@ export async function POST(req: Request) {
 
         if (discount.type === 'Bulk Discount') {
           const minQty = discount.minQuantity ?? 0
-          const qualifies = totalItemCount > minQty
+          const qualifies = totalItemCount >= minQty
           if (!qualifies) return
 
           if (!bestBulk || (bestBulk.minQuantity ?? 0) < minQty) {
@@ -352,7 +353,7 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: type === 'Membership' ? 'subscription' : 'payment',
-      customer_email: email,
+      customer_email: mainEmail,
       success_url:
         type === 'Membership'
           ? `${origin}/registration/membership/payment/success`
@@ -372,8 +373,12 @@ export async function POST(req: Request) {
         ticketMetadata: JSON.stringify(ticketMetadata), // Store which seats belong to which ticket type
         // Guest information (only if userId is not provided)
         ...(guestName && { guestName: guestName }),
-        ...(email && { guestEmail: email }),
+        ...(mainEmail && { guestEmail: mainEmail }),
         ...(guestPhone && { guestPhone: guestPhone }),
+        // Other guests information (array of guest info)
+        ...(otherGuestsInfo && Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0 && {
+          otherGuestsInfo: JSON.stringify(otherGuestsInfo),
+        }),
         description:
           type === 'Membership'
             ? 'Monthly Membership'

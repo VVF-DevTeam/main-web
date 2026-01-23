@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { SelectedTicketWithQuantity } from './EventSingleCheckOut'
 import { JsonValue } from '@prisma/client/runtime/library'
+import Link from 'next/link'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -98,6 +99,11 @@ export default function EventCartCheckout({
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0)
 
   const isGuestCheckout = !userId || userId.trim() === ''
+
+  // Sum of the number of selected seats and tickets
+  const totalItemCount =
+    selectedSeatsWithTickets.length +
+    selectedTickets.reduce((sum, item) => sum + item.quantity, 0)
 
   // Normalize discounts JSON into a typed array for easier rendering
   const discountList: EventDiscountJson[] = useMemo(() => {
@@ -194,7 +200,7 @@ export default function EventCartCheckout({
       const now = Date.now()
       const remaining = Math.max(0, Math.ceil((cooldownEndTime - now) / 1000))
       setCooldownRemaining(remaining)
-      
+
       if (remaining === 0) {
         setCooldownEndTime(null)
       }
@@ -273,10 +279,6 @@ export default function EventCartCheckout({
     let effectivePercent = 0
 
     if (discountList.length > 0) {
-      const totalItemCount =
-        selectedSeatsWithTickets.length +
-        selectedTickets.reduce((sum, item) => sum + item.quantity, 0)
-
       // First, for each non‑code discount type, pick the single "best" qualifying discount:
       // - Bulk Discount: highest minQuantity (stricter condition)
       // - Minimum Total Discount: highest minTotal
@@ -289,7 +291,7 @@ export default function EventCartCheckout({
 
         if (discount.type === 'Bulk Discount') {
           const minQty = discount.minQuantity ?? 0
-          const qualifies = totalItemCount > minQty
+          const qualifies = totalItemCount >= minQty
           if (!qualifies) return
 
           if (!bestBulk || (bestBulk.minQuantity ?? 0) < minQty) {
@@ -388,10 +390,92 @@ export default function EventCartCheckout({
         }
       }
 
+      // Apply discount per unit and round each (matching Stripe's calculation)
+      // Track discount amounts per ticket type for UI display
+      const ticketTypeDiscounts: Array<{ ticketType: string; quantity: number; discountAmount: number; perUnitDiscount: number; currency: string }> = []
+      
       if (effectivePercent > 0) {
-        bulkDiscountAmount =
-          totalAfterMembership * (effectivePercent / 100)
-        totalAfterBulk = totalAfterMembership - bulkDiscountAmount
+        let sumOfRoundedPrices = 0
+        
+        // Apply discount to each seat individually and round
+        // Group seats by ticket type for discount display
+        const seatDiscountsByType = new Map<string, { count: number; totalDiscount: number; currency: string }>()
+        
+        selectedSeatsWithTickets.forEach((item) => {
+          const originalPrice = item.price
+          const discountedPrice = item.price * (1 - effectivePercent / 100)
+          const roundedPrice = Math.round(discountedPrice * 100) / 100
+          const discountAmount = originalPrice - roundedPrice
+          sumOfRoundedPrices += roundedPrice
+          
+          // Track discount by ticket type
+          const ticketType = item.ticket.type
+          const currency = item.ticket.currency || 'CAD'
+          if (!seatDiscountsByType.has(ticketType)) {
+            seatDiscountsByType.set(ticketType, { count: 0, totalDiscount: 0, currency })
+          }
+          const typeData = seatDiscountsByType.get(ticketType)!
+          typeData.count += 1
+          typeData.totalDiscount += discountAmount
+        })
+        
+        // Add seat discounts to ticketTypeDiscounts
+        seatDiscountsByType.forEach((data, ticketType) => {
+          const perUnitDiscount = data.count > 0 ? data.totalDiscount / data.count : 0
+          ticketTypeDiscounts.push({
+            ticketType,
+            quantity: data.count,
+            discountAmount: Math.round(data.totalDiscount * 100) / 100, // Round to 2 decimals
+            perUnitDiscount: Math.round(perUnitDiscount * 100) / 100, // Round to 2 decimals
+            currency: data.currency,
+          })
+        })
+        
+        // Apply discount to each ticket unit individually and round
+        selectedTickets.forEach((item) => {
+          const basePrice = Number(item.ticket.price) || 0
+          const capacity = item.ticket.capacityPerTicket || 1
+          let ticketPrice = basePrice * capacity
+
+          if (item.ticket.payTotalNumber && item.ticket.payTotalNumber > 0) {
+            ticketPrice = basePrice * capacity * item.ticket.payTotalNumber
+          }
+
+          // Apply member discount if subscribed
+          let memberDiscountedPrice = ticketPrice
+          if (isSubscribed) {
+            const discountPercent = item.ticket.discountMemberPercent || 0
+            if (discountPercent > 0) {
+              memberDiscountedPrice = ticketPrice * (1 - discountPercent / 100)
+            }
+          }
+
+          // Calculate discount for this ticket type
+          const originalTotalPrice = memberDiscountedPrice * item.quantity
+          let discountedTotalPrice = 0
+          
+          // Apply event discount to each unit of this ticket type and round
+          for (let i = 0; i < item.quantity; i++) {
+            const discountedPrice = memberDiscountedPrice * (1 - effectivePercent / 100)
+            const roundedPrice = Math.round(discountedPrice * 100) / 100
+            discountedTotalPrice += roundedPrice
+            sumOfRoundedPrices += roundedPrice
+          }
+          
+          // Track discount for this ticket type
+          const ticketDiscountAmount = originalTotalPrice - discountedTotalPrice
+          const perUnitDiscount = item.quantity > 0 ? ticketDiscountAmount / item.quantity : 0
+          ticketTypeDiscounts.push({
+            ticketType: item.ticket.type,
+            quantity: item.quantity,
+            discountAmount: Math.round(ticketDiscountAmount * 100) / 100, // Round to 2 decimals
+            perUnitDiscount: Math.round(perUnitDiscount * 100) / 100, // Round to 2 decimals
+            currency: item.ticket.currency || 'CAD',
+          })
+        })
+        
+        totalAfterBulk = sumOfRoundedPrices
+        bulkDiscountAmount = totalAfterMembership - totalAfterBulk
       }
 
       return {
@@ -407,6 +491,7 @@ export default function EventCartCheckout({
         winningNonStackableDiscount, // Track which discount is actually winning
         isNonStackableWinning, // Track if a non-stackable discount is winning
         isStackableWinning, // Track if stackable discounts are winning
+        ticketTypeDiscounts, // Discount amounts per ticket type
       }
     }
 
@@ -423,6 +508,7 @@ export default function EventCartCheckout({
       winningNonStackableDiscount: null,
       isNonStackableWinning: false,
       isStackableWinning: false,
+      ticketTypeDiscounts: [], // No discounts applied
     }
   }, [
     selectedSeatsWithTickets,
@@ -434,7 +520,10 @@ export default function EventCartCheckout({
   ])
 
   // Master checkout handler for multiple ticket types
-  const handleMasterCheckout = useCallback(async (guestInfo?: GuestInfo) => {
+  const handleMasterCheckout = useCallback(async (
+    representativeGuest?: GuestInfo,
+    otherGuests?: GuestInfo[]
+  ) => {
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
     )
@@ -515,16 +604,24 @@ export default function EventCartCheckout({
           userId: userId || '',
           eventId,
           type,
-          email: guestInfo?.email || email,
+          mainEmail: representativeGuest?.email || email,
           checkoutItems,
           // Only send the code - server will re-verify to prevent tampering
           ...(appliedCodeDiscount && {
             discountCode: appliedCodeDiscount.code,
           }),
           // Guest information (only if userId is not provided)
-          ...(isGuestCheckout && guestInfo && {
-            guestName: guestInfo.name,
-            guestPhone: guestInfo.phone,
+          ...(representativeGuest && {
+            guestName: representativeGuest.name,
+            guestPhone: representativeGuest.phone,
+          }),
+          // Other guests information
+          ...(otherGuests && otherGuests.length > 0 && {
+            otherGuestsInfo: otherGuests.map(guest => ({
+              name: guest.name,
+              email: guest.email,
+              phone: guest.phone,
+            })),
           }),
         }
       )
@@ -577,9 +674,9 @@ export default function EventCartCheckout({
     }
   }
 
-  const handleGuestFormSubmit = (info: GuestInfo) => {
+  const handleGuestFormSubmit = (representativeGuest: GuestInfo, otherGuests: GuestInfo[]) => {
     setShowGuestForm(false)
-    handleMasterCheckout(info)
+    handleMasterCheckout(representativeGuest, otherGuests)
   }
 
   return (
@@ -766,6 +863,7 @@ export default function EventCartCheckout({
                       </p>
                       {discountList
                         .filter((d) => d.type === 'Bulk Discount')
+                        .sort((a, b) => (a.percentage ?? 0) - (b.percentage ?? 0))
                         .map((discount, index) => {
                           const key = discount.id || `bulk-${index}`
                           const percentage = discount.percentage ?? 0
@@ -776,7 +874,7 @@ export default function EventCartCheckout({
                               0
                             )
                           const minQty = discount.minQuantity ?? 0
-                          const technicallyQualifies = totalItemCount > minQty
+                          const technicallyQualifies = totalItemCount >= minQty
 
                           // Determine if this discount is actually applied:
                           // 1. If code discount (non-stackable) is winning: no bulk discount should be applied
@@ -805,7 +903,7 @@ export default function EventCartCheckout({
 
                           const needed = Math.max(
                             0,
-                            minQty + 1 - totalItemCount
+                            minQty - totalItemCount
                           )
 
                           return (
@@ -829,7 +927,7 @@ export default function EventCartCheckout({
                                 }
                               >
                                 <strong>
-                                  {percentage}% off for more than {minQty} items
+                                  {percentage}% off for {minQty} or more items
                                 </strong>
                                 {isActuallyApplied
                                   ? ` — currently applied (you have ${totalItemCount} items).`
@@ -855,6 +953,7 @@ export default function EventCartCheckout({
                         </p>
                         {discountList
                           .filter((d) => d.type === 'Minimum Total Discount')
+                          .sort((a, b) => (a.percentage ?? 0) - (b.percentage ?? 0))
                           .map((discount, index) => {
                             const key = discount.id || `minTotal-${index}`
                             const percentage = discount.percentage ?? 0
@@ -917,14 +1016,9 @@ export default function EventCartCheckout({
                                     ? ` — currently applied (your cart total is $${cartTotal.toFixed(2)}).`
                                     : betterDiscountChosen
                                       ? ` — better discount is chosen.`
-                                      : ` — spend at least $${minTotal.toFixed(
-                                        2
-                                      )} to qualify${needed > 0
-                                        ? ` (about $${needed.toFixed(
+                                      : ` — add at least $${needed.toFixed(
                                           2
-                                        )} more).`
-                                        : '.'
-                                      }`}
+                                        )} to qualify`}
                                 </span>
                               </div>
                             )
@@ -933,6 +1027,11 @@ export default function EventCartCheckout({
                     )}
 
                   {/* Code Discount entry moved to the price breakdown section */}
+                  
+                  {/* Note about rounding */}
+                  <p className="mt-3 text-xs text-gray-500 italic">
+                    Note: Discounted amounts are rounded to 2 decimal places per ticket due to Stripe payment policy. Thank you for your understanding.
+                  </p>
                 </div>
               )}
 
@@ -1049,8 +1148,21 @@ export default function EventCartCheckout({
                 <div className="flex items-center justify-between text-green-600">
                   <span>Event Discounts - {priceBreakdown.effectivePercent}% off</span>
                   <span>
-                    -{selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
-                    {priceBreakdown.bulkDiscountAmount.toFixed(2)}
+                    {priceBreakdown.ticketTypeDiscounts && priceBreakdown.ticketTypeDiscounts.length > 0 ? (
+                      <span className="flex items-center gap-1">
+                        {priceBreakdown.ticketTypeDiscounts.map((discount, index) => (
+                          <span key={index}>
+                            -{discount.currency} ${discount.perUnitDiscount.toFixed(2)} × {discount.quantity}
+                            {index < priceBreakdown.ticketTypeDiscounts.length - 1 && <span className="mx-1">+</span>}
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span>
+                        -{selectedSeatsWithTickets[0]?.ticket.currency || selectedTickets[0]?.ticket.currency || 'CAD'} $
+                        {priceBreakdown.bulkDiscountAmount.toFixed(2)}
+                      </span>
+                    )}
                   </span>
                 </div>
               )}
@@ -1086,17 +1198,34 @@ export default function EventCartCheckout({
           {/* Guest Checkout Form Dialog */}
           {isGuestCheckout && (
             <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{t('guest-checkout-title')}</DialogTitle>
+                  <DialogTitle>
+                    {totalItemCount > 1 
+                      ? `${t('guest-checkout-title')} (${totalItemCount} guests)`
+                      : t('guest-checkout-title')
+                    }
+                  </DialogTitle>
                   <DialogDescription>
-                    {t('guest-checkout-description')}
+                    {totalItemCount > 1 
+                      ? t('guest-checkout-description-with-login', {
+                          otherGuestsText: totalItemCount - 1 === 1 
+                            ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
+                            : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
+                        })
+                      : t('guest-checkout-description-single')
+                    }{' '}
+                    <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
+                      {t('guest-checkout-login-link')}
+                    </Link>{' '}
+                    {t('guest-checkout-login-text')}
                   </DialogDescription>
                 </DialogHeader>
                 <GuestInfoForm
                   onSubmit={handleGuestFormSubmit}
                   initialEmail={email}
                   buttonText={t('reserve-button') || undefined}
+                  totalItemCount={totalItemCount || 1}
                 />
               </DialogContent>
             </Dialog>
