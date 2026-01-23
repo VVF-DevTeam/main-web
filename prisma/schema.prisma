@@ -280,11 +280,12 @@ model Payment {
   refunded        Boolean     @default(false)
   seatNumber      String?
   
-  // Guest information (for payments without user account)
+  // Guests information
   guestName       String?
   guestEmail      String?
   guestPhone      String?
-  
+  otherGuests     Json?
+
   // Relations
   userId          String?
   eventId         String?

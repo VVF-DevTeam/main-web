@@ -398,23 +398,44 @@ export async function POST(req: NextRequest) {
       paymentId = ''
     }
 
-    // Allow guest checkout - userId is optional now
-    // Guest checkout requires guestEmail in metadata or customer_email from checkout session
-    const isGuestCheckout = !metadata?.userId || metadata.userId.trim() === ''
-    
-    // Get customer email from checkout session if available (for guest checkout)
+    // Get customer email from checkout session if available
     let customerEmail: string | null = null
     if (event.type === 'checkout.session.completed') {
       const session = paymentData as Stripe.Checkout.Session
       customerEmail = session.customer_email || null
     }
     
-    // For guest checkout, ensure we have an email (from metadata or checkout session)
-    if (isGuestCheckout && !metadata?.guestEmail && !customerEmail) {
-      return NextResponse.json(
-        { error: { message: 'Missing userId or guestEmail in metadata', data: paymentData } },
-        { status: 400 }
-      )
+    // Handle guest information - guestEmail/mainEmail will always exist
+    // Get guestEmail from metadata or fallback to customerEmail from checkout session
+    const guestEmail = metadata?.guestEmail || customerEmail || ''
+    
+    // Check guestName - if not exists, log error and use default
+    let guestName: string | null = null
+    if (!metadata?.guestName || metadata.guestName.trim() === '') {
+      console.error('[WEBHOOK_ERROR] guestName is required but not found in metadata. Using default: "Unknown User Name"')
+      guestName = 'Unknown User Name'
+    } else {
+      guestName = metadata.guestName
+    }
+    
+    // Check guestPhone - if not exists, log error and use null
+    let guestPhone: string | null = null
+    if (!metadata?.guestPhone || metadata.guestPhone.trim() === '') {
+      console.error('[WEBHOOK_ERROR] guestPhone is required but not found in metadata. Using null.')
+      guestPhone = null
+    } else {
+      guestPhone = metadata.guestPhone
+    }
+    
+    // Parse otherGuestsInfo from metadata if available
+    let otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null = null
+    if (metadata?.otherGuestsInfo) {
+      try {
+        otherGuestsInfo = JSON.parse(metadata.otherGuestsInfo as string) as Array<{ name: string; email: string; phone: string }>
+      } catch (e) {
+        console.error('Error parsing otherGuestsInfo:', e)
+        otherGuestsInfo = null
+      }
     }
 
     // Create payment record in database
@@ -512,12 +533,11 @@ export async function POST(req: NextRequest) {
               seatNumber: ticketInfo.seatNumbers.length > 0 
                 ? ticketInfo.seatNumbers.join(', ') 
                 : null, // null for non-seated tickets
-              // Guest information (only if userId is not provided)
-              ...(isGuestCheckout && {
-                guestName: metadata.guestName || null,
-                guestEmail: metadata.guestEmail || null,
-                guestPhone: metadata.guestPhone || null,
-              }),
+              // Guest information
+              guestName: guestName,
+              guestEmail: guestEmail,
+              guestPhone: guestPhone,
+              otherGuests: otherGuestsInfo || undefined,
             },
           })
         }
@@ -543,8 +563,8 @@ export async function POST(req: NextRequest) {
             )
           }
         }
-        // For Membership or empty/invalid eventTicketId, validEventTicketId remains null
 
+        // For Membership or empty/invalid eventTicketId, validEventTicketId remains null
         await prisma.payment.create({
           data: {
             userId: metadata.userId && metadata.userId.trim() !== '' ? metadata.userId : null,
@@ -556,12 +576,11 @@ export async function POST(req: NextRequest) {
             expiresAt: expiresAt,
             quantity: quantity,
             seatNumber: metadata.seatNumber,
-            // Guest information (only if userId is not provided)
-            ...(isGuestCheckout && {
-              guestName: metadata.guestName || null,
-              guestEmail: metadata.guestEmail || null,
-              guestPhone: metadata.guestPhone || null,
-            }),
+            // Guest information
+            guestName: guestName,
+            guestEmail: guestEmail,
+            guestPhone: guestPhone,
+            otherGuests: otherGuestsInfo || undefined,
           },
         })
       }
@@ -572,20 +591,10 @@ export async function POST(req: NextRequest) {
       if (metadata.eventId || metadata.type === 'Membership') {
         try {
           // Fetch user data (used for both tickets and membership)
-          // For guest checkout, use guest info from metadata or checkout session
-          let user: { name: string | null; email: string } | null = null
-          if (isGuestCheckout) {
-            // Use guestEmail from metadata, or fallback to customer_email from checkout session
-            const guestEmail = metadata.guestEmail || customerEmail || ''
-            user = {
-              name: metadata.guestName || null,
-              email: guestEmail,
-            }
-          } else {
-            user = await prisma.user.findUnique({
-              where: { id: metadata.userId },
-              select: { name: true, email: true },
-            })
+          // Always use guest info from metadata or checkout session
+          const user: { name: string | null; email: string } | null = {
+            name: guestName,
+            email: guestEmail,
           }
 
           // Ticket-based email flow (non-membership with event)
