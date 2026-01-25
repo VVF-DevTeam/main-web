@@ -23,6 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { axiosInstance } from '@/lib/axios'
+import { isAxiosError } from 'axios'
 
 export interface GuestInfo {
   name: string
@@ -32,7 +34,10 @@ export interface GuestInfo {
 
 interface GuestInfoFormProps {
   onSubmit: (representativeGuest: GuestInfo, otherGuests: GuestInfo[]) => void
-  initialEmail?: string
+  mainUserEmail?: string
+  mainUserPhone?: string
+  mainUserName?: string
+  userId?: string | null
   buttonText?: string
   totalItemCount?: number
 }
@@ -52,22 +57,42 @@ const guestInfoFormSchema = z.object({
 
 type GuestInfoFormValues = z.infer<typeof guestInfoFormSchema>
 
+// Parse phone to extract extension and number
+// Phone format: "+11234567890" or "+841234567890" -> extension: "+1"/"+84", number: "1234567890"
+const parsePhone = (phone: string): { extension: string; number: string } => {
+  if (!phone) return { extension: '+1', number: '' }
+
+  if (phone.startsWith('+1')) {
+    return { extension: '+1', number: phone.substring(2) }
+  } else if (phone.startsWith('+84')) {
+    return { extension: '+84', number: phone.substring(3) }
+  }
+
+  // Default to +1 if format is unknown
+  return { extension: '+1', number: phone }
+}
+
 export default function GuestInfoForm({
   onSubmit,
-  initialEmail = '',
+  mainUserEmail = '',
+  mainUserPhone = '',
+  mainUserName = '',
+  userId,
   buttonText,
   totalItemCount = 1,
 }: GuestInfoFormProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['signIn-signUp', 'event'])
 
+  const parsedPhone = parsePhone(mainUserPhone)
+
   // Initialize default values for all guests
   const defaultValues: GuestInfoFormValues = {
     guests: Array.from({ length: totalItemCount }, (_, i) => ({
       name: '',
-      email: i === 0 ? initialEmail : '',
-      phone: '',
-      phoneExtension: '+1',
+      email: i === 0 ? mainUserEmail : '',
+      phone: i === 0 ? parsedPhone.number : '',
+      phoneExtension: i === 0 ? parsedPhone.extension : '+1',
     })),
   }
 
@@ -81,24 +106,26 @@ export default function GuestInfoForm({
     name: 'guests',
   })
 
-  // Reinitialize when totalItemCount or initialEmail changes
+  // Reinitialize when totalItemCount, initialEmail, or initialPhone changes
   useEffect(() => {
+    const parsedPhone = parsePhone(mainUserPhone)
     const newGuests = Array.from({ length: totalItemCount }, (_, i) => ({
-      name: '',
-      email: i === 0 ? initialEmail : '',
-      phone: '',
-      phoneExtension: '+1',
+      name: i === 0 ? mainUserName : '',
+      email: i === 0 ? mainUserEmail : '',
+      phone: i === 0 ? parsedPhone.number : '',
+      phoneExtension: i === 0 ? parsedPhone.extension : '+1',
     }))
     form.reset({ guests: newGuests })
-  }, [totalItemCount, initialEmail, form])
+  }, [totalItemCount, mainUserEmail, mainUserPhone, mainUserName, form])
 
-  const onSubmitForm = (data: GuestInfoFormValues) => {
+  // Handle form submission
+  const onSubmitForm = async (data: GuestInfoFormValues) => {
     // First guest is representative guest
     const representativeGuest: GuestInfo = {
       name: data.guests[0].name.trim(),
       email: data.guests[0].email.trim().toLowerCase(),
-      phone: data.guests[0].phone.trim() 
-        ? `${data.guests[0].phoneExtension}${data.guests[0].phone.trim()}` 
+      phone: data.guests[0].phone.trim()
+        ? `${data.guests[0].phoneExtension}${data.guests[0].phone.trim()}`
         : '',
     }
 
@@ -106,27 +133,99 @@ export default function GuestInfoForm({
     const otherGuests: GuestInfo[] = data.guests.slice(1).map(guest => ({
       name: guest.name.trim(),
       email: guest.email.trim().toLowerCase(),
-      phone: guest.phone.trim() 
-        ? `${guest.phoneExtension}${guest.phone.trim()}` 
+      phone: guest.phone.trim()
+        ? `${guest.phoneExtension}${guest.phone.trim()}`
         : '',
     }))
 
-    onSubmit(representativeGuest, otherGuests)
+    // If user is logged in and mainUserName or mainUserPhone were originally empty,
+    // update the user profile with the new values
+    let hasPhoneError = false
+
+    if (userId && userId.trim() !== '') {
+      const updateData: { name?: string; phone?: string } = {}
+
+      // Check if name was originally empty and now has a value
+      if (!mainUserName || mainUserName.trim() === '') {
+        if (representativeGuest.name && representativeGuest.name.trim() !== '') {
+          updateData.name = representativeGuest.name
+        }
+      }
+
+      // Check if phone was originally empty and now has a value
+      if (!mainUserPhone || mainUserPhone.trim() === '') {
+        if (representativeGuest.phone && representativeGuest.phone.trim() !== '') {
+          updateData.phone = representativeGuest.phone
+        }
+      }
+
+      // Only make API call if there's something to update
+      if (Object.keys(updateData).length > 0) {
+        try {
+          await axiosInstance.put(
+            '/api/users/edit',
+            updateData,
+            {
+              headers: {
+                userId: userId,
+              },
+            }
+          )
+        } catch (error) {
+          // Check if it's a phone uniqueness error
+          if (isAxiosError(error)) {
+            const errorMessage = error.response?.data?.message || error.message || ''
+            const statusCode = error.response?.status
+
+            // Check for phone uniqueness error (Prisma P2002 unique constraint or explicit messages)
+            const isPhoneUniquenessError =
+              statusCode === 409 || // Conflict status code
+              errorMessage?.toLowerCase().includes('phone') &&
+              (errorMessage?.toLowerCase().includes('exists') ||
+                errorMessage?.toLowerCase().includes('duplicate')) ||
+              error.response?.data?.code === 'P2002' // Prisma unique constraint error code
+
+            if (isPhoneUniquenessError) {
+              hasPhoneError = true
+              // Set error on the phone field for the representative guest (index 0)
+              form.setError('guests.0.phone', {
+                type: 'manual',
+                message: 'This phone number is already associated with another account. Please use a different phone number.',
+              })
+            } else if (errorMessage) {
+              // Other errors with messages
+              console.error('Error updating profile:', errorMessage)
+            } else {
+              // Other errors without specific messages
+              console.error('Error updating profile:', error)
+            }
+          } else {
+            // Non-axios errors
+            console.error('Error updating user profile:', error)
+          }
+        }
+      }
+    }
+
+    // Only proceed with checkout if there was no phone uniqueness error
+    if (!hasPhoneError) {
+      onSubmit(representativeGuest, otherGuests)
+    }
   }
 
   const renderGuestFields = (index: number, isRepresentative: boolean) => {
     return (
       <div key={index} className={index > 0 ? 'pt-6 border-t border-black' : ''}>
         {isRepresentative ? (
-          <h4 className="text-sm font-semibold text-gray-700 mb-4">
-            Representative Guest Information
+          <h4 className="text-sm font-semibold text-gray-700 mb-2 underline">
+            Your Information
           </h4>
         ) : (
-          <h4 className="text-sm font-semibold text-gray-700 mb-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2 underline">
             Guest {index} Information
           </h4>
         )}
-        
+
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -220,7 +319,7 @@ export default function GuestInfoForm({
       <form onSubmit={form.handleSubmit(onSubmitForm)} className="space-y-6">
         {/* Representative Guest Form (first) */}
         {renderGuestFields(0, true)}
-        
+
         {/* Other Guests Forms */}
         {fields.slice(1).map((_, index) => renderGuestFields(index + 1, false))}
 

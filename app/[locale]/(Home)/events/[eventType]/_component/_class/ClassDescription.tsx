@@ -97,7 +97,6 @@ const ClassDescription = async ({
   // Get the current user's id
   const session = await auth()
   const author = session?.user?.id!
-  const email = session?.user?.email!
 
   // Check if user has already paid for this class
   let existingPayment: Payment[] | null = null
@@ -265,7 +264,6 @@ const ClassDescription = async ({
                 eventId={classId}
                 title={title}
                 userId={author}
-                email={email}
                 type={typeMap[eventType as keyof typeof typeMap]}
                 loggedIn={author ? true : false}
                 tickets={tickets}
