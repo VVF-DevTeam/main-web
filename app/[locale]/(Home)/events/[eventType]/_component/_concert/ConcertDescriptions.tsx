@@ -94,7 +94,6 @@ const ConcertDescriptions = async ({
   // Get the current user's id
   const session = await auth()
   const author = session?.user?.id!
-  const email = session?.user?.email!
 
   // Convert dates to Vancouver timezone for comparison and display
   const startDateVancouver = event.startDate
@@ -313,7 +312,6 @@ const ConcertDescriptions = async ({
             eventId={event.id}
             title={event.title}
             userId={author}
-            email={email}
             type={typeMap[event.eventType as keyof typeof typeMap]}
             loggedIn={author ? true : false}
             seatingMap={seatingMap}
@@ -324,7 +322,9 @@ const ConcertDescriptions = async ({
         </div>
 
         {/* Sponsors */}
-        <SponsorsList sponsors={event.sponsors} headerText={t('headerSponsors')} />
+        {event.sponsors && event.sponsors.length > 0 && (
+          <SponsorsList sponsors={event.sponsors} headerText={t('headerSponsors')} />
+        )}
 
         {/* Schedule Section */}
         {event.schedules && event.schedules.length > 0 && (

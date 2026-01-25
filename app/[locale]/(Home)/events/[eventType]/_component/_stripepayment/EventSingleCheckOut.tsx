@@ -1,15 +1,15 @@
 'use client'
 
-import NormalCheckoutButton from '@/components/payment/NormalCheckoutButton'
+import SingleCheckoutButton from '@/components/payment/SingleCheckoutButton'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Plus, Minus } from 'lucide-react'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
-import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { EventTicket, PaymentType } from '@prisma/client'
+import { UserInfoProps } from '@/lib/types/userInfo'
 
 export interface SelectedTicketWithQuantity {
   ticket: EventTicket
@@ -22,7 +22,6 @@ interface EventSingleCheckOutProps {
   userId?: string | null
   eventId: string
   tickets: EventTicket[]
-  email: string
   type: string
   seatNumber?: string
   /**
@@ -31,6 +30,7 @@ interface EventSingleCheckOutProps {
    */
   selectedTickets?: SelectedTicketWithQuantity[]
   setSelectedTickets?: (selectedTickets: SelectedTicketWithQuantity[]) => void // Callback to pass selected tickets to parent
+  userInfo?: UserInfoProps | null
 }
 
 const calculateTicketTotalPrice = (ticket: EventTicket): number => {
@@ -88,11 +88,11 @@ export default function EventSingleCheckOut({
   userId,
   eventId,
   tickets,
-  email,
   type,
   seatNumber,
   selectedTickets,
   setSelectedTickets,
+  userInfo,
 }: EventSingleCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -111,10 +111,7 @@ export default function EventSingleCheckOut({
     const fetchUserData = async () => {
       try {
         if (userId) {
-          const [subscribed, userInfo] = await Promise.all([
-            checkSubscription(userId),
-            getCurrentUserInfo(),
-          ])
+          const subscribed = await checkSubscription(userId)
           if (isMounted) {
             setIsSubscribed(Boolean(subscribed))
             setEmailVerified(userInfo?.emailVerified ?? null)
@@ -138,7 +135,7 @@ export default function EventSingleCheckOut({
     return () => {
       isMounted = false
     }
-  }, [userId])
+  }, [userId, userInfo])
 
   useEffect(() => {
     if (showForm && !prevShowFormRef.current && containerRef.current) {
@@ -309,9 +306,9 @@ export default function EventSingleCheckOut({
             </p>
           )}
 
-          {userId && !emailVerified && (
+          {userId && userInfo?.email && !emailVerified && (
             <p className="text-sm text-bgColor-brand900">
-              *{t('email-not-verified-warning-prefix')} <strong>{email}</strong>{' '}
+              *{t('email-not-verified-warning-prefix')} <strong>{userInfo.email}</strong>{' '}
               {t('email-not-verified-warning-suffix')}{' '}
               <Link
                 href={`/profile/${userId}`}
@@ -444,7 +441,7 @@ export default function EventSingleCheckOut({
                     {!seatNumber && !isExpired && (
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-medium text-gray-700 drop-shadow-sm">
-                          Add to cart:
+                          {t('add-to-cart')}:
                         </span>
                         <div className="flex items-center gap-2 rounded-md border border-gray-300">
                           <Button
@@ -485,8 +482,8 @@ export default function EventSingleCheckOut({
                       </Button>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-700 drop-shadow-sm">Or: </span>
-                        <NormalCheckoutButton
+                        <span className="text-sm font-medium text-gray-700 drop-shadow-sm">{t('or')}: </span>
+                        <SingleCheckoutButton
                           stripePriceId={stripePriceIdForUser}
                           stripeProductId={ticket.stripeProductId}
                           eventKeyName={eventKeyName}
@@ -495,9 +492,11 @@ export default function EventSingleCheckOut({
                           buttonText="purchase-ticket-directly"
                           type={paymentTypeValue}
                           numberSession={ticket.payTotalNumber ?? undefined}
-                          email={email}
+                          email={userInfo?.email || ''}
                           seatNumber={seatNumber}
                           eventTicketId={ticket.id}
+                          mainUserPhone={userInfo?.phone || ''}
+                          mainUserName={userInfo?.name || ''}
                         />
                       </div>
                     )}

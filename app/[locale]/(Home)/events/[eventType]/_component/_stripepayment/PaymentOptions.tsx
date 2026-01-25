@@ -27,13 +27,15 @@ import {
 } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
 import { EventTicket } from '@prisma/client'
 import { JsonValue } from '@prisma/client/runtime/library'
+import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
+import { UserInfoProps } from '@/lib/types/userInfo'
+
 interface PaymentOptionsProps {
   formLink: string
   eventKeyName: string
   eventId: string
   title: string
   userId: string
-  email: string
   type: string
   loggedIn: boolean
   seatingMap?: SeatingMap | null
@@ -70,7 +72,6 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   eventId,
   title,
   userId,
-  email,
   type,
   loggedIn,
   seatingMap,
@@ -101,6 +102,26 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
   // Selected tickets from EventSingleCheckOut (non-seated tickets with quantities)
   const [selectedTickets, setSelectedTickets] = useState<SelectedTicketWithQuantity[]>([])
+  const [userInfo, setUserInfo] = useState<UserInfoProps | null>(null)
+
+  // Fetch user info
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        if (userId) {
+          const info = await getCurrentUserInfo()
+          setUserInfo(info)
+        } else {
+          setUserInfo(null)
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error)
+        setUserInfo(null)
+      }
+    }
+
+    fetchUserInfo()
+  }, [userId])
 
   // Close options when user logs out
   useEffect(() => {
@@ -568,10 +589,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   userId={userId}
                   eventId={eventId}
                   tickets={tickets}
-                  email={email}
                   type={type}
                   selectedTickets={selectedTickets}
                   setSelectedTickets={setSelectedTickets}
+                  userInfo={userInfo}
                 />
               </div>
             ) : seatingMap && seatingMap.length > 0 ? (
@@ -598,7 +619,6 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 eventKeyName={eventKeyName}
                 userId={userId}
                 eventId={eventId}
-                email={email}
                 type={type}
                 selectedSeatsWithTickets={selectedSeatsWithTickets}
                 seatsByTicketType={seatsByTicketType}
@@ -609,6 +629,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 onRemoveSeat={handleRemoveFromCart}
                 selectedTickets={selectedTickets}
                 discounts={discounts}
+                userInfo={userInfo}
               />
             )}
 
@@ -728,9 +749,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     userId={userId}
                     eventId={eventId}
                     tickets={[selectedTicket]}
-                    email={email}
                     type={type}
                     seatNumber={selectedSeat?.seat.name}
+                    userInfo={userInfo}
                   />
                 </div>
               </>

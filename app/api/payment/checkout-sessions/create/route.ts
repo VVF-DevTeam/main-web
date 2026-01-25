@@ -56,7 +56,8 @@ export async function POST(req: Request) {
         eventTicketId: eventTicketId || '',
         type: type,
         ...(seatNumber && { seatNumber: seatNumber }),
-        // Guest information (only if userId is not provided)
+        // Guest information - always include if provided
+        // This allows logged-in users to review/confirm their info
         ...(guestName && { guestName: guestName }),
         ...(email && { guestEmail: email }),
         ...(guestPhone && { guestPhone: guestPhone }),

@@ -23,6 +23,7 @@ import {
 import { SelectedTicketWithQuantity } from './EventSingleCheckOut'
 import { JsonValue } from '@prisma/client/runtime/library'
 import Link from 'next/link'
+import { UserInfoProps } from '@/lib/types/userInfo'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -42,7 +43,6 @@ interface EventCartCheckoutProps {
   eventKeyName: string
   userId?: string | null
   eventId: string
-  email: string
   type: string
   selectedSeatsWithTickets: SelectedSeatWithTicket[]
   seatsByTicketType: Map<string, SelectedSeatWithTicket[]>
@@ -50,6 +50,7 @@ interface EventCartCheckoutProps {
   onRemoveSeat: (rowIndex: number, seatIndex: number) => void
   selectedTickets?: SelectedTicketWithQuantity[] // Tickets selected from EventSingleCheckOut
   discounts: JsonValue
+  userInfo?: UserInfoProps | null
 }
 
 // Shape of discounts stored in event.eventDiscounts JSON field
@@ -73,7 +74,6 @@ export default function EventCartCheckout({
   eventKeyName,
   userId,
   eventId,
-  email,
   type,
   selectedSeatsWithTickets,
   seatsByTicketType,
@@ -81,6 +81,7 @@ export default function EventCartCheckout({
   onRemoveSeat,
   selectedTickets = [],
   discounts = [],
+  userInfo,
 }: EventCartCheckoutProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -393,21 +394,21 @@ export default function EventCartCheckout({
       // Apply discount per unit and round each (matching Stripe's calculation)
       // Track discount amounts per ticket type for UI display
       const ticketTypeDiscounts: Array<{ ticketType: string; quantity: number; discountAmount: number; perUnitDiscount: number; currency: string }> = []
-      
+
       if (effectivePercent > 0) {
         let sumOfRoundedPrices = 0
-        
+
         // Apply discount to each seat individually and round
         // Group seats by ticket type for discount display
         const seatDiscountsByType = new Map<string, { count: number; totalDiscount: number; currency: string }>()
-        
+
         selectedSeatsWithTickets.forEach((item) => {
           const originalPrice = item.price
           const discountedPrice = item.price * (1 - effectivePercent / 100)
           const roundedPrice = Math.round(discountedPrice * 100) / 100
           const discountAmount = originalPrice - roundedPrice
           sumOfRoundedPrices += roundedPrice
-          
+
           // Track discount by ticket type
           const ticketType = item.ticket.type
           const currency = item.ticket.currency || 'CAD'
@@ -418,7 +419,7 @@ export default function EventCartCheckout({
           typeData.count += 1
           typeData.totalDiscount += discountAmount
         })
-        
+
         // Add seat discounts to ticketTypeDiscounts
         seatDiscountsByType.forEach((data, ticketType) => {
           const perUnitDiscount = data.count > 0 ? data.totalDiscount / data.count : 0
@@ -430,7 +431,7 @@ export default function EventCartCheckout({
             currency: data.currency,
           })
         })
-        
+
         // Apply discount to each ticket unit individually and round
         selectedTickets.forEach((item) => {
           const basePrice = Number(item.ticket.price) || 0
@@ -453,7 +454,7 @@ export default function EventCartCheckout({
           // Calculate discount for this ticket type
           const originalTotalPrice = memberDiscountedPrice * item.quantity
           let discountedTotalPrice = 0
-          
+
           // Apply event discount to each unit of this ticket type and round
           for (let i = 0; i < item.quantity; i++) {
             const discountedPrice = memberDiscountedPrice * (1 - effectivePercent / 100)
@@ -461,7 +462,7 @@ export default function EventCartCheckout({
             discountedTotalPrice += roundedPrice
             sumOfRoundedPrices += roundedPrice
           }
-          
+
           // Track discount for this ticket type
           const ticketDiscountAmount = originalTotalPrice - discountedTotalPrice
           const perUnitDiscount = item.quantity > 0 ? ticketDiscountAmount / item.quantity : 0
@@ -473,7 +474,7 @@ export default function EventCartCheckout({
             currency: item.ticket.currency || 'CAD',
           })
         })
-        
+
         totalAfterBulk = sumOfRoundedPrices
         bulkDiscountAmount = totalAfterMembership - totalAfterBulk
       }
@@ -604,7 +605,7 @@ export default function EventCartCheckout({
           userId: userId || '',
           eventId,
           type,
-          mainEmail: representativeGuest?.email || email,
+          mainEmail: representativeGuest?.email || userInfo?.email || '',
           checkoutItems,
           // Only send the code - server will re-verify to prevent tampering
           ...(appliedCodeDiscount && {
@@ -661,17 +662,14 @@ export default function EventCartCheckout({
     userId,
     eventId,
     type,
-    email,
+    userInfo,
     isGuestCheckout,
     appliedCodeDiscount,
   ])
 
   const handleCheckoutButtonClick = () => {
-    if (isGuestCheckout) {
-      setShowGuestForm(true)
-    } else {
-      handleMasterCheckout()
-    }
+    // Always show guest form so users can review their information
+    setShowGuestForm(true)
   }
 
   const handleGuestFormSubmit = (representativeGuest: GuestInfo, otherGuests: GuestInfo[]) => {
@@ -1017,8 +1015,8 @@ export default function EventCartCheckout({
                                     : betterDiscountChosen
                                       ? ` — better discount is chosen.`
                                       : ` — add at least $${needed.toFixed(
-                                          2
-                                        )} to qualify`}
+                                        2
+                                      )} to qualify`}
                                 </span>
                               </div>
                             )
@@ -1027,7 +1025,7 @@ export default function EventCartCheckout({
                     )}
 
                   {/* Code Discount entry moved to the price breakdown section */}
-                  
+
                   {/* Note about rounding */}
                   <p className="mt-3 text-xs text-gray-500 italic">
                     Note: Discounted amounts are rounded to 2 decimal places per ticket due to Stripe payment policy. Thank you for your understanding.
@@ -1195,41 +1193,60 @@ export default function EventCartCheckout({
             )}
           </div>
 
-          {/* Guest Checkout Form Dialog */}
-          {isGuestCheckout && (
-            <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
-              <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    {totalItemCount > 1 
-                      ? `${t('guest-checkout-title')} (${totalItemCount} guests)`
-                      : t('guest-checkout-title')
-                    }
-                  </DialogTitle>
-                  <DialogDescription>
-                    {totalItemCount > 1 
-                      ? t('guest-checkout-description-with-login', {
-                          otherGuestsText: totalItemCount - 1 === 1 
-                            ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
-                            : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
-                        })
-                      : t('guest-checkout-description-single')
-                    }{' '}
-                    <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
-                      {t('guest-checkout-login-link')}
-                    </Link>{' '}
-                    {t('guest-checkout-login-text')}
-                  </DialogDescription>
-                </DialogHeader>
-                <GuestInfoForm
-                  onSubmit={handleGuestFormSubmit}
-                  initialEmail={email}
-                  buttonText={t('reserve-button') || undefined}
-                  totalItemCount={totalItemCount || 1}
-                />
-              </DialogContent>
-            </Dialog>
-          )}
+          {/* Guest Checkout Form Dialog - Always shown for review */}
+          <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
+            <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {totalItemCount > 1
+                    ? `${t('guest-checkout-title')} (${totalItemCount} guests)`
+                    : t('guest-checkout-title')
+                  }
+                </DialogTitle>
+                <DialogDescription>
+                  {totalItemCount > 1
+                    ? userId ? t('checkout-description-with-login', {
+                      otherGuestsText: totalItemCount - 1 === 1
+                        ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
+                        : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
+                    }) : t('guest-checkout-description-with-login', {
+                      otherGuestsText: totalItemCount - 1 === 1
+                        ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
+                        : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
+                    }) : t('guest-checkout-description-single')
+                  }
+                  {userId ? (
+                    // Logged in user
+                    <>
+                      {' '}{t('checkout-description-first-form-filled')}{' '}
+                      <Link href={`/profile/${userId}`} className="text-blue-500 hover:text-blue-600 underline">
+                        {t('checkout-profile-link')}
+                      </Link>
+                      . {t('checkout-fill-empty-fields')}
+                    </>
+                  ) : (
+                    // Guest user
+                    <>
+                      {' '}
+                      <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
+                        {t('guest-checkout-login-link')}
+                      </Link>{' '}
+                      {t('guest-checkout-login-text')}
+                    </>
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+              <GuestInfoForm
+                onSubmit={handleGuestFormSubmit}
+                mainUserEmail={userInfo?.email || ''}
+                mainUserPhone={userInfo?.phone || ''}
+                mainUserName={userInfo?.name || ''}
+                userId={userId}
+                buttonText={t('reserve-button') || undefined}
+                totalItemCount={totalItemCount || 1}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </>

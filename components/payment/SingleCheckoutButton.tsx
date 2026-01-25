@@ -24,7 +24,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-interface NormalCheckoutButtonProps {
+interface SingleCheckoutButtonProps {
   stripePriceId: string
   stripeProductId: string
   eventKeyName?: string
@@ -36,9 +36,11 @@ interface NormalCheckoutButtonProps {
   email: string
   seatNumber?: string
   eventTicketId?: string
+  mainUserPhone?: string
+  mainUserName?: string
 }
 
-export default function NormalCheckoutButton({
+export default function SingleCheckoutButton({
   stripePriceId,
   stripeProductId,
   eventKeyName,
@@ -50,7 +52,9 @@ export default function NormalCheckoutButton({
   email,
   seatNumber,
   eventTicketId,
-}: NormalCheckoutButtonProps) {
+  mainUserPhone = '',
+  mainUserName = '',
+}: SingleCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
   const [showGuestForm, setShowGuestForm] = useState(false)
@@ -76,12 +80,13 @@ export default function NormalCheckoutButton({
           email: guestInfo?.email || email,
           seatNumber: seatNumber,
           eventTicketId: eventTicketId,
-          // Guest information (only if userId is not provided)
-          ...(isGuestCheckout &&
-            guestInfo && {
-              guestName: guestInfo.name,
-              guestPhone: guestInfo.phone,
-            }),
+          // Guest information - always send if provided from form
+          // For logged-in users, this allows them to review/confirm their info
+          // For guest users, this is required information
+          ...(guestInfo && {
+            guestName: guestInfo.name,
+            guestPhone: guestInfo.phone,
+          }),
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
@@ -126,13 +131,8 @@ export default function NormalCheckoutButton({
   }
 
   const handleButtonClick = () => {
-    if (isGuestCheckout) {
-      // Show guest form dialog
-      setShowGuestForm(true)
-    } else {
-      // Proceed directly to checkout
-      handleCheckout(stripePriceId)
-    }
+    // Always show guest form so users can review their information
+    setShowGuestForm(true)
   }
 
   const handleGuestFormSubmit = (info: GuestInfo) => {
@@ -152,31 +152,48 @@ export default function NormalCheckoutButton({
         </Button>
       </div>
 
-      {isGuestCheckout && (
-        <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
-          <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[425px] sm:w-auto sm:mx-auto rounded-md">
-            <DialogHeader>
-              <DialogTitle>{t('event:guest-checkout-title')}</DialogTitle>
-              <DialogDescription>
-                {t('event:guest-checkout-description-with-login')}{' '}
-                <Link href="/signIn" className="text-blue-500 hover:text-blue-600 hover:underline">
-                  {t('event:guest-checkout-login-link')}
-                </Link>{' '}
-                {t('event:guest-checkout-login-text')}
-              </DialogDescription>
-            </DialogHeader>
-            <GuestInfoForm
-              onSubmit={handleGuestFormSubmit}
-              initialEmail={email}
-              buttonText={
-                buttonText === 'become-member'
-                  ? (t(`membership:${buttonText}`) || undefined)
-                  : (t(buttonText) || undefined)
-              }
-            />
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Guest Checkout Form Dialog - Always shown for review */}
+      <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
+        <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('event:guest-checkout-title')}</DialogTitle>
+            <DialogDescription>
+              {t('event:guest-checkout-description-single')}
+              {userId ? (
+                // Logged in user
+                <>
+                  {' '}{t('event:checkout-description-first-form-filled')}{' '}
+                  <Link href={`/profile/${userId}`} className="text-blue-500 hover:text-blue-600 underline">
+                    {t('event:checkout-profile-link')}
+                  </Link>
+                  . {t('event:checkout-fill-empty-fields')}
+                </>
+              ) : (
+                // Guest user
+                <>
+                  {' '}
+                  <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
+                    {t('event:guest-checkout-login-link')}
+                  </Link>{' '}
+                  {t('event:guest-checkout-login-text')}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <GuestInfoForm
+            onSubmit={handleGuestFormSubmit}
+            mainUserEmail={email}
+            mainUserPhone={mainUserPhone}
+            mainUserName={mainUserName}
+            userId={userId}
+            buttonText={
+              buttonText === 'become-member'
+                ? (t(`membership:${buttonText}`) || undefined)
+                : (t(buttonText) || undefined)
+            }
+          />
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
