@@ -488,8 +488,13 @@ export async function POST(req: NextRequest) {
               ticket.payTotalNumber && ticket.payTotalNumber > 0
                 ? ticketPrice * ticket.payTotalNumber
                 : ticketPrice
-            totalExpectedPrice +=
-              totalTicketPrice * ticketInfo.seatNumbers.length
+            
+            // For non-seated tickets, use quantity; for seated tickets, use seatNumbers.length
+            const count = ticketInfo.seatNumbers.length > 0 
+              ? ticketInfo.seatNumbers.length 
+              : (ticketInfo.quantity || 1)
+            
+            totalExpectedPrice += totalTicketPrice * count
           }
         }
 
