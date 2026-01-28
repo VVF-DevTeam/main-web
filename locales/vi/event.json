@@ -68,7 +68,7 @@
   "guest-checkout-title": "Thanh toán không login",
   "guest-checkout-description": "Vui lòng cung cấp thông tin liên hệ của bạn để hoàn tất việc mua hàng.",
   "guest-checkout-description-with-login": "Vui lòng cung cấp thông tin cho bạn {{otherGuestsText}}.",
-  "guest-checkout-description-single": "Vui lòng cung cấp thông tin liên hệ của bạn để hoàn tất việc mua hàng.",
+  "checkout-description-first-line": "Vui lòng cung cấp thông tin liên hệ của bạn để hoàn tất việc mua hàng.",
   "guest-checkout-description-logged-in": "Biểu mẫu đầu tiên đã được điền với thông tin từ",
   "guest-checkout-profile-link": "hồ sơ của bạn",
   "guest-checkout-fill-empty-fields": "Vui lòng điền các trường còn trống khác. Cảm ơn bạn.",

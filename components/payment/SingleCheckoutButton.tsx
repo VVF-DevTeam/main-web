@@ -156,26 +156,26 @@ export default function SingleCheckoutButton({
       <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
         <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('event:guest-checkout-title')}</DialogTitle>
+            <DialogTitle>{t('guest-checkout-title')}</DialogTitle>
             <DialogDescription>
-              {t('event:guest-checkout-description-single')}
+              {t('checkout-description-first-line')}
               {userId ? (
                 // Logged in user
                 <>
-                  {' '}{t('event:checkout-description-first-form-filled')}{' '}
+                  {' '}{t('checkout-description-first-form-filled')}{' '}
                   <Link href={`/profile/${userId}`} className="text-blue-500 hover:text-blue-600 underline">
-                    {t('event:checkout-profile-link')}
+                    {t('checkout-profile-link')}
                   </Link>
-                  . {t('event:checkout-fill-empty-fields')}
+                  . {t('checkout-fill-empty-fields')}
                 </>
               ) : (
                 // Guest user
                 <>
-                  {' '}
+                  {' '}{t('more-over-encouraged')}{' '}
                   <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
-                    {t('event:guest-checkout-login-link')}
+                    {t('guest-checkout-login-link')}
                   </Link>{' '}
-                  {t('event:guest-checkout-login-text')}
+                  {t('guest-checkout-login-text')}
                 </>
               )}
             </DialogDescription>

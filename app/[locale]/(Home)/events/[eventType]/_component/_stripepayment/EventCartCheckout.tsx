@@ -1213,7 +1213,7 @@ export default function EventCartCheckout({
                       otherGuestsText: totalItemCount - 1 === 1
                         ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
                         : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
-                    }) : t('guest-checkout-description-single')
+                    }) : t('checkout-description-first-line')
                   }
                   {userId ? (
                     // Logged in user
@@ -1227,7 +1227,7 @@ export default function EventCartCheckout({
                   ) : (
                     // Guest user
                     <>
-                      {' '}
+                      {' '}{t('more-over-encouraged')}{' '}
                       <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
                         {t('guest-checkout-login-link')}
                       </Link>{' '}

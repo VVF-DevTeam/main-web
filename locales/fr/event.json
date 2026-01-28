@@ -68,7 +68,7 @@
   "guest-checkout-title": "Paiement en tant qu'invité",
   "guest-checkout-description": "Veuillez fournir vos informations de contact pour finaliser votre achat.",
   "guest-checkout-description-with-login": "Veuillez fournir des informations pour vous {{otherGuestsText}}.",
-  "guest-checkout-description-single": "Veuillez fournir vos informations de contact pour finaliser votre achat.",
+  "checkout-description-first-line": "Veuillez fournir vos informations de contact pour finaliser votre achat.",
   "guest-checkout-description-logged-in": "Le premier formulaire a été rempli avec les informations de",
   "guest-checkout-profile-link": "votre profil",
   "guest-checkout-fill-empty-fields": "Veuillez remplir tous les autres champs vides. Merci.",
