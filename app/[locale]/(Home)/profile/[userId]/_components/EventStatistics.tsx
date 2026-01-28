@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { FiCopy, FiMail, FiEdit, FiChevronUp, FiChevronDown } from 'react-icons/fi'
@@ -24,6 +24,13 @@ import { getEventPayments } from './getEventPayments'
 import { PaymentMethod, PaymentType } from '@prisma/client'
 import AddPaymentButton from './AddPaymentButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { JsonValue } from '@prisma/client/runtime/library'
+
+type OtherGuestJson = {
+  name?: string
+  email?: string
+  phone?: string
+}
 
 interface EventStatisticsProps {
   user: UserInfoProps
@@ -46,6 +53,7 @@ interface Payment {
   guestName: string | null
   guestEmail: string | null
   guestPhone: string | null
+  otherGuests?: JsonValue
   user: {
     name: string | null
     email: string
@@ -82,6 +90,7 @@ export default function EventStatistics({
     column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod' | null
     order: 'asc' | 'desc' | null
   }>({ column: null, order: null })
+  const [expandedPayments, setExpandedPayments] = useState<Record<string, boolean>>({})
 
   // Initialize from URL params if present
   useEffect(() => {
@@ -132,6 +141,17 @@ export default function EventStatistics({
     }
   }, [selectedEventId])
 
+  // Default all payments with other guests to expanded
+  useEffect(() => {
+    const defaultExpanded: Record<string, boolean> = {}
+    payments.forEach((payment) => {
+      if (Array.isArray(payment.otherGuests) && payment.otherGuests.length > 0) {
+        defaultExpanded[payment.id] = true
+      }
+    })
+    setExpandedPayments(defaultExpanded)
+  }, [payments])
+
   const handleEventSearch = async (searchTerm: string) => {
     if (searchTerm === '') {
       setFilteredEvents(events)
@@ -164,10 +184,15 @@ export default function EventStatistics({
       payments
         .map((p) => (p.user?.email || p.guestEmail)?.trim())
         .filter((email): email is string => !!email && email.length > 0)
+        .concat(
+          payments
+            .map((p) => (p.otherGuests as OtherGuestJson[]).map((g) => g.email))
+            .flat()
+            .filter((email): email is string => !!email && email.length > 0)
+        )
     )
   )
 
-  const selectedEvent = events.find((e) => e.id === selectedEventId)
   const selectedEventKeyName = payments[0]?.event?.keyName
 
   const handleCopyEmails = async () => {
@@ -222,6 +247,13 @@ export default function EventStatistics({
       // New column, start with asc
       setSortConfig({ column, order: 'asc' })
     }
+  }
+
+  const togglePaymentRow = (paymentId: string) => {
+    setExpandedPayments((prev) => ({
+      ...prev,
+      [paymentId]: !prev[paymentId],
+    }))
   }
 
   // Sort payments based on the selected column
@@ -495,6 +527,13 @@ export default function EventStatistics({
                           const displayName =
                             payment.user?.name || payment.guestName || '-'
                           const paymentType = payment.eventTicket?.type || '-'
+                          const otherGuestsList = Array.isArray(payment.otherGuests)
+                            ? (payment.otherGuests as OtherGuestJson[])
+                            : []
+                          const hasOtherGuests = otherGuestsList.length > 0
+                          const isExpanded = hasOtherGuests
+                            ? expandedPayments[payment.id] ?? true
+                            : false
 
                           // Build display payment type with suffixes
                           let displayPaymentType = paymentType
@@ -503,32 +542,67 @@ export default function EventStatistics({
                           }
 
                           return (
-                            <tr key={payment.id} className="bg-white">
-                              <td className="px-4 py-3">
-                                {displayPaymentType}
-                              </td>
-                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
-                                {displayEmail}
-                              </td>
-                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayPhone}</td>
-                              <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayName}</td>
-                              <td className="px-4 py-3">
-                                $
-                                {(typeof payment.pricePaid === 'number'
-                                  ? payment.pricePaid
-                                  : Number(payment.pricePaid.toString())
-                                ).toFixed(2)}
-                              </td>
-                              <td className="px-4 py-3">
-                                {payment.quantity}/{payment.seatNumber || '-'}
-                              </td>
-                              <td className="px-4 py-3">
-                                {payment.eventTicket?.capacityPerTicket ?? 1}
-                              </td>
-                              <td className="px-4 py-3">
-                                {payment.method}
-                              </td>
-                            </tr>
+                            <Fragment key={payment.id}>
+                              <tr
+                                className={`bg-white ${hasOtherGuests ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                                onClick={() => hasOtherGuests && togglePaymentRow(payment.id)}
+                              >
+                                <td className="px-4 py-3">
+                                  <div className="flex items-center gap-2">
+                                    {hasOtherGuests && (
+                                      isExpanded ? (
+                                        <FiChevronUp className="h-4 w-4 text-gray-500" />
+                                      ) : (
+                                        <FiChevronDown className="h-4 w-4 text-gray-500" />
+                                      )
+                                    )}
+                                    <span>{displayPaymentType}</span>
+                                  </div>
+                                </td>
+                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
+                                  {displayEmail}
+                                </td>
+                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayPhone}</td>
+                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayName}</td>
+                                <td className="px-4 py-3">
+                                  $
+                                  {(typeof payment.pricePaid === 'number'
+                                    ? payment.pricePaid
+                                    : Number(payment.pricePaid.toString())
+                                  ).toFixed(2)}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {payment.quantity}/{payment.seatNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {payment.eventTicket?.capacityPerTicket ?? 1}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {payment.method}
+                                </td>
+                              </tr>
+                              {hasOtherGuests && isExpanded && (
+                                <tr className="bg-gray-50">
+                                  <td colSpan={8} className="px-12 py-3">
+                                    <div className="space-y-2">
+                                      {otherGuestsList.map((guest, index) => (
+                                        <div
+                                          key={`${payment.id}-guest-${index}`}
+                                          className="flex flex-wrap gap-6 text-sm text-gray-700"
+                                        >
+                                          <span className="font-medium">
+                                            Guest {index + 1}:
+                                          </span>
+                                          <span>{guest?.email || '-'}</span>
+                                          <span>{guest?.phone || '-'}</span>
+                                          <span>{guest?.name || '-'}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </Fragment>
                           )
                         })}
                       </tbody>

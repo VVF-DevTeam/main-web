@@ -22,6 +22,7 @@ async function fetchEventPaymentsData(eventId: string) {
         guestName: true,
         guestEmail: true,
         guestPhone: true,
+        otherGuests: true,
         user: {
           select: {
             name: true,
@@ -53,6 +54,9 @@ async function fetchEventPaymentsData(eventId: string) {
     return payments.map((payment) => ({
       ...payment,
       pricePaid: Number(payment.pricePaid.toString()),
+      otherGuests: Array.isArray(payment.otherGuests)
+        ? payment.otherGuests
+        : [],
       // Map eventTicket to ensure proper structure
       eventTicket: payment.eventTicket
         ? {
@@ -74,7 +78,7 @@ async function fetchEventPaymentsData(eventId: string) {
 export async function getEventPayments(eventId: string) {
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
-    [`event-payments-v5-${eventId}`], // Cache key per event (v5 after adding phone field)
+    [`event-payments-v6-${eventId}`], // Cache key per event (v6 after adding otherGuests field)
     {
       revalidate: 86400, // Cache for 1 day (revalidateTag handles on-demand invalidation)
       tags: ['payments'], // Tag for revalidation - automatically invalidated when payments change
