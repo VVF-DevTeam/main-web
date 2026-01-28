@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { FiCopy, FiMail, FiEdit, FiChevronUp, FiChevronDown } from 'react-icons/fi'
@@ -120,26 +120,29 @@ export default function EventStatistics({
     fetchEvents()
   }, [user.id, user.role])
 
+  // Helper to fetch payments for the currently selected event
+  const reloadPayments = useCallback(async () => {
+    if (!selectedEventId) return
+    setLoading(true)
+    try {
+      const eventPayments = await getEventPayments(selectedEventId)
+      setPayments(eventPayments)
+    } catch (error) {
+      console.error('Error fetching payments:', error)
+      toast.error('Failed to load event payments')
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedEventId])
+
   // Fetch payments when event is selected
   useEffect(() => {
     if (selectedEventId) {
-      const fetchPayments = async () => {
-        setLoading(true)
-        try {
-          const eventPayments = await getEventPayments(selectedEventId)
-          setPayments(eventPayments)
-        } catch (error) {
-          console.error('Error fetching payments:', error)
-          toast.error('Failed to load event payments')
-        } finally {
-          setLoading(false)
-        }
-      }
-      fetchPayments()
+      reloadPayments()
     } else {
       setPayments([])
     }
-  }, [selectedEventId])
+  }, [selectedEventId, reloadPayments])
 
   // Default all payments with other guests to expanded
   useEffect(() => {
@@ -408,9 +411,10 @@ export default function EventStatistics({
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
-                  <AddPaymentButton 
-                    user={user} 
+                  <AddPaymentButton
+                    user={user}
                     preSelectedEventId={selectedEventId}
+                    onPaymentAdded={reloadPayments}
                   />
                   <Button
                     onClick={handleSendEmail}

@@ -218,11 +218,11 @@ export default function GuestInfoForm({
       <div key={index} className={index > 0 ? 'pt-6 border-t border-black' : ''}>
         {isRepresentative ? (
           <h4 className="text-sm font-semibold text-gray-700 mb-2 underline">
-            Your Information
+            {t('event:checkout-your-information')}
           </h4>
         ) : (
           <h4 className="text-sm font-semibold text-gray-700 mb-2 underline">
-            Guest {index} Information
+            {t('event:checkout-guest-information', { index })}
           </h4>
         )}
 

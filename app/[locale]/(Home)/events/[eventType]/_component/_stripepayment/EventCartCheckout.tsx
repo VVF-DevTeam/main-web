@@ -681,12 +681,11 @@ export default function EventCartCheckout({
     <>
       {isLoading && <Loader />}
       <div className="w-full">
-        <h3 className="web_h3 mb-2 font-semibold text-gray-900">Cart</h3>
-        <div className=" ">
+        <div className="pt-2">
           {/* Cart Header */}
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Cart ({selectedSeatsWithTickets.length + selectedTickets.reduce((sum, item) => sum + item.quantity, 0)} items)
+            <h3 className="web_h3 font-semibold text-gray-900">
+              {t('cart', { count: selectedSeatsWithTickets.length + selectedTickets.reduce((sum, item) => sum + item.quantity, 0) })}
             </h3>
             <Button
               variant="ghost"
@@ -823,22 +822,22 @@ export default function EventCartCheckout({
           {(priceBreakdown.effectivePercent > 0 || discountList.length > 0) && (
             <div className="mt-4 space-y-2 rounded-md border border-green-200 bg-green-50 p-3">
               <h4 className="text-sm font-semibold text-green-900">
-                Available Discounts
+                {t('available-discounts')}
               </h4>
               <div className="space-y-1 text-xs text-gray-700">
                 <p>
-                  <strong>Effective discount:</strong>{' '}
+                  <strong>{t('effective-discount')}</strong>{' '}
                   {priceBreakdown.effectivePercent > 0
-                    ? `${priceBreakdown.effectivePercent}% off applied`
-                    : 'No discounts currently applied'}
+                    ? t('percent-off-applied', { percent: priceBreakdown.effectivePercent })
+                    : t('no-discounts-applied')}
                   {appliedCodeDiscount?.cannotBeStacked ?
                     priceBreakdown.isCodeDiscountApplied && (
                       <span className="text-xs text-gray-700">
-                        {' '}from code discount (Your code discount is not stackable and larger than current discounts)
+                        {' '}{t('code-discount-not-stackable')}
                       </span>
                     ) : priceBreakdown.isCodeDiscountApplied && (
                       <span className="text-xs text-gray-700">
-                        {' '}({appliedCodeDiscount?.percentage}% off from code discount)
+                        {' '}{t('code-discount-applied', { percent: appliedCodeDiscount?.percentage })}
                       </span>
                     )
                   }
@@ -925,15 +924,15 @@ export default function EventCartCheckout({
                                 }
                               >
                                 <strong>
-                                  {percentage}% off for {minQty} or more items
+                                  {t('bulk-discount-percent-off-for-items', { percent: percentage, minQty })}
                                 </strong>
                                 {isActuallyApplied
-                                  ? ` — currently applied (you have ${totalItemCount} items).`
+                                  ? ` ${t('bulk-discount-currently-applied', { count: totalItemCount })}`
                                   : betterDiscountChosen
-                                    ? ` — better discount is chosen.`
+                                    ? ` ${t('bulk-discount-better-chosen')}`
                                     : needed > 0
-                                      ? ` — add ${needed} more item${needed === 1 ? '' : 's'} to qualify.`
-                                      : ` — add more items to qualify.`}
+                                      ? ` ${t('bulk-discount-add-more-to-qualify', { count: needed })}`
+                                      : ` ${t('bulk-discount-add-more-items')}`}
                               </span>
                             </div>
                           )
@@ -1006,17 +1005,19 @@ export default function EventCartCheckout({
                                   }
                                 >
                                   <strong>
-                                    {percentage}% off for orders over $
-                                    {minTotal.toFixed(2)}
+                                    {t('minimum-discount-percent-off-for-orders', { 
+                                      percent: percentage, 
+                                      minTotal: minTotal.toFixed(2) 
+                                    })}
                                   </strong>
-                                  {' '}({discount.cannotBeStacked ? 'non-stackable' : 'stackable'})
+                                  {' '}({discount.cannotBeStacked 
+                                    ? t('minimum-discount-non-stackable') 
+                                    : t('minimum-discount-stackable')})
                                   {isActuallyApplied
-                                    ? ` — currently applied (your cart total is $${cartTotal.toFixed(2)}).`
+                                    ? ` ${t('minimum-discount-currently-applied', { cartTotal: cartTotal.toFixed(2) })}`
                                     : betterDiscountChosen
-                                      ? ` — better discount is chosen.`
-                                      : ` — add at least $${needed.toFixed(
-                                        2
-                                      )} to qualify`}
+                                      ? ` ${t('minimum-discount-better-chosen')}`
+                                      : ` ${t('minimum-discount-add-amount-to-qualify', { needed: needed.toFixed(2) })}`}
                                 </span>
                               </div>
                             )
@@ -1028,7 +1029,9 @@ export default function EventCartCheckout({
 
                   {/* Note about rounding */}
                   <p className="mt-3 text-xs text-gray-500 italic">
-                    Note: Discounted amounts are rounded to 2 decimal places per ticket due to Stripe payment policy. Thank you for your understanding.
+                    {t('discount-rounding-note-prefix')}
+                    <span className="font-semibold">{t('discount-rounding-note-bold')}</span>
+                    {t('discount-rounding-note-suffix')}
                   </p>
                 </div>
               )}
@@ -1043,9 +1046,9 @@ export default function EventCartCheckout({
                   className="flex w-full items-center justify-center gap-1 text-xs font-medium text-green-800 hover:text-green-900"
                 >
                   <span>
-                    {isDiscountsExpanded
-                      ? 'Hide discount details'
-                      : 'Show discount details'}
+                  {isDiscountsExpanded
+                    ? t('toggle-hide-discount-details')
+                    : t('toggle-show-discount-details')}
                   </span>
                   <span
                     className={`transition-transform ${isDiscountsExpanded ? 'rotate-180' : 'rotate-0'
@@ -1060,13 +1063,13 @@ export default function EventCartCheckout({
 
           {/* Discount Code (only if event has Code Discount) */}
           <div className="flex items-center justify-between text-gray-600 border-t pt-4 mt-4">
-            <span className="text-sm text-gray-600">Discount Code</span>
+            <span className="text-sm text-gray-600">{t('checkout-discount-code')}</span>
             <div className="flex w-[240px] items-center gap-2">
               <input
                 type="text"
                 value={discountCode}
                 onChange={(e) => setDiscountCode(e.target.value)}
-                placeholder="Enter Discount Code"
+                placeholder={t('checkout-enter-discount-code') || ''}
                 className="h-8 w-full rounded border border-gray-300 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <Button
@@ -1080,8 +1083,8 @@ export default function EventCartCheckout({
                     return
                   }
                   if (!discountCode.trim()) {
-                    toast.error('Please enter a discount code.', {
-                      description: 'The discount code is not valid. Please try again.',
+                    toast.error(t('checkout-discount-code-required-title'), {
+                      description: t('checkout-discount-code-required-desc'),
                       style: {
                         color: '#ef4444',
                       },
@@ -1095,11 +1098,11 @@ export default function EventCartCheckout({
                 {isVerifyingCode ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : appliedCodeDiscount ? (
-                  'Remove'
+                  t('checkout-remove')
                 ) : cooldownRemaining > 0 ? (
-                  `Wait ${cooldownRemaining}s`
+                  t('checkout-wait-seconds', { seconds: cooldownRemaining })
                 ) : (
-                  'Apply'
+                  t('checkout-apply')
                 )}
               </Button>
             </div>
@@ -1109,10 +1112,11 @@ export default function EventCartCheckout({
             <div className="flex items-center text-xs text-green-700">
               <span className={`pt-1 ${priceBreakdown.isCodeDiscountApplied ? 'text-green-700' : 'text-red-600'}`}>
                 {priceBreakdown.isCodeDiscountApplied ? <span>
-                  Code applied: <span className="font-semibold">{appliedCodeDiscount.code}</span>{' '}
-                  ({appliedCodeDiscount.percentage}% off
-                  {appliedCodeDiscount.cannotBeStacked ? ', non-stackable' : ''})
-                </span> : <span>Not used (better discount applied above)</span>}
+                  {t('checkout-code-applied')}{' '}
+                  <span className="font-semibold">{appliedCodeDiscount.code}</span>{' '}
+                  ({appliedCodeDiscount.percentage}% {t('checkout-off')}
+                  {appliedCodeDiscount.cannotBeStacked ? `, ${t('checkout-non-stackable')}` : ''})
+                </span> : <span>{t('checkout-not-used-better-discount')}</span>}
               </span>
             </div>
           )}
@@ -1123,7 +1127,7 @@ export default function EventCartCheckout({
             {/* Price Breakdown */}
             <div className="space-y-1.5 text-sm">
               <div className="flex items-center justify-between text-gray-600">
-                <span>Subtotal</span>
+                <span>{t('checkout-subtotal')}</span>
                 <span>
                   {selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
                   {priceBreakdown.baseTotal.toFixed(2)}
@@ -1133,7 +1137,7 @@ export default function EventCartCheckout({
               {/* Membership Discount */}
               {priceBreakdown.membershipDiscountAmount > 0 && (
                 <div className="flex items-center justify-between text-green-600">
-                  <span>Membership Discount</span>
+                  <span>{t('checkout-membership-discount')}</span>
                   <span>
                     -{selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
                     {priceBreakdown.membershipDiscountAmount.toFixed(2)}
@@ -1144,7 +1148,11 @@ export default function EventCartCheckout({
               {/* Event Discounts (Bulk / Min Total / Code combined) */}
               {priceBreakdown.bulkDiscountAmount > 0 && (
                 <div className="flex items-center justify-between text-green-600">
-                  <span>Event Discounts - {priceBreakdown.effectivePercent}% off</span>
+                  <span className="max-w-[150px] md:max-w-full">
+                    {t('checkout-event-discounts-with-percent', {
+                      percent: priceBreakdown.effectivePercent,
+                    })}
+                  </span>
                   <span>
                     {priceBreakdown.ticketTypeDiscounts && priceBreakdown.ticketTypeDiscounts.length > 0 ? (
                       <span className="flex items-center gap-1">
@@ -1168,7 +1176,7 @@ export default function EventCartCheckout({
 
             {/* Final Total */}
             <div className="flex items-center justify-between border-t pt-2">
-              <span className="text-lg font-semibold text-gray-900">Total</span>
+              <span className="text-lg font-semibold text-gray-900">{t('checkout-total')}</span>
               <span className="text-xl font-bold text-primary">
                 {selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
                 {priceBreakdown.finalTotal.toFixed(2)}
@@ -1199,7 +1207,7 @@ export default function EventCartCheckout({
               <DialogHeader>
                 <DialogTitle>
                   {totalItemCount > 1
-                    ? `${t('guest-checkout-title')} (${totalItemCount} guests)`
+                    ? `${t('guest-checkout-title')} ${t('checkout-people-count', { count: totalItemCount })}`
                     : t('guest-checkout-title')
                   }
                 </DialogTitle>

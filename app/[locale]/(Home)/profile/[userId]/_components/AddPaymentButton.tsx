@@ -559,9 +559,14 @@ type AddPaymentFormValues = z.infer<typeof addPaymentSchema>
 interface AddPaymentButtonProps {
   user: UserInfoProps
   preSelectedEventId?: string // Optional: pre-select an event and disable event selection
+  onPaymentAdded?: () => void | Promise<void>
 }
 
-const AddPaymentButton = ({ user, preSelectedEventId }: AddPaymentButtonProps) => {
+const AddPaymentButton = ({
+  user,
+  preSelectedEventId,
+  onPaymentAdded,
+}: AddPaymentButtonProps) => {
   const [showAddClientModal, setShowAddClientModal] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [users, setUsers] = useState<UserInfoSimpleProps[]>([])
@@ -674,8 +679,13 @@ const AddPaymentButton = ({ user, preSelectedEventId }: AddPaymentButtonProps) =
       })
       setShowAddClientModal(false)
       form.reset()
-      // Refresh the page data - addPayment already revalidates the cache
-      router.refresh()
+      // Let parent components refresh their data if needed
+      if (onPaymentAdded) {
+        await onPaymentAdded()
+      } else {
+        // Fallback: refresh the page data (for server components using this button)
+        router.refresh()
+      }
     } else {
       console.log(message)
       toast.error('Error', {
