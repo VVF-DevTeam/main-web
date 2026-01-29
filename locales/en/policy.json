@@ -1,54 +1,147 @@
 {
-  "and": "and",
   "header": "Privacy Policy",
+  "lastUpdated": "Last updated: January 29, 2026",
+  "introduction": "Viet Vibe Foundation (\"VietVibe\", \"we\", \"our\", or \"us\") is committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you access or use our website, applications, and related services (collectively, the \"Service\").",
+  "consent": "By using the Service, you consent to the practices described in this Privacy Policy.",
   "section1": {
-    "description": "We collect and process the following personal information:",
-    "header": "1. Information We Collect",
-    "item1": "Name - Used for account identification and personalization",
-    "item2": "Email Address - Used for account verification and communication",
-    "item3": "Phone Number - Used for account verification and important notifications",
-    "item4": "Age - Used to verify eligibility for certain services",
-    "item5": "Address - Used for event location verification and delivery purposes",
-    "item6": "Profile Avatar - Used for personalization and identification",
-    "note": "Please note that this applies to both "
+    "header": "1. Who We Are",
+    "organization": "Organization",
+    "organizationValue": "Viet Vibe Foundation",
+    "address": "Address",
+    "addressValue": "6975 Vivian Street, British Columbia, Canada",
+    "website": "Website",
+    "contactEmail": "Contact Email",
+    "description": "Viet Vibe Foundation is a non-profit organization operating in Canada."
   },
   "section2": {
-    "description": "For payment processing, we use Stripe as our secure payment processor. Your credit card information is:",
-    "header": "2. Payment Information",
-    "item1": "Securely encrypted and stored by Stripe",
-    "item2": "Never stored on our servers",
-    "item3": "Protected by Stripe's industry-standard security measures",
-    "item4": "Used only for processing your authorized payments",
-    "note": "For more info about Stripe policy, please visit"
+    "header": "2. Information We Collect",
+    "subsection1": {
+      "header": "2.1 Personal Information You Provide",
+      "description": "We may collect personal information that you voluntarily provide when you create a new account with us, either manually or using a third-party provider such as Google or Facebook. The data may include:",
+      "item1": "Full name",
+      "item2": "Email address",
+      "item3": "Phone number",
+      "item4": "Mailing address",
+      "item5": "Age (for eligibility verification)",
+      "item6": "Profile photo or avatar",
+      "note": "This information may be collected through website forms, mobile applications, event registration, or account creation, and is used solely to authenticate you, create and manage your user profile, and provide access to the Service.",
+      "profileNote": "You can always modify your data in your",
+      "profile": "profile"
+    },
+    "subsection2": {
+      "header": "2.2 Payment Information",
+      "description": "Payments and donations are processed through Stripe, a third-party payment processor.",
+      "item1": "We do not store your credit card details",
+      "item2": "All payment data is encrypted and handled by Stripe",
+      "item3": "Stripe complies with PCI-DSS security standards",
+      "note": "More information:"
+    },
+    "subsection3": {
+      "header": "2.3 Usage & Technical Data",
+      "description": "We automatically collect certain information when you use the Service, including:",
+      "item1": "IP address",
+      "item2": "Browser type and version",
+      "item3": "Device identifiers",
+      "item4": "Pages visited and time spent",
+      "item5": "Diagnostic and analytics data"
+    }
   },
   "section3": {
-    "header": "3. How We Use Your Information",
-    "item1": "To provide and maintain our services",
-    "item2": "To process your transactions",
-    "item3": "To send you important updates and notifications",
-    "item4": "To improve our services and user experience",
-    "item5": "To comply with legal obligations"
+    "header": "3. Facebook & Instagram Data (Meta Platform Disclosure)",
+    "subsection1": {
+      "header": "3.1 Facebook Login Data (User Data)",
+      "description": "When you use Facebook Login, we collect only the information necessary to create and maintain your account, as described in Section 2.1. This data is linked to your user profile and is not used for advertising or profiling."
+    },
+    "subsection2": {
+      "header": "3.2 Facebook Pages & Instagram Business Data (Non-User Data)",
+      "description": "Our Service uses certain Meta Platform permissions exclusively to access and manage Facebook Pages and Instagram Business accounts owned or administered by Viet Vibe Foundation.",
+      "note": "These permissions do not collect personal data from end users and do not impact individual Facebook or Instagram users. The data is used solely for internal content management, analytics, and community outreach purposes and is not linked to individual user accounts."
+    },
+    "subsection3": {
+      "header": "3.3 Meta Platform Compliance",
+      "description": "We do not sell, rent, or misuse Facebook or Instagram data. All Meta Platform data is processed in accordance with the Meta Platform Terms, Developer Policies, and Data Protection Requirements."
+    }
   },
   "section4": {
-    "description": "We implement appropriate security measures to protect your personal information:",
-    "header": "4. Data Protection",
-    "item1": "All confidential data (such as passwords) is encrypted during transmission",
-    "item2": "Regular security assessments and updates",
-    "item3": "Limited access to personal information",
-    "item4": "Secure data storage systems"
+    "header": "4. Cookies & Tracking Technologies",
+    "description": "We use cookies and similar technologies to:",
+    "item1": "Enable essential website functionality",
+    "item2": "Remember user preferences",
+    "item3": "Analyze website performance",
+    "note": "Where required by law, non-essential cookies are used only with your consent. You may control cookies through your browser settings."
   },
   "section5": {
-    "description": "You have the right to:",
-    "header": "5. Your Rights",
-    "item1": "Access your personal information",
-    "item2": "Correct inaccurate data",
-    "item3": "Delete your data by visiting \"Your Profile\" > \"Delete Account\"",
-    "item4": "Opt-out of marketing communications",
-    "item5": "Export your data (please send us an email)"
+    "header": "5. How We Use Your Information",
+    "description": "We use personal information to:",
+    "item1": "Provide and maintain the Service",
+    "item2": "Manage user accounts and event participation",
+    "item3": "Process payments and donations",
+    "item4": "Communicate service-related updates",
+    "item5": "Improve functionality and user experience",
+    "item6": "Comply with legal and regulatory obligations"
   },
   "section6": {
-    "description": "If you have any questions about our privacy policy or how we handle your data, please contact our support team at tech@vietvibe.org.",
-    "header": "6. Contact Us"
+    "header": "6. Data Sharing & Disclosure",
+    "description": "We may share personal information only with:",
+    "item1": "Trusted service providers (e.g., Stripe, analytics tools)",
+    "item2": "Google and Meta Platforms, Inc., for approved platform integrations",
+    "item3": "Legal authorities where required by law",
+    "note": "We do not sell or share personal data for commercial purposes."
+  },
+  "section7": {
+    "header": "7. Data Retention",
+    "description": "We retain personal information only as long as necessary:",
+    "item1": "Account data: duration of the account plus up to 24 months",
+    "item2": "Support communications: up to 24 months",
+    "item3": "Analytics and usage data: up to 24 months",
+    "note": "Data is securely deleted or anonymized when no longer required."
+  },
+  "section8": {
+    "header": "8. Your Privacy Rights",
+    "subsection1": {
+      "header": "8.1 GDPR (EEA & UK Residents)",
+      "description": "You have the right to:",
+      "item1": "Access your personal data",
+      "item2": "Correct inaccurate information",
+      "item3": "Request deletion of your data",
+      "item4": "Restrict or object to processing",
+      "item5": "Request data portability"
+    },
+    "subsection2": {
+      "header": "8.2 CCPA & CPRA (California Residents)",
+      "description": "You have the right to:",
+      "item1": "Know what personal data we collect and how it is used",
+      "item2": "Request access, correction, or deletion of personal data",
+      "item3": "Opt out of the sale or sharing of personal data"
+    }
+  },
+  "section9": {
+    "header": "9. Data Deletion Requests",
+    "description": "You may request deletion of your personal data, including Facebook Login data, by:",
+    "item1": "Emailing tech@vietvibe.org",
+    "item2": "Using account deletion features (if available)",
+    "note": "Deletion requests are processed within 30 days."
+  },
+  "section10": {
+    "header": "10. Data Security",
+    "description": "We implement reasonable administrative and technical safeguards to protect personal information, including encryption, access controls, and regular security reviews."
+  },
+  "section11": {
+    "header": "11. Children's Privacy",
+    "description": "The Service is not intended for individuals under the age of 16. We do not knowingly collect personal information from children without parental consent."
+  },
+  "section12": {
+    "header": "12. Third-Party Links",
+    "description": "Our Service may contain links to third-party websites. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.",
+    "note": "We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services."
+  },
+  "section13": {
+    "header": "13. Changes to This Privacy Policy",
+    "description": "We may update this Privacy Policy from time to time. Updates will be posted on this page with a revised \"Last updated\" date."
+  },
+  "section14": {
+    "header": "14. Contact Us",
+    "description": "If you have questions, concerns, or data requests, contact us at:"
   },
   "stripe-policy": "Stripe Privacy Policy"
 }

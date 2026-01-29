@@ -1,54 +1,147 @@
 {
-  "and": "và",
   "header": "Chính sách bảo mật",
+  "lastUpdated": "Cập nhật lần cuối: 29 tháng 1 năm 2026",
+  "introduction": "Viet Vibe Foundation (\"VietVibe\", \"chúng tôi\", \"của chúng tôi\" hoặc \"chúng tôi\") cam kết bảo vệ quyền riêng tư và thông tin cá nhân của bạn. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, tiết lộ và bảo vệ thông tin của bạn khi bạn truy cập hoặc sử dụng trang web, ứng dụng và các dịch vụ liên quan của chúng tôi (gọi chung là \"Dịch vụ\").",
+  "consent": "Bằng cách sử dụng Dịch vụ, bạn đồng ý với các thực hành được mô tả trong Chính sách bảo mật này.",
   "section1": {
-    "description": "chúng mình thu thập và xử lý các thông tin cá nhân sau:",
-    "header": "1. Thông tin chúng mình thu thập",
-    "item1": "Tên - Được sử dụng để xác định và cá nhân hóa tài khoản",
-    "item2": "Địa chỉ email - Được sử dụng để xác minh tài khoản và liên lạc",
-    "item3": "Số điện thoại - Được sử dụng để xác minh tài khoản và thông báo quan trọng",
-    "item4": "Tuổi - Được sử dụng để xác minh tính đủ điều kiện cho một số dịch vụ nhất định",
-    "item5": "Địa chỉ - Được sử dụng để xác minh vị trí sự kiện và mục đích giao hàng",
-    "item6": "Ảnh đại diện - Được sử dụng để cá nhân hóa và nhận dạng",
-    "note": "Xin lưu ý rằng điều này áp dụng cho cả hai "
+    "header": "1. Chúng tôi là ai",
+    "organization": "Tổ chức",
+    "organizationValue": "Viet Vibe Foundation",
+    "address": "Địa chỉ",
+    "addressValue": "6975 Vivian Street, British Columbia, Canada",
+    "website": "Trang web",
+    "contactEmail": "Email liên hệ",
+    "description": "Viet Vibe Foundation là một tổ chức phi lợi nhuận hoạt động tại Canada."
   },
   "section2": {
-    "description": "Để xử lý thanh toán, chúng mình sử dụng Stripe làm bộ xử lý thanh toán an toàn. Thông tin thẻ tín dụng của bạn là:",
-    "header": "2. Thông tin thanh toán",
-    "item1": "Được mã hóa và lưu trữ an toàn bởi Stripe",
-    "item2": "Không bao giờ được lưu trữ trên máy chủ của chúng mình",
-    "item3": "Được bảo vệ bởi các biện pháp bảo mật tiêu chuẩn của ngành Stripe",
-    "item4": "Chỉ được sử dụng để xử lý các khoản thanh toán được ủy quyền của bạn",
-    "note": "Để biết thêm thông tin về chính sách của Stripe, vui lòng truy cập"
+    "header": "2. Thông tin chúng tôi thu thập",
+    "subsection1": {
+      "header": "2.1 Thông tin cá nhân bạn cung cấp",
+      "description": "Chúng tôi có thể thu thập thông tin cá nhân mà bạn tự nguyện cung cấp khi bạn tạo tài khoản mới với chúng tôi, thủ công hoặc sử dụng nhà cung cấp bên thứ ba như Google hoặc Facebook. Dữ liệu có thể bao gồm:",
+      "item1": "Họ và tên",
+      "item2": "Địa chỉ email",
+      "item3": "Số điện thoại",
+      "item4": "Địa chỉ gửi thư",
+      "item5": "Tuổi (để xác minh đủ điều kiện)",
+      "item6": "Ảnh đại diện hoặc avatar",
+      "note": "Thông tin này có thể được thu thập thông qua biểu mẫu trang web, ứng dụng di động, đăng ký sự kiện hoặc tạo tài khoản, và chỉ được sử dụng để xác thực bạn, tạo và quản lý hồ sơ người dùng của bạn, và cung cấp quyền truy cập vào Dịch vụ.",
+      "profileNote": "Bạn luôn có thể chỉnh sửa dữ liệu của mình trong",
+      "profile": "hồ sơ"
+    },
+    "subsection2": {
+      "header": "2.2 Thông tin thanh toán",
+      "description": "Thanh toán và quyên góp được xử lý thông qua Stripe, một bộ xử lý thanh toán bên thứ ba.",
+      "item1": "Chúng tôi không lưu trữ chi tiết thẻ tín dụng của bạn",
+      "item2": "Tất cả dữ liệu thanh toán được mã hóa và xử lý bởi Stripe",
+      "item3": "Stripe tuân thủ các tiêu chuẩn bảo mật PCI-DSS",
+      "note": "Thông tin thêm:"
+    },
+    "subsection3": {
+      "header": "2.3 Dữ liệu sử dụng và kỹ thuật",
+      "description": "Chúng tôi tự động thu thập một số thông tin khi bạn sử dụng Dịch vụ, bao gồm:",
+      "item1": "Địa chỉ IP",
+      "item2": "Loại và phiên bản trình duyệt",
+      "item3": "Định danh thiết bị",
+      "item4": "Trang đã truy cập và thời gian sử dụng",
+      "item5": "Dữ liệu chẩn đoán và phân tích"
+    }
   },
   "section3": {
-    "header": "3. chúng mình sử dụng thông tin của bạn như thế nào",
-    "item1": "Để cung cấp và duy trì các dịch vụ của chúng mình",
-    "item2": "Để xử lý các giao dịch của bạn",
-    "item3": "Để gửi cho bạn những thông báo và cập nhật quan trọng",
-    "item4": "Để cải thiện dịch vụ và trải nghiệm người dùng của chúng mình",
-    "item5": "Để tuân thủ các nghĩa vụ pháp lý"
+    "header": "3. Dữ liệu Facebook và Instagram (Tiết lộ nền tảng Meta)",
+    "subsection1": {
+      "header": "3.1 Dữ liệu đăng nhập Facebook (Dữ liệu người dùng)",
+      "description": "Khi bạn sử dụng đăng nhập Facebook, chúng tôi chỉ thu thập thông tin cần thiết để tạo và duy trì tài khoản của bạn, như được mô tả trong Mục 2.1. Dữ liệu này được liên kết với hồ sơ người dùng của bạn và không được sử dụng cho quảng cáo hoặc tạo hồ sơ."
+    },
+    "subsection2": {
+      "header": "3.2 Trang Facebook và Dữ liệu doanh nghiệp Instagram (Dữ liệu không phải người dùng)",
+      "description": "Dịch vụ của chúng tôi sử dụng một số quyền nền tảng Meta độc quyền để truy cập và quản lý Trang Facebook và tài khoản doanh nghiệp Instagram thuộc sở hữu hoặc được quản lý bởi Viet Vibe Foundation.",
+      "note": "Các quyền này không thu thập dữ liệu cá nhân từ người dùng cuối và không ảnh hưởng đến người dùng Facebook hoặc Instagram cá nhân. Dữ liệu chỉ được sử dụng cho mục đích quản lý nội dung nội bộ, phân tích và tiếp cận cộng đồng và không được liên kết với tài khoản người dùng cá nhân."
+    },
+    "subsection3": {
+      "header": "3.3 Tuân thủ nền tảng Meta",
+      "description": "Chúng tôi không bán, cho thuê hoặc lạm dụng dữ liệu Facebook hoặc Instagram. Tất cả dữ liệu nền tảng Meta được xử lý phù hợp với Điều khoản nền tảng Meta, Chính sách dành cho nhà phát triển và Yêu cầu bảo vệ dữ liệu."
+    }
   },
   "section4": {
-    "description": "chúng mình thực hiện các biện pháp bảo mật phù hợp để bảo vệ thông tin cá nhân của bạn:",
-    "header": "4. Bảo vệ dữ liệu",
-    "item1": "Tất cả dữ liệu bí mật (như mật khẩu) được mã hóa trong quá trình truyền tải",
-    "item2": "Đánh giá và cập nhật bảo mật thường xuyên",
-    "item3": "Quyền truy cập hạn chế vào thông tin cá nhân",
-    "item4": "Hệ thống lưu trữ dữ liệu an toàn"
+    "header": "4. Cookie và công nghệ theo dõi",
+    "description": "Chúng tôi sử dụng cookie và các công nghệ tương tự để:",
+    "item1": "Kích hoạt chức năng trang web cần thiết",
+    "item2": "Ghi nhớ tùy chọn người dùng",
+    "item3": "Phân tích hiệu suất trang web",
+    "note": "Khi pháp luật yêu cầu, cookie không cần thiết chỉ được sử dụng khi có sự đồng ý của bạn. Bạn có thể kiểm soát cookie thông qua cài đặt trình duyệt của mình."
   },
   "section5": {
-    "description": "Bạn có quyền:",
-    "header": "5. Quyền của bạn",
-    "item1": "Truy cập thông tin cá nhân của bạn",
-    "item2": "Sửa dữ liệu không chính xác",
-    "item3": "Xóa dữ liệu của bạn bằng cách truy cập \"Hồ sơ của bạn\" > \"Xóa tài khoản\"",
-    "item4": "Từ chối nhận thông tin tiếp thị",
-    "item5": "Xuất dữ liệu của bạn (vui lòng gửi email cho chúng mình)"
+    "header": "5. Cách chúng tôi sử dụng thông tin của bạn",
+    "description": "Chúng tôi sử dụng thông tin cá nhân để:",
+    "item1": "Cung cấp và duy trì Dịch vụ",
+    "item2": "Quản lý tài khoản người dùng và tham gia sự kiện",
+    "item3": "Xử lý thanh toán và quyên góp",
+    "item4": "Giao tiếp các cập nhật liên quan đến dịch vụ",
+    "item5": "Cải thiện chức năng và trải nghiệm người dùng",
+    "item6": "Tuân thủ các nghĩa vụ pháp lý và quy định"
   },
   "section6": {
-    "description": "Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật của chúng mình hoặc cách chúng mình xử lý dữ liệu của bạn, vui lòng liên hệ với nhóm hỗ trợ của chúng mình theo địa chỉ tech@vietvibe.org.",
-    "header": "6. Liên hệ với chúng mình"
+    "header": "6. Chia sẻ và tiết lộ dữ liệu",
+    "description": "Chúng tôi chỉ có thể chia sẻ thông tin cá nhân với:",
+    "item1": "Nhà cung cấp dịch vụ đáng tin cậy (ví dụ: Stripe, công cụ phân tích)",
+    "item2": "Google và Meta Platforms, Inc., cho các tích hợp nền tảng được phê duyệt",
+    "item3": "Cơ quan pháp luật khi pháp luật yêu cầu",
+    "note": "Chúng tôi không bán hoặc chia sẻ dữ liệu cá nhân cho mục đích thương mại."
+  },
+  "section7": {
+    "header": "7. Lưu trữ dữ liệu",
+    "description": "Chúng tôi chỉ lưu giữ thông tin cá nhân trong thời gian cần thiết:",
+    "item1": "Dữ liệu tài khoản: thời gian của tài khoản cộng thêm tối đa 24 tháng",
+    "item2": "Giao tiếp hỗ trợ: tối đa 24 tháng",
+    "item3": "Dữ liệu phân tích và sử dụng: tối đa 24 tháng",
+    "note": "Dữ liệu được xóa an toàn hoặc ẩn danh khi không còn cần thiết."
+  },
+  "section8": {
+    "header": "8. Quyền riêng tư của bạn",
+    "subsection1": {
+      "header": "8.1 GDPR (Cư dân EEA & Vương quốc Anh)",
+      "description": "Bạn có quyền:",
+      "item1": "Truy cập dữ liệu cá nhân của bạn",
+      "item2": "Sửa thông tin không chính xác",
+      "item3": "Yêu cầu xóa dữ liệu của bạn",
+      "item4": "Hạn chế hoặc phản đối việc xử lý",
+      "item5": "Yêu cầu tính di động của dữ liệu"
+    },
+    "subsection2": {
+      "header": "8.2 CCPA & CPRA (Cư dân California)",
+      "description": "Bạn có quyền:",
+      "item1": "Biết dữ liệu cá nhân nào chúng tôi thu thập và cách sử dụng",
+      "item2": "Yêu cầu truy cập, sửa đổi hoặc xóa dữ liệu cá nhân",
+      "item3": "Từ chối việc bán hoặc chia sẻ dữ liệu cá nhân"
+    }
+  },
+  "section9": {
+    "header": "9. Yêu cầu xóa dữ liệu",
+    "description": "Bạn có thể yêu cầu xóa dữ liệu cá nhân của mình, bao gồm dữ liệu đăng nhập Facebook, bằng cách:",
+    "item1": "Gửi email đến tech@vietvibe.org",
+    "item2": "Sử dụng tính năng xóa tài khoản (nếu có)",
+    "note": "Yêu cầu xóa được xử lý trong vòng 30 ngày."
+  },
+  "section10": {
+    "header": "10. Bảo mật dữ liệu",
+    "description": "Chúng tôi thực hiện các biện pháp bảo vệ hành chính và kỹ thuật hợp lý để bảo vệ thông tin cá nhân, bao gồm mã hóa, kiểm soát truy cập và đánh giá bảo mật thường xuyên."
+  },
+  "section11": {
+    "header": "11. Quyền riêng tư của trẻ em",
+    "description": "Dịch vụ không dành cho những người dưới 16 tuổi. Chúng tôi không cố ý thu thập thông tin cá nhân từ trẻ em mà không có sự đồng ý của cha mẹ."
+  },
+  "section12": {
+    "header": "12. Liên kết bên thứ ba",
+    "description": "Dịch vụ của chúng tôi có thể chứa liên kết đến các trang web của bên thứ ba. Nếu bạn nhấp vào liên kết của bên thứ ba, bạn sẽ được chuyển hướng đến trang web của bên thứ ba đó. Chúng tôi khuyên bạn nên xem xét Chính sách bảo mật của mọi trang web bạn truy cập.",
+    "note": "Chúng tôi không kiểm soát và không chịu trách nhiệm về nội dung, chính sách bảo mật hoặc thực hành của bất kỳ trang web hoặc dịch vụ bên thứ ba nào."
+  },
+  "section13": {
+    "header": "13. Thay đổi đối với Chính sách bảo mật này",
+    "description": "Chúng tôi có thể cập nhật Chính sách bảo mật này theo thời gian. Các cập nhật sẽ được đăng trên trang này với ngày \"Cập nhật lần cuối\" đã được sửa đổi."
+  },
+  "section14": {
+    "header": "14. Liên hệ với chúng tôi",
+    "description": "Nếu bạn có câu hỏi, lo ngại hoặc yêu cầu dữ liệu, hãy liên hệ với chúng tôi tại:"
   },
   "stripe-policy": "Chính sách bảo mật của Stripe"
 }

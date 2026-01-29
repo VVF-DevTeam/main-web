@@ -1,54 +1,147 @@
 {
-  "and": "et",
-  "header": "politique de confidentialité",
+  "header": "Politique de confidentialité",
+  "lastUpdated": "Dernière mise à jour : 29 janvier 2026",
+  "introduction": "Viet Vibe Foundation (« VietVibe », « nous », « notre » ou « nos ») s'engage à protéger votre vie privée et vos informations personnelles. Cette Politique de confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous accédez ou utilisez notre site Web, nos applications et nos services connexes (collectivement, le « Service »).",
+  "consent": "En utilisant le Service, vous acceptez les pratiques décrites dans cette Politique de confidentialité.",
   "section1": {
-    "description": "Nous collectons et traitons les informations personnelles suivantes :",
-    "header": "1. Informations que nous collectons",
-    "item1": "Nom - Utilisé pour l'identification et la personnalisation du compte",
-    "item2": "Adresse e-mail - Utilisée pour la vérification du compte et la communication",
-    "item3": "Numéro de téléphone - Utilisé pour la vérification du compte et les notifications importantes",
-    "item4": "Âge - Utilisé pour vérifier l'éligibilité à certains services",
-    "item5": "Adresse - Utilisée à des fins de vérification du lieu de l'événement et de livraison",
-    "item6": "Avatar de profil - Utilisé pour la personnalisation et l'identification",
-    "note": "Veuillez noter que cela s'applique aux deux "
+    "header": "1. Qui nous sommes",
+    "organization": "Organisation",
+    "organizationValue": "Viet Vibe Foundation",
+    "address": "Adresse",
+    "addressValue": "6975 Vivian Street, Colombie-Britannique, Canada",
+    "website": "Site Web",
+    "contactEmail": "Courriel de contact",
+    "description": "Viet Vibe Foundation est une organisation à but non lucratif opérant au Canada."
   },
   "section2": {
-    "description": "Pour le traitement des paiements, nous utilisons Stripe comme système de paiement sécurisé. Vos informations de carte bancaire sont :",
-    "header": "2. Informations de paiement",
-    "item1": "Cryptage et stockage sécurisés par Stripe",
-    "item2": "Jamais stocké sur nos serveurs",
-    "item3": "Protégé par les mesures de sécurité standard de Stripe",
-    "item4": "Utilisé uniquement pour traiter vos paiements autorisés",
-    "note": "Pour plus d'informations sur la politique de Stripe, veuillez visiter"
+    "header": "2. Informations que nous collectons",
+    "subsection1": {
+      "header": "2.1 Informations personnelles que vous fournissez",
+      "description": "Nous pouvons collecter des informations personnelles que vous fournissez volontairement lorsque vous créez un nouveau compte avec nous, soit manuellement, soit en utilisant un fournisseur tiers tel que Google ou Facebook. Les données peuvent inclure :",
+      "item1": "Nom complet",
+      "item2": "Adresse e-mail",
+      "item3": "Numéro de téléphone",
+      "item4": "Adresse postale",
+      "item5": "Âge (pour vérification de l'éligibilité)",
+      "item6": "Photo de profil ou avatar",
+      "note": "Ces informations peuvent être collectées via des formulaires sur le site Web, des applications mobiles, l'inscription à des événements ou la création de compte, et sont utilisées uniquement pour vous authentifier, créer et gérer votre profil utilisateur, et fournir l'accès au Service.",
+      "profileNote": "Vous pouvez toujours modifier vos données dans votre",
+      "profile": "profil"
+    },
+    "subsection2": {
+      "header": "2.2 Informations de paiement",
+      "description": "Les paiements et dons sont traités via Stripe, un processeur de paiement tiers.",
+      "item1": "Nous ne stockons pas les détails de votre carte de crédit",
+      "item2": "Toutes les données de paiement sont cryptées et gérées par Stripe",
+      "item3": "Stripe est conforme aux normes de sécurité PCI-DSS",
+      "note": "Plus d'informations :"
+    },
+    "subsection3": {
+      "header": "2.3 Données d'utilisation et techniques",
+      "description": "Nous collectons automatiquement certaines informations lorsque vous utilisez le Service, notamment :",
+      "item1": "Adresse IP",
+      "item2": "Type et version du navigateur",
+      "item3": "Identifiants d'appareil",
+      "item4": "Pages visitées et temps passé",
+      "item5": "Données de diagnostic et d'analyse"
+    }
   },
   "section3": {
-    "header": "3. Comment nous utilisons vos informations",
-    "item1": "Pour fournir et maintenir nos services",
-    "item2": "Pour traiter vos transactions",
-    "item3": "Pour vous envoyer des mises à jour et des notifications importantes",
-    "item4": "Pour améliorer nos services et l'expérience utilisateur",
-    "item5": "Pour se conformer aux obligations légales"
+    "header": "3. Données Facebook et Instagram (Divulgation de la plateforme Meta)",
+    "subsection1": {
+      "header": "3.1 Données de connexion Facebook (Données utilisateur)",
+      "description": "Lorsque vous utilisez la connexion Facebook, nous collectons uniquement les informations nécessaires pour créer et maintenir votre compte, comme décrit à la section 2.1. Ces données sont liées à votre profil utilisateur et ne sont pas utilisées pour la publicité ou le profilage."
+    },
+    "subsection2": {
+      "header": "3.2 Pages Facebook et données commerciales Instagram (Données non utilisateur)",
+      "description": "Notre Service utilise certaines autorisations de la plateforme Meta exclusivement pour accéder et gérer les Pages Facebook et les comptes commerciaux Instagram détenus ou administrés par Viet Vibe Foundation.",
+      "note": "Ces autorisations ne collectent pas de données personnelles des utilisateurs finaux et n'affectent pas les utilisateurs individuels de Facebook ou Instagram. Les données sont utilisées uniquement à des fins de gestion de contenu interne, d'analyse et de sensibilisation communautaire et ne sont pas liées aux comptes utilisateurs individuels."
+    },
+    "subsection3": {
+      "header": "3.3 Conformité à la plateforme Meta",
+      "description": "Nous ne vendons, ne louons ni n'utilisons à mauvais escient les données Facebook ou Instagram. Toutes les données de la plateforme Meta sont traitées conformément aux Conditions de la plateforme Meta, aux Politiques des développeurs et aux Exigences de protection des données."
+    }
   },
   "section4": {
-    "description": "Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles :",
-    "header": "4. Protection des données",
-    "item1": "Toutes les données confidentielles (telles que les mots de passe) sont cryptées pendant la transmission",
-    "item2": "Évaluations et mises à jour régulières de la sécurité",
-    "item3": "Accès limité aux informations personnelles",
-    "item4": "Systèmes de stockage de données sécurisés"
+    "header": "4. Cookies et technologies de suivi",
+    "description": "Nous utilisons des cookies et des technologies similaires pour :",
+    "item1": "Activer les fonctionnalités essentielles du site Web",
+    "item2": "Mémoriser les préférences des utilisateurs",
+    "item3": "Analyser les performances du site Web",
+    "note": "Lorsque la loi l'exige, les cookies non essentiels ne sont utilisés qu'avec votre consentement. Vous pouvez contrôler les cookies via les paramètres de votre navigateur."
   },
   "section5": {
-    "description": "Vous avez le droit de :",
-    "header": "5. Vos droits",
-    "item1": "Accéder à vos informations personnelles",
-    "item2": "Corriger les données inexactes",
-    "item3": "Supprimez vos données en visitant « Votre profil » > « Supprimer le compte »",
-    "item4": "Désinscription des communications marketing",
-    "item5": "Exportez vos données (veuillez nous envoyer un email)"
+    "header": "5. Comment nous utilisons vos informations",
+    "description": "Nous utilisons les informations personnelles pour :",
+    "item1": "Fournir et maintenir le Service",
+    "item2": "Gérer les comptes utilisateurs et la participation aux événements",
+    "item3": "Traiter les paiements et les dons",
+    "item4": "Communiquer les mises à jour liées au service",
+    "item5": "Améliorer la fonctionnalité et l'expérience utilisateur",
+    "item6": "Se conformer aux obligations légales et réglementaires"
   },
   "section6": {
-    "description": "Si vous avez des questions sur notre politique de confidentialité ou sur la manière dont nous traitons vos données, veuillez contacter notre équipe d'assistance à tech@vietvibe.org.",
-    "header": "6. Contactez-nous"
+    "header": "6. Partage et divulgation des données",
+    "description": "Nous ne pouvons partager des informations personnelles qu'avec :",
+    "item1": "Des fournisseurs de services de confiance (par exemple, Stripe, outils d'analyse)",
+    "item2": "Google et Meta Platforms, Inc., pour les intégrations de plateforme approuvées",
+    "item3": "Les autorités légales lorsque la loi l'exige",
+    "note": "Nous ne vendons ni ne partageons de données personnelles à des fins commerciales."
+  },
+  "section7": {
+    "header": "7. Conservation des données",
+    "description": "Nous conservons les informations personnelles uniquement aussi longtemps que nécessaire :",
+    "item1": "Données de compte : durée du compte plus jusqu'à 24 mois",
+    "item2": "Communications de support : jusqu'à 24 mois",
+    "item3": "Données d'analyse et d'utilisation : jusqu'à 24 mois",
+    "note": "Les données sont supprimées de manière sécurisée ou anonymisées lorsqu'elles ne sont plus nécessaires."
+  },
+  "section8": {
+    "header": "8. Vos droits en matière de confidentialité",
+    "subsection1": {
+      "header": "8.1 RGPD (Résidents de l'EEE et du Royaume-Uni)",
+      "description": "Vous avez le droit de :",
+      "item1": "Accéder à vos données personnelles",
+      "item2": "Corriger les informations inexactes",
+      "item3": "Demander la suppression de vos données",
+      "item4": "Restreindre ou vous opposer au traitement",
+      "item5": "Demander la portabilité des données"
+    },
+    "subsection2": {
+      "header": "8.2 CCPA et CPRA (Résidents de Californie)",
+      "description": "Vous avez le droit de :",
+      "item1": "Savoir quelles données personnelles nous collectons et comment elles sont utilisées",
+      "item2": "Demander l'accès, la correction ou la suppression de données personnelles",
+      "item3": "Refuser la vente ou le partage de données personnelles"
+    }
+  },
+  "section9": {
+    "header": "9. Demandes de suppression de données",
+    "description": "Vous pouvez demander la suppression de vos données personnelles, y compris les données de connexion Facebook, en :",
+    "item1": "Envoyant un e-mail à tech@vietvibe.org",
+    "item2": "Utilisant les fonctionnalités de suppression de compte (si disponibles)",
+    "note": "Les demandes de suppression sont traitées dans les 30 jours."
+  },
+  "section10": {
+    "header": "10. Sécurité des données",
+    "description": "Nous mettons en œuvre des garanties administratives et techniques raisonnables pour protéger les informations personnelles, notamment le cryptage, les contrôles d'accès et les examens de sécurité réguliers."
+  },
+  "section11": {
+    "header": "11. Confidentialité des enfants",
+    "description": "Le Service n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants sans le consentement parental."
+  },
+  "section12": {
+    "header": "12. Liens tiers",
+    "description": "Notre Service peut contenir des liens vers des sites Web tiers. Si vous cliquez sur un lien tiers, vous serez dirigé vers le site de ce tiers. Nous vous conseillons fortement de consulter la Politique de confidentialité de chaque site que vous visitez.",
+    "note": "Nous n'avons aucun contrôle sur et n'assumons aucune responsabilité pour le contenu, les politiques de confidentialité ou les pratiques de tout site ou service tiers."
+  },
+  "section13": {
+    "header": "13. Modifications de cette Politique de confidentialité",
+    "description": "Nous pouvons mettre à jour cette Politique de confidentialité de temps à autre. Les mises à jour seront publiées sur cette page avec une date de « Dernière mise à jour » révisée."
+  },
+  "section14": {
+    "header": "14. Contactez-nous",
+    "description": "Si vous avez des questions, des préoccupations ou des demandes de données, contactez-nous à :"
   },
   "stripe-policy": "Politique de confidentialité de Stripe"
 }
