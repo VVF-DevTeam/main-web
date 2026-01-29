@@ -789,7 +789,7 @@ export default function EventCartCheckout({
               return (
                 <div
                   key={item.ticket.id}
-                  className="flex items-center justify-between rounded border bg-gray-50 p-3"
+                  className="flex items-center justify-between rounded border bg-white shadow-sm p-3"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-900">
@@ -1005,13 +1005,13 @@ export default function EventCartCheckout({
                                   }
                                 >
                                   <strong>
-                                    {t('minimum-discount-percent-off-for-orders', { 
-                                      percent: percentage, 
-                                      minTotal: minTotal.toFixed(2) 
+                                    {t('minimum-discount-percent-off-for-orders', {
+                                      percent: percentage,
+                                      minTotal: minTotal.toFixed(2)
                                     })}
                                   </strong>
-                                  {' '}({discount.cannotBeStacked 
-                                    ? t('minimum-discount-non-stackable') 
+                                  {' '}({discount.cannotBeStacked
+                                    ? t('minimum-discount-non-stackable')
                                     : t('minimum-discount-stackable')})
                                   {isActuallyApplied
                                     ? ` ${t('minimum-discount-currently-applied', { cartTotal: cartTotal.toFixed(2) })}`
@@ -1046,9 +1046,9 @@ export default function EventCartCheckout({
                   className="flex w-full items-center justify-center gap-1 text-xs font-medium text-green-800 hover:text-green-900"
                 >
                   <span>
-                  {isDiscountsExpanded
-                    ? t('toggle-hide-discount-details')
-                    : t('toggle-show-discount-details')}
+                    {isDiscountsExpanded
+                      ? t('toggle-hide-discount-details')
+                      : t('toggle-show-discount-details')}
                   </span>
                   <span
                     className={`transition-transform ${isDiscountsExpanded ? 'rotate-180' : 'rotate-0'
@@ -1155,13 +1155,14 @@ export default function EventCartCheckout({
                   </span>
                   <span>
                     {priceBreakdown.ticketTypeDiscounts && priceBreakdown.ticketTypeDiscounts.length > 0 ? (
-                      <span className="flex items-center gap-1">
+                      <span className="flex flex-wrap items-center gap-1 max-w-[150px] md:max-w-full justify-end">
+                        - (
                         {priceBreakdown.ticketTypeDiscounts.map((discount, index) => (
-                          <span key={index}>
-                            -{discount.currency} ${discount.perUnitDiscount.toFixed(2)} × {discount.quantity}
-                            {index < priceBreakdown.ticketTypeDiscounts.length - 1 && <span className="mx-1">+</span>}
+                          <span key={index} className="whitespace-nowrap">
+                            ${discount.perUnitDiscount.toFixed(2)} × {discount.quantity}
+                            {index < priceBreakdown.ticketTypeDiscounts.length - 1 && <span className="ml-1">+</span>}
                           </span>
-                        ))}
+                        ))})
                       </span>
                     ) : (
                       <span>
