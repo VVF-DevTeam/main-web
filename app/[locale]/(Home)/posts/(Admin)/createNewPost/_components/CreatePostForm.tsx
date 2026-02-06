@@ -33,7 +33,6 @@ interface CreatePostFormProps {
   author: string
   redirectToProfile?: {
     locale: string
-    userId: string
   }
 }
 
@@ -75,7 +74,7 @@ const CreatePostForm = ({ author, redirectToProfile }: CreatePostFormProps) => {
       router.refresh()
       if (redirectToProfile) {
         router.push(
-          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-post&postId=${response.data.id}`
+          `/${redirectToProfile.locale}/profile?section=admin-edit-post&postId=${response.data.id}`
         )
       } else {
         router.push(`/posts/editPost/${response.data.id}`)

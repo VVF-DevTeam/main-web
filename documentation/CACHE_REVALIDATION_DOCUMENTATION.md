@@ -229,7 +229,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
 #### 28. `getEventPayments`
-- **File**: `app/[locale]/(Home)/profile/[userId]/_components/getEventPayments.ts`
+- **File**: `app/[locale]/(Home)/profile/_components/getEventPayments.ts`
 - **Cache Key**: `['event-payments-${eventId}']` (per event)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 86400 seconds (1 day)

@@ -44,7 +44,6 @@ interface CreateJobFormProps {
   author: string
   redirectToProfile?: {
     locale: string
-    userId: string
   }
 }
 // TODO: Abstract the createEventSchema to a separate file
@@ -104,7 +103,7 @@ const CreateJobForm = ({ author, redirectToProfile }: CreateJobFormProps) => {
       router.refresh()
       if (redirectToProfile) {
         router.push(
-          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-job&jobId=${response.data.keyName}`
+          `/${redirectToProfile.locale}/profile?section=admin-edit-job&jobId=${response.data.keyName}`
         )
       } else {
         router.push(`/registration/jobs/editJob/${response.data.keyName}`)

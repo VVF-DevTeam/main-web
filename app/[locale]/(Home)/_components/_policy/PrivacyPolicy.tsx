@@ -42,7 +42,7 @@ const PrivacyPolicy = async ({locale}: {locale: string}) => {
           <p className="mb-4">{t('section2.subsection1.note')}</p>
           <p className="mb-4">
             {t('section2.subsection1.profileNote')}{' '}
-            <Link href={`/${locale}/profile/user`} className="text-textColor-blue hover:underline">
+            <Link href={`/${locale}/profile`} className="text-textColor-blue hover:underline">
               {t('section2.subsection1.profile')}
             </Link>
             .

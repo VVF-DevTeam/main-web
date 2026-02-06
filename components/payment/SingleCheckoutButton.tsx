@@ -60,8 +60,6 @@ export default function SingleCheckoutButton({
   const [showGuestForm, setShowGuestForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const isGuestCheckout = !userId || userId.trim() === ''
-
   const handleCheckout = async (priceId: string, guestInfo?: GuestInfo) => {
     const stripe = await stripePromise
 
@@ -163,7 +161,7 @@ export default function SingleCheckoutButton({
                 // Logged in user
                 <>
                   {' '}{t('checkout-description-first-form-filled')}{' '}
-                  <Link href={`/profile/${userId}`} className="text-blue-500 hover:text-blue-600 underline">
+                  <Link href={`/profile`} className="text-blue-500 hover:text-blue-600 underline">
                     {t('checkout-profile-link')}
                   </Link>
                   . {t('checkout-fill-empty-fields')}

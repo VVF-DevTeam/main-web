@@ -88,7 +88,7 @@ const PaymentSuccess = ({
         <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
           {t('paymentSuccess-profile-text')}{' '}
           <Link
-            href={`/profile/${userName}`}
+            href={`/profile`}
             className="text-textColor-blue underline"
           >
             {t('paymentSuccess-profile-link')}

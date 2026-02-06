@@ -44,7 +44,6 @@ interface CreateEventFormProps {
   author: string
   redirectToProfile?: {
     locale: string
-    userId: string
   }
 }
 // TODO: Abstract the createEventSchema to a separate file
@@ -52,7 +51,7 @@ const createEventSchema = z.object({
   title: z
     .string({ required_error: 'Title is required' })
     .min(1, { message: 'Title must be at least 2 characters long' })
-    .max(20, { message: 'Title must be at most 20 characters long' }),
+    .max(35, { message: 'Title must be at most 35 characters long' }),
   eventType: z.string().min(1, { message: 'Event type is required' }),
 })
 
@@ -73,7 +72,6 @@ const CreateEventForm = ({
       eventType: '',
     },
   })
-  const { isValid } = form.formState
 
   const onSubmit = async (data: z.infer<typeof createEventSchema>) => {
     //Format title to trims whitespaces
@@ -109,7 +107,7 @@ const CreateEventForm = ({
       // Redirect to profile edit page if redirectToProfile is provided
       if (redirectToProfile) {
         router.push(
-          `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-edit-event&eventId=${response.data.keyName}`
+          `/${redirectToProfile.locale}/profile?section=admin-edit-event&eventId=${response.data.keyName}`
         )
       } else {
         router.push(`/events/editEvent/${response.data.keyName}`)
@@ -229,6 +227,7 @@ const CreateEventForm = ({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -236,7 +235,7 @@ const CreateEventForm = ({
             <Button
               variant={'outline'}
               size={'lg'}
-              disabled={!isValid || isLoading}
+              disabled={isLoading}
               className="text-md max-w-fit bg-bgColor-brand900 font-bold text-textColor-white hover:bg-bgColor-brand400 hover:text-textColor-white/90"
               type="submit"
             >
@@ -245,7 +244,7 @@ const CreateEventForm = ({
             <Link
               href={
                 redirectToProfile
-                  ? `/${redirectToProfile.locale}/profile/${redirectToProfile.userId}?section=admin-all-events`
+                  ? `/${redirectToProfile.locale}/profile?section=admin-all-events`
                   : '/events'
               }
             >

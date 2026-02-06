@@ -1228,7 +1228,7 @@ export default function EventCartCheckout({
                     // Logged in user
                     <>
                       {' '}{t('checkout-description-first-form-filled')}{' '}
-                      <Link href={`/profile/${userId}`} className="text-blue-500 hover:text-blue-600 underline">
+                      <Link href={`/profile`} className="text-blue-500 hover:text-blue-600 underline">
                         {t('checkout-profile-link')}
                       </Link>
                       . {t('checkout-fill-empty-fields')}

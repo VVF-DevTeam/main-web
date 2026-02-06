@@ -83,9 +83,9 @@ export default function EditEvent({
   const canPublish = completedFields === eventFields.length
 
   // Default links
-  const defaultCategoriesLink = `/profile/${user.id}?section=admin-event-categories`
-  const defaultSeriesLink = `/profile/${user.id}?section=admin-event-series`
-  const defaultSponsorsLink = `/profile/${user.id}?section=admin-manage-sponsors`
+  const defaultCategoriesLink = `/profile?section=admin-event-categories`
+  const defaultSeriesLink = `/profile?section=admin-event-series`
+  const defaultSponsorsLink = `/profile?section=admin-manage-sponsors`
 
   return (
     <div className="my-12 p-6 lg:my-20">

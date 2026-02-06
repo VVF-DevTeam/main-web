@@ -15,21 +15,21 @@ import PasswordForm from './_components/PasswordForm'
 import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
-import PrivacyPolicy from '../../_components/_policy/PrivacyPolicy'
+import PrivacyPolicy from '../_components/_policy/PrivacyPolicy'
 import EmailComposition from './_components/EmailComposition'
-import EventManagement from '../../events/(Admin)/allEvents/_components/EventManagement'
+import EventManagement from '../events/(Admin)/allEvents/_components/EventManagement'
 import CreateEventForm from './_components/CreateEventForm'
 import EventCategoryManager from './_components/EventCategoryManager'
 import EventSeriesManager from './_components/EventSeriesManager'
 import SponsorsManagement from './_components/SponsorsManagement'
-import EditEvent from '../../events/(Admin)/editEvent/[eventId]/_components/EditEvent'
+import EditEvent from '../events/(Admin)/editEvent/[eventId]/_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
 import CreateJobForm from './_components/CreateJobForm'
-import EditJob from '../../registration/_components/_jobs/_editJob/EditJob'
-import JobManagement from '../../registration/_components/_jobs/_allJob/JobManagement'
-import PostManagement from '../../posts/(Admin)/allPosts/_components/PostManagement'
+import EditJob from '../registration/_components/_jobs/_editJob/EditJob'
+import JobManagement from '../registration/_components/_jobs/_allJob/JobManagement'
+import PostManagement from '../posts/(Admin)/allPosts/_components/PostManagement'
 import CreatePostForm from './_components/CreatePostForm'
-import EditPost from '../../posts/(Admin)/editPost/_components/EditPost'
+import EditPost from '../posts/(Admin)/editPost/_components/EditPost'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -158,8 +158,8 @@ export default async function ProfilePage({
         return (
           <EventManagement
             allEvents={allEvents}
-            createEventLink={`/${locale}/profile/${user.id}?section=admin-create-event`}
-            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-event&eventId={keyName}`}
+            createEventLink={`/${locale}/profile?section=admin-create-event`}
+            editLinkPattern={`/${locale}/profile?section=admin-edit-event&eventId={keyName}`}
             showBackButton={false}
           />
         )
@@ -175,7 +175,7 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        return <CreateEventForm user={user} locale={locale} />
+        return <CreateEventForm locale={locale} />
       }
       return (
         <p className="mt-10 text-center">
@@ -286,8 +286,8 @@ export default async function ProfilePage({
         return (
           <JobManagement
             allJobs={allJobs}
-            createJobLink={`/${locale}/profile/${user.id}?section=admin-create-job`}
-            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-job&jobId={keyName}`}
+            createJobLink={`/${locale}/profile?section=admin-create-job`}
+            editLinkPattern={`/${locale}/profile?section=admin-edit-job&jobId={keyName}`}
             showBackButton={false}
           />
         )
@@ -337,8 +337,8 @@ export default async function ProfilePage({
         return (
           <PostManagement
             allPosts={allPosts}
-            createPostLink={`/${locale}/profile/${user.id}?section=admin-create-post`}
-            editLinkPattern={`/${locale}/profile/${user.id}?section=admin-edit-post&postId={id}`}
+            createPostLink={`/${locale}/profile?section=admin-create-post`}
+            editLinkPattern={`/${locale}/profile?section=admin-edit-post&postId={id}`}
             showBackButton={false}
           />
         )

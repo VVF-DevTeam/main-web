@@ -311,7 +311,7 @@ export default function EventSingleCheckOut({
               *{t('email-not-verified-warning-prefix')} <strong>{userInfo.email}</strong>{' '}
               {t('email-not-verified-warning-suffix')}{' '}
               <Link
-                href={`/profile/${userId}`}
+                href={`/profile`}
                 className="font-medium text-textColor-blue underline"
               >
                 {t('verify-in-profile')}

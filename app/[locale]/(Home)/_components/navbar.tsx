@@ -40,7 +40,7 @@ const Navbar = () => {
           {session?.user?.id && (
             <Link
               className="flex-center gap-x-[5px] text-textColor transition-all hover:text-textColor-brand900"
-              href={`/profile/${session?.user?.name}`}
+              href={`/profile`}
               aria-label="Go to user profile"
             >
               <User2 className="h-5 w-5" />

@@ -1,6 +1,6 @@
 # Prisma Query Cache Recommendations for Profile Folder
 
-## Analysis of Prisma Queries in `app/[locale]/(Home)/profile/[userId]`
+## Analysis of Prisma Queries in `app/[locale]/(Home)/profile`
 
 ### ✅ Already Using Caching:
 1. **`getPublishedEvents`** in `page.tsx` - ✅ Now using `getAllPublishedEvents` (cached)

@@ -1,5 +1,5 @@
 // Libraries
-import CreatePostFormComponent from '../../../posts/(Admin)/createNewPost/_components/CreatePostForm'
+import CreatePostFormComponent from '../../posts/(Admin)/createNewPost/_components/CreatePostForm'
 
 interface CreatePostFormProps {
   user: {
@@ -17,7 +17,7 @@ export default function CreatePostForm({
     <div className="mx-auto my-40 w-full max-w-5xl p-8 lg:p-12 xl:p-16">
       <CreatePostFormComponent
         author={user.id}
-        redirectToProfile={{ locale, userId: user.id }}
+        redirectToProfile={{ locale }}
       />
     </div>
   )

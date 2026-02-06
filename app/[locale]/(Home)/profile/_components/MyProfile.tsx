@@ -182,7 +182,7 @@ const MyProfile = async ({
                               <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
                                 {payment.type === 'Membership' ? (
                                   <Link
-                                    href={`/profile/${user.name}?section=subscription`}
+                                    href={`/profile?section=subscription`}
                                   >
                                     Membership
                                   </Link>

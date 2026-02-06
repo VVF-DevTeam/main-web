@@ -1,5 +1,5 @@
 // Libraries
-import CreateJobFormComponent from "../../../registration/_components/_jobs/_createJob/CreateJobForm"
+import CreateJobFormComponent from "../../registration/_components/_jobs/_createJob/CreateJobForm"
 
 interface CreateJobFormProps {
   user: {
@@ -17,7 +17,7 @@ export default function CreateJobForm({
     <div className="mx-auto my-40 w-full max-w-5xl p-8 lg:p-12 xl:p-16">
       <CreateJobFormComponent
         author={user.id}
-        redirectToProfile={{ locale, userId: user.id }}
+        redirectToProfile={{ locale }}
       />
     </div>
   )

@@ -86,7 +86,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
             return (
               <li key={key}>
                 <Link
-                  href={`/${locale}/profile/${userId}?section=${key}`}
+                  href={`/${locale}/profile?section=${key}`}
                   className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
                     currentSection === key
                       ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -110,7 +110,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               {isAdmin && adminSections.map(({ key, label }) => (
                 <li key={key}>
                   <Link
-                    href={`/${locale}/profile/${userId}?section=${key}`}
+                    href={`/${locale}/profile?section=${key}`}
                     className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
                       currentSection === key
                         ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -139,7 +139,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                   <ul className="mt-2 space-y-2 pl-4">
                     <li>
                       <Link
-                        href={`/${locale}/profile/${userId}?section=admin-create-event`}
+                        href={`/${locale}/profile?section=admin-create-event`}
                         className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                           currentSection === 'admin-create-event'
                             ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -151,7 +151,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                     </li>
                     <li>
                       <Link
-                        href={`/${locale}/profile/${userId}?section=admin-all-events`}
+                        href={`/${locale}/profile?section=admin-all-events`}
                         className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                           currentSection === 'admin-all-events'
                             ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -165,7 +165,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                       <>
                         <li>
                           <Link
-                            href={`/${locale}/profile/${userId}?section=admin-event-categories`}
+                            href={`/${locale}/profile?section=admin-event-categories`}
                             className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                               currentSection === 'admin-event-categories'
                                 ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -177,7 +177,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                         </li>
                         <li>
                           <Link
-                            href={`/${locale}/profile/${userId}?section=admin-event-series`}
+                            href={`/${locale}/profile?section=admin-event-series`}
                             className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                               currentSection === 'admin-event-series'
                                 ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -189,7 +189,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                         </li>
                         <li>
                           <Link
-                            href={`/${locale}/profile/${userId}?section=admin-manage-sponsors`}
+                            href={`/${locale}/profile?section=admin-manage-sponsors`}
                             className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                               currentSection === 'admin-manage-sponsors'
                                 ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -223,7 +223,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                     <ul className="mt-2 space-y-2 pl-4">
                       <li>
                         <Link
-                          href={`/${locale}/profile/${userId}?section=admin-create-job`}
+                          href={`/${locale}/profile?section=admin-create-job`}
                           className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                             currentSection === 'admin-create-job'
                               ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -235,7 +235,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                       </li>
                       <li>
                         <Link
-                          href={`/${locale}/profile/${userId}?section=admin-all-jobs`}
+                          href={`/${locale}/profile?section=admin-all-jobs`}
                           className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                             currentSection === 'admin-all-jobs'
                               ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -268,7 +268,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                     <ul className="mt-2 space-y-2 pl-4">
                       <li>
                         <Link
-                          href={`/${locale}/profile/${userId}?section=admin-create-post`}
+                          href={`/${locale}/profile?section=admin-create-post`}
                           className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                             currentSection === 'admin-create-post'
                               ? 'text-textColor-black bg-white font-medium shadow-sm'
@@ -280,7 +280,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                       </li>
                       <li>
                         <Link
-                          href={`/${locale}/profile/${userId}?section=admin-all-posts`}
+                          href={`/${locale}/profile?section=admin-all-posts`}
                           className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
                             currentSection === 'admin-all-posts'
                               ? 'text-textColor-black bg-white font-medium shadow-sm'

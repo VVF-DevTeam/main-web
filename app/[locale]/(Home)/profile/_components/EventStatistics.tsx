@@ -222,7 +222,7 @@ export default function EventStatistics({
       return
     }
     router.push(
-      `/${locale}/profile/${user.id}?section=admin-email-composition&eventId=${selectedEventId}`
+      `/${locale}/profile?section=admin-email-composition&eventId=${selectedEventId}`
     )
   }
 
@@ -232,7 +232,7 @@ export default function EventStatistics({
       return
     }
     router.push(
-      `/${locale}/profile/${user.id}?section=admin-edit-event&eventId=${selectedEventKeyName}`
+      `/${locale}/profile?section=admin-edit-event&eventId=${selectedEventKeyName}`
     )
   }
 
