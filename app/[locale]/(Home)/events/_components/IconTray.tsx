@@ -59,7 +59,7 @@ const IconTray = ({
                 </TooltipTrigger>
                 <TooltipContent className="bg-bgColor-black" sideOffset={4}>
                   <p className="text-sm text-textColor-brand600">
-                    View {icon.name} of instructor
+                    View {icon.name} of organizer
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -78,7 +78,7 @@ const IconTray = ({
                 </TooltipTrigger>
                 <TooltipContent className="bg-bgColor-black" sideOffset={4}>
                   <p className="text-sm text-textColor-brand600">
-                    View {icon.name} of instructor
+                    View {icon.name} of organizer
                   </p>
                 </TooltipContent>
               </Tooltip>
