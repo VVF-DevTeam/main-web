@@ -57,7 +57,8 @@ interface EventCartCheckoutProps {
 interface EventDiscountJson {
   id?: string
   type?: string
-  percentage?: number
+  discountAmount?: number
+  discountUnit?: 'percentage' | 'amount'
   minQuantity?: number | null
   minTotal?: number | null
   code?: string | null
@@ -66,7 +67,8 @@ interface EventDiscountJson {
 
 type AppliedCodeDiscount = {
   code: string
-  percentage: number
+  discountAmount: number
+  discountUnit: 'percentage' | 'amount'
   cannotBeStacked: boolean
 }
 
@@ -126,11 +128,15 @@ export default function EventCartCheckout({
         if (result.valid) {
           setAppliedCodeDiscount({
             code: result.code!,
-            percentage: result.percentage!,
+            discountAmount: result.discountAmount!,
+            discountUnit: result.discountUnit!,
             cannotBeStacked: Boolean(result.cannotBeStacked),
           })
           toast.success('Discount code applied', {
-            description: `Applied ${result.percentage}% off`,
+            description:
+              result.discountUnit === 'amount'
+                ? `Applied $${result.discountAmount.toFixed(2)} off`
+                : `Applied ${result.discountAmount}% off`,
             style: { color: '#22c55e' },
           })
         } else {
@@ -278,129 +284,387 @@ export default function EventCartCheckout({
     let totalAfterBulk = totalAfterMembership
     let bulkDiscountAmount = 0
     let effectivePercent = 0
+    let effectiveAmount = 0
 
     if (discountList.length > 0) {
-      // First, for each non‑code discount type, pick the single "best" qualifying discount:
+      // First, for each non‑code discount type, pick the single "best" qualifying discount
+      // separately for percentage‑based and amount‑based discounts:
       // - Bulk Discount: highest minQuantity (stricter condition)
       // - Minimum Total Discount: highest minTotal
-      let bestBulk: EventDiscountJson | null = null
-      let bestMinTotal: EventDiscountJson | null = null
+      let bestBulkPercent: EventDiscountJson | null = null
+      let bestMinTotalPercent: EventDiscountJson | null = null
+      let bestBulkAmount: EventDiscountJson | null = null
+      let bestMinTotalAmount: EventDiscountJson | null = null
 
       discountList.forEach((discount) => {
-        const pct = discount.percentage ?? 0
-        if (pct <= 0) return
+        const value = discount.discountAmount ?? 0
+        if (value <= 0) return
+
+        const unit = discount.discountUnit ?? 'percentage'
 
         if (discount.type === 'Bulk Discount') {
           const minQty = discount.minQuantity ?? 0
           const qualifies = totalItemCount >= minQty
           if (!qualifies) return
 
-          if (!bestBulk || (bestBulk.minQuantity ?? 0) < minQty) {
-            bestBulk = discount
+          if (unit === 'amount') {
+            if (!bestBulkAmount || (bestBulkAmount.minQuantity ?? 0) < minQty) {
+              bestBulkAmount = discount
+            }
+          } else {
+            if (!bestBulkPercent || (bestBulkPercent.minQuantity ?? 0) < minQty) {
+              bestBulkPercent = discount
+            }
           }
         } else if (discount.type === 'Minimum Total Discount') {
           const minTotal = discount.minTotal ?? 0
           const qualifies = totalAfterMembership >= minTotal
           if (!qualifies) return
 
-          if (!bestMinTotal || (bestMinTotal.minTotal ?? 0) < minTotal) {
-            bestMinTotal = discount
+          if (unit === 'amount') {
+            if (!bestMinTotalAmount || (bestMinTotalAmount.minTotal ?? 0) < minTotal) {
+              bestMinTotalAmount = discount
+            }
+          } else {
+            if (!bestMinTotalPercent || (bestMinTotalPercent.minTotal ?? 0) < minTotal) {
+              bestMinTotalPercent = discount
+            }
           }
         }
       })
 
-      // Build the final list of qualifying non‑code discounts (at most one per type)
-      const effectiveDiscounts: EventDiscountJson[] = []
-      if (bestBulk) effectiveDiscounts.push(bestBulk)
-      if (bestMinTotal) effectiveDiscounts.push(bestMinTotal)
-
-      // Now apply stacking rules over these non‑code discounts:
-      // Compute total stackable percentage and best non‑stackable percentage
-      let stackablePercent = 0
-      let bestNonStackablePercent = 0
-
-      effectiveDiscounts.forEach((discount) => {
-        const pct = discount.percentage ?? 0
-        if (pct <= 0) return
-
-        const isNonStackable = !!discount.cannotBeStacked
-
-        if (isNonStackable) {
-          // Track the best single non‑stackable discount
-          bestNonStackablePercent = Math.max(bestNonStackablePercent, pct)
+      // If both percentage and amount discounts exist for the same type,
+      // only keep the one with the highest requirement (minQuantity for Bulk, minTotal for Minimum Total)
+      if (bestBulkPercent && bestBulkAmount) {
+        const bulkPercent = bestBulkPercent as EventDiscountJson
+        const bulkAmount = bestBulkAmount as EventDiscountJson
+        const percentMinQty = bulkPercent.minQuantity ?? 0
+        const amountMinQty = bulkAmount.minQuantity ?? 0
+        if (amountMinQty > percentMinQty) {
+          bestBulkPercent = null
+        } else if (percentMinQty > amountMinQty) {
+          bestBulkAmount = null
         } else {
-          // Stack all stackable discounts
-          stackablePercent += pct
+          // If equal, prefer percentage (arbitrary choice)
+          bestBulkAmount = null
         }
-      })
+      }
 
-      // Decide event percentage from non‑code discounts:
-      // - If only stackable: use sum of stackable.
-      // - If only non‑stackable: use best non‑stackable.
-      // - If both: choose the larger of (stacked) vs (best non‑stackable).
-      const nonCodePercent =
-        stackablePercent > 0 && bestNonStackablePercent > 0
-          ? Math.max(stackablePercent, bestNonStackablePercent)
-          : stackablePercent > 0
-            ? stackablePercent
-            : bestNonStackablePercent
-      effectivePercent = nonCodePercent
+      if (bestMinTotalPercent && bestMinTotalAmount) {
+        const minTotalPercent = bestMinTotalPercent as EventDiscountJson
+        const minTotalAmount = bestMinTotalAmount as EventDiscountJson
+        const percentMinTotal = minTotalPercent.minTotal ?? 0
+        const amountMinTotal = minTotalAmount.minTotal ?? 0
+        if (amountMinTotal > percentMinTotal) {
+          bestMinTotalPercent = null
+        } else if (percentMinTotal > amountMinTotal) {
+          bestMinTotalAmount = null
+        } else {
+          // If equal, prefer percentage (arbitrary choice)
+          bestMinTotalAmount = null
+        }
+      }
+
+      // --- Percentage-based discounts ---
+      const percentDiscounts: EventDiscountJson[] = []
+      if (bestBulkPercent) percentDiscounts.push(bestBulkPercent)
+      if (bestMinTotalPercent) percentDiscounts.push(bestMinTotalPercent)
 
       // Track which discount is actually being used (for UI display)
       // If a non-stackable discount wins, only that one should show as green
-      let isNonStackableWinning = bestNonStackablePercent > 0 &&
-        (stackablePercent === 0 || bestNonStackablePercent >= stackablePercent)
-
-      // Track if stackable discounts are winning (for UI display)
-      const isStackableWinning = stackablePercent > 0 &&
-        (bestNonStackablePercent === 0 || stackablePercent > bestNonStackablePercent)
-
-      // Find the winning non-stackable discount if applicable
+      let isNonStackableWinning = false
+      let isStackableWinning = false
       let winningNonStackableDiscount: EventDiscountJson | null = null
-      if (isNonStackableWinning) {
-        // Find the non-stackable discount with the winning percentage
-        winningNonStackableDiscount = effectiveDiscounts.find(
-          (d) => !!d.cannotBeStacked && (d.percentage ?? 0) === bestNonStackablePercent
-        ) || null
+
+      // Approximate total discount value from non‑code percentage discounts
+      let approxNonCodePercentDiscount = 0
+      // Track whether the chosen non‑code percentage comes from a non‑stackable discount
+      let percentNonStackableChosen = false
+
+      if (percentDiscounts.length > 0) {
+        // Compute total stackable percentage and best non‑stackable percentage
+        let stackablePercent = 0
+        let bestNonStackablePercent = 0
+
+        percentDiscounts.forEach((discount) => {
+          const pct = discount.discountAmount ?? 0
+          if (pct <= 0) return
+
+          const isNonStackable = !!discount.cannotBeStacked
+
+          if (isNonStackable) {
+            // Track the best single non‑stackable discount
+            bestNonStackablePercent = Math.max(bestNonStackablePercent, pct)
+          } else {
+            // Stack all stackable discounts
+            stackablePercent += pct
+          }
+        })
+
+        // Decide event percentage from non‑code discounts:
+        // - If only stackable: use sum of stackable.
+        // - If only non‑stackable: use best non‑stackable.
+        // - If both: choose the larger of (stacked) vs (best non‑stackable).
+        const nonCodePercent =
+          stackablePercent > 0 && bestNonStackablePercent > 0
+            ? Math.max(stackablePercent, bestNonStackablePercent)
+            : stackablePercent > 0
+              ? stackablePercent
+              : bestNonStackablePercent
+        effectivePercent = nonCodePercent
+        // Approximate total discount value from non‑code percentage discounts
+        approxNonCodePercentDiscount = totalAfterMembership * (effectivePercent / 100)
+
+        isNonStackableWinning =
+          bestNonStackablePercent > 0 &&
+          (stackablePercent === 0 || bestNonStackablePercent >= stackablePercent)
+
+        isStackableWinning =
+          stackablePercent > 0 &&
+          (bestNonStackablePercent === 0 || stackablePercent > bestNonStackablePercent)
+
+        // Record whether the chosen percentage result comes from a non‑stackable discount
+        percentNonStackableChosen = isNonStackableWinning
+
+        if (isNonStackableWinning) {
+          // Find the non-stackable discount with the winning percentage
+          winningNonStackableDiscount =
+            percentDiscounts.find(
+              (d) => !!d.cannotBeStacked && (d.discountAmount ?? 0) === bestNonStackablePercent
+            ) || null
+        }
+      }
+
+      // --- Amount-based discounts (absolute values) ---
+      const amountDiscounts: EventDiscountJson[] = []
+      if (bestBulkAmount) amountDiscounts.push(bestBulkAmount)
+      if (bestMinTotalAmount) amountDiscounts.push(bestMinTotalAmount)
+
+      let stackableAmount = 0
+      let bestNonStackableAmount = 0
+      let bestNonStackableAmountDiscount: EventDiscountJson | null = null
+      // Track whether the chosen non‑code amount comes from a non‑stackable discount
+      let amountNonStackableChosen = false
+
+      if (amountDiscounts.length > 0) {
+        amountDiscounts.forEach((discount) => {
+          const amount = discount.discountAmount ?? 0
+          if (amount <= 0) return
+
+          const isNonStackable = !!discount.cannotBeStacked
+
+          if (isNonStackable) {
+            // Track the best single non‑stackable amount discount
+            if (amount > bestNonStackableAmount) {
+              bestNonStackableAmount = amount
+              bestNonStackableAmountDiscount = discount
+            }
+          } else {
+            // Stack all stackable amount discounts
+            stackableAmount += amount
+          }
+        })
+
+        // Decide event amount from non‑code discounts:
+        // - If only stackable: use sum of stackable amounts.
+        // - If only non‑stackable: use best non‑stackable amount.
+        // - If both: choose the larger of (stacked) vs (best non‑stackable).
+        const nonCodeAmount =
+          stackableAmount > 0 && bestNonStackableAmount > 0
+            ? Math.max(stackableAmount, bestNonStackableAmount)
+            : stackableAmount > 0
+              ? stackableAmount
+              : bestNonStackableAmount
+
+        effectiveAmount = nonCodeAmount
+
+        // Record whether the chosen amount result comes from a non‑stackable discount
+        if (bestNonStackableAmount > 0 && effectiveAmount === bestNonStackableAmount) {
+          amountNonStackableChosen = true
+        }
+      }
+
+      // Decide between non‑stackable amount and percentage discounts:
+      // If a non‑stackable amount discount exists, it should replace
+      // percentage discounts when it yields a better total (and vice versa).
+      if (bestNonStackableAmount > 0) {
+        // Compare approximate discount values (before per‑ticket rounding).
+        const amountValue = bestNonStackableAmount
+        const percentValue = approxNonCodePercentDiscount
+
+        if (amountValue >= percentValue) {
+          // Amount wins: drop non‑code percentage discounts completely.
+          // Keep only the best non‑stackable amount as the effective amount.
+          effectivePercent = 0
+          effectiveAmount = amountValue
+
+          // Update UI flags so the winning non‑stackable amount discount
+          // is shown as applied in the discount list.
+          percentNonStackableChosen = false
+          amountNonStackableChosen = true
+          isNonStackableWinning = true
+          isStackableWinning = false
+          winningNonStackableDiscount = bestNonStackableAmountDiscount
+        } else {
+          // Percentage wins: drop all amount discounts (both stackable and non-stackable)
+          // when the winning percentage is non-stackable.
+          if (percentNonStackableChosen) {
+            effectiveAmount = 0
+          } else {
+            // If percentage is stackable, keep stackable amount discounts
+            effectiveAmount = stackableAmount
+          }
+          amountNonStackableChosen = false
+        }
+      }
+
+      // If a non-stackable percentage discount won and there were no non-stackable
+      // amount discounts to compare, we should still compare against stackable amount discounts.
+      if (percentNonStackableChosen && bestNonStackableAmount === 0 && effectiveAmount > 0) {
+        // Compare non-stackable percentage discount value against stackable amount discounts
+        const percentValue = approxNonCodePercentDiscount
+        const amountValue = effectiveAmount // This is stackableAmount at this point
+        
+        if (amountValue > percentValue) {
+          // Stackable amount discounts are better: replace the non-stackable percentage
+          effectivePercent = 0
+          effectiveAmount = amountValue
+          percentNonStackableChosen = false
+          isNonStackableWinning = false
+          isStackableWinning = true
+          winningNonStackableDiscount = null
+        } else {
+          // Non-stackable percentage is better: drop all amount discounts
+          effectiveAmount = 0
+          amountNonStackableChosen = false
+        }
       }
 
       // Now incorporate the (possibly verified) Code Discount:
-      // - If stackable: always add its percentage on top of non‑code percent.
-      // - If non‑stackable: use whichever is larger between code percent and non‑code percent.
+      // - Percentage code: behaves like existing logic (stackable/non‑stackable).
+      // - Amount code: adds to or competes with amount-based discounts.
       let isCodeDiscountApplied = false
       let isCodeDiscountWinning = false
-      if (appliedCodeDiscount && appliedCodeDiscount.percentage > 0) {
-        const codePercent = appliedCodeDiscount.percentage
-        if (appliedCodeDiscount.cannotBeStacked) {
-          // Non‑stackable: pick the better of code vs non‑code
-          if (codePercent > effectivePercent) {
-            effectivePercent = codePercent
-            isCodeDiscountApplied = true
-            isCodeDiscountWinning = true
-            // Code discount wins, so no non-code discount should show as green
-            winningNonStackableDiscount = null
-            // Update isNonStackableWinning to true since code discount is winning
-            isNonStackableWinning = true
+      if (appliedCodeDiscount && appliedCodeDiscount.discountAmount > 0) {
+        if (appliedCodeDiscount.discountUnit === 'percentage') {
+          const codePercent = appliedCodeDiscount.discountAmount
+          if (appliedCodeDiscount.cannotBeStacked) {
+            // Non‑stackable: pick the better of code vs non‑code percentage
+            if (codePercent > effectivePercent) {
+              effectivePercent = codePercent
+              isCodeDiscountApplied = true
+              isCodeDiscountWinning = true
+              // Code discount wins, so no non-code discount should show as green
+              winningNonStackableDiscount = null
+              // Update isNonStackableWinning to true since code discount is winning
+              isNonStackableWinning = true
+            } else {
+              isCodeDiscountApplied = false
+            }
           } else {
-            isCodeDiscountApplied = false
+            // Stackable code discount: if there's a non-stackable bulk discount,
+            // compare and replace if code discount is better. Otherwise, add on top.
+            if (percentNonStackableChosen) {
+              // Compare code discount against non-stackable bulk discount
+              if (codePercent > effectivePercent) {
+                // Code discount wins: replace the non-stackable bulk discount
+                // and drop all amount discounts (stackable and non-stackable)
+                effectivePercent = codePercent
+                effectiveAmount = 0
+                isCodeDiscountApplied = true
+                isCodeDiscountWinning = true
+                winningNonStackableDiscount = null
+                isNonStackableWinning = false
+                isStackableWinning = true
+                amountNonStackableChosen = false
+              } else {
+                // Non-stackable bulk discount is better: don't apply code discount
+                isCodeDiscountApplied = false
+              }
+            } else {
+              // No non-stackable bulk discount: add stackable code discount on top
+              effectivePercent += codePercent
+              isCodeDiscountApplied = true
+            }
           }
         } else {
-          // Stackable: always add on top of non‑code percent
-          effectivePercent += codePercent
-          isCodeDiscountApplied = true
+          const codeAmount = appliedCodeDiscount.discountAmount
+          if (appliedCodeDiscount.cannotBeStacked) {
+            // Non‑stackable amount code: compete with existing non‑code discounts.
+            // If one of the non‑code parts (percent or amount) is non‑stackable,
+            // compare only against that part. Only when both are stackable do we sum them.
+            let nonCodeValue = 0
+            if (percentNonStackableChosen && !amountNonStackableChosen) {
+              nonCodeValue = approxNonCodePercentDiscount
+            } else if (!percentNonStackableChosen && amountNonStackableChosen) {
+              nonCodeValue = effectiveAmount
+            } else {
+              nonCodeValue = approxNonCodePercentDiscount + effectiveAmount
+            }
+            if (codeAmount >= nonCodeValue) {
+              // Code amount wins: drop other event discounts
+              effectivePercent = 0
+              effectiveAmount = codeAmount
+              isCodeDiscountApplied = true
+              isCodeDiscountWinning = true
+              winningNonStackableDiscount = null
+              isNonStackableWinning = true
+              isStackableWinning = false
+            } else {
+              isCodeDiscountApplied = false
+            }
+          } else {
+            // Stackable amount code: if there's a non-stackable percentage discount,
+            // compare and replace if code discount is better. Otherwise, add to existing amount discounts.
+            if (percentNonStackableChosen) {
+              // Compare code discount amount against non-stackable percentage discount value
+              const percentDiscountValue = approxNonCodePercentDiscount
+              if (codeAmount >= percentDiscountValue) {
+                // Code discount wins: replace the non-stackable percentage discount
+                // and drop all amount discounts (stackable and non-stackable)
+                effectivePercent = 0
+                effectiveAmount = codeAmount
+                isCodeDiscountApplied = true
+                isCodeDiscountWinning = true
+                winningNonStackableDiscount = null
+                isNonStackableWinning = false
+                isStackableWinning = true
+                amountNonStackableChosen = false
+              } else {
+                // Non-stackable percentage discount is better: don't apply code discount
+                isCodeDiscountApplied = false
+              }
+            } else {
+              // No non-stackable percentage discount: add stackable amount code to existing amount discounts
+              effectiveAmount += codeAmount
+              isCodeDiscountApplied = true
+            }
+          }
         }
       }
 
       // Apply discount per unit and round each (matching Stripe's calculation)
       // Track discount amounts per ticket type for UI display
-      const ticketTypeDiscounts: Array<{ ticketType: string; quantity: number; discountAmount: number; perUnitDiscount: number; currency: string }> = []
+      const ticketTypeDiscounts: Array<{
+        ticketType: string
+        quantity: number
+        discountAmount: number
+        perUnitDiscount: number
+        currency: string
+      }> = []
+
+      // First apply percentage-based discounts (if any)
+      let totalAfterPercentDiscounts = totalAfterMembership
 
       if (effectivePercent > 0) {
         let sumOfRoundedPrices = 0
 
         // Apply discount to each seat individually and round
         // Group seats by ticket type for discount display
-        const seatDiscountsByType = new Map<string, { count: number; totalDiscount: number; currency: string }>()
+        const seatDiscountsByType = new Map<
+          string,
+          { count: number; totalDiscount: number; currency: string }
+        >()
 
         selectedSeatsWithTickets.forEach((item) => {
           const originalPrice = item.price
@@ -413,7 +677,11 @@ export default function EventCartCheckout({
           const ticketType = item.ticket.type
           const currency = item.ticket.currency || 'CAD'
           if (!seatDiscountsByType.has(ticketType)) {
-            seatDiscountsByType.set(ticketType, { count: 0, totalDiscount: 0, currency })
+            seatDiscountsByType.set(ticketType, {
+              count: 0,
+              totalDiscount: 0,
+              currency,
+            })
           }
           const typeData = seatDiscountsByType.get(ticketType)!
           typeData.count += 1
@@ -422,7 +690,8 @@ export default function EventCartCheckout({
 
         // Add seat discounts to ticketTypeDiscounts
         seatDiscountsByType.forEach((data, ticketType) => {
-          const perUnitDiscount = data.count > 0 ? data.totalDiscount / data.count : 0
+          const perUnitDiscount =
+            data.count > 0 ? data.totalDiscount / data.count : 0
           ticketTypeDiscounts.push({
             ticketType,
             quantity: data.count,
@@ -447,7 +716,8 @@ export default function EventCartCheckout({
           if (isSubscribed) {
             const discountPercent = item.ticket.discountMemberPercent || 0
             if (discountPercent > 0) {
-              memberDiscountedPrice = ticketPrice * (1 - discountPercent / 100)
+              memberDiscountedPrice =
+                ticketPrice * (1 - discountPercent / 100)
             }
           }
 
@@ -457,7 +727,8 @@ export default function EventCartCheckout({
 
           // Apply event discount to each unit of this ticket type and round
           for (let i = 0; i < item.quantity; i++) {
-            const discountedPrice = memberDiscountedPrice * (1 - effectivePercent / 100)
+            const discountedPrice =
+              memberDiscountedPrice * (1 - effectivePercent / 100)
             const roundedPrice = Math.round(discountedPrice * 100) / 100
             discountedTotalPrice += roundedPrice
             sumOfRoundedPrices += roundedPrice
@@ -465,7 +736,8 @@ export default function EventCartCheckout({
 
           // Track discount for this ticket type
           const ticketDiscountAmount = originalTotalPrice - discountedTotalPrice
-          const perUnitDiscount = item.quantity > 0 ? ticketDiscountAmount / item.quantity : 0
+          const perUnitDiscount =
+            item.quantity > 0 ? ticketDiscountAmount / item.quantity : 0
           ticketTypeDiscounts.push({
             ticketType: item.ticket.type,
             quantity: item.quantity,
@@ -475,9 +747,17 @@ export default function EventCartCheckout({
           })
         })
 
-        totalAfterBulk = sumOfRoundedPrices
-        bulkDiscountAmount = totalAfterMembership - totalAfterBulk
+        totalAfterPercentDiscounts = sumOfRoundedPrices
       }
+
+      // Then apply amount-based discounts on top of percentage discounts
+      const totalAfterAllEventDiscounts = Math.max(
+        0,
+        totalAfterPercentDiscounts - effectiveAmount
+      )
+
+      totalAfterBulk = totalAfterAllEventDiscounts
+      bulkDiscountAmount = totalAfterMembership - totalAfterBulk
 
       return {
         baseTotal,
@@ -487,6 +767,7 @@ export default function EventCartCheckout({
         bulkDiscountAmount,
         finalTotal: totalAfterBulk,
         effectivePercent,
+        effectiveAmount,
         isCodeDiscountApplied,
         isCodeDiscountWinning, // Track if code discount is winning (non-stackable)
         winningNonStackableDiscount, // Track which discount is actually winning
@@ -504,6 +785,7 @@ export default function EventCartCheckout({
       bulkDiscountAmount,
       finalTotal: totalAfterBulk,
       effectivePercent,
+      effectiveAmount: 0,
       isCodeDiscountApplied: false,
       isCodeDiscountWinning: false,
       winningNonStackableDiscount: null,
@@ -827,20 +1109,54 @@ export default function EventCartCheckout({
               <div className="space-y-1 text-xs text-gray-700">
                 <p>
                   <strong>{t('effective-discount')}</strong>{' '}
-                  {priceBreakdown.effectivePercent > 0
-                    ? t('percent-off-applied', { percent: priceBreakdown.effectivePercent })
-                    : t('no-discounts-applied')}
-                  {appliedCodeDiscount?.cannotBeStacked ?
-                    priceBreakdown.isCodeDiscountApplied && (
+                  {priceBreakdown.effectivePercent > 0 && priceBreakdown.effectiveAmount > 0 && (
+                    <>
+                      {t('percent-off-applied', {
+                        percent: priceBreakdown.effectivePercent,
+                      })}{' '}
+                      + ${priceBreakdown.effectiveAmount.toFixed(2)} off
+                    </>
+                  )}
+                  {priceBreakdown.effectivePercent > 0 && priceBreakdown.effectiveAmount === 0 && (
+                    <>
+                      {t('percent-off-applied', {
+                        percent: priceBreakdown.effectivePercent,
+                      })}
+                    </>
+                  )}
+                  {priceBreakdown.effectivePercent === 0 && priceBreakdown.effectiveAmount > 0 && (
+                    <>
+                      ${priceBreakdown.effectiveAmount.toFixed(2)} off
+                    </>
+                  )}
+                  {priceBreakdown.effectivePercent === 0 && priceBreakdown.effectiveAmount === 0 && (
+                    <>
+                      {t('no-discounts-applied')}
+                    </>
+                  )}
+                  {appliedCodeDiscount?.cannotBeStacked
+                    ? priceBreakdown.isCodeDiscountApplied && (
                       <span className="text-xs text-gray-700">
-                        {' '}{t('code-discount-not-stackable')}
-                      </span>
-                    ) : priceBreakdown.isCodeDiscountApplied && (
-                      <span className="text-xs text-gray-700">
-                        {' '}{t('code-discount-applied', { percent: appliedCodeDiscount?.percentage })}
+                        {' '}
+                        {t('code-discount-not-stackable')}
                       </span>
                     )
-                  }
+                    : priceBreakdown.isCodeDiscountApplied && (
+                      <span className="text-xs text-gray-700">
+                        {' '}
+                        {appliedCodeDiscount &&
+                          appliedCodeDiscount.discountUnit === 'amount'
+                          ? t('code-discount-applied-amount', {
+                            amount:
+                              appliedCodeDiscount.discountAmount.toFixed(2),
+                          })
+                          : appliedCodeDiscount
+                            ? t('code-discount-applied', {
+                              percent: appliedCodeDiscount.discountAmount,
+                            })
+                            : null}
+                      </span>
+                    )}
                 </p>
               </div>
 
@@ -860,10 +1176,11 @@ export default function EventCartCheckout({
                       </p>
                       {discountList
                         .filter((d) => d.type === 'Bulk Discount')
-                        .sort((a, b) => (a.percentage ?? 0) - (b.percentage ?? 0))
+                        .sort((a, b) => (a.discountAmount ?? 0) - (b.discountAmount ?? 0))
                         .map((discount, index) => {
                           const key = discount.id || `bulk-${index}`
-                          const percentage = discount.percentage ?? 0
+                          const amount = discount.discountAmount ?? 0
+                          const unit = discount.discountUnit ?? 'percentage'
                           const totalItemCount =
                             selectedSeatsWithTickets.length +
                             selectedTickets.reduce(
@@ -924,8 +1241,16 @@ export default function EventCartCheckout({
                                 }
                               >
                                 <strong>
-                                  {t('bulk-discount-percent-off-for-items', { percent: percentage, minQty })}
+                                  {unit === 'percentage'
+                                    ? t('bulk-discount-percent-off-for-items', {
+                                      percent: amount,
+                                      minQty,
+                                    })
+                                    : `${amount.toFixed(2)} off for minimum ${minQty} items`}
                                 </strong>
+                                {' '}({discount.cannotBeStacked
+                                  ? t('minimum-discount-non-stackable')
+                                  : t('minimum-discount-stackable')})
                                 {isActuallyApplied
                                   ? ` ${t('bulk-discount-currently-applied', { count: totalItemCount })}`
                                   : betterDiscountChosen
@@ -950,10 +1275,11 @@ export default function EventCartCheckout({
                         </p>
                         {discountList
                           .filter((d) => d.type === 'Minimum Total Discount')
-                          .sort((a, b) => (a.percentage ?? 0) - (b.percentage ?? 0))
+                          .sort((a, b) => (a.discountAmount ?? 0) - (b.discountAmount ?? 0))
                           .map((discount, index) => {
                             const key = discount.id || `minTotal-${index}`
-                            const percentage = discount.percentage ?? 0
+                            const amount = discount.discountAmount ?? 0
+                            const unit = discount.discountUnit ?? 'percentage'
                             const minTotal = discount.minTotal ?? 0
                             const cartTotal = priceBreakdown.totalAfterMembership
                             const technicallyQualifies = cartTotal >= minTotal
@@ -1005,10 +1331,12 @@ export default function EventCartCheckout({
                                   }
                                 >
                                   <strong>
-                                    {t('minimum-discount-percent-off-for-orders', {
-                                      percent: percentage,
-                                      minTotal: minTotal.toFixed(2)
-                                    })}
+                                    {unit === 'percentage'
+                                      ? t('minimum-discount-percent-off-for-orders', {
+                                        percent: amount,
+                                        minTotal: minTotal.toFixed(2),
+                                      })
+                                      : `$${amount.toFixed(2)} off for orders over ${minTotal.toFixed(2)}`}
                                   </strong>
                                   {' '}({discount.cannotBeStacked
                                     ? t('minimum-discount-non-stackable')
@@ -1114,9 +1442,17 @@ export default function EventCartCheckout({
                 {priceBreakdown.isCodeDiscountApplied ? <span>
                   {t('checkout-code-applied')}{' '}
                   <span className="font-semibold">{appliedCodeDiscount.code}</span>{' '}
-                  ({appliedCodeDiscount.percentage}% {t('checkout-off')}
+                  ({appliedCodeDiscount.discountUnit === 'amount'
+                    ? `$${appliedCodeDiscount.discountAmount.toFixed(2)} ${t('checkout-off')}`
+                    : `${appliedCodeDiscount.discountAmount}% ${t('checkout-off')}`
+                  }
                   {appliedCodeDiscount.cannotBeStacked ? `, ${t('checkout-non-stackable')}` : ''})
-                </span> : <span>{t('checkout-not-used-better-discount')}</span>}
+                </span> : <span>
+                  ({appliedCodeDiscount.discountUnit === 'amount'
+                    ? `$${appliedCodeDiscount.discountAmount.toFixed(2)} ${t('checkout-off')}`
+                    : `${appliedCodeDiscount.discountAmount}% ${t('checkout-off')}`
+                  } - {t('checkout-not-used-better-discount')})
+                </span>}
               </span>
             </div>
           )}
@@ -1148,26 +1484,77 @@ export default function EventCartCheckout({
               {/* Event Discounts (Bulk / Min Total / Code combined) */}
               {priceBreakdown.bulkDiscountAmount > 0 && (
                 <div className="flex items-center justify-between text-green-600">
-                  <span className="max-w-[150px] md:max-w-full">
-                    {t('checkout-event-discounts-with-percent', {
-                      percent: priceBreakdown.effectivePercent,
-                    })}
+                  <span className="max-w-[150px] md:max-w-[250px]">
+                    {priceBreakdown.effectivePercent > 0 &&
+                      priceBreakdown.effectiveAmount > 0 ? (
+                      <>
+                        {t('checkout-event-discounts-with-percent', {
+                          percent: priceBreakdown.effectivePercent,
+                        })}{' '}
+                        + $
+                        {priceBreakdown.effectiveAmount.toFixed(2)} off
+                      </>
+                    ) : priceBreakdown.effectivePercent > 0 ? (
+                      <>
+                        {t('checkout-event-discounts-with-percent', {
+                          percent: priceBreakdown.effectivePercent,
+                        })}
+                      </>
+                    ) : (
+                      <>
+                        Event Discounts - $
+                        {priceBreakdown.effectiveAmount.toFixed(2)} off
+                      </>
+                    )}
                   </span>
                   <span>
-                    {priceBreakdown.ticketTypeDiscounts && priceBreakdown.ticketTypeDiscounts.length > 0 ? (
-                      <span className="flex flex-wrap items-center gap-1 max-w-[150px] md:max-w-full justify-end">
-                        - (
-                        {priceBreakdown.ticketTypeDiscounts.map((discount, index) => (
-                          <span key={index} className="whitespace-nowrap">
-                            ${discount.perUnitDiscount.toFixed(2)} × {discount.quantity}
-                            {index < priceBreakdown.ticketTypeDiscounts.length - 1 && <span className="ml-1">+</span>}
+                    {priceBreakdown.ticketTypeDiscounts &&
+                      priceBreakdown.ticketTypeDiscounts.length > 0 ? (
+                      (() => {
+                        const percentPortion = priceBreakdown.ticketTypeDiscounts.reduce(
+                          (sum, d) => sum + d.discountAmount,
+                          0
+                        )
+                        const flatAmountPortion = Math.max(
+                          0,
+                          priceBreakdown.bulkDiscountAmount - percentPortion
+                        )
+                        // Round to 2 decimals to avoid floating point precision issues
+                        const roundedFlatAmount = Math.round(flatAmountPortion * 100) / 100
+
+                        return (
+                          <span className="flex flex-wrap items-center max-w-[150px] md:max-w-full justify-end">
+                            - (
+                            {priceBreakdown.ticketTypeDiscounts.map(
+                              (discount, index) => (
+                                <span key={index} className="whitespace-nowrap">
+                                  ${discount.perUnitDiscount.toFixed(2)} ×{' '}
+                                  {discount.quantity}
+                                  {index <
+                                    priceBreakdown.ticketTypeDiscounts.length -
+                                    1 && <span className="ml-1">+</span>}
+                                </span>
+                              )
+                            )}
+                            {roundedFlatAmount > 0 && priceBreakdown.effectiveAmount > 0 && (
+                              <>
+                                {priceBreakdown.ticketTypeDiscounts.length >
+                                  0 && <span className="ml-1">+</span>}
+                                <span className="whitespace-nowrap">
+                                  ${roundedFlatAmount.toFixed(2)}
+                                </span>
+                              </>
+                            )}
+                            )
                           </span>
-                        ))})
-                      </span>
+                        )
+                      })()
                     ) : (
                       <span>
-                        -{selectedSeatsWithTickets[0]?.ticket.currency || selectedTickets[0]?.ticket.currency || 'CAD'} $
-                        {priceBreakdown.bulkDiscountAmount.toFixed(2)}
+                        -{selectedSeatsWithTickets[0]?.ticket.currency ||
+                          selectedTickets[0]?.ticket.currency ||
+                          'CAD'}{' '}
+                        ${priceBreakdown.bulkDiscountAmount.toFixed(2)}
                       </span>
                     )}
                   </span>

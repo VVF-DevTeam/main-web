@@ -296,6 +296,27 @@ model Payment {
 
 }
 
+model CheckoutSessionData {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Representative guest (main contact)
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
+  
+  // Seat and ticket data
+  seatNumbers     Json?
+  ticketMetadata  Json             // Required - always present
+  otherGuestsInfo Json?            // Other guests (array)
+  
+  stripeSessionId String? @unique // Optional initially, set after session creation
+
+  @@index([stripeSessionId]) // Fast lookup in webhook
+  @@index([createdAt])       // For cleanup jobs (delete old records)
+} 
+
 model PostLikes {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())

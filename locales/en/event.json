@@ -188,7 +188,7 @@
   "checkout-discount-code-required-title": "Please enter a discount code.",
   "checkout-discount-code-required-desc": "The discount code is not valid. Please try again.",
   "checkout-code-applied": "Code applied:",
-  "checkout-not-used-better-discount": "Not used (better discount applied above)",
+  "checkout-not-used-better-discount": "Not used/better discount applied above",
   "checkout-off": "off",
   "checkout-non-stackable": "non-stackable",
   "checkout-subtotal": "Subtotal",

@@ -38,7 +38,8 @@ type DiscountType = 'Bulk Discount' | 'Minimum Total Discount' | 'Code Discount'
 interface EventDiscount {
   id: string
   type: DiscountType
-  percentage: number
+  discountAmount: number
+  discountUnit: 'percentage' | 'amount'
   minQuantity?: number // Only for Bulk Discount
   minTotal?: number // Only for Minimum Total Discount
   code?: string // Only for Code Discount
@@ -53,7 +54,8 @@ interface EventDiscountsProps {
 const eventDiscountSchema = z
   .object({
     type: z.enum(['Bulk Discount', 'Minimum Total Discount', 'Code Discount']),
-    percentage: z.coerce.number().min(0, 'Percentage must be at least 0').max(100, 'Percentage must be at most 100'),
+    discountAmount: z.coerce.number().min(0, 'Discount amount must be at least 0'),
+    discountUnit: z.enum(['percentage', 'amount']),
     minQuantity: z.coerce.number().min(1, 'Minimum quantity must be at least 1').optional().nullable(),
     minTotal: z.coerce.number().min(0, 'Minimum total must be at least 0').optional().nullable(),
     code: z.string().min(1, 'Code is required').optional().nullable(),
@@ -98,6 +100,19 @@ const eventDiscountSchema = z
       path: ['code'],
     }
   )
+  .refine(
+    (data) => {
+      // If unit is "percentage", amount must be at most 100
+      if (data.discountUnit === 'percentage') {
+        return data.discountAmount <= 100
+      }
+      return true
+    },
+    {
+      message: 'Percentage must be at most 100',
+      path: ['discountAmount'],
+    }
+  )
 
 type EventDiscountFormData = z.infer<typeof eventDiscountSchema>
 
@@ -118,7 +133,8 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
     mode: 'all',
     defaultValues: {
       type: 'Bulk Discount',
-      percentage: 0,
+      discountAmount: 0,
+      discountUnit: 'percentage',
       minQuantity: null,
       minTotal: null,
       code: null,
@@ -127,11 +143,13 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
   })
 
   const discountType = discountForm.watch('type')
+  const discountUnit = discountForm.watch('discountUnit')
 
   const resetDiscountForm = () => {
     discountForm.reset({
       type: 'Bulk Discount',
-      percentage: 0,
+      discountAmount: 0,
+      discountUnit: 'percentage',
       minQuantity: null,
       minTotal: null,
       code: null,
@@ -147,9 +165,14 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
   }
 
   const loadDiscountIntoForm = (discount: EventDiscount) => {
+    // Handle backward compatibility: if percentage exists but discountAmount doesn't, use percentage
+    const discountAmount = discount.discountAmount ?? 0
+    const discountUnit = discount.discountUnit ?? 'percentage'
+    
     discountForm.reset({
       type: discount.type,
-      percentage: discount.percentage,
+      discountAmount: discountAmount,
+      discountUnit: discountUnit,
       minQuantity: discount.minQuantity ?? null,
       minTotal: discount.minTotal ?? null,
       code: discount.code ?? null,
@@ -166,9 +189,10 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
 
       // Create discount object
       const discountData: EventDiscount = {
-        id: editingDiscountId || `${event.keyName}--${values.type.toLowerCase().replace(' ', '-')}--${values.percentage}--${Date.now()}`,
+        id: editingDiscountId || `${event.keyName}--${values.type.toLowerCase().replace(' ', '-')}--${values.discountAmount}--${Date.now()}`,
         type: values.type,
-        percentage: values.percentage,
+        discountAmount: values.discountAmount,
+        discountUnit: values.discountUnit,
         minQuantity: values.type === 'Bulk Discount' ? values.minQuantity ?? undefined : undefined,
         minTotal: values.type === 'Minimum Total Discount' ? values.minTotal ?? undefined : undefined,
         code: values.type === 'Code Discount' ? values.code ?? undefined : undefined,
@@ -384,7 +408,12 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                 >
                   <div className="flex flex-col gap-y-1">
                     <div className="font-semibold">
-                      {discount.type} - {discount.percentage}% off
+                      {discount.type} - {(() => {
+                        // Handle backward compatibility
+                        const amount = discount.discountAmount ?? 0
+                        const unit = discount.discountUnit ?? 'percentage'
+                        return unit === 'percentage' ? `${amount}% off` : `$${amount} off`
+                      })()}
                       {discount.type === 'Bulk Discount' && discount.minQuantity && (
                         <span className="text-sm font-normal text-muted-foreground">
                           {' '}
@@ -489,20 +518,46 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                       )}
                     />
 
-                    {/* Percentage */}
+                    {/* Discount Unit */}
                     <FormField
                       control={discountForm.control}
-                      name="percentage"
+                      name="discountUnit"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Discount Percentage</FormLabel>
+                          <FormLabel>Discount Unit</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="border border-gray-300">
+                                <SelectValue placeholder="Select discount unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="percentage">Percentage (%)</SelectItem>
+                              <SelectItem value="amount">Amount ($)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Discount Amount */}
+                    <FormField
+                      control={discountForm.control}
+                      name="discountAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Discount</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               step="0.01"
                               min="0"
-                              max="100"
-                              placeholder="eg: 10"
+                              max={discountUnit === 'percentage' ? '100' : undefined}
+                              placeholder={discountUnit === 'percentage' ? 'eg: 10' : 'eg: 5.00'}
                               {...field}
                             />
                           </FormControl>

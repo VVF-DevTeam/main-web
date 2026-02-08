@@ -398,38 +398,100 @@ export async function POST(req: NextRequest) {
       paymentId = ''
     }
 
-    // Get customer email from checkout session if available
+    // Get customer email from checkout session if available (for backward compatibility fallback)
     let customerEmail: string | null = null
     if (event.type === 'checkout.session.completed') {
       const session = paymentData as Stripe.Checkout.Session
       customerEmail = session.customer_email || null
     }
     
-    // Handle guest information - guestEmail/mainEmail will always exist
-    // Get guestEmail from metadata or fallback to customerEmail from checkout session
-    const guestEmail = metadata?.guestEmail || customerEmail || ''
-    
-    // Check guestName - if not exists, log error and use default
+    // Fetch checkout session data from database if checkoutDataId exists
+    let checkoutSessionData: {
+      guestName: string | null
+      guestEmail: string | null
+      guestPhone: string | null
+      seatNumbers: string[] | null
+      ticketMetadata: Array<{
+        ticketId: string
+        seatNumbers: string[]
+        quantity?: number
+      }>
+      otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null
+    } | null = null
+
+    if (metadata?.checkoutDataId) {
+      try {
+        const data = await prisma.checkoutSessionData.findUnique({
+          where: { id: metadata.checkoutDataId },
+          select: {
+            guestName: true,
+            guestEmail: true,
+            guestPhone: true,
+            seatNumbers: true,
+            ticketMetadata: true,
+            otherGuestsInfo: true,
+          },
+        })
+        if (data) {
+          checkoutSessionData = {
+            guestName: data.guestName,
+            guestEmail: data.guestEmail,
+            guestPhone: data.guestPhone,
+            seatNumbers: data.seatNumbers as string[] | null,
+            ticketMetadata: data.ticketMetadata as Array<{
+              ticketId: string
+              seatNumbers: string[]
+              quantity?: number
+            }>,
+            otherGuestsInfo: data.otherGuestsInfo as Array<{ name: string; email: string; phone: string }> | null,
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching CheckoutSessionData:', e)
+      }
+    }
+
+    // Handle guest information - use database data if available, otherwise fallback to metadata (backward compatibility)
     let guestName: string | null = null
-    if (!metadata?.guestName || metadata.guestName.trim() === '') {
-      console.error('[WEBHOOK_ERROR] guestName is required but not found in metadata. Using default: "Unknown User Name"')
-      guestName = 'Unknown User Name'
-    } else {
+    if (checkoutSessionData?.guestName) {
+      // Use data from database (new method)
+      guestName = checkoutSessionData.guestName
+    } else if (metadata?.guestName && metadata.guestName.trim() !== '') {
+      // Fallback to metadata (backward compatibility)
       guestName = metadata.guestName
-    }
-    
-    // Check guestPhone - if not exists, log error and use null
-    let guestPhone: string | null = null
-    if (!metadata?.guestPhone || metadata.guestPhone.trim() === '') {
-      console.error('[WEBHOOK_ERROR] guestPhone is required but not found in metadata. Using null.')
-      guestPhone = null
     } else {
-      guestPhone = metadata.guestPhone
+      console.error('[WEBHOOK_ERROR] guestName is required but not found in CheckoutSessionData or metadata. Using default: "Unknown User Name"')
+      guestName = 'Unknown User Name'
     }
-    
-    // Parse otherGuestsInfo from metadata if available
+
+    let guestEmail: string = ''
+    if (checkoutSessionData?.guestEmail) {
+      // Use data from database (new method)
+      guestEmail = checkoutSessionData.guestEmail
+    } else {
+      // Fallback to metadata or customerEmail from checkout session (backward compatibility)
+      guestEmail = metadata?.guestEmail || customerEmail || ''
+    }
+
+    let guestPhone: string | null = null
+    if (checkoutSessionData?.guestPhone) {
+      // Use data from database (new method)
+      guestPhone = checkoutSessionData.guestPhone
+    } else if (metadata?.guestPhone && metadata.guestPhone.trim() !== '') {
+      // Fallback to metadata (backward compatibility)
+      guestPhone = metadata.guestPhone
+    } else {
+      console.error('[WEBHOOK_ERROR] guestPhone is required but not found in CheckoutSessionData or metadata. Using null.')
+      guestPhone = null
+    }
+
+    // Parse otherGuestsInfo from database if available, otherwise from metadata (backward compatibility)
     let otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null = null
-    if (metadata?.otherGuestsInfo) {
+    if (checkoutSessionData?.otherGuestsInfo) {
+      // Use data from database (new method)
+      otherGuestsInfo = checkoutSessionData.otherGuestsInfo
+    } else if (metadata?.otherGuestsInfo) {
+      // Fallback to metadata parsing (backward compatibility)
       try {
         otherGuestsInfo = JSON.parse(metadata.otherGuestsInfo as string) as Array<{ name: string; email: string; phone: string }>
       } catch (e) {
@@ -452,7 +514,11 @@ export async function POST(req: NextRequest) {
         quantity?: number // For non-seated tickets when seatNumbers is empty
       }> | null = null
 
-      if (metadata.ticketMetadata) {
+      if (checkoutSessionData?.ticketMetadata) {
+        // Use data from database (new method)
+        ticketMetadata = checkoutSessionData.ticketMetadata
+      } else if (metadata.ticketMetadata) {
+        // Fallback to metadata parsing (backward compatibility)
         try {
           ticketMetadata = JSON.parse(
             metadata.ticketMetadata as string
@@ -668,13 +734,16 @@ export async function POST(req: NextRequest) {
             }
 
             // update event seatingMap - handle both single and multiple seats
-            // Get seat numbers from ticketMetadata if available, otherwise from metadata
+            // Get seat numbers from ticketMetadata if available, otherwise from checkoutSessionData or metadata
             const seatNumbersToUpdate: string[] = []
             if (ticketMetadata && ticketMetadata.length > 0) {
               // Use seat numbers from ticketMetadata (multi-ticket checkout)
               ticketMetadata.forEach((ticketInfo) => {
                 seatNumbersToUpdate.push(...ticketInfo.seatNumbers)
               })
+            } else if (checkoutSessionData?.seatNumbers && checkoutSessionData.seatNumbers.length > 0) {
+              // Use seat numbers from database (new method)
+              seatNumbersToUpdate.push(...checkoutSessionData.seatNumbers)
             } else if (metadata.seatNumbers) {
               // Multiple seats (backward compatibility)
               try {

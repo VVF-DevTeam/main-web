@@ -191,7 +191,7 @@
   "checkout-discount-code-required-title": "Vui lòng nhập mã giảm giá.",
   "checkout-discount-code-required-desc": "Mã giảm giá không hợp lệ. Vui lòng thử lại.",
   "checkout-code-applied": "Đã áp dụng mã:",
-  "checkout-not-used-better-discount": "Không dùng (đã áp dụng giảm giá tốt hơn ở phía trên)",
+  "checkout-not-used-better-discount": "Không dùng/đã áp dụng giảm giá tốt hơn ở phía trên",
   "checkout-off": "giảm",
   "checkout-non-stackable": "không thể stack",
   "checkout-subtotal": "Tạm tính",

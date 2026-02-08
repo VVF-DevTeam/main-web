@@ -191,7 +191,7 @@
   "checkout-discount-code-required-title": "Veuillez saisir un code promo.",
   "checkout-discount-code-required-desc": "Le code promo n'est pas valide. Veuillez réessayer.",
   "checkout-code-applied": "Code appliqué :",
-  "checkout-not-used-better-discount": "Non utilisé (une meilleure réduction est appliquée ci-dessus)",
+  "checkout-not-used-better-discount": "Non utilisé/une meilleure réduction est appliquée ci-dessus",
   "checkout-off": "de réduction",
   "checkout-non-stackable": "non cumulable",
   "checkout-subtotal": "Sous-total",

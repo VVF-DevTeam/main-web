@@ -4,6 +4,10 @@ import { prisma } from '@/lib/db'
 
 type EventCodeDiscount = {
   code?: string | null
+  // New format
+  discountAmount?: number | null
+  discountUnit?: 'percentage' | 'amount' | null
+  // Legacy field for backward compatibility
   percentage?: number | null
   cannotBeStacked?: boolean | null
   type?: string
@@ -13,7 +17,8 @@ export type VerifiedEventCodeDiscount =
   | {
       valid: true
       code: string
-      percentage: number
+      discountAmount: number
+      discountUnit: 'percentage' | 'amount'
       cannotBeStacked: boolean
     }
   | {
@@ -47,15 +52,31 @@ export async function verifyEventDiscountCode(params: {
 
   if (!match) return { valid: false, reason: 'Invalid code' }
 
-  const percentage = Number(match.percentage ?? 0)
-  if (!Number.isFinite(percentage) || percentage <= 0) {
+  // Support new JSON format (discountAmount + discountUnit) with
+  // backward compatibility for legacy `percentage` field.
+  const rawAmount =
+    match.discountAmount !== undefined && match.discountAmount !== null
+      ? match.discountAmount
+      : match.percentage ?? 0
+
+  const unit = (match.discountUnit ?? 'percentage') as
+    | 'percentage'
+    | 'amount'
+
+  if (unit !== 'percentage' && unit !== 'amount') {
+    return { valid: false, reason: 'Invalid code' }
+  }
+
+  const discountAmount = Number(rawAmount ?? 0)
+  if (!Number.isFinite(discountAmount) || discountAmount <= 0) {
     return { valid: false, reason: 'Invalid code' }
   }
 
   return {
     valid: true,
     code,
-    percentage,
+    discountAmount,
+    discountUnit: unit,
     cannotBeStacked: Boolean(match.cannotBeStacked),
   }
 }
