@@ -932,6 +932,19 @@ export async function POST(req: NextRequest) {
       // Revalidate payment cache after creating new payment
       revalidateTag('payments')
 
+      // Update CheckoutSessionData status to COMPLETED
+      if (metadata?.checkoutDataId) {
+        try {
+          await prisma.checkoutSessionData.update({
+            where: { id: metadata.checkoutDataId },
+            data: { status: 'COMPLETED' },
+          })
+        } catch (e) {
+          // Log error but don't fail webhook if status update fails
+          console.error('[WEBHOOK_ERROR] Failed to update CheckoutSessionData status:', e)
+        }
+      }
+
       // add role member to user
       if (metadata.type === 'Membership') {
         await prisma.user.update({

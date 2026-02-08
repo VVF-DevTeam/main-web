@@ -301,6 +301,9 @@ model CheckoutSessionData {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
+  // Transaction status
+  status          CheckoutSessionStatus @default(PENDING)
+  
   // Representative guest (main contact)
   guestName       String?
   guestEmail      String?
@@ -315,6 +318,7 @@ model CheckoutSessionData {
 
   @@index([stripeSessionId]) // Fast lookup in webhook
   @@index([createdAt])       // For cleanup jobs (delete old records)
+  @@index([status])          // For querying by status (cleanup, analytics)
 } 
 
 model PostLikes {
@@ -441,4 +445,11 @@ enum SponsorTier {
   Gold
   Silver
   Bronze
+}
+
+enum CheckoutSessionStatus {
+  PENDING      // Session created, awaiting payment
+  COMPLETED    // Payment successful, webhook processed
+  EXPIRED      // Session expired (Stripe session expired)
+  CANCELLED    // User cancelled the checkout
 }
