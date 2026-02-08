@@ -1451,7 +1451,7 @@ export default function EventCartCheckout({
                   ({appliedCodeDiscount.discountUnit === 'amount'
                     ? `$${appliedCodeDiscount.discountAmount.toFixed(2)} ${t('checkout-off')}`
                     : `${appliedCodeDiscount.discountAmount}% ${t('checkout-off')}`
-                  } - {t('checkout-not-used-better-discount')})
+                  }, {appliedCodeDiscount.cannotBeStacked ? t('checkout-non-stackable') : ''} - {t('checkout-not-used-better-discount')})
                 </span>}
               </span>
             </div>

@@ -143,7 +143,7 @@
   "goToCheckout": "Go to Checkout",
   "total": "Total",
   "each": "per person/each session",
-  "headerSponsors": "Sponsored By",
+  "headerSponsors": "Sponsors and Partners",
   "member-price-applied": "Member price applied: ${{price}}",
   "member-price": "Member price: ${{price}}",
   "spots-available": "{{count}} spots available",

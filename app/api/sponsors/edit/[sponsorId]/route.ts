@@ -29,6 +29,7 @@ export const PUT = async (
         imgUrl: values.imgUrl,
         description: values.description,
         displayName: values.displayName,
+        isPartner: values.isPartner ?? false,
         url: values.url,
         events: {
           deleteMany: {},
@@ -43,6 +44,7 @@ export const PUT = async (
 
     // Revalidate event sponsors cache
     revalidateTag('event-sponsors')
+    revalidateTag('events')
 
     return NextResponse.json(updated)
   } catch (error) {

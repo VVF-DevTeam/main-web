@@ -329,6 +329,16 @@ This document provides a comprehensive overview of all functions using `unstable
     - Line: 44
     - Action: When a job's eventId is changed (linking/unlinking from an event), this triggers event cache revalidation. This is necessary because event queries include linked jobs, and the volunteer section visibility depends on this data.
 
+16. **`app/api/sponsors/create/route.ts`**
+    - Function: `POST`
+    - Line: 31
+    - Action: Creates a new event sponsor with event associations. Sponsors are included in cached event queries (e.g., `getEventByKeyName` includes sponsors), so changes must invalidate the cache.
+
+17. **`app/api/sponsors/edit/[sponsorId]/route.ts`**
+    - Function: `PUT`
+    - Line: 47
+    - Action: Updates an existing event sponsor (including event associations and isPartner field). Sponsors are included in cached event queries (e.g., `getEventByKeyName` includes sponsors), so changes must invalidate the cache.
+
 ---
 
 ### Tag: `'reviews'`
@@ -434,13 +444,15 @@ This document provides a comprehensive overview of all functions using `unstable
 
 1. **`app/api/sponsors/create/route.ts`**
    - Function: `POST`
-   - Line: After sponsor creation
+   - Line: 30-31
    - Action: Creates a new event sponsor
+   - Also calls: `revalidateTag('events')` - Sponsors are included in cached event queries, so changes must invalidate the events cache as well
 
 2. **`app/api/sponsors/edit/[sponsorId]/route.ts`**
    - Function: `PUT`
-   - Line: After sponsor update
-   - Action: Updates an existing event sponsor (including event associations)
+   - Line: 46
+   - Action: Updates an existing event sponsor (including event associations and isPartner field)
+   - Also calls: `revalidateTag('events')` - Sponsors are included in cached event queries, so changes must invalidate the events cache as well
 
 ---
 
@@ -566,7 +578,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 12 functions | 14 API routes | ✅ Fully covered |
+| `events` | 12 functions | 17 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 3 functions | 5 API routes | ✅ Fully covered |
 | `series` | 2 functions | 2 API routes | ✅ Fully covered |
@@ -609,6 +621,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating or updating series, always call `revalidateTag('series')`
 - When creating or updating event categories, always call `revalidateTag('event-categories')`
 - When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
+- **Additionally**, when creating or updating event sponsors (creating/editing sponsor associations or isPartner field), also call `revalidateTag('events')` since sponsors are included in cached event queries
 - When creating, updating, or deleting users, or changing user roles, call `revalidateTag('users')`
 - When creating, updating, publishing, unpublishing, or deleting jobs, always call `revalidateTag('jobs')`
 - **Additionally**, call `revalidateTag('events')` when changing a job's eventId (linking/unlinking from event), as events include linked jobs and use this to display volunteer sections

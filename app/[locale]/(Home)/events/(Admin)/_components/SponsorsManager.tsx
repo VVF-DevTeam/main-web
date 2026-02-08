@@ -52,6 +52,7 @@ const SponsorsManager = ({
   const [imgUrl, setImgUrl] = useState('')
   const [description, setDescription] = useState('')
   const [displayName, setDisplayName] = useState(false)
+  const [isPartner, setIsPartner] = useState(false)
   const [selectedEventTiers, setSelectedEventTiers] = useState<
     Record<string, { tier: SponsorTier; order: number }>
   >({})
@@ -65,6 +66,7 @@ const SponsorsManager = ({
     setImgUrl('')
     setDescription('')
     setDisplayName(false)
+    setIsPartner(false)
     setSelectedEventTiers({})
     setUrl('')
   }
@@ -76,6 +78,7 @@ const SponsorsManager = ({
     setUrl(sponsor.url ?? '')
     setDescription(sponsor.description ?? '')
     setDisplayName(sponsor.displayName)
+    setIsPartner(sponsor.isPartner)
 
     // Build the selectedEventTiers object from sponsor.events
     const eventTiers: Record<string, { tier: SponsorTier; order: number }> = {}
@@ -149,6 +152,7 @@ const SponsorsManager = ({
       url: url || null,
       description: description || null,
       displayName,
+      isPartner,
       events: selectedEvents.map(([eventId, data]) => ({
         eventId,
         tier: data.tier,
@@ -250,7 +254,7 @@ const SponsorsManager = ({
       {isSubmitting && <Loader />}
       <div className="mt-8 flex flex-col gap-10">
         <h1 className="mb-4 text-center text-2xl font-semibold md:text-3xl lg:text-4xl">
-          Manage Sponsors
+          Manage Sponsors/Partners
         </h1>
 
       {/* Sponsors list and form */}
@@ -258,10 +262,10 @@ const SponsorsManager = ({
         {/* Left side: Sponsors list */}
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">All Sponsors</h2>
+            <h2 className="text-lg font-semibold">All Sponsors/Partners</h2>
             <Button size="sm" onClick={resetForm} className="gap-2" disabled={isSubmitting}>
               <Plus className="h-4 w-4" />
-              New Sponsor
+              New
             </Button>
           </div>
 
@@ -333,7 +337,7 @@ const SponsorsManager = ({
         <div className="flex-1 rounded-xl bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">
-              {editingSponsor ? 'Edit Sponsor' : 'Add New Sponsor'}
+              {editingSponsor ? 'Edit Sponsor/Partner' : 'Add New Sponsor/Partner'}
             </h2>
             {editingSponsor && (
               <Button size="sm" variant="ghost" onClick={resetForm} disabled={isSubmitting}>
@@ -350,7 +354,7 @@ const SponsorsManager = ({
                 htmlFor="sponsorName"
                 className="mb-1 block text-sm font-medium"
               >
-                Sponsor Name <span className="text-red-500">*</span>
+                Sponsor/Partner Name <span className="text-red-500">*</span>
               </label>
               <Input
                 id="sponsorName"
@@ -376,6 +380,24 @@ const SponsorsManager = ({
                 className="cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Display sponsor name on event page
+              </label>
+            </div>
+
+            {/* Is Partner toggle */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isPartner"
+                checked={isPartner}
+                onCheckedChange={(checked) =>
+                  setIsPartner(checked as boolean)
+                }
+                disabled={isSubmitting}
+              />
+              <label
+                htmlFor="isPartner"
+                className="cursor-pointer text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Mark as Partner
               </label>
             </div>
 

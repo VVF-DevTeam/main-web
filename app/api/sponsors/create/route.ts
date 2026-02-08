@@ -14,6 +14,7 @@ export const POST = async (request: Request) => {
         imgUrl: values.imgUrl,
         description: values.description,
         displayName: values.displayName,
+        isPartner: values.isPartner ?? false,
         url: values.url,
         events: {
           create: values.events.map((event: { eventId: string; tier: SponsorTier; order: number }) => ({
@@ -27,6 +28,7 @@ export const POST = async (request: Request) => {
 
     // Revalidate event sponsors cache
     revalidateTag('event-sponsors')
+    revalidateTag('events')
 
     return NextResponse.json(created)
   } catch (error) {

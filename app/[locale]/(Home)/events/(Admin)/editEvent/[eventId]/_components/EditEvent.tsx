@@ -329,11 +329,11 @@ export default function EditEvent({
           {/* Event Sponsors */}
           <div className="flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step XXI :</span> Event Sponsors
+              <span className="text-gray-500">Step XXI :</span> Event Sponsors/Partners
               (Optional)
             </h2>
             <p>
-              Please use this link to manage sponsors:{' '}
+              Please use this link to manage sponsors/partners:{' '}
               <Link
                 href={sponsorsLink || defaultSponsorsLink}
                 target="_blank"

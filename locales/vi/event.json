@@ -146,7 +146,7 @@
   "goToCheckout": "Đến thanh toán",
   "total": "Tổng",
   "each": "cho mỗi người/mỗi buổi",
-  "headerSponsors": "Được tài trợ bởi",
+  "headerSponsors": "Các nhà tài trợ và đối tác",
   "member-price-applied": "Giá thành viên đã áp dụng: ${{price}}",
   "member-price": "Giá thành viên: ${{price}}",
   "spots-available": "{{count}} chỗ còn lại",

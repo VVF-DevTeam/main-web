@@ -68,25 +68,29 @@ const SponsorsList = ({ sponsors, headerText }: SponsorsListProps) => {
                         height={150}
                         className="transition-transform duration-200 group-hover:scale-110"
                       />
-                      {/* Tier Badge - Bottom Left Corner (Outside) */}
-                      <div
-                        className="absolute -bottom-3 -left-6 h-10 w-10 overflow-hidden rounded-full"
-                        title={`${item.tier} Sponsor`}
-                      >
-                        <Image
-                          src={getTierImageUrl(item.tier)}
-                          alt={`${item.tier} tier`}
-                          width={48}
-                          height={48}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
+                      {/* Tier Badge - Bottom Left Corner (Outside) - Only show if not a partner */}
+                      {!item.sponsor.isPartner && (
+                        <div
+                          className="absolute -bottom-3 -left-6 h-10 w-10 overflow-hidden rounded-full"
+                          title={`${item.tier} Sponsor`}
+                        >
+                          <Image
+                            src={getTierImageUrl(item.tier)}
+                            alt={`${item.tier} tier`}
+                            width={48}
+                            height={48}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      )}
                     </div>
                     <span className="text-center text-sm font-medium">
                       {item.sponsor.displayName && (
                         <span>{item.sponsor.name} - </span>
                       )}
-                      <span>{item.tier} Sponsor</span>
+                      <span>
+                        {item.sponsor.isPartner ? 'Partner' : `${item.tier} Sponsor`}
+                      </span>
                     </span>
                   </div>
                 </TooltipTrigger>

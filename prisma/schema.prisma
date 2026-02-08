@@ -79,6 +79,7 @@ model EventSponsor {
   url         String?    
   description String?
   events      SponsorOnEvent[]
+  isPartner   Boolean           @default(false)
 }
 
 model SponsorOnEvent {
