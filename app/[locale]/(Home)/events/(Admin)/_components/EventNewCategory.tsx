@@ -46,32 +46,16 @@ const EventNewCategory = ({
   const [categoryType, setCategoryType] = useState(initialType || '')
   const [isItalic, setIsItalic] = useState(initialIsItalic || false)
   const [isBold, setIsBold] = useState(initialIsBold || false)
+  // Initialize with proper defaults - useColor expects a valid hex string
   const [bgcolor, setBgColor] = useColor(initialBgColor || '#ffffff')
   const [titleColor, setTitleColor] = useColor(initialTextColor || '#1A1A1A')
   const [isLoading, setIsLoading] = useState(false)
 
   const router = useRouter()
 
-  // Helper function to normalize hex color (ensure it's #RRGGBB format)
-  const normalizeHex = (hex: string): string => {
-    if (!hex) return '#ffffff'
-    // Remove # if present
-    hex = hex.replace('#', '')
-    // If it's 3 characters, expand to 6
-    if (hex.length === 3) {
-      hex = hex.split('').map(char => char + char).join('')
-    }
-    // Ensure it's 6 characters
-    if (hex.length !== 6) {
-      return '#ffffff'
-    }
-    return `#${hex.toLowerCase()}`
-  }
-
   // Helper function to convert hex to rgb
   const hexToRgb = (hex: string) => {
-    const normalizedHex = normalizeHex(hex)
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(normalizedHex)
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
       ? {
           r: parseInt(result[1], 16),
@@ -96,17 +80,18 @@ const EventNewCategory = ({
       setCategoryType(initialType || '')
       setIsItalic(initialIsItalic || false)
       setIsBold(initialIsBold || false)
+      // Ensure hex values are clean strings (no undefined, properly formatted)
+      // This fixes the production issue where ColorPicker shows "hexundefined"
       if (initialBgColor) {
-        const normalizedBgHex = normalizeHex(initialBgColor)
-        // Ensure hex is a clean string without any undefined values
-        const cleanHex = String(normalizedBgHex || '#ffffff').replace(/undefined/gi, '')
-        setBgColor({ hex: cleanHex, rgb: hexToRgb(cleanHex), hsv: hexToHsv(cleanHex) })
+        const cleanHex = String(initialBgColor).trim().replace(/undefined/gi, '').replace(/^#?/, '#')
+        // Ensure it's a valid 6-digit hex
+        const normalizedHex = cleanHex.length === 4 ? `#${cleanHex[1]}${cleanHex[1]}${cleanHex[2]}${cleanHex[2]}${cleanHex[3]}${cleanHex[3]}` : cleanHex.length === 7 ? cleanHex : '#ffffff'
+        setBgColor({ hex: normalizedHex, rgb: hexToRgb(normalizedHex), hsv: hexToHsv(normalizedHex) })
       }
       if (initialTextColor) {
-        const normalizedTextHex = normalizeHex(initialTextColor)
-        // Ensure hex is a clean string without any undefined values
-        const cleanHex = String(normalizedTextHex || '#1A1A1A').replace(/undefined/gi, '')
-        setTitleColor({ hex: cleanHex, rgb: hexToRgb(cleanHex), hsv: hexToHsv(cleanHex) })
+        const cleanHex = String(initialTextColor).trim().replace(/undefined/gi, '').replace(/^#?/, '#')
+        const normalizedHex = cleanHex.length === 4 ? `#${cleanHex[1]}${cleanHex[1]}${cleanHex[2]}${cleanHex[2]}${cleanHex[3]}${cleanHex[3]}` : cleanHex.length === 7 ? cleanHex : '#1A1A1A'
+        setTitleColor({ hex: normalizedHex, rgb: hexToRgb(normalizedHex), hsv: hexToHsv(normalizedHex) })
       }
     }
   }, [categoryId, initialTitle, initialType, initialIsItalic, initialIsBold, initialBgColor, initialTextColor, setBgColor, setTitleColor])
@@ -228,7 +213,7 @@ const EventNewCategory = ({
         <ColorPicker
           key={`bg-${categoryId || 'new'}-${initialBgColor || '#ffffff'}`}
           height={130}
-          color={bgcolor}
+          color={bgcolor?.hex ? bgcolor : { hex: '#ffffff', rgb: { r: 255, g: 255, b: 255, a: 1 }, hsv: { h: 0, s: 0, v: 100, a: 1 } }}
           hideInput={['rgb', 'hsv']}
           onChange={setBgColor}
           disabled={isLoading}
@@ -245,7 +230,7 @@ const EventNewCategory = ({
         <ColorPicker
           key={`text-${categoryId || 'new'}-${initialTextColor || '#1A1A1A'}`}
           height={130}
-          color={titleColor}
+          color={titleColor?.hex ? titleColor : { hex: '#1A1A1A', rgb: { r: 26, g: 26, b: 26, a: 1 }, hsv: { h: 0, s: 0, v: 10, a: 1 } }}
           hideInput={['rgb', 'hsv']}
           onChange={setTitleColor}
           disabled={isLoading}
