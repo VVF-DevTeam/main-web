@@ -11,6 +11,8 @@ axiosInstance.interceptors.request.use(
   function (config) {
     if (config.method === 'get') {
       // For all get requests, add the secret token to the headers to prevent unauthorized access to the GET APIs
+      // Axios get functions are intended for mobile apps only, not for website
+      // On website, DO NOT call 'get' as it will compromise SECRET_TRUST_CLIENT
       const secretToken = createSecretToken()
       config.headers.set('secret', secretToken)
     }
