@@ -496,7 +496,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   const options: { id: OptionType; label: string }[] = [
     // No quick check out option for Concert
     { id: 'checkout', label: 'normal-checkout' },
-    { id: 'etransfer', label: 'E-transfer' },
+    // { id: 'etransfer', label: 'E-transfer' },
   ]
 
   const seatLegendItems = useMemo(
@@ -633,7 +633,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               />
             )}
 
-            {selected === 'etransfer' && (
+            {/* {selected === 'etransfer' && (
               <div className="rounded border bg-white p-4 text-sm leading-relaxed dark:bg-gray-800">
                 <p className="mb-2 font-semibold">
                   {t('etransfer-description')}
@@ -671,12 +671,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   <li>
                     {t('etransfer-description-2')}
                   </li>
-                </ul>
+                </ul> */}
                 {/* <p className="pt-2 text-xs italic">
                   *{t('etransfer-description-7')}
                 </p> */}
-              </div>
-            )}
+              {/* </div>
+            )} */}
           </motion.div>
         )}
       </AnimatePresence>
