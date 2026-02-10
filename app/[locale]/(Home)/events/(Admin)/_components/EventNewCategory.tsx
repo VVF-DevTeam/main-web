@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ColorPicker, useColor } from 'react-color-palette'
+import { ColorPicker, useColor, IColor } from 'react-color-palette'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -52,6 +52,12 @@ const EventNewCategory = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const router = useRouter()
+
+  // Sanitize hex coming from ColorPicker (prod bug can append "undefined")
+  const sanitizeColor = (color: IColor): IColor => {
+    const cleanHex = color.hex.replace(/undefined$/i, '')
+    return { ...color, hex: cleanHex }
+  }
 
   // Helper function to convert hex to rgb
   const hexToRgb = (hex: string) => {
@@ -215,7 +221,7 @@ const EventNewCategory = ({
           height={130}
           color={bgcolor?.hex ? bgcolor : { hex: '#ffffff', rgb: { r: 255, g: 255, b: 255, a: 1 }, hsv: { h: 0, s: 0, v: 100, a: 1 } }}
           hideInput={['rgb', 'hsv']}
-          onChange={setBgColor}
+          onChange={(color) => setBgColor(sanitizeColor(color))}
           disabled={isLoading}
         />
       </div>
@@ -232,7 +238,7 @@ const EventNewCategory = ({
           height={130}
           color={titleColor?.hex ? titleColor : { hex: '#1A1A1A', rgb: { r: 26, g: 26, b: 26, a: 1 }, hsv: { h: 0, s: 0, v: 10, a: 1 } }}
           hideInput={['rgb', 'hsv']}
-          onChange={setTitleColor}
+          onChange={(color) => setTitleColor(sanitizeColor(color))}
           disabled={isLoading}
         />
       </div>
