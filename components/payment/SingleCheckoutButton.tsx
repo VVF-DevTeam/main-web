@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { toast } from 'sonner'
 import Loader from '@/components/loader/Loader'
@@ -10,15 +10,9 @@ import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { ArrowRight } from 'lucide-react'
 import { PaymentType } from '@prisma/client'
-import GuestInfoForm, { GuestInfo } from './GuestInfoForm'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import Link from 'next/link'
+import { FormResponses } from './PaymentInfoForm'
+import { EventCheckoutDialog } from './EventCheckoutDialog'
+import { getEventForm, EventFormData } from '@/lib/actions/event/getEventForm'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -57,10 +51,43 @@ export default function SingleCheckoutButton({
 }: SingleCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
-  const [showGuestForm, setShowGuestForm] = useState(false)
+  const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [eventFormData, setEventFormData] = useState<EventFormData | null>(null)
+  const [guestInfo, setGuestInfo] = useState<{
+    guestName: string
+    guestEmail: string
+    guestPhone: string
+    otherGuests: Array<{ name: string; email: string; phone: string }>
+  } | null>(null)
 
-  const handleCheckout = async (priceId: string, guestInfo?: GuestInfo) => {
+  // Fetch event form data if eventId is provided
+  useEffect(() => {
+    const fetchEventForm = async () => {
+      if (!eventId) return
+
+      try {
+        const formData = await getEventForm(eventId)
+        setEventFormData(formData)
+      } catch (error) {
+        console.error('Error fetching event form:', error)
+        setEventFormData(null)
+      }
+    }
+
+    fetchEventForm()
+  }, [eventId])
+
+  const handleCheckout = async (
+    priceId: string,
+    guestInfo: {
+      guestName: string
+      guestEmail: string
+      guestPhone: string
+      otherGuests: Array<{ name: string; email: string; phone: string }>
+    },
+    formResponses?: FormResponses
+  ) => {
     const stripe = await stripePromise
 
     try {
@@ -75,16 +102,14 @@ export default function SingleCheckoutButton({
           eventId: eventId,
           type: type,
           numberSession: numberSession,
-          email: guestInfo?.email || email,
+          email: guestInfo.guestEmail || email,
           seatNumber: seatNumber,
           eventTicketId: eventTicketId,
-          // Guest information - always send if provided from form
-          // For logged-in users, this allows them to review/confirm their info
-          // For guest users, this is required information
-          ...(guestInfo && {
-            guestName: guestInfo.name,
-            guestPhone: guestInfo.phone,
-          }),
+          // Guest information
+          guestName: guestInfo.guestName,
+          guestPhone: guestInfo.guestPhone,
+          // Event form responses
+          ...(formResponses && { formResponses }),
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })
@@ -129,13 +154,31 @@ export default function SingleCheckoutButton({
   }
 
   const handleButtonClick = () => {
-    // Always show guest form so users can review their information
-    setShowGuestForm(true)
+    // Show checkout dialog
+    setShowCheckoutDialog(true)
   }
 
-  const handleGuestFormSubmit = (info: GuestInfo) => {
-    setShowGuestForm(false)
-    handleCheckout(stripePriceId, info)
+  const handleGuestFormSubmit = (guestInfo: {
+    guestName: string
+    guestEmail: string
+    guestPhone: string
+    otherGuests: Array<{ name: string; email: string; phone: string }>
+  }) => {
+    // Save guest info
+    setGuestInfo(guestInfo)
+
+    // If there's no event form, proceed directly to checkout
+    if (!eventFormData || !eventFormData.questions || eventFormData.questions.length === 0) {
+      setShowCheckoutDialog(false)
+      handleCheckout(stripePriceId, guestInfo)
+    }
+  }
+
+  const handleEventFormSubmit = (formResponses: FormResponses) => {
+    setShowCheckoutDialog(false)
+    if (guestInfo) {
+      handleCheckout(stripePriceId, guestInfo, formResponses)
+    }
   }
 
   return (
@@ -150,48 +193,23 @@ export default function SingleCheckoutButton({
         </Button>
       </div>
 
-      {/* Guest Checkout Form Dialog - Always shown for review */}
-      <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
-        <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{t('guest-checkout-title')}</DialogTitle>
-            <DialogDescription>
-              {t('checkout-description-first-line')}
-              {userId ? (
-                // Logged in user
-                <>
-                  {' '}{t('checkout-description-first-form-filled')}{' '}
-                  <Link href={`/profile`} className="text-blue-500 hover:text-blue-600 underline">
-                    {t('checkout-profile-link')}
-                  </Link>
-                  . {t('checkout-fill-empty-fields')}
-                </>
-              ) : (
-                // Guest user
-                <>
-                  {' '}{t('more-over-encouraged')}{' '}
-                  <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
-                    {t('guest-checkout-login-link')}
-                  </Link>{' '}
-                  {t('guest-checkout-login-text')}
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <GuestInfoForm
-            onSubmit={handleGuestFormSubmit}
-            mainUserEmail={email}
-            mainUserPhone={mainUserPhone}
-            mainUserName={mainUserName}
-            userId={userId}
-            buttonText={
-              buttonText === 'become-member'
-                ? (t(`membership:${buttonText}`) || undefined)
-                : (t(buttonText) || undefined)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Checkout Dialog with Event Form Support */}
+      <EventCheckoutDialog
+        open={showCheckoutDialog}
+        onOpenChange={setShowCheckoutDialog}
+        onGuestFormSubmit={handleGuestFormSubmit}
+        onEventFormSubmit={handleEventFormSubmit}
+        totalItemCount={1}
+        userId={userId || null}
+        userInfo={{
+          email: email || null,
+          phone: mainUserPhone || null,
+          name: mainUserName || null,
+        }}
+        eventFormData={eventFormData}
+        isLoading={isLoading}
+        t={t}
+      />
     </>
   )
 }

@@ -8,22 +8,18 @@ import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { verifyEventDiscountCode } from '@/lib/actions/event/verifyEventDiscountCode'
+import { getEventForm, EventFormData } from '@/lib/actions/event/getEventForm'
 import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { EventTicket } from '@prisma/client'
-import GuestInfoForm, { GuestInfo } from '@/components/payment/GuestInfoForm'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { GuestInfo } from '@/components/payment/GuestInfoForm'
+import { FormResponses } from '@/components/payment/PaymentInfoForm'
+import { EventCheckoutDialog } from '@/components/payment/EventCheckoutDialog'
 import { SelectedTicketWithQuantity } from './EventSingleCheckOut'
 import { JsonValue } from '@prisma/client/runtime/library'
-import Link from 'next/link'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { CheckoutItems } from '@/lib/types/payment'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -91,7 +87,7 @@ export default function EventCartCheckout({
   // Check subscription status for member pricing
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
-  const [showGuestForm, setShowGuestForm] = useState(false)
+  const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isDiscountsExpanded, setIsDiscountsExpanded] = useState(false)
   const [discountCode, setDiscountCode] = useState('')
@@ -100,6 +96,11 @@ export default function EventCartCheckout({
     useState<AppliedCodeDiscount | null>(null)
   const [cooldownEndTime, setCooldownEndTime] = useState<number | null>(null)
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0)
+  
+  // Event form data and responses
+  const [eventFormData, setEventFormData] = useState<EventFormData>(null)
+  const [isLoadingEventForm, setIsLoadingEventForm] = useState(true)
+  const [guestInfo, setGuestInfo] = useState<{ representativeGuest?: GuestInfo; otherGuests?: GuestInfo[] }>({})
 
   const isGuestCheckout = !userId || userId.trim() === ''
 
@@ -195,6 +196,29 @@ export default function EventCartCheckout({
       isMounted = false
     }
   }, [userId])
+
+  // Fetch event form data
+  useEffect(() => {
+    let isMounted = true
+    const fetchEventForm = async () => {
+      try {
+        const formData = await getEventForm(eventId)
+        if (isMounted) {
+          setEventFormData(formData)
+        }
+      } catch (error) {
+        console.error('Error fetching event form:', error)
+      } finally {
+        if (isMounted) {
+          setIsLoadingEventForm(false)
+        }
+      }
+    }
+    fetchEventForm()
+    return () => {
+      isMounted = false
+    }
+  }, [eventId])
 
   // Cooldown timer for discount code verification
   useEffect(() => {
@@ -805,7 +829,8 @@ export default function EventCartCheckout({
   // Master checkout handler for multiple ticket types
   const handleMasterCheckout = useCallback(async (
     representativeGuest?: GuestInfo,
-    otherGuests?: GuestInfo[]
+    otherGuests?: GuestInfo[],
+    eventFormResponses?: Record<string, string>
   ) => {
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -823,14 +848,7 @@ export default function EventCartCheckout({
     try {
       setIsLoading(true)
       // Prepare checkout items: group by ticket type with seat numbers
-      const checkoutItems: Array<{
-        ticketId: string
-        stripePriceId: string
-        stripeProductId: string
-        seatNumbers: string[]
-        eventTicketId: string
-        quantity?: number // For non-seated tickets when seatNumbers is empty
-      }> = []
+      const checkoutItems: CheckoutItems = []
 
       // Add seat-based tickets
       seatsByTicketType.forEach((seats) => {
@@ -879,6 +897,20 @@ export default function EventCartCheckout({
         return
       }
 
+      // Prepare form responses for API
+      const formattedFormResponses = eventFormResponses && Object.keys(eventFormResponses).length > 0
+        ? {
+            responses: Object.entries(eventFormResponses).map(([questionId, answer]) => {
+              const question = eventFormData?.questions.find(q => q.id === questionId)
+              return {
+                questionId,
+                question: question?.question || '',
+                answer,
+              }
+            }),
+          }
+        : null
+
       // Call API endpoint for multi-ticket checkout
       const { data } = await axiosInstance.post(
         '/api/payment/checkout-sessions/create-multi',
@@ -905,6 +937,10 @@ export default function EventCartCheckout({
               email: guest.email,
               phone: guest.phone,
             })),
+          }),
+          // Event form responses
+          ...(formattedFormResponses && {
+            formResponses: formattedFormResponses,
           }),
         }
       )
@@ -947,16 +983,47 @@ export default function EventCartCheckout({
     userInfo,
     isGuestCheckout,
     appliedCodeDiscount,
+    eventFormData,
   ])
 
   const handleCheckoutButtonClick = () => {
-    // Always show guest form so users can review their information
-    setShowGuestForm(true)
+    // Show checkout dialog (will start with guest form)
+    setShowCheckoutDialog(true)
   }
 
-  const handleGuestFormSubmit = (representativeGuest: GuestInfo, otherGuests: GuestInfo[]) => {
-    setShowGuestForm(false)
-    handleMasterCheckout(representativeGuest, otherGuests)
+  const handleGuestFormSubmit = (guestInfo: {
+    guestName: string
+    guestEmail: string
+    guestPhone: string
+    otherGuests: Array<{ name: string; email: string; phone: string }>
+  }) => {
+    // Save guest info
+    setGuestInfo({
+      representativeGuest: {
+        name: guestInfo.guestName,
+        email: guestInfo.guestEmail,
+        phone: guestInfo.guestPhone,
+      },
+      otherGuests: guestInfo.otherGuests,
+    })
+    
+    // If there's no event form, proceed directly to checkout
+    if (!eventFormData || !eventFormData.questions || eventFormData.questions.length === 0) {
+      setShowCheckoutDialog(false)
+      handleMasterCheckout(
+        {
+          name: guestInfo.guestName,
+          email: guestInfo.guestEmail,
+          phone: guestInfo.guestPhone,
+        },
+        guestInfo.otherGuests
+      )
+    }
+  }
+
+  const handleEventFormSubmit = (formResponses: FormResponses) => {
+    setShowCheckoutDialog(false)
+    handleMasterCheckout(guestInfo.representativeGuest, guestInfo.otherGuests, formResponses)
   }
 
   return (
@@ -1589,60 +1656,19 @@ export default function EventCartCheckout({
             )}
           </div>
 
-          {/* Guest Checkout Form Dialog - Always shown for review */}
-          <Dialog open={showGuestForm} onOpenChange={setShowGuestForm}>
-            <DialogContent className="bg-bgColor-white w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-[500px] sm:w-auto sm:mx-auto rounded-md max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {totalItemCount > 1
-                    ? `${t('guest-checkout-title')} ${t('checkout-people-count', { count: totalItemCount })}`
-                    : t('guest-checkout-title')
-                  }
-                </DialogTitle>
-                <DialogDescription>
-                  {totalItemCount > 1
-                    ? userId ? t('checkout-description-with-login', {
-                      otherGuestsText: totalItemCount - 1 === 1
-                        ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
-                        : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
-                    }) : t('guest-checkout-description-with-login', {
-                      otherGuestsText: totalItemCount - 1 === 1
-                        ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
-                        : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
-                    }) : t('checkout-description-first-line')
-                  }
-                  {userId ? (
-                    // Logged in user
-                    <>
-                      {' '}{t('checkout-description-first-form-filled')}{' '}
-                      <Link href={`/profile`} className="text-blue-500 hover:text-blue-600 underline">
-                        {t('checkout-profile-link')}
-                      </Link>
-                      . {t('checkout-fill-empty-fields')}
-                    </>
-                  ) : (
-                    // Guest user
-                    <>
-                      {' '}{t('more-over-encouraged')}{' '}
-                      <Link href="/signIn" className="text-blue-500 hover:text-blue-600 underline">
-                        {t('guest-checkout-login-link')}
-                      </Link>{' '}
-                      {t('guest-checkout-login-text')}
-                    </>
-                  )}
-                </DialogDescription>
-              </DialogHeader>
-              <GuestInfoForm
-                onSubmit={handleGuestFormSubmit}
-                mainUserEmail={userInfo?.email || ''}
-                mainUserPhone={userInfo?.phone || ''}
-                mainUserName={userInfo?.name || ''}
-                userId={userId}
-                buttonText={t('reserve-button') || undefined}
-                totalItemCount={totalItemCount || 1}
-              />
-            </DialogContent>
-          </Dialog>
+          {/* Checkout Dialog with Animated Form Transitions */}
+          <EventCheckoutDialog
+            open={showCheckoutDialog}
+            onOpenChange={setShowCheckoutDialog}
+            onGuestFormSubmit={handleGuestFormSubmit}
+            onEventFormSubmit={handleEventFormSubmit}
+            totalItemCount={totalItemCount || 1}
+            userId={userId || null}
+            userInfo={userInfo || null}
+            eventFormData={eventFormData}
+            isLoading={isLoading}
+            t={t}
+          />
         </div>
       </div>
     </>

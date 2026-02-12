@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { verifyEventDiscountCode } from '@/lib/actions/event/verifyEventDiscountCode'
 import { getEventDiscountsAndTickets } from '@/lib/actions/event/getEventDiscountsAndTickets'
 import { prisma } from '@/lib/db'
+import { CheckoutItems } from '@/lib/types/payment'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -36,6 +37,19 @@ export async function POST(req: Request) {
       guestName,
       guestPhone,
       otherGuestsInfo, // Array of other guests' information
+      formResponses, // Event form responses
+    }: {
+      eventKeyName: string
+      userId?: string
+      eventId: string
+      type: string
+      mainEmail: string
+      checkoutItems: CheckoutItems
+      discountCode?: string
+      guestName?: string
+      guestPhone?: string
+      otherGuestsInfo?: Array<{ name: string; email: string; phone: string }>
+      formResponses?: any
     } = await req.json()
 
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
@@ -49,7 +63,7 @@ export async function POST(req: Request) {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
     const allSeatNumbers: string[] = []
     const ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> = []
-    
+
     // Count total items to determine if discount applies
     let totalItemCount = 0
     checkoutItems.forEach((item) => {
@@ -68,7 +82,7 @@ export async function POST(req: Request) {
     // This ensures we use member prices if applicable, matching the frontend calculation
     let totalAfterMembership = 0
     const stripePriceCache = new Map<string, Stripe.Price>()
-    
+
     for (const item of checkoutItems) {
       // Retrieve the actual Stripe price being used (could be member price)
       if (!stripePriceCache.has(item.stripePriceId)) {
@@ -76,15 +90,15 @@ export async function POST(req: Request) {
           const stripePrice = await stripe.prices.retrieve(item.stripePriceId)
           stripePriceCache.set(item.stripePriceId, stripePrice)
         } catch (error) {
-          console.error('Failed to retrieve Stripe price:', error) 
+          console.error('Failed to retrieve Stripe price:', error)
           continue
         }
       }
-      
+
       const stripePrice = stripePriceCache.get(item.stripePriceId)!
       const unitAmount = stripePrice.unit_amount || 0
       const priceInDollars = unitAmount / 100 // Convert cents to dollars
-      
+
       if (item.seatNumbers.length > 0) {
         // Seated tickets: price per seat
         totalAfterMembership += priceInDollars * item.seatNumbers.length
@@ -94,10 +108,6 @@ export async function POST(req: Request) {
         totalAfterMembership += priceInDollars * (item as any).quantity
       }
     }
-    
-    // Use totalAfterMembership as the base for discount calculations
-    // (This matches the frontend logic where discounts are applied to totalAfterMembership)
-    const baseTotal = totalAfterMembership
 
     // Normalize discounts JSON into a typed array
     const discountList: EventDiscountJson[] = event?.eventDiscounts && Array.isArray(event.eventDiscounts)
@@ -396,7 +406,7 @@ export async function POST(req: Request) {
 
     // Apply discount at price level if effective discount > 0
     const shouldApplyDiscount = (effectivePercent > 0 || effectiveAmount > 0) && type !== 'Membership'
-    
+
     // Cache for discounted prices to avoid creating duplicates
     const discountedPriceCache = new Map<string, string>()
 
@@ -407,13 +417,13 @@ export async function POST(req: Request) {
     // We need to match this by rounding per unit, then distributing across items
     let totalAfterPercentDiscounts = totalAfterMembership
     let totalDiscountAmount = 0
-    
+
     if (shouldApplyDiscount) {
       // First apply percentage-based discounts (if any)
       if (effectivePercent > 0) {
         // Apply percentage discount per unit and round (matching frontend)
         let sumOfRoundedPrices = 0
-        
+
         for (const item of checkoutItems) {
           if (!stripePriceCache.has(item.stripePriceId)) {
             try {
@@ -424,14 +434,14 @@ export async function POST(req: Request) {
               continue
             }
           }
-          
+
           const stripePrice = stripePriceCache.get(item.stripePriceId)!
           const unitPrice = (stripePrice.unit_amount || 0) / 100
-          
-          const unitCount = item.seatNumbers.length > 0 
-            ? item.seatNumbers.length 
+
+          const unitCount = item.seatNumbers.length > 0
+            ? item.seatNumbers.length
             : ((item as any).quantity || 1)
-          
+
           // Apply discount to each unit individually and round
           for (let i = 0; i < unitCount; i++) {
             const discountedPrice = unitPrice * (1 - effectivePercent / 100)
@@ -439,13 +449,13 @@ export async function POST(req: Request) {
             sumOfRoundedPrices += roundedPrice
           }
         }
-        
+
         totalAfterPercentDiscounts = sumOfRoundedPrices
       }
-      
+
       // Then apply amount-based discounts on top of percentage discounts
       const totalAfterAllEventDiscounts = Math.max(0, totalAfterPercentDiscounts - effectiveAmount)
-      
+
       totalDiscountAmount = totalAfterMembership - totalAfterAllEventDiscounts
       // Round to 2 decimal places (matching frontend)
       totalDiscountAmount = Math.round(totalDiscountAmount * 100) / 100
@@ -453,18 +463,18 @@ export async function POST(req: Request) {
 
     // Group items by price to calculate proportional discount distribution
     const priceGroups = new Map<string, Array<{ item: typeof checkoutItems[0]; unitCount: number; unitPrice: number }>>()
-    
+
     for (const item of checkoutItems) {
       const key = item.stripePriceId
       if (!priceGroups.has(key)) {
         priceGroups.set(key, [])
       }
-      
+
       // Get unit count and price
-      const unitCount = item.seatNumbers.length > 0 
-        ? item.seatNumbers.length 
+      const unitCount = item.seatNumbers.length > 0
+        ? item.seatNumbers.length
         : ((item as any).quantity || 1)
-      
+
       // Retrieve price to get unit amount
       if (!stripePriceCache.has(item.stripePriceId)) {
         try {
@@ -475,10 +485,10 @@ export async function POST(req: Request) {
           continue
         }
       }
-      
+
       const stripePrice = stripePriceCache.get(item.stripePriceId)!
       const unitPrice = (stripePrice.unit_amount || 0) / 100
-      
+
       priceGroups.get(key)!.push({ item, unitCount, unitPrice })
     }
 
@@ -487,27 +497,27 @@ export async function POST(req: Request) {
       if (!shouldApplyDiscount || totalDiscountAmount === 0) {
         continue
       }
-      
+
       // Calculate total for this price group
       const groupTotal = group.reduce((sum, g) => sum + (g.unitPrice * g.unitCount), 0)
-      
+
       // Calculate discount for this group proportionally based on final discount amount
       const groupDiscount = (groupTotal / totalAfterMembership) * totalDiscountAmount
       const groupFinalTotal = groupTotal - groupDiscount
-      
+
       // Calculate discounted price per unit
       const totalUnits = group.reduce((sum, g) => sum + g.unitCount, 0)
       const discountedPricePerUnit = groupFinalTotal / totalUnits
-      
+
       // Round to cents (Stripe requires integer cents)
       const discountedAmountInCents = Math.round(discountedPricePerUnit * 100)
-      
+
       // Get first item's details for creating the price
       const firstItem = group[0].item
       if (!discountedPriceCache.has(priceId)) {
         try {
           const originalPrice = stripePriceCache.get(priceId)!
-          
+
           const discountedPrice = await stripe.prices.create({
             unit_amount: discountedAmountInCents,
             currency: originalPrice.currency,
@@ -524,7 +534,7 @@ export async function POST(req: Request) {
               }),
             },
           })
-          
+
           discountedPriceCache.set(priceId, discountedPrice.id)
         } catch (error) {
           console.error('Failed to create discounted price:', error)
@@ -534,12 +544,12 @@ export async function POST(req: Request) {
 
     for (const item of checkoutItems) {
       let priceIdToUse = item.stripePriceId
-      
+
       // If discount applies, use the discounted price
       if (shouldApplyDiscount && discountedPriceCache.has(item.stripePriceId)) {
         priceIdToUse = discountedPriceCache.get(item.stripePriceId)!
       }
-      
+
       // Create line items: one per seat for seated tickets, or use quantity for non-seated tickets
       if (item.seatNumbers.length > 0) {
         // Seated tickets: create one line item per seat
@@ -550,10 +560,10 @@ export async function POST(req: Request) {
             ...(type === 'Membership'
               ? {}
               : {
-                  adjustable_quantity: {
-                    enabled: false,
-                  },
-                }),
+                adjustable_quantity: {
+                  enabled: false,
+                },
+              }),
           })
           allSeatNumbers.push(seatNumber)
         })
@@ -567,10 +577,10 @@ export async function POST(req: Request) {
             ...(type === 'Membership'
               ? {}
               : {
-                  adjustable_quantity: {
-                    enabled: false,
-                  },
-                }),
+                adjustable_quantity: {
+                  enabled: false,
+                },
+              }),
           })
         }
       }
@@ -594,9 +604,11 @@ export async function POST(req: Request) {
         // Seat and ticket data
         seatNumbers: allSeatNumbers.length > 0 ? allSeatNumbers : undefined,
         ticketMetadata: ticketMetadata,
-        otherGuestsInfo: otherGuestsInfo && Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0 
-          ? otherGuestsInfo 
+        otherGuestsInfo: otherGuestsInfo && Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0
+          ? otherGuestsInfo
           : undefined,
+        // Event form responses
+        formResponses: formResponses || undefined,
       },
     })
 

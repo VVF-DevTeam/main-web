@@ -153,7 +153,6 @@ model EventForm {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
 
-
   // Relation
   eventId   String
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -287,6 +286,9 @@ model Payment {
   guestPhone      String?
   otherGuests     Json?
 
+  // Custom form responses
+  formResponses   Json?       // Answers to EventForm questions
+
   // Relations
   userId          String?
   eventId         String?
@@ -314,6 +316,9 @@ model CheckoutSessionData {
   seatNumbers     Json?
   ticketMetadata  Json             // Required - always present
   otherGuestsInfo Json?            // Other guests (array)
+  
+  // Event form responses
+  formResponses   Json?            // Custom event registration form answers
   
   stripeSessionId String? @unique // Optional initially, set after session creation
 

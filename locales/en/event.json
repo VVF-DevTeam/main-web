@@ -87,6 +87,7 @@
   "quick-checkout-description": "Debit and Credit cards only. For other payment methods or paying for full course of a class, please use normal checkout.",
   "remaining": "remaining",
   "reserve-button": "Click here to pay",
+  "go-to-next-section": "Go to next section",
   "purchase-ticket-directly": "Purchase ticket directly",
   "reserve-here": "Reserve Here",
   "saturday": "Sat",
@@ -194,5 +195,8 @@
   "checkout-subtotal": "Subtotal",
   "checkout-membership-discount": "Membership Discount",
   "checkout-event-discounts-with-percent": "Event Discounts - {{percent}}% off each ticket",
-  "checkout-total": "Total"
+  "checkout-total": "Total",
+  "event-registration-form-title": "Event Registration Form",
+  "event-registration-form-description": "Please fill out the following information to complete your registration.",
+  "continue-to-payment": "Continue to Payment"
 }

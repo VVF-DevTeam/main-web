@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { nanoid } from 'nanoid'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,6 +30,7 @@ import { Switch } from '@/components/ui/switch'
 import { Plus, Trash2 } from 'lucide-react'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
+import { getEventForm } from '@/lib/actions/event/getEventForm'
 
 interface EventFormProps {
   event: Event
@@ -38,25 +40,27 @@ interface EventFormProps {
  * Shape of a single dynamic question that will be stored in EventForm.FormData (Json)
  *
  * Example stored JSON:
- * [
- *   {
- *     "id": "q1",
- *     "question": "What is your full name?",
- *     "type": "short_text",
- *     "required": true
- *   },
- *   {
- *     "id": "q2",
- *     "question": "What class are you interested in?",
- *     "type": "single_choice",
- *     "required": true,
- *     "options": ["Beginner", "Intermediate", "Advanced"]
- *   }
- * ]
+ * {
+ *   "questions": [
+ *     {
+ *       "id": "V1StGXR8_Z", // Auto-generated with nanoid(10)
+ *       "question": "What is your full name?",
+ *       "type": "short_text",
+ *       "required": true
+ *     },
+ *     {
+ *       "id": "4f90d13a42", // Auto-generated with nanoid(10)
+ *       "question": "What class are you interested in?",
+ *       "type": "single_choice",
+ *       "required": true,
+ *       "options": ["Beginner", "Intermediate", "Advanced"]
+ *     }
+ *   ]
+ * }
  */
 
 const QuestionSchema = z.object({
-  id: z.string().optional(), // can be generated on backend
+  id: z.string().min(1, 'Question ID is required'), // Required - generated with nanoid
   question: z.string().min(1, 'Question is required'),
   description: z.string().optional(),
   type: z.enum([
@@ -82,12 +86,105 @@ type EventDynamicFormValues = z.infer<typeof EventDynamicFormSchema>
 
 type QuestionType = z.infer<typeof QuestionSchema>['type']
 
-const EMPTY_QUESTION: z.infer<typeof QuestionSchema> = {
+const createEmptyQuestion = (): z.infer<typeof QuestionSchema> => ({
+  id: nanoid(), // Generate unique 21-character ID
   question: '',
   description: '',
   type: 'short_text',
   required: true,
   options: undefined,
+})
+
+interface OptionsFieldArrayProps {
+  control: any
+  questionIndex: number
+  fieldType: QuestionType
+  isLoading: boolean
+}
+
+const OptionsFieldArray = ({
+  control,
+  questionIndex,
+  fieldType,
+  isLoading,
+}: OptionsFieldArrayProps) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `questions.${questionIndex}.options`,
+  })
+
+  // Ensure at least one option box exists
+  useEffect(() => {
+    if (fields.length === 0) {
+      append('')
+    }
+  }, [fields.length, append])
+
+  return (
+    <FormField
+      control={control}
+      name={`questions.${questionIndex}.options`}
+      render={() => (
+        <FormItem className="mt-4">
+          <FormLabel>Options</FormLabel>
+          <div className="space-y-2">
+            {fields.map((field, optionIndex) => (
+              <div
+                key={field.id}
+                className="flex items-center gap-2"
+              >
+                <FormField
+                  control={control}
+                  name={`questions.${questionIndex}.options.${optionIndex}`}
+                  render={({ field: optionField }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          {...optionField}
+                          placeholder={`Option ${optionIndex + 1}`}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {fields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 hover:text-red-700"
+                    disabled={isLoading}
+                    onClick={() => remove(optionIndex)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append('')}
+              disabled={isLoading}
+              className="mt-2 flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add option
+            </Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            These options will be shown as{' '}
+            {fieldType === 'single_choice'
+              ? 'radio buttons.'
+              : 'checkboxes.'}
+          </p>
+        </FormItem>
+      )}
+    />
+  )
 }
 
 const EventForm = ({ event }: EventFormProps) => {
@@ -95,7 +192,7 @@ const EventForm = ({ event }: EventFormProps) => {
   const form = useForm<EventDynamicFormValues>({
     resolver: zodResolver(EventDynamicFormSchema),
     defaultValues: {
-      questions: [EMPTY_QUESTION],
+      questions: [createEmptyQuestion()],
     },
   })
 
@@ -108,16 +205,20 @@ const EventForm = ({ event }: EventFormProps) => {
   useEffect(() => {
     const fetchFormDefinition = async () => {
       try {
-        const response = await axiosInstance.get(
-          `/api/events/forms/${event.id}`
-        )
-        const data = response.data?.data
+        const data = await getEventForm(event.id)
 
         if (data && Array.isArray(data.questions)) {
+          // Ensure options are initialized as arrays for choice type questions
+          // and generate IDs for questions that don't have them (backward compatibility)
+          const normalizedQuestions = data.questions.map((q: any) => ({
+            ...q,
+            id: q.id || nanoid(10), // Generate ID if missing (for old data)
+            options: q.options && Array.isArray(q.options) ? q.options : undefined,
+          }))
           form.reset({
-            questions: data.questions.length
-              ? data.questions
-              : [EMPTY_QUESTION],
+            questions: normalizedQuestions.length
+              ? normalizedQuestions
+              : [createEmptyQuestion()],
           })
         }
       } catch (error) {
@@ -147,8 +248,19 @@ const EventForm = ({ event }: EventFormProps) => {
         return
       }
 
+      // Filter out empty options from choice type questions
+      const cleanedValues = {
+        ...values,
+        questions: values.questions.map((q) => ({
+          ...q,
+          options: q.options
+            ? q.options.filter((opt) => opt.trim().length > 0)
+            : undefined,
+        })),
+      }
+
       await axiosInstance.put(`/api/events/forms/${event.id}`, {
-        formData: values,
+        formData: cleanedValues,
       })
 
       toast.success('Event registration form definition saved.', {
@@ -167,7 +279,7 @@ const EventForm = ({ event }: EventFormProps) => {
   }
 
   const handleAddQuestion = () => {
-    append(EMPTY_QUESTION)
+    append(createEmptyQuestion())
   }
 
   const isChoiceType = (type: QuestionType) =>
@@ -182,7 +294,7 @@ const EventForm = ({ event }: EventFormProps) => {
           <h3 className="text-lg font-bold">Custom Registration Questions</h3>
           <p className="text-sm text-muted-foreground">
             Design the questions participants must answer when registering for
-            this event.
+            this event. Note that this form will be displayed after clicking purchase button, and will be shown after users fill in their information.
           </p>
         </div>
       </div>
@@ -224,7 +336,7 @@ const EventForm = ({ event }: EventFormProps) => {
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="e.g. What is your full name?"
+                              placeholder="e.g. Is there anything else you would like to add?"
                             />
                           </FormControl>
                           <FormMessage />
@@ -257,7 +369,19 @@ const EventForm = ({ event }: EventFormProps) => {
                         <FormItem>
                           <FormLabel>Expected answer format</FormLabel>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value)
+                              // Initialize options array when switching to choice type
+                              if (value === 'single_choice' || value === 'multi_choice') {
+                                const currentOptions = form.getValues(`questions.${index}.options`)
+                                if (!currentOptions || !Array.isArray(currentOptions) || currentOptions.length === 0) {
+                                  form.setValue(`questions.${index}.options`, [''])
+                                }
+                              } else {
+                                // Clear options when switching away from choice type
+                                form.setValue(`questions.${index}.options`, undefined)
+                              }
+                            }}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -311,36 +435,11 @@ const EventForm = ({ event }: EventFormProps) => {
                   </div>
 
                   {isChoiceType(fieldType) && (
-                    <FormField
+                    <OptionsFieldArray
                       control={form.control}
-                      name={`questions.${index}.options`}
-                      render={({ field }) => (
-                        <FormItem className="mt-4">
-                          <FormLabel>Options</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              rows={3}
-                              placeholder="Enter one option per line, e.g.&#10;Beginner&#10;Intermediate&#10;Advanced"
-                              onChange={(e) => {
-                                const lines = e.target.value
-                                  .split('\n')
-                                  .map((line) => line.trim())
-                                  .filter(Boolean)
-                                field.onChange(lines)
-                              }}
-                              value={(field.value || []).join('\n')}
-                            />
-                          </FormControl>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            These options will be shown as{' '}
-                            {fieldType === 'single_choice'
-                              ? 'radio buttons.'
-                              : 'checkboxes.'}
-                          </p>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      questionIndex={index}
+                      fieldType={fieldType}
+                      isLoading={isLoading}
                     />
                   )}
                 </div>

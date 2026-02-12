@@ -113,25 +113,32 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns event discounts (eventDiscounts) and tickets (id, price, discountMemberPercent, capacityPerTicket, payTotalNumber) for a specific event. Used in checkout session creation to calculate discounts. Tagged with 'events' since discounts and tickets are part of event data and should be revalidated when events, discounts, or tickets change.
 
+#### 15. `getEventForm`
+- **File**: `lib/actions/event/getEventForm.ts`
+- **Cache Key**: `['event-form']`
+- **Tags**: `['events']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns the FormData JSON from the EventForm table for a specific event. Contains custom registration questions (question, description, type, required, options) that participants must answer when registering for the event. Used in EventForm component to display and edit custom form fields. Tagged with 'events' since event forms are part of event data and should be revalidated when event forms are created/updated/deleted.
+
 ---
 
 ### Jobs
 
-#### 15. `getAllJobs`
+#### 16. `getAllJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-all']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 16. `getPublishedJobs`
+#### 17. `getPublishedJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-published']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published jobs with optional filters (title search and event filter). Includes event relation (id, title, keyName) if job is linked to an event. Ordered by updatedAt descending.
 
-#### 17. `getJobForEditing`
+#### 18. `getJobForEditing`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['job-for-editing']`
 - **Tags**: `['jobs']`
@@ -142,21 +149,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Reviews
 
-#### 18. `getCachedReviewsPaginated`
+#### 19. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 19. `getCachedPublishedEventsForReviews`
+#### 20. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 20. `getCachedPublishedSeriesForReviews`
+#### 21. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -167,21 +174,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 21. `getCachedPostsPaginated`
+#### 22. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated posts with search by title
 
-#### 22. `getAllPosts`
+#### 23. `getAllPosts`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-all']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all posts (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 23. `getPostForEditing`
+#### 24. `getPostForEditing`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['post-for-editing']`
 - **Tags**: `['posts']`
@@ -192,7 +199,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Social Media Posts
 
-#### 24. `getCachedSocialMediaPostsPaginated`
+#### 25. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
@@ -203,14 +210,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Users
 
-#### 25. `getUsersSimple` (via `getCachedUsersSimple`)
+#### 26. `getUsersSimple` (via `getCachedUsersSimple`)
 - **File**: `lib/actions/user/getAllUsersSimple.ts`
 - **Cache Key**: `['users-simple']`
 - **Tags**: `['users']`
 - **Revalidate Time**: 3600 seconds (1 hour)
 - **Description**: Returns list of users with optional count limit and name search
 
-#### 26. `getUsersWithRole` (via `getCachedUsersWithRole`)
+#### 27. `getUsersWithRole` (via `getCachedUsersWithRole`)
 - **File**: `lib/actions/user/getUsersWithRole.ts`
 - **Cache Key**: `['users-with-role']`
 - **Tags**: `['users']`
@@ -221,14 +228,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Payments
 
-#### 27. `getPaginatedPayments`
+#### 28. `getPaginatedPayments`
 - **File**: `lib/actions/payment/getPaginatedPayments.ts`
 - **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
-#### 28. `getEventPayments`
+#### 29. `getEventPayments`
 - **File**: `app/[locale]/(Home)/profile/_components/getEventPayments.ts`
 - **Cache Key**: `['event-payments-${eventId}']` (per event)
 - **Tags**: `['payments']`
@@ -253,6 +260,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getAllEvents`
 - `getEventTickets` (via `getCachedEventTickets`)
 - `getEventDiscountsAndTickets`
+- `getEventForm`
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -578,7 +586,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 12 functions | 17 API routes | ✅ Fully covered |
+| `events` | 13 functions | 17 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 3 functions | 5 API routes | ✅ Fully covered |
 | `series` | 2 functions | 2 API routes | ✅ Fully covered |

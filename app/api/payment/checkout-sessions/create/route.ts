@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
       // Guest information (for payments without login)
       guestName,
       guestPhone,
+      // Event form responses
+      formResponses,
     } = await req.json()
 
     // Create single line item for one ticket
@@ -31,6 +34,28 @@ export async function POST(req: Request) {
         quantity: 1,
       },
     ]
+
+    // Store checkout data in database if we have guest info or form responses
+    // This is needed because Stripe metadata has a 500-character limit per value
+    let checkoutDataId: string | undefined = undefined
+    if (guestName || guestPhone || formResponses) {
+      const checkoutData = await prisma.checkoutSessionData.create({
+        data: {
+          guestName: guestName || null,
+          guestEmail: email || null,
+          guestPhone: guestPhone || null,
+          seatNumbers: seatNumber ? [seatNumber] : undefined,
+          ticketMetadata: [{
+            ticketId: eventTicketId,
+            seatNumbers: seatNumber ? [seatNumber] : [],
+            quantity: 1,
+          }],
+          formResponses: formResponses || undefined,
+          status: 'PENDING',
+        },
+      })
+      checkoutDataId = checkoutData.id
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -56,11 +81,13 @@ export async function POST(req: Request) {
         eventTicketId: eventTicketId || '',
         type: type,
         ...(seatNumber && { seatNumber: seatNumber }),
-        // Guest information - always include if provided
-        // This allows logged-in users to review/confirm their info
-        ...(guestName && { guestName: guestName }),
-        ...(email && { guestEmail: email }),
-        ...(guestPhone && { guestPhone: guestPhone }),
+        // If we stored data in CheckoutSessionData, use that
+        // Otherwise, fallback to inline metadata (backward compatibility)
+        ...(checkoutDataId ? { checkoutDataId } : {
+          ...(guestName && { guestName: guestName }),
+          ...(email && { guestEmail: email }),
+          ...(guestPhone && { guestPhone: guestPhone }),
+        }),
         description:
           type === 'Membership'
             ? 'Monthly Membership'

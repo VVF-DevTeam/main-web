@@ -29,3 +29,26 @@ export type PaymentWithRelations = {
     stripeProductId: string
   } | null
 }
+
+/**
+ * Represents a single item in the checkout cart
+ */
+export type CheckoutItem = {
+  /** Unique identifier for the event ticket */
+  ticketId: string
+  /** Stripe price ID (regular or member price) */
+  stripePriceId: string
+  /** Stripe product ID */
+  stripeProductId: string
+  /** Array of seat identifiers (empty for non-seated tickets) */
+  seatNumbers: string[]
+  /** Event ticket ID (same as ticketId) */
+  eventTicketId: string
+  /** Quantity for non-seated tickets (only when seatNumbers is empty) */
+  quantity?: number
+}
+
+/**
+ * Array of checkout items representing the shopping cart
+ */
+export type CheckoutItems = CheckoutItem[]

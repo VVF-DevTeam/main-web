@@ -90,6 +90,7 @@
   "quick-checkout-description": "Chỉ áp dụng thẻ ghi nợ và thẻ tín dụng. Đối với các phương thức thanh toán khác hoặc thanh toán cho toàn bộ khóa học, vui lòng sử dụng phương thức thanh toán thông thường.",
   "remaining": "còn lại",
   "reserve-button": "Nhấp vào đây để thanh toán",
+  "go-to-next-section": "Đi đến phần tiếp theo",
   "purchase-ticket-directly": "Mua vé ngay",
   "reserve-here": "Đặt Chỗ",
   "saturday": "T7",
@@ -197,5 +198,8 @@
   "checkout-subtotal": "Tạm tính",
   "checkout-membership-discount": "Giảm giá thành viên",
   "checkout-event-discounts-with-percent": "Giảm giá của sự kiện - {{percent}}% off mỗi vé",
-  "checkout-total": "Tổng"
+  "checkout-total": "Tổng",
+  "event-registration-form-title": "Mẫu Đăng Ký Sự Kiện",
+  "event-registration-form-description": "Vui lòng điền thông tin sau để hoàn tất đăng ký của bạn.",
+  "continue-to-payment": "Tiếp tục thanh toán"
 }

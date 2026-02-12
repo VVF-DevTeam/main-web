@@ -90,6 +90,7 @@
   "quick-checkout-description": "Cartes de débit et de crédit uniquement. Pour tout autre mode de paiement ou pour régler un cours complet, veuillez utiliser le paiement standard.",
   "remaining": "restant",
   "reserve-button": "Cliquez ici pour payer",
+  "go-to-next-section": "Aller à la section suivante",
   "purchase-ticket-directly": "Acheter le billet directement",
   "reserve-here": "Réservez ici",
   "saturday": "Sam",
@@ -197,5 +198,8 @@
   "checkout-subtotal": "Sous-total",
   "checkout-membership-discount": "Réduction membre",
   "checkout-event-discounts-with-percent": "Réductions événement - {{percent}}% de réduction par billet",
-  "checkout-total": "Total"
+  "checkout-total": "Total",
+  "event-registration-form-title": "Formulaire d'inscription à l'événement",
+  "event-registration-form-description": "Veuillez remplir les informations suivantes pour finaliser votre inscription.",
+  "continue-to-payment": "Continuer vers le paiement"
 }

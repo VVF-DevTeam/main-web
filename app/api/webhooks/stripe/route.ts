@@ -417,6 +417,7 @@ export async function POST(req: NextRequest) {
         quantity?: number
       }>
       otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null
+      formResponses: any | null
     } | null = null
 
     if (metadata?.checkoutDataId) {
@@ -430,6 +431,7 @@ export async function POST(req: NextRequest) {
             seatNumbers: true,
             ticketMetadata: true,
             otherGuestsInfo: true,
+            formResponses: true,
           },
         })
         if (data) {
@@ -444,6 +446,7 @@ export async function POST(req: NextRequest) {
               quantity?: number
             }>,
             otherGuestsInfo: data.otherGuestsInfo as Array<{ name: string; email: string; phone: string }> | null,
+            formResponses: data.formResponses,
           }
         }
       } catch (e) {
@@ -609,6 +612,8 @@ export async function POST(req: NextRequest) {
               guestEmail: guestEmail,
               guestPhone: guestPhone,
               otherGuests: otherGuestsInfo || undefined,
+              // Event form responses
+              formResponses: checkoutSessionData?.formResponses || undefined,
             },
           })
         }
@@ -652,6 +657,8 @@ export async function POST(req: NextRequest) {
             guestEmail: guestEmail,
             guestPhone: guestPhone,
             otherGuests: otherGuestsInfo || undefined,
+            // Event form responses
+            formResponses: checkoutSessionData?.formResponses || undefined,
           },
         })
       }
