@@ -277,10 +277,10 @@ export default function EventStatistics({
   // Sort payments based on the selected column
   const sortedPayments = [...payments].sort((a, b) => {
     if (sortConfig.column === null || sortConfig.order === null) return 0
-    
+
     let valueA = ''
     let valueB = ''
-    
+
     switch (sortConfig.column) {
       case 'ticketName':
         valueA = a.eventTicket?.type || ''
@@ -303,7 +303,7 @@ export default function EventStatistics({
         valueB = b.method || ''
         break
     }
-    
+
     if (sortConfig.order === 'asc') {
       return valueA.localeCompare(valueB)
     } else {
@@ -355,347 +355,345 @@ export default function EventStatistics({
           <>
             {/* Tab Header */}
             <div className="mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8" aria-label="Tabs">
-                <button
-                  onClick={() => setActiveTab('tickets')}
-                  className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                    activeTab === 'tickets'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  Tickets
-                </button>
-                <button
-                  onClick={() => setActiveTab('answers')}
-                  className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                    activeTab === 'answers'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  Answers
-                </button>
-              </nav>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Left Side - Statistics */}
-            <div className="lg:col-span-1">
-              <div className="rounded-lg border bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-semibold">Event Overview</h2>
-
-                {/* Event Details */}
-                {payments.length > 0 && payments[0]?.event && (
-                  <div className="mb-6 space-y-2 border-b pb-4">
-                    {payments[0].event.startDate && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          Start Date
-                        </p>
-                        <p className="text-sm font-medium">
-                          {new Date(
-                            payments[0].event.startDate
-                          ).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                    )}
-                    {payments[0].event.endDate && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          End Date
-                        </p>
-                        <p className="text-sm font-medium">
-                          {new Date(
-                            payments[0].event.endDate
-                          ).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                    )}
-                    {payments[0].event.location && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          Location
-                        </p>
-                        <p className="text-sm font-medium">
-                          {payments[0].event.location}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Statistics */}
-                <div className="mb-6 space-y-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total Participants
-                    </p>
-                    <p className="text-2xl font-bold">{totalParticipants}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total Earned
-                    </p>
-                    <p className="text-2xl font-bold">
-                      ${totalEarned.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  <AddPaymentButton
-                    user={user}
-                    preSelectedEventId={selectedEventId}
-                    onPaymentAdded={reloadPayments}
-                  />
-                  <Button
-                    onClick={handleSendEmail}
-                    className="w-full"
-                    variant="default"
+              <div className="border-b border-gray-200">
+                <nav className="flex space-x-8" aria-label="Tabs">
+                  <button
+                    onClick={() => setActiveTab('tickets')}
+                    className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'tickets'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
                   >
-                    <FiMail className="mr-2 h-4 w-4" />
-                    Send Email
-                  </Button>
-                  <Button
-                    onClick={handleCopyEmails}
-                    className="w-full"
-                    variant="outline"
+                    Tickets
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('answers')}
+                    className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'answers'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
                   >
-                    <FiCopy className="mr-2 h-4 w-4" />
-                    Copy Email List
-                  </Button>
-                  <Button
-                    onClick={handleManageEvent}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <FiEdit className="mr-2 h-4 w-4" />
-                    Manage Event
-                  </Button>
-                </div>
+                    Answers
+                  </button>
+                </nav>
               </div>
             </div>
 
-            {/* Right Side - Content */}
-            <div className="lg:col-span-2">
-              {activeTab === 'tickets' ? (
-                <>
-                  {loading ? (
-                    <div className="flex items-center justify-center rounded-lg border bg-white p-8">
-                      <p>Loading...</p>
-                    </div>
-                  ) : payments.length > 0 ? (
-                <div className="rounded-lg border bg-white shadow-sm">
-                  <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                    Sold Tickets Table
-                  </h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th 
-                            className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
-                            onClick={() => handleSort('ticketName')}
-                          >
-                            <div className="flex items-center gap-2">
-                              Ticket Name
-                              {sortConfig.column !== 'ticketName' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
-                              {sortConfig.column === 'ticketName' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
-                              {sortConfig.column === 'ticketName' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
-                            </div>
-                          </th>
-                          <th 
-                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
-                            onClick={() => handleSort('email')}
-                          >
-                            <div className="flex items-center gap-2">
-                              Email
-                              {sortConfig.column !== 'email' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
-                              {sortConfig.column === 'email' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
-                              {sortConfig.column === 'email' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
-                            </div>
-                          </th>
-                          <th 
-                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
-                            onClick={() => handleSort('phone')}
-                          >
-                            <div className="flex items-center gap-2">
-                              Phone Number
-                              {sortConfig.column !== 'phone' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
-                              {sortConfig.column === 'phone' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
-                              {sortConfig.column === 'phone' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
-                            </div>
-                          </th>
-                          <th 
-                            className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
-                            onClick={() => handleSort('customer')}
-                          >
-                            <div className="flex items-center gap-2">
-                              Customer
-                              {sortConfig.column !== 'customer' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
-                              {sortConfig.column === 'customer' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
-                              {sortConfig.column === 'customer' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
-                            </div>
-                          </th>
-                          <th className="px-4 py-3 text-left">Amount</th>
-                          <th className="max-w-[110px] break-words px-4 py-3 text-left">Quantity/Seat</th>
-                          <th className="px-4 py-3 text-left">Capacity</th>
-                          <th 
-                            className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
-                            onClick={() => handleSort('paymentMethod')}
-                          >
-                            <div className="flex items-center gap-2">
-                              Payment Method
-                              {sortConfig.column !== 'paymentMethod' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
-                              {sortConfig.column === 'paymentMethod' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
-                              {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {sortedPayments.map((payment) => {
-                          const isGuestCheckout =
-                            !payment.user &&
-                            (payment.guestEmail || payment.guestName)
-                          const displayEmail =
-                          payment.guestEmail || payment.user?.email || '-'
-                          const displayPhone =
-                          payment.guestPhone || payment.user?.phone ||  '-'
-                          const displayName =
-                          payment.guestName || payment.user?.name ||  '-'
-                          const paymentType = payment.eventTicket?.type || '-'
-                          const otherGuestsList = Array.isArray(payment.otherGuests)
-                            ? (payment.otherGuests as OtherGuestJson[])
-                            : []
-                          const hasOtherGuests = otherGuestsList.length > 0
-                          const isExpanded = hasOtherGuests
-                            ? expandedPayments[payment.id] ?? true
-                            : false
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {/* Left Side - Statistics */}
+              <div className="lg:col-span-1">
+                <div className="rounded-lg border bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-xl font-semibold">Event Overview</h2>
 
-                          // Build display payment type with suffixes
-                          let displayPaymentType = paymentType
-                          if (isGuestCheckout) {
-                            displayPaymentType += ' (Guest Checkout)'
-                          }
-
-                          return (
-                            <Fragment key={payment.id}>
-                              <tr
-                                className={`bg-white ${hasOtherGuests ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-                                onClick={() => hasOtherGuests && togglePaymentRow(payment.id)}
-                              >
-                                <td className="px-4 py-3">
-                                  <div className="flex items-center gap-2">
-                                    {hasOtherGuests && (
-                                      isExpanded ? (
-                                        <FiChevronUp className="h-4 w-4 text-gray-500" />
-                                      ) : (
-                                        <FiChevronDown className="h-4 w-4 text-gray-500" />
-                                      )
-                                    )}
-                                    <span>{displayPaymentType}</span>
-                                  </div>
-                                </td>
-                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
-                                  {displayEmail}
-                                </td>
-                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayPhone}</td>
-                                <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayName}</td>
-                                <td className="px-4 py-3">
-                                  $
-                                  {(typeof payment.pricePaid === 'number'
-                                    ? payment.pricePaid
-                                    : Number(payment.pricePaid.toString())
-                                  ).toFixed(2)}
-                                </td>
-                                <td className="px-4 py-3">
-                                  {payment.quantity}/{payment.seatNumber || '-'}
-                                </td>
-                                <td className="px-4 py-3">
-                                  {payment.eventTicket?.capacityPerTicket ?? 1}
-                                </td>
-                                <td className="px-4 py-3">
-                                  {payment.method}
-                                </td>
-                              </tr>
-                              {hasOtherGuests && isExpanded && (
-                                <tr className="bg-gray-50">
-                                  <td colSpan={9} className="px-4">
-                                    <div className="ml-8">
-                                      <table className="w-full text-sm">
-                                        <tbody>
-                                          {otherGuestsList.map((guest, index) => (
-                                            <tr
-                                              key={`${payment.id}-guest-${index}`}
-                                              className="border-b border-gray-200 last:border-0"
-                                            >
-                                              <td className="px-4 py-2 font-medium text-gray-700">
-                                                Guest {index + 1}
-                                              </td>
-                                              <td className="px-4 py-2 text-gray-700">{guest?.email || '-'}</td>
-                                              <td className="px-4 py-2 text-gray-700">{guest?.phone || '-'}</td>
-                                              <td className="px-4 py-2 text-gray-700">{guest?.name || '-'}</td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
-                            </Fragment>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                  ) : (
-                    <div className="flex items-center justify-center rounded-lg border bg-white p-8">
-                      <p className="text-muted-foreground">
-                        No payments found for this event
-                      </p>
+                  {/* Event Details */}
+                  {payments.length > 0 && payments[0]?.event && (
+                    <div className="mb-6 space-y-2 border-b pb-4">
+                      {payments[0].event.startDate && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            Start Date
+                          </p>
+                          <p className="text-sm font-medium">
+                            {new Date(
+                              payments[0].event.startDate
+                            ).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      )}
+                      {payments[0].event.endDate && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            End Date
+                          </p>
+                          <p className="text-sm font-medium">
+                            {new Date(
+                              payments[0].event.endDate
+                            ).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      )}
+                      {payments[0].event.location && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            Location
+                          </p>
+                          <p className="text-sm font-medium">
+                            {payments[0].event.location}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
-                </>
-              ) : (
-                // Answers Tab
-                <div className="rounded-lg border bg-white shadow-sm">
-                  <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                    Form Responses
-                  </h3>
-                  <div className="p-4">
+
+                  {/* Statistics */}
+                  <div className="mb-6 space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Total Participants
+                      </p>
+                      <p className="text-2xl font-bold">{totalParticipants}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Total Earned
+                      </p>
+                      <p className="text-2xl font-bold">
+                        ${totalEarned.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    <AddPaymentButton
+                      user={user}
+                      preSelectedEventId={selectedEventId}
+                      onPaymentAdded={reloadPayments}
+                    />
+                    <Button
+                      onClick={handleSendEmail}
+                      className="w-full"
+                      variant="default"
+                    >
+                      <FiMail className="mr-2 h-4 w-4" />
+                      Send Email
+                    </Button>
+                    <Button
+                      onClick={handleCopyEmails}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      <FiCopy className="mr-2 h-4 w-4" />
+                      Copy Email List
+                    </Button>
+                    <Button
+                      onClick={handleManageEvent}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      <FiEdit className="mr-2 h-4 w-4" />
+                      Manage Event
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side - Content */}
+              <div className="lg:col-span-2">
+                {activeTab === 'tickets' ? (
+                  <>
                     {loading ? (
-                      <div className="flex items-center justify-center p-8">
+                      <div className="flex items-center justify-center rounded-lg border bg-white p-8">
                         <p>Loading...</p>
                       </div>
                     ) : payments.length > 0 ? (
-                      <FormResponsesView payments={payments} />
+                      <div className="rounded-lg border bg-white shadow-sm">
+                        <h3 className="border-b px-4 py-3 text-lg font-semibold">
+                          Sold Tickets Table
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th
+                                  className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('ticketName')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Ticket Name
+                                    {sortConfig.column !== 'ticketName' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'ticketName' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'ticketName' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('email')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Email
+                                    {sortConfig.column !== 'email' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'email' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'email' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('phone')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Phone Number
+                                    {sortConfig.column !== 'phone' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'phone' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'phone' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('customer')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Customer
+                                    {sortConfig.column !== 'customer' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'customer' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'customer' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th className="px-4 py-3 text-left">Amount</th>
+                                <th className="max-w-[110px] break-words px-4 py-3 text-left">Quantity/Seat</th>
+                                <th className="px-4 py-3 text-left">Capacity</th>
+                                <th
+                                  className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('paymentMethod')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Payment Method
+                                    {sortConfig.column !== 'paymentMethod' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'paymentMethod' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              {sortedPayments.map((payment) => {
+                                const isGuestCheckout =
+                                  !payment.user &&
+                                  (payment.guestEmail || payment.guestName)
+                                const displayEmail =
+                                  payment.guestEmail || payment.user?.email || '-'
+                                const displayPhone =
+                                  payment.guestPhone || payment.user?.phone || '-'
+                                const displayName =
+                                  payment.guestName || payment.user?.name || '-'
+                                const paymentType = payment.eventTicket?.type || '-'
+                                const otherGuestsList = Array.isArray(payment.otherGuests)
+                                  ? (payment.otherGuests as OtherGuestJson[])
+                                  : []
+                                const hasOtherGuests = otherGuestsList.length > 0
+                                const isExpanded = hasOtherGuests
+                                  ? expandedPayments[payment.id] ?? true
+                                  : false
+
+                                // Build display payment type with suffixes
+                                let displayPaymentType = paymentType
+                                if (isGuestCheckout) {
+                                  displayPaymentType += ' (Guest Checkout)'
+                                }
+
+                                return (
+                                  <Fragment key={payment.id}>
+                                    <tr
+                                      className={`bg-white ${hasOtherGuests ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                                      onClick={() => hasOtherGuests && togglePaymentRow(payment.id)}
+                                    >
+                                      <td className="px-4 py-3">
+                                        <div className="flex items-center gap-2">
+                                          {hasOtherGuests && (
+                                            isExpanded ? (
+                                              <FiChevronUp className="h-4 w-4 text-gray-500" />
+                                            ) : (
+                                              <FiChevronDown className="h-4 w-4 text-gray-500" />
+                                            )
+                                          )}
+                                          <span>{displayPaymentType}</span>
+                                        </div>
+                                      </td>
+                                      <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
+                                        {displayEmail}
+                                      </td>
+                                      <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayPhone}</td>
+                                      <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">{displayName}</td>
+                                      <td className="px-4 py-3">
+                                        $
+                                        {(typeof payment.pricePaid === 'number'
+                                          ? payment.pricePaid
+                                          : Number(payment.pricePaid.toString())
+                                        ).toFixed(2)}
+                                      </td>
+                                      <td className="px-4 py-3">
+                                        {payment.quantity}/{payment.seatNumber || '-'}
+                                      </td>
+                                      <td className="px-4 py-3">
+                                        {payment.eventTicket?.capacityPerTicket ?? 1}
+                                      </td>
+                                      <td className="px-4 py-3">
+                                        {payment.method}
+                                      </td>
+                                    </tr>
+                                    {hasOtherGuests && isExpanded && (
+                                      <tr className="bg-gray-50">
+                                        <td colSpan={9} className="px-4">
+                                          <div className="ml-8">
+                                            <table className="w-full text-sm">
+                                              <tbody>
+                                                {otherGuestsList.map((guest, index) => (
+                                                  <tr
+                                                    key={`${payment.id}-guest-${index}`}
+                                                    className="border-b border-gray-200 last:border-0"
+                                                  >
+                                                    <td className="px-4 py-2 font-medium text-gray-700">
+                                                      Guest {index + 1}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-gray-700">{guest?.email || '-'}</td>
+                                                    <td className="px-4 py-2 text-gray-700">{guest?.phone || '-'}</td>
+                                                    <td className="px-4 py-2 text-gray-700">{guest?.name || '-'}</td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Fragment>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     ) : (
-                      <div className="flex items-center justify-center p-8">
+                      <div className="flex items-center justify-center rounded-lg border bg-white p-8">
                         <p className="text-muted-foreground">
-                          No form responses found for this event
+                          No payments found for this event
                         </p>
                       </div>
                     )}
+                  </>
+                ) : (
+                  // Answers Tab
+                  <div className="rounded-lg border bg-white shadow-sm">
+                    <h3 className="border-b px-4 py-3 text-lg font-semibold">
+                      Form Responses
+                    </h3>
+                    <div className="p-4">
+                      {loading ? (
+                        <div className="flex items-center justify-center p-8">
+                          <p>Loading...</p>
+                        </div>
+                      ) : payments.length > 0 ? (
+                        <FormResponsesView payments={payments} />
+                      ) : (
+                        <div className="flex items-center justify-center p-8">
+                          <p className="text-muted-foreground">
+                            No form responses found for this event
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
           </>
         )}
 
@@ -737,9 +735,9 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
     if (!formData.responses || !Array.isArray(formData.responses)) return
 
     const customerName =
-      payment.user?.name || payment.guestName || 'Unknown'
+      payment.guestName || payment.user?.name || 'Unknown'
     const customerEmail =
-      payment.user?.email || payment.guestEmail || 'Unknown'
+      payment.guestEmail || payment.user?.email || 'Unknown'
 
     formData.responses.forEach((response: FormResponse) => {
       if (!questionMap.has(response.questionId)) {
@@ -794,7 +792,7 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
                   <th className="px-4 py-2 text-left font-semibold text-gray-700">
                     Customer Name
                   </th>
-                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700 hidden md:table-cell">
                     Email
                   </th>
                   <th className="px-4 py-2 text-left font-semibold text-gray-700">
@@ -811,7 +809,7 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
                     <td className="px-4 py-3 text-gray-700">
                       {response.customerName}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">
+                    <td className="px-4 py-3 text-gray-700 hidden md:table-cell">
                       {response.customerEmail}
                     </td>
                     <td className="px-4 py-3 text-gray-700">
@@ -826,29 +824,29 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
           {/* Summary for choice questions */}
           {(data.questionType === 'single_choice' ||
             data.questionType === 'multi_choice') && (
-            <div className="mt-3 rounded-md bg-blue-50 p-3">
-              <p className="text-xs font-semibold text-blue-900 mb-2">
-                Summary:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {(() => {
-                  const summary = getSummary(data.responses, data.questionType)
-                  const total = summary.reduce((sum, item) => sum + item.count, 0)
-                  return summary.map((item, idx) => {
-                    const percentage = ((item.count / total) * 100).toFixed(1)
-                    return (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
-                      >
-                        {item.value}: {item.count} ({percentage}%)
-                      </span>
-                    )
-                  })
-                })()}
+              <div className="mt-3 rounded-md bg-blue-50 p-3">
+                <p className="text-xs font-semibold text-blue-900 mb-2">
+                  Summary:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const summary = getSummary(data.responses, data.questionType)
+                    const total = summary.reduce((sum, item) => sum + item.count, 0)
+                    return summary.map((item, idx) => {
+                      const percentage = ((item.count / total) * 100).toFixed(1)
+                      return (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+                        >
+                          {item.value}: {item.count} ({percentage}%)
+                        </span>
+                      )
+                    })
+                  })()}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       ))}
     </div>
