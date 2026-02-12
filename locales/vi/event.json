@@ -201,5 +201,9 @@
   "checkout-total": "Tổng",
   "event-registration-form-title": "Mẫu Đăng Ký Sự Kiện",
   "event-registration-form-description": "Vui lòng điền thông tin sau để hoàn tất đăng ký của bạn.",
-  "continue-to-payment": "Tiếp tục thanh toán"
+  "continue-to-payment": "Tiếp tục thanh toán",
+  "back-button": "Quay lại",
+  "processing": "Đang xử lý...",
+  "form-validation-error": "Vui lòng trả lời tất cả các câu hỏi bắt buộc",
+  "form-validation-description": "{{count}} câu hỏi bắt buộc cần được trả lời."
 }

@@ -92,6 +92,24 @@ export default function SingleCheckoutButton({
 
     try {
       setIsLoading(true)
+
+      // Prepare form responses for API
+      const formattedFormResponses = formResponses && Object.keys(formResponses).length > 0
+        ? {
+            responses: Object.entries(formResponses).map(([questionId, answer]) => {
+              const question = eventFormData?.questions.find(q => q.id === questionId)
+              return {
+                questionId,
+                question: question?.question || '',
+                answer,
+                questionType: question?.type || '',
+                required: question?.required || false,
+                options: question?.options || [],
+              }
+            }),
+          }
+        : null
+
       const { data } = await axiosInstance.post(
         '/api/payment/checkout-sessions/create',
         {
@@ -109,7 +127,7 @@ export default function SingleCheckoutButton({
           guestName: guestInfo.guestName,
           guestPhone: guestInfo.guestPhone,
           // Event form responses
-          ...(formResponses && { formResponses }),
+          ...(formattedFormResponses && { formResponses: formattedFormResponses }),
         }
       )
       const result = await stripe!.redirectToCheckout({ sessionId: data.id })

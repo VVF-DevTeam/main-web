@@ -906,6 +906,9 @@ export default function EventCartCheckout({
                 questionId,
                 question: question?.question || '',
                 answer,
+                questionType: question?.type || '',
+                required: question?.required || false,
+                options: question?.options || [],
               }
             }),
           }

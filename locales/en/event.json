@@ -198,5 +198,9 @@
   "checkout-total": "Total",
   "event-registration-form-title": "Event Registration Form",
   "event-registration-form-description": "Please fill out the following information to complete your registration.",
-  "continue-to-payment": "Continue to Payment"
+  "continue-to-payment": "Continue to Payment",
+  "back-button": "Back",
+  "processing": "Processing...",
+  "form-validation-error": "Please answer all required questions",
+  "form-validation-description": "{{count}} required question(s) need to be answered."
 }

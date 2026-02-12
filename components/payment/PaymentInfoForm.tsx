@@ -44,8 +44,8 @@ export default function PaymentInfoForm({
         )
 
         if (missingResponses.length > 0) {
-            toast.error('Please answer all required questions', {
-                description: `${missingResponses.length} required question(s) need to be answered.`,
+            toast.error(t('form-validation-error'), {
+                description: t('form-validation-description', { count: missingResponses.length }),
                 style: { color: '#ef4444' },
             })
             return
@@ -204,7 +204,7 @@ export default function PaymentInfoForm({
                         disabled={isLoading}
                         type="button"
                     >
-                        Back
+                        {t('back-button')}
                     </Button>
                 )}
                 <Button
@@ -216,11 +216,11 @@ export default function PaymentInfoForm({
                     {isLoading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
+                            {t('processing')}
                         </>
                     ) : (
                         <>
-                            {buttonText || 'Continue to Payment'}
+                            {buttonText || t('continue-to-payment')}
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </>
                     )}

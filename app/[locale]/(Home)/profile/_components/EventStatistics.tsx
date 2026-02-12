@@ -54,6 +54,7 @@ interface Payment {
   guestEmail: string | null
   guestPhone: string | null
   otherGuests?: JsonValue
+  formResponses?: JsonValue
   user: {
     name: string | null
     email: string
@@ -70,6 +71,19 @@ interface Payment {
     type: string
     capacityPerTicket: number
   } | null
+}
+
+type FormResponse = {
+  questionId: string
+  question: string
+  answer: string
+  questionType: string
+  required: boolean
+  options: string[]
+}
+
+type FormResponsesData = {
+  responses: FormResponse[]
 }
 
 export default function EventStatistics({
@@ -91,6 +105,7 @@ export default function EventStatistics({
     order: 'asc' | 'desc' | null
   }>({ column: null, order: null })
   const [expandedPayments, setExpandedPayments] = useState<Record<string, boolean>>({})
+  const [activeTab, setActiveTab] = useState<'tickets' | 'answers'>('tickets')
 
   // Initialize from URL params if present
   useEffect(() => {
@@ -337,6 +352,35 @@ export default function EventStatistics({
         </div>
 
         {selectedEventId && (
+          <>
+            {/* Tab Header */}
+            <div className="mb-6">
+            <div className="border-b border-gray-200">
+              <nav className="flex space-x-8" aria-label="Tabs">
+                <button
+                  onClick={() => setActiveTab('tickets')}
+                  className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+                    activeTab === 'tickets'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                >
+                  Tickets
+                </button>
+                <button
+                  onClick={() => setActiveTab('answers')}
+                  className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+                    activeTab === 'answers'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                >
+                  Answers
+                </button>
+              </nav>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Side - Statistics */}
             <div className="lg:col-span-1">
@@ -444,13 +488,15 @@ export default function EventStatistics({
               </div>
             </div>
 
-            {/* Right Side - Table */}
+            {/* Right Side - Content */}
             <div className="lg:col-span-2">
-              {loading ? (
-                <div className="flex items-center justify-center rounded-lg border bg-white p-8">
-                  <p>Loading...</p>
-                </div>
-              ) : payments.length > 0 ? (
+              {activeTab === 'tickets' ? (
+                <>
+                  {loading ? (
+                    <div className="flex items-center justify-center rounded-lg border bg-white p-8">
+                      <p>Loading...</p>
+                    </div>
+                  ) : payments.length > 0 ? (
                 <div className="rounded-lg border bg-white shadow-sm">
                   <h3 className="border-b px-4 py-3 text-lg font-semibold">
                     Sold Tickets Table
@@ -587,21 +633,25 @@ export default function EventStatistics({
                               </tr>
                               {hasOtherGuests && isExpanded && (
                                 <tr className="bg-gray-50">
-                                  <td colSpan={8} className="px-12 py-3">
-                                    <div className="space-y-2">
-                                      {otherGuestsList.map((guest, index) => (
-                                        <div
-                                          key={`${payment.id}-guest-${index}`}
-                                          className="flex flex-wrap gap-6 text-sm text-gray-700"
-                                        >
-                                          <span className="font-medium">
-                                            Guest {index + 1}:
-                                          </span>
-                                          <span>{guest?.email || '-'}</span>
-                                          <span>{guest?.phone || '-'}</span>
-                                          <span>{guest?.name || '-'}</span>
-                                        </div>
-                                      ))}
+                                  <td colSpan={9} className="px-4">
+                                    <div className="ml-8">
+                                      <table className="w-full text-sm">
+                                        <tbody>
+                                          {otherGuestsList.map((guest, index) => (
+                                            <tr
+                                              key={`${payment.id}-guest-${index}`}
+                                              className="border-b border-gray-200 last:border-0"
+                                            >
+                                              <td className="px-4 py-2 font-medium text-gray-700">
+                                                Guest {index + 1}
+                                              </td>
+                                              <td className="px-4 py-2 text-gray-700">{guest?.email || '-'}</td>
+                                              <td className="px-4 py-2 text-gray-700">{guest?.phone || '-'}</td>
+                                              <td className="px-4 py-2 text-gray-700">{guest?.name || '-'}</td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
                                     </div>
                                   </td>
                                 </tr>
@@ -613,15 +663,40 @@ export default function EventStatistics({
                     </table>
                   </div>
                 </div>
+                  ) : (
+                    <div className="flex items-center justify-center rounded-lg border bg-white p-8">
+                      <p className="text-muted-foreground">
+                        No payments found for this event
+                      </p>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="flex items-center justify-center rounded-lg border bg-white p-8">
-                  <p className="text-muted-foreground">
-                    No payments found for this event
-                  </p>
+                // Answers Tab
+                <div className="rounded-lg border bg-white shadow-sm">
+                  <h3 className="border-b px-4 py-3 text-lg font-semibold">
+                    Form Responses
+                  </h3>
+                  <div className="p-4">
+                    {loading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <p>Loading...</p>
+                      </div>
+                    ) : payments.length > 0 ? (
+                      <FormResponsesView payments={payments} />
+                    ) : (
+                      <div className="flex items-center justify-center p-8">
+                        <p className="text-muted-foreground">
+                          No form responses found for this event
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           </div>
+          </>
         )}
 
         {!selectedEventId && (
@@ -634,4 +709,212 @@ export default function EventStatistics({
       </div>
     </div>
   )
+}
+
+// Component to display form responses grouped by question
+function FormResponsesView({ payments }: { payments: Payment[] }) {
+  // Aggregate all form responses by question
+  const questionMap = new Map<
+    string,
+    {
+      question: string
+      questionType: string
+      required: boolean
+      options: string[]
+      responses: Array<{
+        paymentId: string
+        customerName: string
+        customerEmail: string
+        answer: string
+      }>
+    }
+  >()
+
+  payments.forEach((payment) => {
+    if (!payment.formResponses) return
+
+    const formData = payment.formResponses as FormResponsesData
+    if (!formData.responses || !Array.isArray(formData.responses)) return
+
+    const customerName =
+      payment.user?.name || payment.guestName || 'Unknown'
+    const customerEmail =
+      payment.user?.email || payment.guestEmail || 'Unknown'
+
+    formData.responses.forEach((response: FormResponse) => {
+      if (!questionMap.has(response.questionId)) {
+        questionMap.set(response.questionId, {
+          question: response.question,
+          questionType: response.questionType,
+          required: response.required,
+          options: response.options,
+          responses: [],
+        })
+      }
+
+      questionMap.get(response.questionId)!.responses.push({
+        paymentId: payment.id,
+        customerName,
+        customerEmail,
+        answer: response.answer,
+      })
+    })
+  })
+
+  if (questionMap.size === 0) {
+    return (
+      <div className="text-center text-muted-foreground p-8">
+        No form responses available
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8">
+      {Array.from(questionMap.entries()).map(([questionId, data]) => (
+        <div key={questionId} className="border-b pb-6 last:border-b-0">
+          <div className="mb-4">
+            <h4 className="text-base font-semibold text-gray-900">
+              {data.question}
+              {data.required && (
+                <span className="ml-2 text-xs text-red-500">*Required</span>
+              )}
+            </h4>
+            <p className="text-xs text-gray-500 mt-1">
+              Type: {data.questionType.replace('_', ' ')}
+              {data.options.length > 0 &&
+                ` • Options: ${data.options.join(', ')}`}
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-300 bg-gray-50">
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                    Customer Name
+                  </th>
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                    Email
+                  </th>
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                    Answer
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.responses.map((response, index) => (
+                  <tr
+                    key={`${response.paymentId}-${index}`}
+                    className="border-b border-gray-200 last:border-0"
+                  >
+                    <td className="px-4 py-3 text-gray-700">
+                      {response.customerName}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {response.customerEmail}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {renderAnswer(response.answer, data.questionType)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary for choice questions */}
+          {(data.questionType === 'single_choice' ||
+            data.questionType === 'multi_choice') && (
+            <div className="mt-3 rounded-md bg-blue-50 p-3">
+              <p className="text-xs font-semibold text-blue-900 mb-2">
+                Summary:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(() => {
+                  const summary = getSummary(data.responses, data.questionType)
+                  const total = summary.reduce((sum, item) => sum + item.count, 0)
+                  return summary.map((item, idx) => {
+                    const percentage = ((item.count / total) * 100).toFixed(1)
+                    return (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+                      >
+                        {item.value}: {item.count} ({percentage}%)
+                      </span>
+                    )
+                  })
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Helper function to render answer based on question type
+function renderAnswer(answer: string, questionType: string): React.ReactNode {
+  if (!answer) return <span className="text-gray-400 italic">No answer</span>
+
+  switch (questionType) {
+    case 'date':
+      try {
+        const date = new Date(answer)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      } catch {
+        return answer
+      }
+    case 'multi_choice':
+      return (
+        <div className="flex flex-wrap gap-1">
+          {answer.split(',').map((item, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800"
+            >
+              {item.trim()}
+            </span>
+          ))}
+        </div>
+      )
+    case 'long_text':
+      return <div className="whitespace-pre-wrap">{answer}</div>
+    default:
+      return answer
+  }
+}
+
+// Helper function to get summary for choice questions
+function getSummary(
+  responses: Array<{ answer: string }>,
+  questionType: string
+): Array<{ value: string; count: number }> {
+  const countMap = new Map<string, number>()
+
+  responses.forEach((response) => {
+    if (questionType === 'multi_choice') {
+      // For multi-choice, split by comma and count each option
+      response.answer.split(',').forEach((item) => {
+        const trimmed = item.trim()
+        countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+      })
+    } else {
+      // For single choice, count the whole answer
+      countMap.set(
+        response.answer,
+        (countMap.get(response.answer) || 0) + 1
+      )
+    }
+  })
+
+  return Array.from(countMap.entries())
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count)
 }

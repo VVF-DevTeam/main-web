@@ -201,5 +201,9 @@
   "checkout-total": "Total",
   "event-registration-form-title": "Formulaire d'inscription à l'événement",
   "event-registration-form-description": "Veuillez remplir les informations suivantes pour finaliser votre inscription.",
-  "continue-to-payment": "Continuer vers le paiement"
+  "continue-to-payment": "Continuer vers le paiement",
+  "back-button": "Retour",
+  "processing": "Traitement en cours...",
+  "form-validation-error": "Veuillez répondre à toutes les questions obligatoires",
+  "form-validation-description": "{{count}} question(s) obligatoire(s) doit/doivent être répondue(s)."
 }
