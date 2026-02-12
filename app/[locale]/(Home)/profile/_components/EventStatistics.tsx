@@ -571,11 +571,11 @@ export default function EventStatistics({
                             !payment.user &&
                             (payment.guestEmail || payment.guestName)
                           const displayEmail =
-                            payment.user?.email || payment.guestEmail || '-'
+                          payment.guestEmail || payment.user?.email || '-'
                           const displayPhone =
-                            payment.user?.phone || payment.guestPhone || '-'
+                          payment.guestPhone || payment.user?.phone ||  '-'
                           const displayName =
-                            payment.user?.name || payment.guestName || '-'
+                          payment.guestName || payment.user?.name ||  '-'
                           const paymentType = payment.eventTicket?.type || '-'
                           const otherGuestsList = Array.isArray(payment.otherGuests)
                             ? (payment.otherGuests as OtherGuestJson[])
