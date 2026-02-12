@@ -823,16 +823,18 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
 
           {/* Summary for choice questions */}
           {(data.questionType === 'single_choice' ||
-            data.questionType === 'multi_choice') && (
-              <div className="mt-3 rounded-md bg-blue-50 p-3">
-                <p className="text-xs font-semibold text-blue-900 mb-2">
-                  Summary:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {(() => {
-                    const summary = getSummary(data.responses, data.questionType)
-                    const total = summary.reduce((sum, item) => sum + item.count, 0)
-                    return summary.map((item, idx) => {
+            data.questionType === 'multi_choice') &&
+            (() => {
+              const summary = getSummary(data.responses, data.questionType)
+              if (summary.length === 0) return null
+              const total = summary.reduce((sum, item) => sum + item.count, 0)
+              return (
+                <div className="mt-3 rounded-md bg-blue-50 p-3">
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Summary:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {summary.map((item, idx) => {
                       const percentage = ((item.count / total) * 100).toFixed(1)
                       return (
                         <span
@@ -842,11 +844,11 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
                           {item.value}: {item.count} ({percentage}%)
                         </span>
                       )
-                    })
-                  })()}
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
         </div>
       ))}
     </div>
@@ -901,14 +903,18 @@ function getSummary(
       // For multi-choice, split by comma and count each option
       response.answer.split(',').forEach((item) => {
         const trimmed = item.trim()
-        countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+        // Skip empty values
+        if (trimmed) {
+          countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+        }
       })
     } else {
       // For single choice, count the whole answer
-      countMap.set(
-        response.answer,
-        (countMap.get(response.answer) || 0) + 1
-      )
+      const trimmed = response.answer.trim()
+      // Skip empty values
+      if (trimmed) {
+        countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+      }
     }
   })
 
