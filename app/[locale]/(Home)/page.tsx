@@ -77,8 +77,8 @@ export default async function Home({
     getCachedPostsPaginated('', 1, 3),
   ])
 
-  const reviews = paginatedReviews.reviews
-  const posts = paginatedPosts!.posts
+  const reviews = paginatedReviews?.reviews || []
+  const posts = paginatedPosts?.posts || []
 
   return (
     <div className="flex flex-col gap-y-12 overflow-hidden">
