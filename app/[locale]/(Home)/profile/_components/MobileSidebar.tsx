@@ -45,6 +45,14 @@ export default function MobileSidebar({
   const [isJobsDropdownOpen, setIsJobsDropdownOpen] = useState(
     jobManagementSections.includes(currentSection)
   )
+  const shopManagementSections = [
+    'admin-create-shop',
+    'admin-all-shops',
+    'admin-edit-shop',
+  ]
+  const [isShopsDropdownOpen, setIsShopsDropdownOpen] = useState(
+    shopManagementSections.includes(currentSection)
+  )
   const postManagementSections = [
     'admin-create-post',
     'admin-all-posts',
@@ -254,6 +262,53 @@ export default function MobileSidebar({
                             onClick={() => setIsOpen(false)}
                           >
                             {t('view-all-jobs')}
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+                )}
+
+                {/* Manage Shops Dropdown */}
+                {isAdmin && (
+                  <li>
+                    <button
+                      onClick={() => setIsShopsDropdownOpen(!isShopsDropdownOpen)}
+                      className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                    >
+                      <span>{t('manage-shops')}</span>
+                      <ChevronDown
+                        className={`h-5 w-5 transition-transform ${
+                          isShopsDropdownOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    {isShopsDropdownOpen && (
+                      <ul className="mt-2 space-y-2 pl-4">
+                        <li>
+                          <Link
+                            href={`/${locale}/profile?section=admin-create-shop`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-create-shop'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('create-shop')}
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href={`/${locale}/profile?section=admin-all-shops`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-all-shops'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('view-all-shops')}
                           </Link>
                         </li>
                       </ul>

@@ -4,6 +4,7 @@ import React, { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
 import { Quill } from 'react-quill-new'
+import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 
 interface EditorProps {
   onChange: (value: string) => void
@@ -48,7 +49,7 @@ const Editor = ({ onChange, value }: EditorProps) => {
         ],
         handlers: {
           image: function (this: QuillToolbarContext) {
-            const url = prompt('Enter image URL')
+            const url = getValidGoogleDriveImageUrl(prompt('Enter image URL') || '')
             if (url) {
               const range = this.quill.getSelection()
               this.quill.insertEmbed(range?.index || 0, 'image', url)

@@ -69,16 +69,6 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
       // update the event description
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
 
-      // update product description
-      // const processedText = htmlToVisibleText(values.description)
-
-      // if (event.stripeProductId) {
-      //   await axiosInstance.put(`/api/payment/events`, {
-      //     stripeProductId: event.stripeProductId,
-      //     description: processedText,
-      //   })
-      // }
-
       // send a success message
       setEditing(false)
       toast.success('Event description updated successfully', {

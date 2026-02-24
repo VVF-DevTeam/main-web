@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/form'
 import Image from 'next/image'
 import { axiosInstance } from '@/lib/axios'
+import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 
 interface PostImageProps {
   post: Post
@@ -98,14 +99,47 @@ const PostImage = ({ post }: PostImageProps) => {
               <FormField
                 control={form.control}
                 name="imgUrl"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <Input placeholder="Enter Image URL" {...field} disabled={isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const validUrl = getValidGoogleDriveImageUrl(field.value)
+                  return (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <div className="space-y-2">
+                          <Input
+                            placeholder="Enter Image URL"
+                            {...field}
+                            disabled={isLoading}
+                            onBlur={(e) => {
+                              const raw = e.target.value || ''
+                              const normalized = getValidGoogleDriveImageUrl(raw)
+                              if (normalized && normalized !== field.value) {
+                                field.onChange(normalized)
+                              }
+                              field.onBlur()
+                            }}
+                          />
+                          {field.value && (
+                            <div className="relative aspect-video max-w-xl">
+                              {validUrl ? (
+                                <Image
+                                  fill
+                                  src={validUrl}
+                                  alt="Post image preview"
+                                  className="rounded-md object-cover"
+                                />
+                              ) : (
+                                <p className="text-xs text-textColor-red">
+                                  Invalid Google Drive image URL
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
               />
               <Button disabled={isSubmitting || !isValid || isLoading}>Save</Button>
             </form>
@@ -116,12 +150,18 @@ const PostImage = ({ post }: PostImageProps) => {
           </p>
         ) : (
           <div className="relative mx-auto aspect-video h-full max-h-[900px] w-full max-w-[900px]">
-            <Image
-              fill
-              src={post?.imgUrl}
-              alt="Post Image"
-              className="absolute mt-4 rounded-lg object-cover"
-            ></Image>
+            {(() => {
+              const src =
+                getValidGoogleDriveImageUrl(post.imgUrl) || post.imgUrl
+              return (
+                <Image
+                  fill
+                  src={src}
+                  alt="Post Image"
+                  className="absolute mt-4 rounded-lg object-cover"
+                />
+              )
+            })()}
           </div>
         )}
       </div>

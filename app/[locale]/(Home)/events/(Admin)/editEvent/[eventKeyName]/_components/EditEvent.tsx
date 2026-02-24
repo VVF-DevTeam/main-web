@@ -6,38 +6,33 @@ import { EventForEditing } from '@/lib/actions/event/getEventById'
 // Components
 import PublishButton from '@/components/ui/PublishButton'
 import BackButton from '@/components/ui/back-button'
-import EventStartDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventStartDate'
-import EventTitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTitle'
-import EventEndDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventEndDate'
-import EventTimings from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTimings'
-import EventSchedule from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSchedule'
-import EventCategories from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventCategories'
-import EventDays from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDays'
-import EventImage from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventImage'
-import EventTickets from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventTicket'
-import EventDiscounts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDiscount'
-import EventLocation from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventLocation'
-import EventType from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventType'
-import EventHosts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventHosts'
-import EventDescription from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventDescription'
-import EventCapacity from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventCapacity'
-import EventEditSeries from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSeries'
+import EventStartDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventStartDate'
+import EventTitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventTitle'
+import EventEndDate from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventEndDate'
+import EventTimings from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventTimings'
+import EventSchedule from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventSchedule'
+import EventCategories from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventCategories'
+import EventDays from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventDays'
+import EventImage from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventImage'
+import EventTickets from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventTicket'
+import EventDiscounts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventDiscount'
+import EventLocation from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventLocation'
+import EventType from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventType'
+import EventHosts from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventHosts'
+import EventDescription from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventDescription'
+import EventCapacity from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventCapacity'
+import EventEditSeries from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventSeries'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
-import EventFormLink from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventFormLink'
-import EventSocialMedia from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSocialMedia'
-import EventSubtitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSubtitle'
-import EventGallery from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventGallery'
-import DeleteEventButton from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/DeleteEventButton'
-import EventSeating from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventSeating'
-import EventForm from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EventForm'
+import EventFormLink from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventFormLink'
+import EventSocialMedia from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventSocialMedia'
+import EventSubtitle from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventSubtitle'
+import EventGallery from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventGallery'
+import DeleteEventButton from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/DeleteEventButton'
+import EventSeating from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
+import EventForm from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EventForm'
 
 interface EditEventProps {
-  eventId: string
-  user: {
-    id: string
-    role: string[]
-  }
   event: EventForEditing
   categories: EventCategory[]
   allSeries: EventSeries[]
@@ -48,8 +43,6 @@ interface EditEventProps {
 }
 
 export default function EditEvent({
-  eventId,
-  user,
   event,
   categories,
   allSeries,

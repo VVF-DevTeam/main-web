@@ -9,42 +9,12 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 import Image from 'next/image'
 import Loader from '@/components/loader/Loader'
 
 interface EventGalleryProps {
   event: Event
-}
-
-// Helper: Validate URL and check if it's a Google Drive image file link
-function getValidImageUrl(url: string): string | null {
-  if (!url || typeof url !== 'string') return null
-  let parsedUrl: URL
-  try {
-    parsedUrl = new URL(url)
-  } catch {
-    return null
-  }
-
-  // Only accept Google Drive file links
-  if (parsedUrl.hostname === 'drive.google.com') {
-    // File link
-    const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
-    if (fileMatch && fileMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}`
-    }
-    // Thumbnail link
-    const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
-    if (idMatch && idMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${idMatch[1]}`
-    }
-    // Folder link (not supported)
-    if (url.includes('/folders/')) {
-      return null
-    }
-  }
-  // Not a Google Drive file link
-  return null
 }
 
 const EventGallery = ({ event }: EventGalleryProps) => {
@@ -76,11 +46,11 @@ const EventGallery = ({ event }: EventGalleryProps) => {
       setIsLoading(true)
       // Filter out empty image URLs and convert to valid Google Drive URLs
       const completeImages = galleryImages
-        .map((url) => getValidImageUrl(url))
+        .map((url) => getValidGoogleDriveImageUrl(url))
         .filter((url): url is string => !!url)
 
       // Prevent saving if any URL is not a valid Google Drive file link
-      const invalidUrls = galleryImages.filter((url) => !getValidImageUrl(url))
+      const invalidUrls = galleryImages.filter((url) => !getValidGoogleDriveImageUrl(url))
       if (invalidUrls.length > 0) {
         toast.error('Only Google Drive image file URLs are accepted.', {
           description: (
@@ -186,7 +156,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
             {galleryImages
               .filter((url) => url.trim() !== '')
               .map((imageUrl, index) => {
-                const validUrl = getValidImageUrl(imageUrl)
+                const validUrl = getValidGoogleDriveImageUrl(imageUrl)
                 return (
                   <div
                     key={index}

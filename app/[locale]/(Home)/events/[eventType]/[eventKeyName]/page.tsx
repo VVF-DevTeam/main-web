@@ -7,7 +7,7 @@ import ConcertHeaders from '../_component/_concert/ConcertHeaders'
 import NotFound from '../../../not-found'
 
 // Types
-import { SeatingMap } from '../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+import { SeatingMap } from '../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
 
 // Libraries
 import { Metadata } from 'next'

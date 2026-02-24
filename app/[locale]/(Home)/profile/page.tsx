@@ -7,6 +7,7 @@ import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
+import { getAllShops, getShopForEditing } from '@/lib/actions/shop/getShop'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -22,7 +23,7 @@ import CreateEventForm from './_components/CreateEventForm'
 import EventCategoryManager from './_components/EventCategoryManager'
 import EventSeriesManager from './_components/EventSeriesManager'
 import SponsorsManagement from './_components/SponsorsManagement'
-import EditEvent from '../events/(Admin)/editEvent/[eventId]/_components/EditEvent'
+import EditEvent from '../events/(Admin)/editEvent/[eventKeyName]/_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
 import CreateJobForm from './_components/CreateJobForm'
 import EditJob from '../registration/_components/_jobs/_editJob/EditJob'
@@ -30,6 +31,9 @@ import JobManagement from '../registration/_components/_jobs/_allJob/JobManageme
 import PostManagement from '../posts/(Admin)/allPosts/_components/PostManagement'
 import CreatePostForm from './_components/CreatePostForm'
 import EditPost from '../posts/(Admin)/editPost/_components/EditPost'
+import ShopManagement from '../shop/(Admin)/allShops/_components/ShopManagement'
+import CreateShopForm from './_components/CreateShopForm'
+import EditShop from '../shop/(Admin)/editShop/[shopId]/_components/EditShop'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -83,13 +87,14 @@ export default async function ProfilePage({
     section?: string
     page?: string
     pageSize?: string
-    eventId?: string
+    eventKeyName?: string
     jobId?: string
     postId?: string
+    shopId?: string
   }>
 }) {
   const [
-    { section, page: pageStr, pageSize: pageSizeStr, eventId, jobId, postId },
+    { section, page: pageStr, pageSize: pageSizeStr, eventKeyName, jobId, postId, shopId },
     { locale },
     user,
   ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
@@ -159,7 +164,7 @@ export default async function ProfilePage({
           <EventManagement
             allEvents={allEvents}
             createEventLink={`/${locale}/profile?section=admin-create-event`}
-            editLinkPattern={`/${locale}/profile?section=admin-edit-event&eventId={keyName}`}
+            editLinkPattern={`/${locale}/profile?section=admin-edit-event&eventKeyName={keyName}`}
             showBackButton={false}
           />
         )
@@ -231,17 +236,17 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN'))
       ) {
-        if (!eventId) {
+        if (!eventKeyName) {
           return (
             <p className="mt-10 text-center">
-              Event ID is required to edit an event.
+              Event Key Name is required to edit an event.
             </p>
           )
         }
 
         // Fetch event data, categories, and series in parallel
         const [event, categories, allSeries] = await Promise.all([
-          getEventForEditing(eventId),
+          getEventForEditing(eventKeyName),
           getAllEventCategories(),
           getAllEventSeries(),
         ])
@@ -256,8 +261,6 @@ export default async function ProfilePage({
 
         return (
           <EditEvent
-            eventId={eventId}
-            user={user}
             event={event}
             categories={categories}
             allSeries={allSeries}
@@ -383,6 +386,71 @@ export default async function ProfilePage({
         return (
           <EditPost
             post={post}
+            showBackButton={false}
+          />
+        )
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-create-shop':
+      if (user.role && user.role.includes('ADMIN')) {
+        return <CreateShopForm ownerId={user.id} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-all-shops':
+      if (user.role && user.role.includes('ADMIN')) {
+        const allShops = await getAllShops()
+        return (
+          <ShopManagement
+            allShops={allShops}
+            createShopLink={`/${locale}/profile?section=admin-create-shop`}
+            editLinkPattern={`/${locale}/profile?section=admin-edit-shop&shopId={shopId}`}
+            showBackButton={false}
+          />
+        )
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-edit-shop':
+      if (
+        user.role &&
+        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+      ) {
+        if (!shopId) {
+          return (
+            <p className="mt-10 text-center">
+              Shop ID is required to edit a shop.
+            </p>
+          )
+        }
+
+        // Fetch shop data
+        const shop = await getShopForEditing(shopId)
+
+        if (!shop) {
+          return (
+            <p className="mt-10 text-center">
+              Shop not found.
+            </p>
+          )
+        }
+
+        return (
+          <EditShop
+            shop={shop}
             showBackButton={false}
           />
         )

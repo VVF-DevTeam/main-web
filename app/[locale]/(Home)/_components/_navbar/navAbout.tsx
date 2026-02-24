@@ -73,7 +73,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
         {/* <Ribbon className="h-5 w-5" /> */}
         <span>{title}</span>
         <ChevronDown
-          className={`h-6 w-6 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`lg:h-6 lg:w-6 h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
