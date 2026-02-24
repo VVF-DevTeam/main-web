@@ -67,7 +67,7 @@ const AuthButtons = ({ mode }: { mode: string }) => {
     }
   }
   return (
-    <div className="flex items-center justify-center gap-x-4 lg:ml-[2vw] xl:ml-[5vw]">
+    <div className="flex items-center justify-center gap-x-4 lg:ml-[2vw]">
       {!userExists && (
         <Link href="/signUp">
           <button

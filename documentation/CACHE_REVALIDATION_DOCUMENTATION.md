@@ -244,6 +244,45 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Shops
+
+#### 30. `getAllShops`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shops-all']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all shops (published and unpublished) for admin use only, ordered by updatedAt descending. Includes event relation (title).
+
+#### 31. `getAllPublishedShops`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shops-published-all']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns published shops with optional select fields. Default returns minimal fields (id, title) for backward compatibility.
+
+#### 32. `getShopById`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shop-by-id']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns a single shop by ID with shopItems and event relations.
+
+#### 33. `getShopBySlug`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shop-by-slug']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns a single shop by slug with shopItems and event relations. Used for shop detail pages.
+
+#### 34. `getShopForEditing`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shop-for-editing']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 86400 seconds (1 hour)
+- **Description**: Returns a single shop by ID specifically for editing, with shopItems (ordered by createdAt) and event relation (id, title, keyName). Used in admin edit shop pages.
+
+---
+
 ## Tag-Based Revalidation Mapping
 
 ### Tag: `'events'`
@@ -270,37 +309,37 @@ This document provides a comprehensive overview of all functions using `unstable
    - Line: 21
    - Action: Creates a new event
 
-2. **`app/api/events/edit/[eventId]/route.ts`**
+2. **`app/api/events/edit/[eventKeyName]/route.ts`**
    - Function: `PUT`
    - Line: 53
    - Action: Updates an existing event
 
-3. **`app/api/events/publish/[eventId]/route.ts`**
+3. **`app/api/events/publish/[eventKeyName]/route.ts`**
    - Function: `PATCH`
    - Line: 32
    - Action: Publishes an event (sets isPublished to true)
 
-4. **`app/api/events/unpublish/[eventId]/route.ts`**
+4. **`app/api/events/unpublish/[eventKeyName]/route.ts`**
    - Function: `PATCH`
    - Line: 34
    - Action: Unpublishes an event (sets isPublished to false)
 
-5. **`app/api/events/delete/[eventId]/route.ts`**
+5. **`app/api/events/delete/[eventKeyName]/route.ts`**
    - Function: `DELETE`
    - Line: 36
    - Action: Deletes an event
 
-6. **`app/api/events/edit/[eventId]/series/edit/route.ts`**
+6. **`app/api/events/edit/[eventKeyName]/series/edit/route.ts`**
    - Function: `PUT` (line 35)
    - Function: `DELETE` (line 73)
    - Action: Adds or removes series from an event
 
-7. **`app/api/events/edit/[eventId]/hosts/edit/route.ts`**
+7. **`app/api/events/edit/[eventKeyName]/hosts/edit/route.ts`**
    - Function: `PUT` (line 37)
    - Function: `DELETE` (line 81)
    - Action: Adds or removes hosts from an event
 
-8. **`app/api/events/edit/[eventId]/categories/edit/route.ts`**
+8. **`app/api/events/edit/[eventKeyName]/categories/edit/route.ts`**
    - Function: `POST` (line 28)
    - Function: `DELETE` (line 62)
    - Action: Adds or removes categories from an event
@@ -323,11 +362,11 @@ This document provides a comprehensive overview of all functions using `unstable
     - Function: `DELETE`
     - Action: Deletes a schedule item from an event. Schedules are included in cached event queries, so changes must invalidate the cache.
 
-13. **`app/api/events/forms/[eventId]/route.ts`**
+13. **`app/api/events/forms/[eventKeyName]/route.ts`**
     - Function: `PUT`
     - Action: Creates or updates event form data. Event forms are part of event data, so changes must invalidate the cache.
 
-14. **`app/api/events/discounts/[eventId]/route.ts`**
+14. **`app/api/events/discounts/[eventKeyName]/route.ts`**
     - Function: `PUT`
     - Line: 66
     - Action: Creates or updates event discounts data (stored in eventDiscounts JSON field). Event discounts are part of event data, so changes must invalidate the cache.
@@ -580,6 +619,45 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Tag: `'shops'`
+
+**Cached Functions Affected:**
+- `getAllShops`
+- `getAllPublishedShops`
+- `getShopById`
+- `getShopBySlug`
+- `getShopForEditing`
+
+**Functions Calling `revalidateTag('shops')`:**
+
+1. **`app/api/shops/create/route.ts`**
+   - Function: `POST`
+   - Line: 21
+   - Action: Creates a new shop
+
+2. **`app/api/shops/edit/[shopId]/route.ts`**
+   - Function: `PUT`
+   - Line: 37
+   - Action: Updates an existing shop
+
+3. **`app/api/shops/items/route.ts`**
+   - Function: `POST` (line 105)
+   - Function: `PUT` (line 280)
+   - Function: `DELETE` (line 326)
+   - Action: Creates, updates, or deletes shop items. Shop items are included in cached shop queries (e.g., `getShopById`, `getShopBySlug`, `getShopForEditing`), so changes must invalidate the cache.
+
+4. **`app/api/shops/publish/[shopId]/route.ts`**
+   - Function: `PATCH`
+   - Line: 24
+   - Action: Publishes a shop (sets isPublished to true)
+
+5. **`app/api/shops/unpublish/[shopId]/route.ts`**
+   - Function: `PATCH`
+   - Line: 24
+   - Action: Unpublishes a shop (sets isPublished to false)
+
+---
+
 ## Summary by Tag
 
 ### Complete Tag Coverage
@@ -596,6 +674,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
 | `jobs` | 3 functions | 5 API routes | ✅ Fully covered |
 | `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
+| `shops` | 5 functions | 5 API routes | ✅ Fully covered |
 
 ---
 
@@ -608,6 +687,7 @@ This document provides a comprehensive overview of all functions using `unstable
    - Event for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Job for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Post for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
+   - Shop for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 
@@ -635,6 +715,8 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Additionally**, call `revalidateTag('events')` when changing a job's eventId (linking/unlinking from event), as events include linked jobs and use this to display volunteer sections
 - Note: Job applications do NOT require `revalidateTag('jobs')` as they don't modify job data
 - When creating, updating, or refunding payments, always call `revalidateTag('payments')`
+- When creating, updating, publishing, unpublishing, or deleting shops, always call `revalidateTag('shops')`
+- When creating, updating, or deleting shop items, always call `revalidateTag('shops')` (shop items are included in cached shop queries)
 - Social media posts cache automatically refreshes every 10 minutes
 
 

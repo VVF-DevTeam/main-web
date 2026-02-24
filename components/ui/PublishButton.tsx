@@ -11,8 +11,8 @@ interface PublishButtonProps {
   id: string
   canPublish: boolean
   isPublished: boolean
-  type: 'post' | 'event' | 'class' | 'job'
-  domain: 'posts' | 'events' | 'classes' | 'jobs'
+  type: 'post' | 'event' | 'class' | 'job' | 'shop'
+  domain: 'posts' | 'events' | 'classes' | 'jobs' | 'shops'
 }
 
 const PublishButton = ({

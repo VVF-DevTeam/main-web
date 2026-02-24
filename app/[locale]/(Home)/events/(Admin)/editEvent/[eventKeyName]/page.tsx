@@ -7,14 +7,14 @@ import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { getEventForEditing } from '@/lib/actions/event/getEventById'
 
 // Components
-import EditEvent from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventId]/_components/EditEvent'
+import EditEvent from '@/app/[locale]/(Home)/events/(Admin)/editEvent/[eventKeyName]/_components/EditEvent'
 import NotFound from '@/app/[locale]/(Home)/not-found'
 
 // Main Component
 const EditEventPage = async ({
   params,
 }: {
-  params: Promise<{ eventId: string; locale: string }>
+  params: Promise<{ eventKeyName: string; locale: string }>
 }) => {
   // check if the current user is an admin or host to allow access to the post control page
   if (
@@ -24,7 +24,7 @@ const EditEventPage = async ({
     return redirect('/events')
   }
 
-  const { eventId } = await params
+  const { eventKeyName } = await params
 
   // Get current user info
   const user = await getCurrentUserInfo()
@@ -34,7 +34,7 @@ const EditEventPage = async ({
 
   // Fetch event data, categories, and series in parallel
   const [event, categories, allSeries] = await Promise.all([
-    getEventForEditing(eventId),
+    getEventForEditing(eventKeyName),
     getAllEventCategories(),
     getAllEventSeries(),
   ])
@@ -45,8 +45,6 @@ const EditEventPage = async ({
 
   return (
     <EditEvent
-      eventId={eventId}
-      user={user}
       event={event}
       categories={categories}
       allSeries={allSeries}

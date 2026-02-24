@@ -13,7 +13,7 @@ import Link from 'next/link'
 import {
   SeatingMap,
   SeatValue,
-} from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+} from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
 import {
   Sheet,
   SheetContent,
@@ -24,7 +24,7 @@ import {
 import {
   SEAT_STATUS,
   SEAT_STATUS_USER,
-} from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+} from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
 import { EventTicket } from '@prisma/client'
 import { JsonValue } from '@prisma/client/runtime/library'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'

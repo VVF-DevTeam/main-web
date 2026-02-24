@@ -29,7 +29,7 @@ import ServerError from '@/components/error/ServerError'
 import VolunteerSection from '../_class/VolunteerSection'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
-import { SeatingMap } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+import { SeatingMap } from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
 import { JsonValue } from '@prisma/client/runtime/library'
 
 type SponsorOnEvent = {

@@ -247,7 +247,7 @@ export default function EventStatistics({
       return
     }
     router.push(
-      `/${locale}/profile?section=admin-edit-event&eventId=${selectedEventKeyName}`
+      `/${locale}/profile?section=admin-edit-event&eventKeyName=${selectedEventKeyName}`
     )
   }
 

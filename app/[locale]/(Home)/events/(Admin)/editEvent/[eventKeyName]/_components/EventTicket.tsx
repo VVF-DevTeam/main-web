@@ -32,6 +32,8 @@ import {
 import { axiosInstance } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import Loader from '@/components/loader/Loader'
+import Image from 'next/image'
+import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 
 type TicketWithPayments = EventTicket & {
   payments: Array<{ quantity: number }>
@@ -282,7 +284,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
           typeChanged
         ) {
           const { data } = await axiosInstance.put<StripeTicketDataEdit>(
-            '/api/payment/tickets',
+            '/api/payment/stripe-prices/event-tickets',
             {
               eventId: event.id,
               eventUrl,
@@ -304,9 +306,9 @@ const EventTickets = ({ event }: EventTicketsProps) => {
           }
         }
       } else {
-        // Creating new ticket
+        // Creating new prices
         const { data } = await axiosInstance.post<StripeTicketDataCreate>(
-          '/api/payment/tickets',
+          '/api/payment/stripe-prices/event-tickets',
           {
             eventId: event.id,
             eventUrl,
@@ -367,7 +369,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
 
         // Update Stripe product metadata with ticketId after ticket creation (one-time only)
         // Metadata is only set when the product is first created or immediately after ticket creation
-        await axiosInstance.put('/api/payment/tickets', {
+        await axiosInstance.put('/api/payment/stripe-prices/event-tickets', {
           eventId: event.id,
           eventUrl,
           title: ticketTitle,
@@ -586,12 +588,16 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                 ticket.capacityPerTicket
 
               const soldCount = calculateSoldCount(ticket.payments || [])
+              const ticketImageUrl = ticket.imageUrl
+                ? getValidGoogleDriveImageUrl(ticket.imageUrl) || ticket.imageUrl
+                : null
               return (
                 <div
                   key={ticket.id}
-                  className="flex items-center justify-between rounded-md border bg-white p-4"
+                  className="flex items-center gap-4 rounded-md border bg-white p-4"
                 >
-                  <div className="flex flex-col gap-y-1">
+                  {/* Content */}
+                  <div className="flex flex-1 flex-col gap-y-1">
                     <div className="font-semibold">
                       {ticket.type} - ${displayPrice.toFixed(2)}{' '}
                       {ticket.currency}
@@ -618,6 +624,21 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                       </div>
                     )}
                   </div>
+
+                  {/* Background Image - Middle */}
+                  {ticketImageUrl && (
+                    <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-md">
+                      <Image
+                        src={ticketImageUrl}
+                        alt={`${ticket.type} ticket background`}
+                        fill
+                        className="object-cover"
+                        sizes="128px"
+                      />
+                    </div>
+                  )}
+
+                  {/* Buttons */}
                   <div className="flex gap-x-2">
                     <button
                       onClick={() => loadTicketIntoForm(ticket)}
@@ -898,26 +919,55 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                   <FormField
                     control={ticketForm.control}
                     name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Ticket Background Image URL (Optional)
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="url"
-                            placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
-                            {...field}
-                            value={field.value ?? ''}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              field.onChange(value === '' ? null : value)
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const validUrl = getValidGoogleDriveImageUrl(field.value || '')
+                      return (
+                        <FormItem>
+                          <FormLabel>
+                            Ticket Background Image URL (Optional)
+                          </FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <Input
+                                type="url"
+                                placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
+                                {...field}
+                                value={field.value ?? ''}
+                                onChange={(e) => {
+                                  const value = e.target.value
+                                  field.onChange(value === '' ? null : value)
+                                }}
+                                onBlur={(e) => {
+                                  const raw = e.target.value || ''
+                                  const normalized = getValidGoogleDriveImageUrl(raw)
+                                  if (normalized && normalized !== field.value) {
+                                    field.onChange(normalized)
+                                  }
+                                  field.onBlur()
+                                }}
+                              />
+                              {field.value && (
+                                <div className="relative aspect-video max-w-xl">
+                                  {validUrl ? (
+                                    <Image
+                                      fill
+                                      src={validUrl}
+                                      alt="Ticket background image preview"
+                                      className="rounded-md object-cover"
+                                    />
+                                  ) : (
+                                    <p className="text-xs text-textColor-red">
+                                      Invalid Google Drive image URL
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
                   />
                 </div>
 

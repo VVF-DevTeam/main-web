@@ -24,6 +24,40 @@ export function extractGoogleDriveId(url: string): string {
   return '1Vxf5XRe8ENcYtKA2FbaYb2blj9fTwBCx'
 }
 
+// Helper: Validate URL and check if it's a Google Drive image file link.
+// Returns a thumbnail URL (https://drive.google.com/thumbnail?id=FILE_ID) or null if invalid.
+export function getValidGoogleDriveImageUrl(url: string): string | null {
+  if (!url || typeof url !== 'string') return null
+
+  let parsedUrl: URL
+  try {
+    parsedUrl = new URL(url)
+  } catch {
+    return null
+  }
+
+  // Only accept Google Drive file links
+  if (parsedUrl.hostname === 'drive.google.com') {
+    // File link
+    const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+    if (fileMatch && fileMatch[1]) {
+      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}`
+    }
+    // Thumbnail or open link with ?id=
+    const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
+    if (idMatch && idMatch[1]) {
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}`
+    }
+    // Folder link (not supported)
+    if (url.includes('/folders/')) {
+      return null
+    }
+  }
+
+  // Not a Google Drive file link
+  return null
+}
+
 export default function gdriveLoader({ src, width }: gdriveLoaderArgs) {
   // `src` of the image should be like `https://drive.google.com/thumbnail?id=1JLCsSSkUa9T6_dIksI8L3XWu8K0H6gKz`.
   // if not return as it is

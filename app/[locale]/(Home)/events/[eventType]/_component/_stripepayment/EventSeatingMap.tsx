@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils'
 import {
     SeatingMap,
     SeatValue,
-} from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
-import { SEAT_STATUS } from '../../../(Admin)/editEvent/[eventId]/_components/EventSeating'
+} from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
+import { SEAT_STATUS } from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
 
 interface EventSeatingMapProps {
     seatingMap: SeatingMap

@@ -107,7 +107,7 @@ const CreateEventForm = ({
       // Redirect to profile edit page if redirectToProfile is provided
       if (redirectToProfile) {
         router.push(
-          `/${redirectToProfile.locale}/profile?section=admin-edit-event&eventId=${response.data.keyName}`
+          `/${redirectToProfile.locale}/profile?section=admin-edit-event&eventKeyName=${response.data.keyName}`
         )
       } else {
         router.push(`/events/editEvent/${response.data.keyName}`)

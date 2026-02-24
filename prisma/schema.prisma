@@ -35,7 +35,6 @@ model Event {
   endDate            DateTime        @default(now())
   capacity           Int?
 
-
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
@@ -50,7 +49,6 @@ model Event {
   subImgUrls         Json?
   imgUrls            Json?
   seatingMap         Json?
-  eventHosts         Json?
   eventDiscounts     Json?
   eventCodeDiscounts Json?
 
@@ -64,6 +62,7 @@ model Event {
   Review             Review[]
   form               EventForm[]
   jobs               Job[]
+  shops              Shop[]
   categories         EventCategory[] @relation("EventToEventCategory")
   hosts              User[]          @relation("EventToUser")
 
@@ -393,6 +392,85 @@ model Review {
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Shop {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  title       String
+  description String?
+  slug        String?      @unique  // URL-friendly identifier
+  imageUrl    String?      // Shop logo/banner
+  type        ShopType     @default(General)
+  
+  isPublished Boolean      @default(false)
+  isFeatured  Boolean      @default(false)
+  sortOrder   Int?         // For manual ordering
+  
+  ownerId     String
+  eventId     String?
+  
+  // Contact/Business info
+  contactEmail String?
+  contactPhone String?
+  termsUrl     String?
+  
+  shopItems   ShopItem[]   @relation("ShopToShopItem")
+  event       Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+}
+
+model ShopItem {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  title       String
+  description String?      @db.Text  // Detailed description
+  sku         String?      @unique   // Stock keeping unit
+  type        ShopItemType
+  imageUrl    String?      // Background for the item
+  images      String[]     // Multiple images
+  
+  // Inventory
+  limit       Int?
+  stockCount  Int?         // Current stock level
+  lowStockThreshold Int?   // Alert threshold
+  trackInventory Boolean   @default(false)
+  
+  // Pricing
+  price       Decimal
+  currency    String       @default("CAD")
+  discountMemberPercent    Int?
+  taxPercent  Int?         // If empty, there is no tax
+  
+  // Purchase constraints
+  minQuantity Int?         @default(1)
+  maxQuantity Int?
+  
+  // Availability
+  status      ItemStatus   @default(AVAILABLE)
+  validFrom   DateTime?
+  validTo     DateTime?
+  
+  // Display
+  isFeatured  Boolean      @default(false)
+  sortOrder   Int?
+  tags        String[]     // For categorization/filtering
+  
+  // Stripe catalog mapping
+  stripeProductId         String
+  stripePriceId           String
+  subscribedStripePriceId String?
+  
+  // Physical item properties (optional)
+  weight           Decimal?
+  weightUnit       String?  @default("kg")
+  dimension        String?
+  
+  // Relations
+  shops       Shop[]       @relation("ShopToShopItem")
+}
+
 enum Role {
   USER
   ADMIN
@@ -458,4 +536,27 @@ enum CheckoutSessionStatus {
   COMPLETED    // Payment successful, webhook processed
   EXPIRED      // Session expired (Stripe session expired)
   CANCELLED    // User cancelled the checkout
+}
+
+enum ShopItemType {
+  General
+  Limit
+  Discount
+}
+
+enum ItemStatus {
+  AVAILABLE
+  OUT_OF_STOCK
+  DISCONTINUED
+  COMING_SOON
+}
+
+enum ShopType {
+  General
+  Food
+  Clothes
+  Event
+  Fundraiser
+  Digital
+  Seasonal
 }
