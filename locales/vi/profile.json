@@ -15,6 +15,7 @@
   "create-edit-series": "Tạo & Chỉnh sửa Series",
   "create-edit-tags": "Tạo & Chỉnh sửa Tags",
   "create-event": "Tạo sự kiện",
+  "create-shop": "Tạo cửa hàng",
   "create-job": "Tạo việc làm",
   "create-post": "Tạo bài viết",
   "current-password": "Mật khẩu hiện tại",
@@ -43,6 +44,7 @@
   "manage-events": "Quản lý sự kiện",
   "manage-jobs": "Quản lý việc làm",
   "manage-posts": "Quản lý bài viết",
+  "manage-shops": "Quản lý cửa hàng",
   "manage-sponsors": "Quản lý nhà tài trợ",
   "my-profile": "Hồ sơ của tôi",
   "new-password": "Mật khẩu mới",
@@ -92,6 +94,7 @@
   "verification-email-error": "Đã xảy ra lỗi khi gửi email xác minh",
   "verify-phone-number": "Xác minh số điện thoại",
   "view-all-events": "Xem tất cả sự kiện",
+  "view-all-shops": "Xem tất cả cửa hàng",
   "view-all-jobs": "Xem tất cả việc làm",
   "view-all-posts": "Xem tất cả bài viết",
   "user-doesnt-exist": "Người dùng không tồn tại, vui lòng kiểm tra lại email của bạn"

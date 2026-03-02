@@ -83,10 +83,15 @@ const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
     if (event.target.files && event.target.files[0]) {
       setIsLoading(true)
       const file = event.target.files[0]
-      console.log(file)
       const formData = new FormData()
       formData.append('file', file)
-      const response = await axiosInstance.post('/api/users/avatars', formData)
+      const response = await axiosInstance.post(
+        '/api/users/avatars',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      )
       if (response.status === 200) {
         setImagePreview(response.data.url)
         form.setValue('image', response.data.url)

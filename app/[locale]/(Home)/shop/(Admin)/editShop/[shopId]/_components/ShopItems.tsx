@@ -224,6 +224,64 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
     setIsAddingNew(true)
   }
 
+  const handleMainImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files && event.target.files[0]) {
+      setIsLoading(true)
+      const file = event.target.files[0]
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await axiosInstance.post(
+          '/api/shops/items/images',
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          }
+        )
+
+        if (response.status === 200) {
+          itemForm.setValue('imageUrl', getValidGoogleDriveImageUrl(response.data.url), {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          })
+          toast.success('Image uploaded successfully', {
+            style: { color: '#22c55e' },
+            description: (
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            ),
+          })
+        } else {
+          toast.error('Failed to upload image', {
+            style: { color: '#ef4444' },
+            description: (
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            ),
+          })
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        toast.error('Failed to upload image', {
+          style: { color: '#ef4444' },
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
   const loadItemIntoForm = (item: ShopItemWithRelations) => {
     itemForm.reset({
       title: item.title,
@@ -938,7 +996,7 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
                       name="limit"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Limit (Optional)</FormLabel>
+                          <FormLabel>Limit (Optional, maximum number of items that can be purchased)</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -1076,7 +1134,7 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
                           name="stockCount"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Stock Count <span className="text-red-500">*</span></FormLabel>
+                              <FormLabel>Stock Count (Actual number of items in stock)<span className="text-red-500">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
@@ -1229,45 +1287,66 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
                         return (
                           <FormItem>
                             <FormLabel>Main Image URL (Optional)</FormLabel>
+                            <FormDescription>
+                              (Please use the button to upload new image. An URL will be generated automatically. You can reuse the same image link for multiple items.)
+                            </FormDescription>
                             <FormControl>
-                              <div className="space-y-2">
-                                <Input
-                                  type="url"
-                                  placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
-                                  {...field}
-                                  value={field.value ?? ''}
-                                  onChange={(e) => {
-                                    const value = e.target.value
-                                    field.onChange(
-                                      value === '' ? null : value
-                                    )
-                                  }}
-                                  onBlur={(e) => {
-                                    const raw = e.target.value || ''
-                                    const normalized =
-                                      getValidGoogleDriveImageUrl(raw)
-                                    if (normalized && normalized !== field.value) {
-                                      field.onChange(normalized)
-                                    }
-                                    field.onBlur()
-                                  }}
-                                />
-                                {field.value && (
-                                  <div className="relative aspect-video max-w-xl">
-                                    {validUrl ? (
-                                      <Image
-                                        fill
-                                        src={validUrl}
-                                        alt="Item main image preview"
-                                        className="rounded-md object-cover"
-                                      />
-                                    ) : (
-                                      <p className="text-xs text-textColor-red">
-                                        Invalid Google Drive image URL
-                                      </p>
-                                    )}
-                                  </div>
-                                )}
+                              <div className="space-y-3">
+                                <div className="space-y-2">
+                                  <Input
+                                    type="url"
+                                    placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    onChange={(e) => {
+                                      const value = e.target.value
+                                      field.onChange(
+                                        value === '' ? null : value
+                                      )
+                                    }}
+                                    onBlur={(e) => {
+                                      const raw = e.target.value || ''
+                                      const normalized =
+                                        getValidGoogleDriveImageUrl(raw)
+                                      if (
+                                        normalized &&
+                                        normalized !== field.value
+                                      ) {
+                                        field.onChange(normalized)
+                                      }
+                                      field.onBlur()
+                                    }}
+                                  />
+                                  {field.value && (
+                                    <div className="relative aspect-video max-w-xl">
+                                      {validUrl ? (
+                                        <Image
+                                          fill
+                                          src={validUrl}
+                                          alt="Item main image preview"
+                                          className="rounded-md object-cover"
+                                        />
+                                      ) : (
+                                        <p className="text-xs text-textColor-red">
+                                          Invalid Google Drive image URL
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="inline-flex cursor-pointer items-center justify-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                                    Upload Image File
+                                    <input
+                                      type="file"
+                                      className="hidden"
+                                      accept="image/*"
+                                      onChange={handleMainImageUpload}
+                                      disabled={isLoading}
+                                    />
+                                  </label>
+                                </div>
                               </div>
                             </FormControl>
                             <FormMessage />

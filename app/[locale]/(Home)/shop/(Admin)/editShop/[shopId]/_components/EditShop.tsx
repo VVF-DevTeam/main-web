@@ -11,6 +11,7 @@ import ShopSlug from './ShopSlug'
 import ShopImage from './ShopImage'
 import ShopInfo from './ShopInfo'
 import ShopItems from './ShopItems'
+import ShopEvent from './ShopEvent'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
 
@@ -111,10 +112,18 @@ export default function EditShop({
             <ShopType shop={shop} />
           </div>
 
+          {/* Event */}
+          <div className="flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step V :</span> Link to Event (Optional)
+            </h2>
+            <ShopEvent shop={shop} />
+          </div>
+
           {/* Image */}
           <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step V :</span> Image
+              <span className="text-gray-500">Step VI :</span> Image
             </h2>
             <ImageAddInstruction />
             <ShopImage shop={shop} />
@@ -123,7 +132,7 @@ export default function EditShop({
           {/* Shop Info */}
           <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VI :</span> Shop Info
+              <span className="text-gray-500">Step VII :</span> Shop Info
             </h2>
             <ShopInfo shop={shop} />
           </div>
@@ -131,7 +140,7 @@ export default function EditShop({
           {/* Shop Items */}
           <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VII :</span> Shop Items
+              <span className="text-gray-500">Step VIII :</span> Shop Items
             </h2>
             <ShopItems shop={shop} />
           </div>

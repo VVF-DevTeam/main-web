@@ -3,33 +3,30 @@ import { listDriveImages, uploadDriveImage } from '@/lib/drive'
 
 // Disable Next.js body parser for file upload
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+    api: {
+        bodyParser: false,
+    },
 }
 
 export async function GET() {
-  const avatars = await listDriveImages("avatars")
-  return NextResponse.json({ avatars })
+    const images = await listDriveImages('shop')
+    return NextResponse.json({ images })
 }
 
 export async function POST(req: NextRequest) {
-  try {
     const formData = await req.formData()
     const file = formData.get('file') as File
 
     if (!file) {
-      return NextResponse.json({ error: 'Missing file' }, { status: 400 })
+        return NextResponse.json({ error: 'Missing file' }, { status: 400 })
     }
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     const mimetype = file.type || 'image/jpeg'
 
-    const uploaded = await uploadDriveImage("avatars", buffer, file.name, mimetype)
+    const uploaded = await uploadDriveImage('shop', buffer, file.name, mimetype)
     return NextResponse.json(uploaded, { status: 200 })
-  } catch (error) {
-    console.error('Error uploading avatar:', error)
-    return NextResponse.json({ error: 'Failed to upload avatar' }, { status: 500 })
-  }
 }
+
+
