@@ -280,6 +280,13 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Tags**: `['shops']`
 - **Revalidate Time**: 86400 seconds (1 hour)
 - **Description**: Returns a single shop by ID specifically for editing, with shopItems (ordered by createdAt) and event relation (id, title, keyName). Used in admin edit shop pages.
+ 
+#### 35. `getAllShopItemTags`
+- **File**: `lib/actions/shop/shopItem/tag/getShopItemTag.ts`
+- **Cache Key**: `['shop-item-tags-all']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns all existing `ShopItemTag` records across all shops, ordered by title. Tagged with `'shops'` so tag data stays in sync when shop items and their tags are created, updated, or deleted.
 
 ---
 
@@ -674,7 +681,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
 | `jobs` | 3 functions | 5 API routes | ✅ Fully covered |
 | `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
-| `shops` | 5 functions | 5 API routes | ✅ Fully covered |
+| `shops` | 6 functions | 5 API routes | ✅ Fully covered |
 
 ---
 

@@ -28,5 +28,8 @@
   "view-partners": "(Voir les partenaires)",
   "partner-businesses-discounts": "Entreprises Partenaires & Réductions",
   "business-name": "Nom de l'Entreprise",
-  "discount": "Réduction"
+  "discount": "Réduction",
+  "paymentSuccess-profile-text": "Veuillez également consulter les détails du paiement sur",
+  "paymentSuccess-profile-link": "votre profil",
+  "paymentSuccess-closing": "Merci de nous rejoindre, et à bientôt !"
 }

@@ -1,6 +1,6 @@
 // Libraries
 import initTranslation from '@/app/i18n'
-import NormalCheckoutButton from '@/components/payment/SingleCheckoutButton'
+import SingleCheckoutButton from '@/components/payment/SingleCheckoutButton'
 import { auth } from '@/auth'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import Link from 'next/link'
@@ -79,13 +79,14 @@ export const MembershipBenefits = async ({
               </div>
             ) : (
               <div className="absolute bottom-[15px] left-7">
-                <NormalCheckoutButton
+                <SingleCheckoutButton
                   stripePriceId={tier.priceId}
                   stripeProductId="prod_SGnQhahDiUFrsq"
                   userId={userId}
                   buttonText="become-member"
                   type="Membership"
                   email={email}
+                  isMembership={true}
                 />
               </div>
             )

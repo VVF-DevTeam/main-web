@@ -28,5 +28,8 @@
   "view-partners": "(Xem đối tác)",
   "partner-businesses-discounts": "Doanh Nghiệp Đối Tác & Giảm Giá",
   "business-name": "Tên Doanh Nghiệp",
-  "discount": "Giảm Giá"
+  "discount": "Giảm Giá",
+  "paymentSuccess-profile-text": "Vui lòng kiểm tra thông tin thanh toán tại",
+  "paymentSuccess-profile-link": "tài khoản của bạn",
+  "paymentSuccess-closing": "Cảm ơn đã tham gia chúng tôi, và chúng tôi hy vọng sẽ gặp bạn sớm!"
 }

@@ -455,7 +455,6 @@ model ShopItem {
   // Display
   isFeatured  Boolean      @default(false)
   sortOrder   Int?
-  tags        String[]     // For categorization/filtering
   
   // Stripe catalog mapping
   stripeProductId         String
@@ -468,7 +467,14 @@ model ShopItem {
   dimension        String?
   
   // Relations
-  shops       Shop[]       @relation("ShopToShopItem")
+  shops       Shop[]        @relation("ShopToShopItem")
+  tags        ShopItemTag[] @relation("ShopItemTagToShopItem")
+}
+
+model ShopItemTag {
+  id        String       @id @default(cuid())
+  title     String
+  shopItem  ShopItem[]      @relation("ShopItemTagToShopItem")
 }
 
 enum Role {

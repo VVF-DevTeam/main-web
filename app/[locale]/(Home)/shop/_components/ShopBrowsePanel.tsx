@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState, useCallback, useEffect } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { ChevronRight, RotateCcw, ShoppingCart, ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import TextPreview from '@/components/quill/TextPreview'
 
 import {
     Select,
@@ -18,6 +19,7 @@ type ShopItemFilterData = {
     id: string
     title: string
     type: 'General' | 'Limit' | 'Discount'
+    // Tag titles for this item
     tags: string[]
     status: 'AVAILABLE' | 'OUT_OF_STOCK' | 'DISCONTINUED' | 'COMING_SOON'
     isFeatured: boolean
@@ -35,6 +37,8 @@ type ShopWithItems = {
     title: string
     imageUrl?: string | null
     type: ShopType
+    isPublished: boolean
+    sortOrder: number | null
     shopItems: ShopItemFilterData[]
     event?: {
         title: string
@@ -82,7 +86,7 @@ const SHOP_TYPE_OPTIONS: ShopType[] = [
 ]
 
 const DEFAULT_SHOP_HEADER_IMAGE =
-    'https://drive.google.com/thumbnail?id=1MPonA6byLm1rQUOhDHT7dJNoaH3tDQ9S'
+    'https://drive.google.com/thumbnail?id=1PXKYQic5fhczpFJjMHPK4AyYTjSC-zya'
 
 const getAllFilteredItems = (
     shops: ShopWithItems[],
@@ -104,7 +108,13 @@ const getAllFilteredItems = (
 }
 
 // Carousel component for shop items
-function ShopItemCarousel({ items }: { items: ShopItemFilterData[] }) {
+function ShopItemCarousel({
+    items,
+    onItemClick,
+}: {
+    items: ShopItemFilterData[]
+    onItemClick: (item: ShopItemFilterData) => void
+}) {
     const [currentIndex, setCurrentIndex] = useState(0)
 
     // Calculate items per view based on screen size
@@ -164,7 +174,10 @@ function ShopItemCarousel({ items }: { items: ShopItemFilterData[] }) {
                             className="flex-shrink-0 px-3"
                             style={{ width: `${itemWidthPercent}%` }}
                         >
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                            <div
+                                className="bg-white rounded-lg shadow-sm overflow-hidden h-full cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-md"
+                                onClick={() => onItemClick(item)}
+                            >
                                 {/* Image Container */}
                                 <div className="relative w-full h-48 bg-gray-100">
                                     {item.imageUrl ? (
@@ -264,22 +277,40 @@ function ShopItemCarousel({ items }: { items: ShopItemFilterData[] }) {
 }
 
 export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
+    // Only show published shops in the browse UI, ordered by sortOrder (lower first),
+    // and randomize order between shops that share the same sortOrder.
+    const publishedShops = useMemo(() => {
+        const published = shops.filter((shop) => shop.isPublished)
+
+        return published.sort((a, b) => {
+            const aOrder = a.sortOrder ?? Number.MAX_SAFE_INTEGER
+            const bOrder = b.sortOrder ?? Number.MAX_SAFE_INTEGER
+
+            if (aOrder !== bOrder) {
+                return aOrder - bOrder
+            }
+
+            // Same sortOrder: randomize relative order
+            return Math.random() - 0.5
+        })
+    }, [shops])
     const [selectedShopId, setSelectedShopId] = useState<string>('')
     const [selectedShopType, setSelectedShopType] = useState<string>('')
     const [selectedType, setSelectedType] = useState<string>('')
     const [selectedTag, setSelectedTag] = useState<string>('')
     const [selectedStatus, setSelectedStatus] = useState<string>('')
     const [selectedSort, setSelectedSort] = useState<(typeof SORT_OPTIONS)[number]['value']>('featured')
+    const [selectedItem, setSelectedItem] = useState<ShopItemFilterData | null>(null)
 
     const selectedShop = useMemo(
-        () => shops.find((shop) => shop.id === selectedShopId) ?? null,
-        [shops, selectedShopId]
+        () => publishedShops.find((shop) => shop.id === selectedShopId) ?? null,
+        [publishedShops, selectedShopId]
     )
 
     const shopsGroupedByType = useMemo(() => {
         const filteredShops = selectedShopType
-            ? shops.filter((shop) => shop.type === selectedShopType)
-            : shops
+            ? publishedShops.filter((shop) => shop.type === selectedShopType)
+            : publishedShops
 
         const grouped: Record<ShopType, ShopWithItems[]> = {} as Record<ShopType, ShopWithItems[]>
         SHOP_TYPE_OPTIONS.forEach((type) => {
@@ -293,7 +324,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             }
         })
         return grouped
-    }, [shops, selectedShopType])
+    }, [publishedShops, selectedShopType])
 
     const allTypes = useMemo(
         () => SHOP_ITEM_TYPE_OPTIONS,
@@ -303,7 +334,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const allTags = useMemo(() => {
         if (selectedShopId) {
             // Only show tags from the selected shop's items
-            const selectedShop = shops.find((shop) => shop.id === selectedShopId)
+            const selectedShop = publishedShops.find((shop) => shop.id === selectedShopId)
             if (!selectedShop) return []
             return Array.from(
                 new Set(
@@ -314,12 +345,12 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         // Show all tags when no shop is selected
         return Array.from(
             new Set(
-                shops.flatMap((shop) =>
+                publishedShops.flatMap((shop) =>
                     shop.shopItems.flatMap((item) => item.tags.filter((tag) => tag.trim() !== ''))
                 )
             )
         )
-    }, [shops, selectedShopId])
+    }, [publishedShops, selectedShopId])
 
     const allStatuses = useMemo(
         () => ITEM_STATUS_OPTIONS,
@@ -329,13 +360,13 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const filteredItems = useMemo(
         () =>
             getAllFilteredItems(
-                shops,
+                publishedShops,
                 selectedShopId,
                 selectedType,
                 selectedTag,
                 selectedStatus
             ),
-        [shops, selectedShopId, selectedType, selectedTag, selectedStatus]
+        [publishedShops, selectedShopId, selectedType, selectedTag, selectedStatus]
     )
 
     const sortedItems = useMemo(() => {
@@ -354,7 +385,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const featuredItemsByShop = useMemo(() => {
         const result: Array<{ shop: ShopWithItems; items: ShopItemFilterData[] }> = []
 
-        shops.forEach((shop) => {
+        publishedShops.forEach((shop) => {
             if (shop.shopItems.length === 0) return
 
             // Filter by selected shop type
@@ -405,7 +436,21 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         })
 
         return result
-    }, [shops, selectedShopType, selectedType, selectedTag, selectedStatus])
+    }, [publishedShops, selectedShopType, selectedType, selectedTag, selectedStatus])
+
+    // When switching between shops, reset item filters so each shop starts "clean"
+    useEffect(() => {
+        setSelectedType('')
+        setSelectedTag('')
+        setSelectedStatus('')
+    }, [selectedShopId])
+
+    // Clear selected item when item filters change so the detail view stays in sync,
+    // but do NOT clear it just because the selected shop changes (so clicking an
+    // item from the Home/all-shops view both selects the shop and keeps that item open).
+    useEffect(() => {
+        setSelectedItem(null)
+    }, [selectedType, selectedTag, selectedStatus])
 
     const headerBackgroundImage =
         selectedShop?.imageUrl?.trim() || DEFAULT_SHOP_HEADER_IMAGE
@@ -450,7 +495,12 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                 <button
                                                     key={shop.id}
                                                     type="button"
-                                                    onClick={() => setSelectedShopId(shop.id)}
+                                                    onClick={() => {
+                                                        setSelectedShopId(shop.id)
+                                                        // When manually switching shops from the sidebar,
+                                                        // clear any previously selected item.
+                                                        setSelectedItem(null)
+                                                    }}
                                                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${isActive
                                                             ? 'bg-bgColor-brand900 text-white font-medium'
                                                             : 'text-gray-700 hover:bg-gray-100'
@@ -480,7 +530,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             <div className="flex-1 flex flex-col">
                 {/* Header */}
                 <header className="relative overflow-hidden px-6 py-8 text-color-white bg-[#1F2937]">
-                    <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full max-w-[50%] md:max-w-[40%]">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full max-w-[30%] lg:max-w-[23%]">
                         <Image
                             src={headerBackgroundImage}
                             alt={selectedShop?.title ?? 'Shop header background'}
@@ -599,15 +649,84 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                 {selectedShop ? (
                     <div className="flex-1 p-6">
                         {sortedItems.length > 0 ? (
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {sortedItems.map((item) => {
+                            <>
+                                {/* Selected item detail view */}
+                                {selectedItem && (
+                                    <div className="mb-8 flex flex-col gap-4 rounded-lg border bg-white p-4 md:flex-row">
+                                        {/* Left: Image */}
+                                        <div className="w-full md:w-1/2">
+                                            <div className="relative aspect-video w-full overflow-hidden rounded-md bg-gray-100">
+                                                {selectedItem.imageUrl ? (
+                                                    <Image
+                                                        src={selectedItem.imageUrl}
+                                                        alt={selectedItem.title}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                                        No Image
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Tags under image */}
+                                            {selectedItem.tags.length > 0 && (
+                                                <div className="mt-3 flex flex-wrap gap-2">
+                                                    {selectedItem.tags.map((tag, idx) => (
+                                                        <Badge
+                                                            key={`${selectedItem.id}-tag-${idx}`}
+                                                            variant="secondary"
+                                                            className="text-xs bg-gray-100 text-gray-700"
+                                                        >
+                                                            {tag}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Right: Info */}
+                                        <div className="w-full space-y-3 md:w-1/2">
+                                            <h2 className="text-2xl font-bold text-gray-900">
+                                                {selectedItem.title}
+                                            </h2>
+                                            <p className="text-sm text-gray-500">
+                                                {selectedItem.type} • {ITEM_STATUS_LABELS[selectedItem.status]}
+                                            </p>
+                                            <p className="text-xl font-semibold text-gray-900">
+                                                {typeof selectedItem.price === 'string'
+                                                    ? `$${parseFloat(selectedItem.price).toFixed(2)} ${selectedItem.currency}`
+                                                    : `$${selectedItem.price.toFixed(2)} ${selectedItem.currency}`}
+                                            </p>
+
+                                            {selectedItem.description && (
+                                                <div className="prose max-w-none text-sm text-gray-700">
+                                                    <TextPreview value={selectedItem.description || ''} />
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                <Button className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600">
+                                                    <ShoppingCart className="mr-2 h-4 w-4" />
+                                                    Add to Cart
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Product cards grid */}
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {sortedItems.map((item) => {
                                     const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price
                                     const formattedPrice = isNaN(price) ? '0.00' : price.toFixed(2)
 
                                     return (
                                         <div
                                             key={item.id}
-                                            className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                                                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md cursor-pointer transition-transform duration-200 hover:scale-105"
+                                                onClick={() => setSelectedItem(item)}
                                         >
                                             {/* Image Container */}
                                             <div className="relative w-full h-48 bg-gray-100">
@@ -668,7 +787,8 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                         </div>
                                     )
                                 })}
-                            </div>
+                                </div>
+                            </>
                         ) : (
                             <div className="flex items-center justify-center h-64">
                                 <p className="text-gray-500">No items found</p>
@@ -690,7 +810,13 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                             <span>{shop.title}</span>
                                             <ChevronRight className="h-5 w-5" />
                                         </button>
-                                        <ShopItemCarousel items={items} />
+                                        <ShopItemCarousel
+                                            items={items}
+                                            onItemClick={(item) => {
+                                                setSelectedShopId(shop.id)
+                                                setSelectedItem(item)
+                                            }}
+                                        />
                                     </div>
                                 ))}
                             </div>

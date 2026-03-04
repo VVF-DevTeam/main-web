@@ -32,6 +32,7 @@ interface SingleCheckoutButtonProps {
   eventTicketId?: string
   mainUserPhone?: string
   mainUserName?: string
+  isMembership?: boolean
 }
 
 export default function SingleCheckoutButton({
@@ -48,6 +49,7 @@ export default function SingleCheckoutButton({
   eventTicketId,
   mainUserPhone = '',
   mainUserName = '',
+  isMembership = false,
 }: SingleCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
@@ -172,7 +174,21 @@ export default function SingleCheckoutButton({
   }
 
   const handleButtonClick = () => {
-    // Show checkout dialog
+    // For membership checkout, skip dialog and go straight to Stripe payment
+    if (isMembership) {
+      const memberGuestInfo = {
+        guestName: mainUserName || '',
+        guestEmail: email,
+        guestPhone: mainUserPhone || '',
+        otherGuests: [] as Array<{ name: string; email: string; phone: string }>,
+      }
+
+      // Directly start Stripe checkout for membership
+      handleCheckout(stripePriceId, memberGuestInfo)
+      return
+    }
+
+    // Show checkout dialog for non-membership flows
     setShowCheckoutDialog(true)
   }
 
