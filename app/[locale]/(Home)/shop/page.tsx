@@ -15,7 +15,10 @@ const ShopPage = async ({ params }: ShopPageProps) => {
     ...shop,
     shopItems: shop.shopItems.map((item) => ({
       ...item,
+      // Normalize price to number
       price: Number(item.price),
+      // Convert related ShopItemTag objects to an array of tag titles
+      tags: (item.tags || []).map((tag) => tag.title),
     })),
   }))
 

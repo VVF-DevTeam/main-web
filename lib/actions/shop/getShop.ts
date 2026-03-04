@@ -20,6 +20,7 @@ export const getAllShops = unstable_cache(
           imageUrl: true,
           type: true,
           isPublished: true,
+          sortOrder: true,
           updatedAt: true,
           event: {
             select: {
@@ -159,6 +160,9 @@ export const getShopForEditing = unstable_cache(
         },
         include: {
           shopItems: {
+            include: {
+              tags: true,
+            },
             orderBy: {
               createdAt: 'asc',
             },

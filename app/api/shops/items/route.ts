@@ -29,7 +29,8 @@ export const POST = async (request: Request) => {
             validTo,
             isFeatured,
             sortOrder,
-            tags,
+            existingTagIds,
+            newTagTitles,
             stripeProductId,
             stripePriceId,
             subscribedStripePriceId,
@@ -91,7 +92,25 @@ export const POST = async (request: Request) => {
                     sortOrder !== undefined && sortOrder !== null
                         ? Math.round(Number(sortOrder))
                         : null,
-                tags: tags || [],
+                // Tags: connect existing tags by id and/or create new tags by title
+                ...(Array.isArray(existingTagIds) || Array.isArray(newTagTitles)
+                    ? {
+                        tags: {
+                            ...(Array.isArray(existingTagIds) && existingTagIds.length > 0
+                                ? {
+                                    connect: existingTagIds.map((id: string) => ({ id })),
+                                }
+                                : {}),
+                            ...(Array.isArray(newTagTitles) && newTagTitles.length > 0
+                                ? {
+                                    create: newTagTitles
+                                        .filter((title: string) => title.trim() !== '')
+                                        .map((title: string) => ({ title })),
+                                }
+                                : {}),
+                        },
+                    }
+                    : {}),
                 stripeProductId: stripeProductId,
                 stripePriceId: stripePriceId,
                 subscribedStripePriceId: subscribedStripePriceId,
@@ -160,7 +179,8 @@ export const PUT = async (request: Request) => {
             price,
             imageUrl,
             images,
-            tags,
+            existingTagIds,
+            newTagTitles,
             minQuantity,
             maxQuantity,
             sortOrder,
@@ -178,7 +198,8 @@ export const PUT = async (request: Request) => {
             price?: number
             imageUrl?: string | null
             images?: string[]
-            tags?: string[]
+            existingTagIds?: string[]
+            newTagTitles?: string[]
             minQuantity?: number | null
             maxQuantity?: number | null
             sortOrder?: number | null
@@ -238,7 +259,24 @@ export const PUT = async (request: Request) => {
                 imageUrl:
                     imageUrl !== undefined ? imageUrl ?? null : existing.imageUrl,
                 images: images !== undefined ? images : existing.images,
-                tags: tags !== undefined ? tags : existing.tags,
+                // Update tag relations when explicit tag data is provided
+                ...((existingTagIds !== undefined || newTagTitles !== undefined) && {
+                    tags:
+                        {
+                            // Set to provided existing ids (or clear if none) and create new titles
+                            set:
+                                existingTagIds && existingTagIds.length > 0
+                                    ? existingTagIds.map((id) => ({ id }))
+                                    : [],
+                            ...(newTagTitles && newTagTitles.length > 0
+                                ? {
+                                    create: newTagTitles
+                                        .filter((title) => title.trim() !== '')
+                                        .map((title) => ({ title })),
+                                }
+                                : {}),
+                        },
+                }),
                 minQuantity:
                     minQuantity !== undefined
                         ? minQuantity !== null

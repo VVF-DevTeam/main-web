@@ -1,5 +1,8 @@
 // Libraries
-import { Shop, ShopItem } from '@prisma/client'
+import { Shop, ShopItem, ShopItemTag } from '@prisma/client'
+
+// Actions
+import { getAllShopItemTags } from '@/lib/actions/shop/shopItem/tag/getShopItemTag'
 
 // Components
 import PublishButton from '@/components/ui/PublishButton'
@@ -17,7 +20,7 @@ import EditorInstructions from '@/components/instruction/EditorInstructions'
 
 // Type for Shop with relations (matches getShopForEditing return type)
 type ShopForEditing = Shop & {
-  shopItems: ShopItem[]
+  shopItems: (ShopItem & { tags?: ShopItemTag[] })[]
   event?: {
     id: string
     title: string
@@ -30,10 +33,12 @@ interface EditShopProps {
   showBackButton?: boolean
 }
 
-export default function EditShop({
+export default async function EditShop({
   shop,
   showBackButton = false,
 }: EditShopProps) {
+  const allShopItemTags = await getAllShopItemTags()
+
   const shopFields = [
     !!shop.title,
     !!shop.description,
@@ -142,7 +147,7 @@ export default function EditShop({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step VIII :</span> Shop Items
             </h2>
-            <ShopItems shop={shop} />
+            <ShopItems shop={shop} allTags={allShopItemTags} />
           </div>
         </div>
       </div>

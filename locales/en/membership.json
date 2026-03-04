@@ -28,5 +28,8 @@
   "view-partners": "(View partners)",
   "partner-businesses-discounts": "Partner Businesses & Discounts",
   "business-name": "Business Name",
-  "discount": "Discount"
+  "discount": "Discount",
+  "paymentSuccess-profile-text": "Please also check the payment details at",
+  "paymentSuccess-profile-link": "your profile",
+  "paymentSuccess-closing": "Thank you for joining us, and we hope to see you soon!"
 }

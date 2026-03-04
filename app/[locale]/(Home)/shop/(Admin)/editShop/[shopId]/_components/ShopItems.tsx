@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { Shop, ShopItem, ShopItemType, ItemStatus } from '@prisma/client'
+import { Shop, ShopItem, ShopItemType, ItemStatus, ShopItemTag } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Pencil, Plus, Trash2, X } from 'lucide-react'
@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
 import {
   Form,
   FormControl,
@@ -39,12 +40,11 @@ import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 import Image from 'next/image'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 
-type ShopItemWithRelations = ShopItem
-
 interface ShopItemsProps {
   shop: Shop & {
-    shopItems?: ShopItemWithRelations[]
+    shopItems?: (ShopItem & { tags?: ShopItemTag[] })[]
   }
+  allTags: ShopItemTag[]
 }
 
 interface StripeShopItemDataCreate {
@@ -148,13 +148,25 @@ const createShopItemSchema = z
 
 type ShopItemFormData = z.infer<typeof createShopItemSchema>
 
-const ShopItems = ({ shop }: ShopItemsProps) => {
+// Normalize a tag string to "Camel case" (Title Case words)
+const formatTagLabel = (value: string) => {
+  return value
+    .toLowerCase()
+    .split(' ')
+    .filter((part) => part.trim() !== '')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
+const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
   const router = useRouter()
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [imageInputs, setImageInputs] = useState<string[]>([''])
   const [tagInputs, setTagInputs] = useState<string[]>([''])
+  const [tagIds, setTagIds] = useState<(string | null)[]>([null])
+  const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null)
   const currentDateTime = getCurrentDateTime()
   const items = shop.shopItems || []
 
@@ -217,6 +229,7 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
     setIsAddingNew(false)
     setImageInputs([''])
     setTagInputs([''])
+    setTagIds([null])
   }
 
   const handleAddItemClick = () => {
@@ -282,7 +295,7 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
     }
   }
 
-  const loadItemIntoForm = (item: ShopItemWithRelations) => {
+  const loadItemIntoForm = (item: ShopItem & { tags?: ShopItemTag[] }) => {
     itemForm.reset({
       title: item.title,
       description: item.description ?? null,
@@ -305,13 +318,18 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
       validTo: item.validTo ? new Date(item.validTo) : null,
       isFeatured: item.isFeatured,
       sortOrder: item.sortOrder ?? null,
-      tags: item.tags || [],
+      // Map related ShopItemTag objects to their titles for the form
+      tags: (item.tags || []).map((tag) => tag.title),
       stripeProductId: item.stripeProductId,
       stripePriceId: item.stripePriceId,
       subscribedStripePriceId: item.subscribedStripePriceId ?? undefined,
     })
     setImageInputs(item.images && item.images.length > 0 ? [...item.images, ''] : [''])
-    setTagInputs(item.tags && item.tags.length > 0 ? [...item.tags, ''] : [''])
+    // Pre-fill tag inputs and ids with existing tags
+    const tagTitles = (item.tags || []).map((tag) => tag.title)
+    const tagIdList = (item.tags || []).map((tag) => tag.id)
+    setTagInputs(tagTitles.length > 0 ? [...tagTitles, ''] : [''])
+    setTagIds(tagIdList.length > 0 ? [...tagIdList, null] : [null])
     setEditingItemId(item.id)
     setIsAddingNew(false)
   }
@@ -326,8 +344,20 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
       // Process images array - remove empty strings
       const processedImages = imageInputs.filter((img) => img.trim() !== '')
 
-      // Process tags array - remove empty strings
-      const processedTags = tagInputs.filter((tag) => tag.trim() !== '')
+      // Process tags array - split into existing tag ids and new tag titles
+      const existingTagIds: string[] = []
+      const newTagTitles: string[] = []
+
+      tagInputs.forEach((rawTitle, index) => {
+        const title = rawTitle.trim()
+        if (!title) return
+        const id = tagIds[index]
+        if (id) {
+          existingTagIds.push(id)
+        } else {
+          newTagTitles.push(title)
+        }
+      })
 
       // Auto-generate SKU from shop title and item title
       const shopTitleTrimmed = shop.title.trim()
@@ -423,7 +453,8 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
         validTo: values.validTo ? values.validTo.toISOString() : null,
         isFeatured: values.isFeatured,
         sortOrder: values.sortOrder ?? null,
-        tags: processedTags,
+        existingTagIds,
+        newTagTitles,
         stripeProductId,
         stripePriceId,
         subscribedStripePriceId,
@@ -658,6 +689,21 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
                   >
                     {/* Content */}
                     <div className="flex flex-1 flex-col gap-y-1">
+                      {/* Tags row on top of card content, similar to ShopBrowsePanel */}
+                      {item.tags && item.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-1">
+                          {item.tags.slice(0, 3).map((tag) => (
+                            <Badge
+                              key={tag.id}
+                              variant="secondary"
+                              className="text-[10px] bg-gray-100 text-gray-700"
+                            >
+                              {tag.title}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
                       <div className="font-semibold">
                         {item.title} - ${Number(item.price).toFixed(2)}{' '}
                         {item.currency}
@@ -1472,40 +1518,127 @@ const ShopItems = ({ shop }: ShopItemsProps) => {
                   {/* Tags */}
                   <div className="space-y-2">
                     <FormLabel>Tags (Optional)</FormLabel>
+                    <FormDescription>Please reuse existing tags by clicking on the tag name if possible.</FormDescription>
                     {tagInputs.map((tag, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          type="text"
-                          placeholder={`Tag ${index + 1}`}
-                          value={tag}
-                          onChange={(e) => {
-                            const newInputs = [...tagInputs]
-                            newInputs[index] = e.target.value
-                            setTagInputs(newInputs)
-                            itemForm.setValue('tags', newInputs.filter((t) => t.trim() !== ''))
-                          }}
-                        />
-                        {index === tagInputs.length - 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setTagInputs([...tagInputs, ''])}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {tagInputs.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              const newInputs = tagInputs.filter((_, i) => i !== index)
+                      <div key={index} className="flex flex-1 flex-col gap-1">
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            placeholder={`Tag ${index + 1}`}
+                            value={tag}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              const newInputs = [...tagInputs]
+                              const newIds = [...tagIds]
+                              newInputs[index] = value
+                              // When user types, clear any previously selected tag id
+                              newIds[index] = null
                               setTagInputs(newInputs)
-                              itemForm.setValue('tags', newInputs.filter((t) => t.trim() !== ''))
+                              setTagIds(newIds)
+                              itemForm.setValue(
+                                'tags',
+                                newInputs
+                                  .map((t) => t.trim())
+                                  .filter((t) => t !== '')
+                              )
                             }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                            onFocus={() => setActiveTagIndex(index)}
+                            onBlur={(e) => {
+                              // Format tag to Camel case / Title Case on blur
+                              const raw = e.target.value
+                              const formatted = formatTagLabel(raw)
+
+                              const newInputs = [...tagInputs]
+                              newInputs[index] = formatted
+                              setTagInputs(newInputs)
+
+                              itemForm.setValue(
+                                'tags',
+                                newInputs
+                                  .map((t) => t.trim())
+                                  .filter((t) => t !== '')
+                              )
+
+                              setActiveTagIndex((current) =>
+                                current === index ? null : current
+                              )
+                            }}
+                          />
+                          {index === tagInputs.length - 1 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                setTagInputs([...tagInputs, ''])
+                                setTagIds([...tagIds, null])
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {tagInputs.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                const newInputs = tagInputs.filter((_, i) => i !== index)
+                                const newIds = tagIds.filter((_, i) => i !== index)
+                                setTagInputs(newInputs)
+                                setTagIds(newIds)
+                                itemForm.setValue(
+                                  'tags',
+                                  newInputs
+                                    .map((t) => t.trim())
+                                    .filter((t) => t !== '')
+                                )
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Suggestions dropdown */}
+                        {activeTagIndex === index && (
+                          <div className="max-h-40 w-full overflow-y-auto rounded-md border bg-white text-sm shadow-sm">
+                            {allTags
+                              .filter((t) => {
+                                const query = tag.toLowerCase().trim()
+                                const matchesQuery =
+                                  query === '' ||
+                                  t.title.toLowerCase().includes(query)
+                                // avoid showing tags already selected by id in other rows
+                                const alreadySelected = tagIds.includes(t.id)
+                                return matchesQuery && !alreadySelected
+                              })
+                              .slice(0, 10)
+                              .map((t) => (
+                                <button
+                                  key={t.id}
+                                  type="button"
+                                  className="flex w-full items-center justify-between px-2 py-1 text-left hover:bg-gray-100"
+                                  // Use onMouseDown so selection happens before the input loses focus
+                                  onMouseDown={(e) => {
+                                    e.preventDefault()
+                                    const newInputs = [...tagInputs]
+                                    const newIds = [...tagIds]
+                                    newInputs[index] = t.title
+                                    newIds[index] = t.id
+                                    setTagInputs(newInputs)
+                                    setTagIds(newIds)
+                                    itemForm.setValue(
+                                      'tags',
+                                      newInputs
+                                        .map((title) => title.trim())
+                                        .filter((title) => title !== '')
+                                    )
+                                    setActiveTagIndex(null)
+                                  }}
+                                >
+                                  <span>{t.title}</span>
+                                </button>
+                              ))}
+                          </div>
                         )}
                       </div>
                     ))}
