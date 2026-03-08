@@ -26,7 +26,7 @@ export function extractGoogleDriveId(url: string): string {
 
 // Helper: Validate URL and check if it's a Google Drive image file link.
 // Returns a thumbnail URL (https://drive.google.com/thumbnail?id=FILE_ID) or null if invalid.
-export function getValidGoogleDriveImageUrl(url: string): string | null {
+export function getValidGoogleDriveImageUrl(url: string, forEditor: boolean = false): string | null {
   if (!url || typeof url !== 'string') return null
 
   let parsedUrl: URL
@@ -38,15 +38,24 @@ export function getValidGoogleDriveImageUrl(url: string): string | null {
 
   // Only accept Google Drive file links
   if (parsedUrl.hostname === 'drive.google.com') {
+    // Extract size parameter if forEditor is true
+    let sizeParam = ''
+    if (forEditor) {
+      const sizeMatch = url.match(/sz=([^&]+)/)
+      if (sizeMatch && sizeMatch[1]) {
+        sizeParam = `&sz=${sizeMatch[1]}`
+      }
+    }
+
     // File link
     const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
     if (fileMatch && fileMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}`
+      return `https://drive.google.com/thumbnail?id=${fileMatch[1]}${sizeParam}`
     }
     // Thumbnail or open link with ?id=
     const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/)
     if (idMatch && idMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${idMatch[1]}`
+      return `https://drive.google.com/thumbnail?id=${idMatch[1]}${sizeParam}`
     }
     // Folder link (not supported)
     if (url.includes('/folders/')) {

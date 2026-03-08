@@ -38,26 +38,30 @@ const PostPage = async ({ params }: PostPageProps) => {
   let isVisited = null
 
   if (isLoggedIn) {
-    isVisited = await prisma.user.findUnique({
-      where: {
-        id: session?.user?.id || '',
-      },
-      select: {
-        visitedPosts: {
-          where: {
-            postId: postId,
-            userId: session?.user?.id || '',
+    try {
+      isVisited = await prisma.user.findUnique({
+        where: {
+          id: session?.user?.id || '',
+        },
+        select: {
+          visitedPosts: {
+            where: {
+              postId: postId,
+              userId: session?.user?.id || '',
+            },
           },
         },
-      },
-    })
-    if (isVisited && isVisited.visitedPosts.length === 0) {
-      await prisma.postVisits.create({
-        data: {
-          postId: postId,
-          userId: session?.user?.id!,
-        },
       })
+      if (isVisited && isVisited.visitedPosts.length === 0) {
+        await prisma.postVisits.create({
+          data: {
+            postId: postId,
+            userId: session?.user?.id!,
+          },
+        })
+      }
+    } catch (error) {
+      console.error('[POST VISIT ERROR]', error)
     }
   }
 

@@ -1665,7 +1665,7 @@ export default function EventCartCheckout({
             onOpenChange={setShowCheckoutDialog}
             onGuestFormSubmit={handleGuestFormSubmit}
             onEventFormSubmit={handleEventFormSubmit}
-            totalItemCount={totalItemCount || 1}
+            totalGuestRequired={totalItemCount || 1}
             userId={userId || null}
             userInfo={userInfo || null}
             eventFormData={eventFormData}

@@ -26,14 +26,14 @@ interface EventCheckoutDialogProps {
     otherGuests: Array<{ name: string; email: string; phone: string }>
   }) => void
   onEventFormSubmit: (formResponses: Record<string, string>) => void
-  totalItemCount: number
+  totalGuestRequired: number
   userId: string | null
   userInfo: {
     email?: string | null
     phone?: string | null
     name?: string | null
   } | null
-  eventFormData: EventFormData | null
+  eventFormData?: EventFormData
   isLoading: boolean
   t: (key: string, params?: any) => string
 }
@@ -43,7 +43,7 @@ export function EventCheckoutDialog({
   onOpenChange,
   onGuestFormSubmit,
   onEventFormSubmit,
-  totalItemCount,
+  totalGuestRequired,
   userId,
   userInfo,
   eventFormData,
@@ -95,8 +95,8 @@ export function EventCheckoutDialog({
         <DialogHeader>
           <DialogTitle>
             {currentStep === 'guest' ? (
-              totalItemCount > 1
-                ? `${t('guest-checkout-title')} ${t('checkout-people-count', { count: totalItemCount })}`
+              totalGuestRequired > 1
+                ? `${t('guest-checkout-title')} ${t('checkout-people-count', { count: totalGuestRequired })}`
                 : t('guest-checkout-title')
             ) : (
               t('event-registration-form-title')
@@ -105,15 +105,15 @@ export function EventCheckoutDialog({
           <DialogDescription>
             {currentStep === 'guest' ? (
               <>
-                {totalItemCount > 1
+                {totalGuestRequired > 1
                   ? userId ? t('checkout-description-with-login', {
-                    otherGuestsText: totalItemCount - 1 === 1
-                      ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
-                      : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
+                    otherGuestsText: totalGuestRequired - 1 === 1
+                      ? t('guest-checkout-other-guests-single', { count: totalGuestRequired - 1 })
+                      : t('guest-checkout-other-guests-plural', { count: totalGuestRequired - 1 })
                   }) : t('guest-checkout-description-with-login', {
-                    otherGuestsText: totalItemCount - 1 === 1
-                      ? t('guest-checkout-other-guests-single', { count: totalItemCount - 1 })
-                      : t('guest-checkout-other-guests-plural', { count: totalItemCount - 1 })
+                    otherGuestsText: totalGuestRequired - 1 === 1
+                      ? t('guest-checkout-other-guests-single', { count: totalGuestRequired - 1 })
+                      : t('guest-checkout-other-guests-plural', { count: totalGuestRequired - 1 })
                   }) : t('checkout-description-first-line')
                 }
                 {userId ? (
@@ -159,7 +159,7 @@ export function EventCheckoutDialog({
                   mainUserName={userInfo?.name || ''}
                   userId={userId}
                   buttonText={(eventFormData && eventFormData.questions && eventFormData.questions.length > 0 ? t('go-to-next-section'): t('reserve-button')) || undefined}
-                  totalItemCount={totalItemCount || 1}
+                  totalItemCount={totalGuestRequired || 1}
                 />
               </motion.div>
             ) : (

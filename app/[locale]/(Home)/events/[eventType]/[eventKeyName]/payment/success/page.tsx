@@ -6,19 +6,19 @@ import { auth } from '@/auth'
 export const dynamic = 'force-dynamic'
 
 // Interfaces
-interface ClassPaymentSuccessPageProps {
+interface EventPaymentSuccessPageProps {
   params: Promise<{ locale: string; eventKeyName: string }>
 }
 
 // Main Component
-const ClassPaymentSuccessPage = async ({
+const EventPaymentSuccessPage = async ({
   params,
-}: ClassPaymentSuccessPageProps) => {
+}: EventPaymentSuccessPageProps) => {
   const { locale, eventKeyName } = await params
 
-  const publishedClass = await getEventTitleByKeyName(eventKeyName)
+  const publishedEvent = await getEventTitleByKeyName(eventKeyName)
 
-  if (!publishedClass) return null
+  if (!publishedEvent) return null
 
   // Check if user is authenticated
   const session = await auth()
@@ -26,7 +26,7 @@ const ClassPaymentSuccessPage = async ({
 
   return (
     <PaymentSuccess
-      title={publishedClass.title}
+      title={publishedEvent.title}
       locale={locale}
       translationWorkspaces={['event']}
       isGuestCheckout={isGuestCheckout}
@@ -34,4 +34,4 @@ const ClassPaymentSuccessPage = async ({
   )
 }
 
-export default ClassPaymentSuccessPage
+export default EventPaymentSuccessPage
