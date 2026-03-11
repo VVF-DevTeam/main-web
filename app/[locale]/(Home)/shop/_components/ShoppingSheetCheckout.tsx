@@ -24,6 +24,8 @@ type SelectedShopItem = {
   stripeProductId: string
   quantity: number
   imageUrl?: string | null
+  discountMemberPercent?: number | null
+  subscribedStripePriceId?: string | null
 }
 
 interface ShoppingSheetCheckoutProps {
@@ -62,6 +64,7 @@ export default function ShoppingSheetCheckout({
   const totalItemCount = selectedShopItems.reduce((sum, item) => sum + item.quantity, 0)
 
   useEffect(() => {
+    console.log('selectedShopItems', selectedShopItems)
     let isMounted = true
     const fetchSubscription = async () => {
       try {
@@ -87,20 +90,38 @@ export default function ShoppingSheetCheckout({
 
   // Calculate total price
   const priceBreakdown = useMemo(() => {
-    const baseTotal = selectedShopItems.reduce((sum, item) => {
-      const numericPrice = typeof item.price === 'string' ? parseFloat(item.price) : item.price
-      const safePrice = Number.isNaN(numericPrice) ? 0 : numericPrice
-      return sum + safePrice * item.quantity
-    }, 0)
+    let baseTotal = 0
+    let finalTotal = 0
 
-    // For now, no discounts for shops
-    // If shops get member discounts later, add them here
+    selectedShopItems.forEach((item) => {
+      const numericPrice =
+        typeof item.price === 'string' ? parseFloat(item.price) : item.price
+      const safePrice = Number.isNaN(numericPrice) ? 0 : numericPrice
+
+      const itemBaseTotal = safePrice * item.quantity
+      baseTotal += itemBaseTotal
+
+      let effectivePrice = safePrice
+      if (
+        isSubscribed &&
+        item.discountMemberPercent != null &&
+        item.discountMemberPercent > 0
+      ) {
+        effectivePrice =
+          safePrice * (1 - item.discountMemberPercent / 100)
+      }
+
+      finalTotal += effectivePrice * item.quantity
+    })
+
+    const membershipDiscountAmount = Math.max(baseTotal - finalTotal, 0)
 
     return {
       baseTotal,
-      finalTotal: baseTotal,
+      finalTotal,
+      membershipDiscountAmount,
     }
-  }, [selectedShopItems])
+  }, [selectedShopItems, isSubscribed])
 
   // Master checkout handler for multiple shop items
   const handleMasterCheckout = useCallback(async (
@@ -125,13 +146,25 @@ export default function ShoppingSheetCheckout({
 
       // Prepare checkout items
       const checkoutItems = selectedShopItems
-        .filter((item) => item.stripePriceId && item.stripeProductId && item.quantity >= 1)
-        .map((item) => ({
-          shopItemId: item.id,
-          stripePriceId: item.stripePriceId,
-          stripeProductId: item.stripeProductId,
-          quantity: item.quantity,
-        }))
+        .map((item) => {
+          const stripePriceIdToUse =
+            isSubscribed && item.subscribedStripePriceId
+              ? item.subscribedStripePriceId
+              : item.stripePriceId
+
+          return {
+            shopItemId: item.id,
+            stripePriceId: stripePriceIdToUse,
+            stripeProductId: item.stripeProductId,
+            quantity: item.quantity,
+          }
+        })
+        .filter(
+          (ci) =>
+            ci.stripePriceId &&
+            ci.stripeProductId &&
+            ci.quantity >= 1
+        )
 
       if (checkoutItems.length === 0) {
         toast.error('Error', {
@@ -141,7 +174,6 @@ export default function ShoppingSheetCheckout({
       }
 
       // Call API endpoint for multi-item shop checkout
-      // Note: This endpoint may need to be created if it doesn't exist
       const { data } = await axiosInstance.post(
         '/api/payment/shop-checkout-sessions/create-multi',
         {
@@ -199,6 +231,7 @@ export default function ShoppingSheetCheckout({
     userId,
     shopId,
     userInfo,
+    isSubscribed,
   ])
 
   const handleCheckoutButtonClick = () => {
@@ -318,7 +351,7 @@ export default function ShoppingSheetCheckout({
                           className="text-sm text-white underline hover:text-gray-300"
                           disabled={isLoading}
                         >
-                          {t('remove') || 'Remove'}
+                          {t('remove')}
                         </button>
                       </div>
 
@@ -379,6 +412,17 @@ export default function ShoppingSheetCheckout({
                   {priceBreakdown.baseTotal.toFixed(2)}
                 </span>
               </div>
+
+              {/* Membership Discount */}
+              {priceBreakdown.membershipDiscountAmount > 0 && (
+                <div className="flex items-center justify-between text-green-600">
+                  <span>{t('checkout-membership-discount')}</span>
+                  <span>
+                    -{selectedShopItems[0]?.currency || 'CAD'} $
+                    {priceBreakdown.membershipDiscountAmount.toFixed(2)}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Final Total */}
@@ -399,7 +443,7 @@ export default function ShoppingSheetCheckout({
                 className="group mt-4 w-full"
                 disabled={selectedShopItems.length === 0 || isLoading}
               >
-                {t('reserve-button')}{' '}
+                {t('buy-button')}{' '}
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             )}

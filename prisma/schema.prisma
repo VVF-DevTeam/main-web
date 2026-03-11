@@ -403,6 +403,9 @@ model Shop {
   imageUrl    String?      // Shop logo/banner
   type        ShopType     @default(General)
   
+  shopDiscounts     Json?
+  shopCodeDiscounts Json?
+
   isPublished Boolean      @default(false)
   isFeatured  Boolean      @default(false)
   sortOrder   Int?         // For manual ordering

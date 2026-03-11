@@ -42,6 +42,8 @@ export const getAllShops = unstable_cache(
               updatedAt: true,
               stripePriceId: true,
               stripeProductId: true,
+              subscribedStripePriceId: true,
+              discountMemberPercent: true,
             },
             orderBy: {
               updatedAt: 'desc',

@@ -38,10 +38,12 @@ type ShopItemFilterData = {
     imageUrl?: string | null
     price: number | string
     currency: string
+    discountMemberPercent?: number | null
     description?: string | null
     updatedAt: Date | string
     stripePriceId?: string | null
     stripeProductId?: string | null
+    subscribedStripePriceId?: string | null
 }
 
 type ShopType = 'General' | 'Food' | 'Clothes' | 'Event' | 'Fundraiser' | 'Digital' | 'Seasonal'
@@ -380,8 +382,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                     title: item.title,
                     price: item.price,
                     currency: item.currency,
-                    stripePriceId: item.stripePriceId ?? '',
-                    stripeProductId: item.stripeProductId ?? '',
+          stripePriceId: item.stripePriceId ?? '',
+          stripeProductId: item.stripeProductId ?? '',
+          discountMemberPercent: item.discountMemberPercent ?? null,
+          subscribedStripePriceId: item.subscribedStripePriceId ?? null,
                     quantity,
                     imageUrl: item.imageUrl,
                 }))
@@ -814,6 +818,28 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                     ? `$${parseFloat(selectedItem.price).toFixed(2)} ${selectedItem.currency}`
                                                     : `$${selectedItem.price.toFixed(2)} ${selectedItem.currency}`}
                                             </p>
+                                            {selectedItem.discountMemberPercent != null &&
+                                                selectedItem.discountMemberPercent > 0 && (
+                                                    <p className="text-sm text-green-700">
+                                                        {t('member-price')}:{' '}
+                                                        {(() => {
+                                                            const numericPrice =
+                                                                typeof selectedItem.price === 'string'
+                                                                    ? parseFloat(selectedItem.price)
+                                                                    : selectedItem.price
+                                                            const safePrice = Number.isNaN(numericPrice)
+                                                                ? 0
+                                                                : numericPrice
+                                                            const discounted =
+                                                                safePrice *
+                                                                (1 -
+                                                                    selectedItem.discountMemberPercent! /
+                                                                    100)
+
+                                                            return `$${discounted.toFixed(2)} ${selectedItem.currency} (${selectedItem.discountMemberPercent}% off)`
+                                                        })()}
+                                                    </p>
+                                                )}
 
                                             {selectedItem.description && (
                                                 <div className="prose max-w-none text-sm text-gray-700">

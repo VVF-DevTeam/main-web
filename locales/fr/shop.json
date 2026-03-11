@@ -32,5 +32,9 @@
     "clear-all": "Tout effacer",
     "cart": "Mon panier",
     "checkout-subtotal": "Sous-total",
-    "checkout-total": "Total"
+    "checkout-total": "Total",
+    "remove": "Supprimer",
+    "member-price": "Prix membre",
+    "checkout-membership-discount": "Réduction membre",
+    "buy-button": "Acheter"
 }

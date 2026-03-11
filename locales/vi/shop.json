@@ -32,5 +32,9 @@
     "clear-all": "Xóa tất cả",
     "cart": "Giỏ hàng",
     "checkout-subtotal": "Subtotal",
-    "checkout-total": "Tổng cộng"
+    "checkout-total": "Tổng cộng",
+    "remove": "Xóa",
+    "member-price": "Giá thành viên",
+    "checkout-membership-discount": "Giảm giá thành viên",
+    "buy-button": "Mua"
 }   

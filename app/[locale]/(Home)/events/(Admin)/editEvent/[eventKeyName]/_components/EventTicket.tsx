@@ -614,7 +614,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                         <> | Limit: {ticket.limit}</>
                       )}
                       {ticket.discountMemberPercent !== null && (
-                        <> | Discount: {ticket.discountMemberPercent}%</>
+                        <> | Discount for Members: {ticket.discountMemberPercent}%</>
                       )}
                     </div>
                     {ticket.validFrom && ticket.validTo && (

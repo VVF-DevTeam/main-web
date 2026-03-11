@@ -14,6 +14,7 @@ import ShopSlug from './ShopSlug'
 import ShopImage from './ShopImage'
 import ShopInfo from './ShopInfo'
 import ShopItems from './ShopItems'
+import ShopDiscounts from './ShopDiscount'
 import ShopEvent from './ShopEvent'
 import ImageAddInstruction from '@/components/instruction/ImageAddInstruction'
 import EditorInstructions from '@/components/instruction/EditorInstructions'
@@ -142,10 +143,18 @@ export default async function EditShop({
             <ShopInfo shop={shop} />
           </div>
 
+          {/* Shop Discounts */}
+          <div className="col-span-full flex flex-col gap-y-8">
+            <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
+              <span className="text-gray-500">Step VIII :</span> Shop Discounts
+            </h2>
+            <ShopDiscounts shop={shop} />
+          </div>
+
           {/* Shop Items */}
           <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
-              <span className="text-gray-500">Step VIII :</span> Shop Items
+              <span className="text-gray-500">Step IX :</span> Shop Items
             </h2>
             <ShopItems shop={shop} allTags={allShopItemTags} />
           </div>

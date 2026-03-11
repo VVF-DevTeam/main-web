@@ -32,5 +32,9 @@
     "clear-all": "Clear All",
     "cart": "My Cart",
     "checkout-subtotal": "Subtotal",
-    "checkout-total": "Total"
+    "checkout-total": "Total",
+    "remove": "Remove",
+    "member-price": "Member Price",
+    "checkout-membership-discount": "Membership Discount",
+    "buy-button": "Buy"
 }

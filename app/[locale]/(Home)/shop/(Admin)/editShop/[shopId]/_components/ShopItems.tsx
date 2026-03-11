@@ -719,7 +719,7 @@ const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
                           <> | Limit: {item.limit}</>
                         )}
                         {item.discountMemberPercent !== null && (
-                          <> | Discount: {item.discountMemberPercent}%</>
+                          <> | Discount for Members: {item.discountMemberPercent}%</>
                         )}
                       </div>
                       {item.validFrom && item.validTo && (
