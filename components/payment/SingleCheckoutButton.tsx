@@ -233,7 +233,7 @@ export default function SingleCheckoutButton({
         onOpenChange={setShowCheckoutDialog}
         onGuestFormSubmit={handleGuestFormSubmit}
         onEventFormSubmit={handleEventFormSubmit}
-        totalItemCount={1}
+        totalGuestRequired={1}
         userId={userId || null}
         userInfo={{
           email: email || null,

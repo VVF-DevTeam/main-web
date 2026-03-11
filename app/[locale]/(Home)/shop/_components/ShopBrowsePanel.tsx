@@ -1,7 +1,14 @@
-'use client'
+"use client"
 
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { ChevronRight, RotateCcw, ShoppingCart, ArrowLeft, ArrowRight } from 'lucide-react'
+import React, { useMemo, useState, useCallback, useEffect } from "react"
+import {
+    ChevronRight,
+    RotateCcw,
+    ShoppingCart,
+    ArrowLeft,
+    ArrowRight,
+    ShoppingBag,
+} from "lucide-react"
 import Image from 'next/image'
 import TextPreview from '@/components/quill/TextPreview'
 
@@ -14,6 +21,11 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import ShoppingSheetCheckout from './ShoppingSheetCheckout'
+import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
+import { UserInfoProps } from '@/lib/types/userInfo'
+import { useTranslation } from 'react-i18next'
 
 type ShopItemFilterData = {
     id: string
@@ -26,8 +38,12 @@ type ShopItemFilterData = {
     imageUrl?: string | null
     price: number | string
     currency: string
+    discountMemberPercent?: number | null
     description?: string | null
     updatedAt: Date | string
+    stripePriceId?: string | null
+    stripeProductId?: string | null
+    subscribedStripePriceId?: string | null
 }
 
 type ShopType = 'General' | 'Food' | 'Clothes' | 'Event' | 'Fundraiser' | 'Digital' | 'Seasonal'
@@ -35,6 +51,7 @@ type ShopType = 'General' | 'Food' | 'Clothes' | 'Event' | 'Fundraiser' | 'Digit
 type ShopWithItems = {
     id: string
     title: string
+    slug?: string | null
     imageUrl?: string | null
     type: ShopType
     isPublished: boolean
@@ -43,6 +60,11 @@ type ShopWithItems = {
     event?: {
         title: string
     } | null
+}
+
+type CartItem = {
+    item: ShopItemFilterData
+    quantity: number
 }
 
 interface ShopBrowsePanelProps {
@@ -111,12 +133,15 @@ const getAllFilteredItems = (
 function ShopItemCarousel({
     items,
     onItemClick,
+    onAddToCart,
 }: {
     items: ShopItemFilterData[]
     onItemClick: (item: ShopItemFilterData) => void
+    onAddToCart: (item: ShopItemFilterData) => void
 }) {
     const [currentIndex, setCurrentIndex] = useState(0)
-
+    // @ts-ignore: useTranslation will always throw an error for typescript
+    const { t } = useTranslation(['shop'])
     // Calculate items per view based on screen size
     const getItemsPerView = useCallback(() => {
         if (typeof window === 'undefined') return 1
@@ -228,9 +253,13 @@ function ShopItemCarousel({
                                         <Button
                                             size="sm"
                                             className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                onAddToCart(item)
+                                            }}
                                         >
                                             <ShoppingCart className="h-4 w-4 mr-1" />
-                                            Add
+                                            {t('add')}
                                         </Button>
                                     </div>
                                 </div>
@@ -277,6 +306,8 @@ function ShopItemCarousel({
 }
 
 export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
+    // @ts-ignore: useTranslation will always throw an error for typescript
+    const { t } = useTranslation(['shop'])
     // Only show published shops in the browse UI, ordered by sortOrder (lower first),
     // and randomize order between shops that share the same sortOrder.
     const publishedShops = useMemo(() => {
@@ -301,6 +332,80 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('')
     const [selectedSort, setSelectedSort] = useState<(typeof SORT_OPTIONS)[number]['value']>('featured')
     const [selectedItem, setSelectedItem] = useState<ShopItemFilterData | null>(null)
+    const [cartItems, setCartItems] = useState<CartItem[]>([])
+    const [isCartSheetOpen, setIsCartSheetOpen] = useState(false)
+    const [userInfo, setUserInfo] = useState<UserInfoProps | null>(null)
+
+    // Fetch user info
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const info = await getCurrentUserInfo()
+                setUserInfo(info)
+            } catch {
+                setUserInfo(null)
+            }
+        }
+        fetchUserInfo()
+    }, [])
+
+    const handleAddItemToCart = useCallback((item: ShopItemFilterData) => {
+        setCartItems((prev) => {
+            const existingIndex = prev.findIndex((ci) => ci.item.id === item.id)
+            if (existingIndex !== -1) {
+                const updated = [...prev]
+                updated[existingIndex] = {
+                    ...updated[existingIndex],
+                    quantity: updated[existingIndex].quantity + 1,
+                }
+                return updated
+            }
+            return [...prev, { item, quantity: 1 }]
+        })
+        setIsCartSheetOpen(true)
+    }, [])
+
+    const handleRemoveCartItem = useCallback((itemId: string) => {
+        setCartItems((prev) => prev.filter((ci) => ci.item.id !== itemId))
+    }, [])
+
+    const cartItemCount = useMemo(
+        () => cartItems.reduce((sum, ci) => sum + ci.quantity, 0),
+        [cartItems]
+    )
+
+    const checkoutItems = useMemo(
+        () =>
+            cartItems
+                .map(({ item, quantity }) => ({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    currency: item.currency,
+          stripePriceId: item.stripePriceId ?? '',
+          stripeProductId: item.stripeProductId ?? '',
+          discountMemberPercent: item.discountMemberPercent ?? null,
+          subscribedStripePriceId: item.subscribedStripePriceId ?? null,
+                    quantity,
+                    imageUrl: item.imageUrl,
+                }))
+                .filter(
+                    (ci) => ci.stripePriceId && ci.stripeProductId
+                ),
+        [cartItems]
+    )
+
+    const handleUpdateQuantity = useCallback((itemId: string, quantity: number) => {
+        setCartItems((prev) =>
+            prev.map((ci) =>
+                ci.item.id === itemId ? { ...ci, quantity } : ci
+            )
+        )
+    }, [])
+
+    const handleCartSheetOpenChange = (open: boolean) => {
+        setIsCartSheetOpen(open)
+    }
 
     const selectedShop = useMemo(
         () => publishedShops.find((shop) => shop.id === selectedShopId) ?? null,
@@ -461,7 +566,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
                 <div className="p-4">
                     <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">
-                        Shops
+                        {t('shops')}
                     </h2>
                     <div className="mb-6">
                         <Select value={selectedShopType || 'all'} onValueChange={(value) => setSelectedShopType(value === 'all' ? '' : value)}>
@@ -469,10 +574,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                 <SelectValue placeholder="Filter by Shop Type" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All Shop Types</SelectItem>
+                                <SelectItem value="all">{t('all-shop-types')}</SelectItem>
                                 {SHOP_TYPE_OPTIONS.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {type}
+                                        {t(type)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -486,7 +591,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                             return (
                                 <div key={shopType} className="space-y-2">
                                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                        {shopType}
+                                        {t(shopType)}
                                     </h3>
                                     <div className="space-y-1">
                                         {shopsInType.map((shop) => {
@@ -530,19 +635,33 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             <div className="flex-1 flex flex-col">
                 {/* Header */}
                 <header className="relative overflow-hidden px-6 py-8 text-color-white bg-[#1F2937]">
-                    <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full max-w-[30%] lg:max-w-[23%]">
-                        <Image
-                            src={headerBackgroundImage}
-                            alt={selectedShop?.title ?? 'Shop header background'}
-                            fill
-                            sizes="(min-width: 1024px) 33vw, 50vw"
-                            className="object-fill object-right opacity-40"
-                        />
+                    <div className="absolute inset-y-0 right-0 z-0 w-full max-w-[30%] lg:max-w-[23%] flex items-start justify-end gap-4 pr-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsCartSheetOpen(true)}
+                            className="relative mt-1 flex h-10 w-10 items-center justify-center rounded-full text-textColor-secondary100"
+                        >
+                            <ShoppingBag className="h-6 w-6" />
+                            {cartItemCount > 0 && (
+                                <span className="absolute top-1 right-0 rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white">
+                                    {cartItemCount}
+                                </span>
+                            )}
+                        </button>
+                        <div className="relative h-full w-full pointer-events-none">
+                            <Image
+                                src={headerBackgroundImage}
+                                alt={selectedShop?.title ?? 'Shop header background'}
+                                fill
+                                sizes="(min-width: 1024px) 33vw, 50vw"
+                                className="object-fill object-right opacity-40"
+                            />
+                        </div>
                     </div>
 
                     <div className="relative z-20 flex flex-col gap-2">
                         <h1 className="flex-1 text-center text-4xl font-bold text-textColor-white">
-                            {selectedShop?.title ?? 'All Shops'}
+                            {selectedShop?.title ?? t('all-shops')}
                         </h1>
 
                         <div className="flex items-center gap-2 text-textColor-white">
@@ -568,10 +687,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                         <SelectValue placeholder="Item Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">Item Type (All)</SelectItem>
+                                        <SelectItem value="all">{t('item-type-all')}</SelectItem>
                                         {allTypes.map((type) => (
                                             <SelectItem key={type} value={type}>
-                                                {type}
+                                                {t(type)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -582,7 +701,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                         <SelectValue placeholder="Tags" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">Tags (All)</SelectItem>
+                                        <SelectItem value="all">{t('tags-all')}</SelectItem>
                                         {allTags.map((tag) => (
                                             <SelectItem key={tag} value={tag}>
                                                 {tag}
@@ -596,10 +715,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                         <SelectValue placeholder="Item Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">Item Status (All)</SelectItem>
+                                        <SelectItem value="all">{t('item-status-all')}</SelectItem>
                                         {allStatuses.map((status) => (
                                             <SelectItem key={status} value={status}>
-                                                {ITEM_STATUS_LABELS[status]}
+                                                {t(ITEM_STATUS_LABELS[status])}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -616,25 +735,25 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                     }}
                                 >
                                     <RotateCcw className="h-4 w-4" />
-                                    Reset
+                                    {t('reset')}
                                 </Button>
                             </div>
 
                             <div className="flex items-center gap-4 text-lg">
                                 <p className="text-textColor-white/80">
-                                    Showing <span className="font-bold text-textColor-white">{sortedItems.length}</span>{' '}
-                                    products
+                                    {t('showing')} <span className="font-bold text-textColor-white">{sortedItems.length}</span>{' '}
+                                    {t('products')}
                                 </p>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-textColor-white/80">Sort by:</span>
+                                    <span className="text-textColor-white/80">{t('sort-by')}:</span>
                                     <Select value={selectedSort} onValueChange={(value) => setSelectedSort(value as (typeof SORT_OPTIONS)[number]['value'])}>
                                         <SelectTrigger className="h-11 w-[180px] rounded-xl border border-white/20 bg-white/5 px-4 text-base text-textColor-white">
-                                            <SelectValue placeholder="Featured" />
+                                            <SelectValue placeholder={t('featured')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {SORT_OPTIONS.map((option) => (
                                                 <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
+                                                    {t(option.label)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -692,13 +811,35 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                 {selectedItem.title}
                                             </h2>
                                             <p className="text-sm text-gray-500">
-                                                {selectedItem.type} • {ITEM_STATUS_LABELS[selectedItem.status]}
+                                                {t(selectedItem.type)} • {t(ITEM_STATUS_LABELS[selectedItem.status])}
                                             </p>
                                             <p className="text-xl font-semibold text-gray-900">
                                                 {typeof selectedItem.price === 'string'
                                                     ? `$${parseFloat(selectedItem.price).toFixed(2)} ${selectedItem.currency}`
                                                     : `$${selectedItem.price.toFixed(2)} ${selectedItem.currency}`}
                                             </p>
+                                            {selectedItem.discountMemberPercent != null &&
+                                                selectedItem.discountMemberPercent > 0 && (
+                                                    <p className="text-sm text-green-700">
+                                                        {t('member-price')}:{' '}
+                                                        {(() => {
+                                                            const numericPrice =
+                                                                typeof selectedItem.price === 'string'
+                                                                    ? parseFloat(selectedItem.price)
+                                                                    : selectedItem.price
+                                                            const safePrice = Number.isNaN(numericPrice)
+                                                                ? 0
+                                                                : numericPrice
+                                                            const discounted =
+                                                                safePrice *
+                                                                (1 -
+                                                                    selectedItem.discountMemberPercent! /
+                                                                    100)
+
+                                                            return `$${discounted.toFixed(2)} ${selectedItem.currency} (${selectedItem.discountMemberPercent}% off)`
+                                                        })()}
+                                                    </p>
+                                                )}
 
                                             {selectedItem.description && (
                                                 <div className="prose max-w-none text-sm text-gray-700">
@@ -707,9 +848,12 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                             )}
 
                                             <div>
-                                                <Button className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600">
+                                                <Button
+                                                    className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600"
+                                                    onClick={() => selectedItem && handleAddItemToCart(selectedItem)}
+                                                >
                                                     <ShoppingCart className="mr-2 h-4 w-4" />
-                                                    Add to Cart
+                                                    {t('add-to-cart')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -767,7 +911,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
 
                                                 {/* Item Type under title */}
                                                 <p className="text-sm text-gray-500">
-                                                    {item.type}
+                                                    {t(item.type)}
                                                 </p>
 
                                                 {/* Price and Add Button */}
@@ -778,9 +922,13 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                     <Button
                                                         size="sm"
                                                         className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleAddItemToCart(item)
+                                                        }}
                                                     >
                                                         <ShoppingCart className="h-4 w-4 mr-1" />
-                                                        Add
+                                                        {t('add')}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -816,6 +964,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                 setSelectedShopId(shop.id)
                                                 setSelectedItem(item)
                                             }}
+                                            onAddToCart={handleAddItemToCart}
                                         />
                                     </div>
                                 ))}
@@ -828,6 +977,38 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                     </div>
                 )}
             </div>
+
+            <Sheet open={isCartSheetOpen} onOpenChange={handleCartSheetOpenChange}>
+                <SheetContent
+                    side="right"
+                    className="w-full overflow-y-auto bg-white text-gray-900 md:min-w-[400px] lg:min-w-[480px]"
+                >
+                    <SheetHeader>
+                        <SheetTitle>{t('selected-items')}</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6 space-y-4">
+                        {cartItems.length === 0 ? (
+                            <p className="text-sm text-gray-500">
+                                {t('no-items-selected')}
+                            </p>
+                        ) : checkoutItems.length === 0 ? (
+                            <p className="text-sm text-red-600">
+                                These items are not yet configured for online checkout.
+                            </p>
+                        ) : (
+                            <ShoppingSheetCheckout
+                                shopSlug={selectedShop?.slug ?? selectedShop?.id ?? ''}
+                                shopId={selectedShop?.id ?? ''}
+                                selectedShopItems={checkoutItems}
+                                onClearCart={() => setCartItems([])}
+                                onRemoveItem={handleRemoveCartItem}
+                                onUpdateQuantity={handleUpdateQuantity}
+                                userInfo={userInfo}
+                            />
+                        )}
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     )
 }

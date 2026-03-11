@@ -49,7 +49,7 @@ const Editor = ({ onChange, value }: EditorProps) => {
         ],
         handlers: {
           image: function (this: QuillToolbarContext) {
-            const url = getValidGoogleDriveImageUrl(prompt('Enter image URL') || '')
+            const url = getValidGoogleDriveImageUrl(prompt('Enter image URL') || '', true)
             if (url) {
               const range = this.quill.getSelection()
               this.quill.insertEmbed(range?.index || 0, 'image', url)

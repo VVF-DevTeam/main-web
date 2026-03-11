@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useSession } from 'next-auth/react'
@@ -12,6 +13,9 @@ interface PaymentSuccessProps {
   translationWorkspaces: string[]
   isGuestCheckout?: boolean
 }
+
+const PAYMENT_SUCCESS_IMAGE =
+  'https://drive.google.com/thumbnail?id=1rq8yi8jxSDNPSkzUoh4__dsuCrhz1DnR'
 
 const PaymentSuccess = ({
   title,
@@ -39,37 +43,51 @@ const PaymentSuccess = ({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center dark:bg-neutral-900">
-      {/* Checkmark SVG */}
-      <svg
-        className="mb-6 h-20 w-20 text-green-500"
-        viewBox="0 0 52 52"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle
-          cx="26"
-          cy="26"
-          r="25"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="stroke-current"
+      <div className="relative flex w-full max-w-md justify-center overflow-hidden rounded-2xl">
+        <Image
+          src={PAYMENT_SUCCESS_IMAGE}
+          alt="Payment success background"
+          width={1200}
+          height={900}
+          className="mx-auto w-[400px] object-contain"
+          sizes="(min-width: 768px) 24rem, 80vw"
+          priority
         />
-        <path
-          d="M14 27l7 7 17-17"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="checkmark-path"
-        />
-      </svg>
+        <div className="absolute inset-0 flex items-center justify-center flex-col gap-4 mt-32">
+          <svg
+            className="h-20 w-20 text-green-500"
+            viewBox="0 0 52 52"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="26"
+              cy="26"
+              r="25"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="stroke-current"
+            />
+            <path
+              d="M14 27l7 7 17-17"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="checkmark-path"
+            />
+          </svg>
+
+          <h1 className="mb-2 text-2xl font-bold text-green-600">
+            {t('paymentSuccess-header')}
+          </h1>
+        </div>
+      </div>
 
       {/* Message */}
-      <h1 className="mb-2 text-2xl font-bold text-green-600">
-        {t('paymentSuccess-header')}
-      </h1>
+
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
         {t('paymentSuccess-text')} <strong>{title}</strong>
       </p>

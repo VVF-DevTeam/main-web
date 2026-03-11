@@ -35,6 +35,7 @@ const i18nNamespaces = [
   'policy',
   'post',
   'host',
+  'shop',
 ]
 
 // Generate static params for all supported locales
