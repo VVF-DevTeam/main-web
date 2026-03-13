@@ -96,10 +96,9 @@ export async function POST(req: Request) {
         guestEmail: mainEmail || undefined,
         guestPhone: guestPhone || undefined,
         // Shop item data (using ticketMetadata field for shop items)
-        ticketMetadata: shopItemMetadata.map((item) => ({
+        shopItemMetadata: shopItemMetadata.map((item) => ({
           shopItemId: item.shopItemId,
           quantity: item.quantity,
-          seatNumbers: [], // Empty for shop items (not applicable)
         })),
         otherGuestsInfo: otherGuestsInfo && Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0
           ? otherGuestsInfo

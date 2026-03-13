@@ -36,5 +36,17 @@
     "remove": "Supprimer",
     "member-price": "Prix membre",
     "checkout-membership-discount": "Réduction membre",
-    "buy-button": "Acheter"
+    "buy-button": "Acheter",
+    "guest-checkout-title": "Checkout",
+    "checkout-description-first-line": "Veuillez fournir vos informations de contact pour finaliser votre achat.",
+    "more-over-encouraged": "De plus, nous vous encourageons vivement à",
+    "guest-checkout-login-link": "vous connecter",
+    "guest-checkout-login-text": "pour acheter les articles pour faciliter la gestion de vos achats.",
+    "reserve-button": "Cliquez ici pour payer",
+    "available-discounts": "Réductions Disponibles",
+    "effective-discount": "Réduction effective :",
+    "toggle-hide-discount-details": "Masquer les détails de la réduction",
+    "no-discounts-applied": "Aucune réduction actuellement appliquée",
+    "toggle-show-discount-details": "Afficher les détails de la réduction",
+    "percent-off-applied": "{{percent}}% off appliqué"
 }

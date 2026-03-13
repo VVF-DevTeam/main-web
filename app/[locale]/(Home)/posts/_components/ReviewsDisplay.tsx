@@ -566,7 +566,7 @@ const ReviewsDisplay = ({
                       {review.imageLink && (
                         <div className="mb-3 flex justify-center">
                           <div
-                            className="relative h-48 w-full max-w-sm cursor-pointer overflow-hidden rounded-lg border border-gray-200 transition-transform hover:scale-105"
+                            className="group relative h-48 w-full max-w-sm cursor-pointer overflow-hidden rounded-lg border border-gray-200 transition-transform hover:scale-105"
                             onClick={() => openImageModal(review.imageLink!)}
                           >
                             <Image
@@ -577,8 +577,8 @@ const ReviewsDisplay = ({
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
                             {/* Click indicator overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 hover:bg-opacity-10">
-                              <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 hover:opacity-100">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-10">
+                              <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                                 <Search className="h-5 w-5 text-gray-700" />
                               </div>
                             </div>

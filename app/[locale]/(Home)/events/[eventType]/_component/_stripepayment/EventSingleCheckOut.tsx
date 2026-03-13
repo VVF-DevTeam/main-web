@@ -377,12 +377,18 @@ export default function EventSingleCheckOut({
                       <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
                         {ticket.type}
                       </span>
-                      <span className="text-lg font-bold text-gray-900 drop-shadow-sm">
-                        {/* {currencyLabel}  */}$
-                        {isSubscribed && memberPrice !== null
-                          ? memberPrice.toFixed(2)
-                          : totalPrice.toFixed(2)}
-                      </span>
+                      <div className="flex flex-col items-end gap-0.5">
+                        {isSubscribed && memberPrice !== null && (
+                          <span className="text-xs text-gray-400 line-through drop-shadow-sm">
+                            ${totalPrice.toFixed(2)}
+                          </span>
+                        )}
+                        <span className={`text-lg font-bold drop-shadow-sm ${isSubscribed && memberPrice !== null ? 'text-green-600' : 'text-gray-900'}`}>
+                          ${isSubscribed && memberPrice !== null
+                            ? memberPrice.toFixed(2)
+                            : totalPrice.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Display seat information - single seat only */}
@@ -412,15 +418,15 @@ export default function EventSingleCheckOut({
 
                     {/* Member price */}
                     {memberPrice !== null ? (
-                      <span className="text-xs text-gray-500 drop-shadow-sm">
-                        {isSubscribed
-                          ? t('member-price-applied', {
-                              price: memberPrice.toFixed(2),
-                            })
-                          : t('member-price', {
-                              price: memberPrice.toFixed(2),
-                            })}
-                      </span>
+                      isSubscribed ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-600 w-fit">
+                          ✦ {t('member-price-applied', { price: memberPrice.toFixed(2) })}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 drop-shadow-sm w-fit">
+                          ✦ {t('member-price', { price: memberPrice.toFixed(2) })}
+                        </span>
+                      )
                     ) : null}
 
                     {/* Valid To Date */}

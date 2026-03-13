@@ -8,6 +8,7 @@ import {
     ArrowLeft,
     ArrowRight,
     ShoppingBag,
+    Search,
 } from "lucide-react"
 import Image from 'next/image'
 import TextPreview from '@/components/quill/TextPreview'
@@ -24,8 +25,10 @@ import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import ShoppingSheetCheckout from './ShoppingSheetCheckout'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
+import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { useTranslation } from 'react-i18next'
+import { JsonValue } from "@prisma/client/runtime/library"
 
 type ShopItemFilterData = {
     id: string
@@ -36,6 +39,7 @@ type ShopItemFilterData = {
     status: 'AVAILABLE' | 'OUT_OF_STOCK' | 'DISCONTINUED' | 'COMING_SOON'
     isFeatured: boolean
     imageUrl?: string | null
+    images?: string[]
     price: number | string
     currency: string
     discountMemberPercent?: number | null
@@ -60,6 +64,7 @@ type ShopWithItems = {
     event?: {
         title: string
     } | null
+    shopDiscounts?: JsonValue
 }
 
 type CartItem = {
@@ -242,7 +247,7 @@ function ShopItemCarousel({
 
                                     {/* Item Type under title */}
                                     <p className="text-sm text-gray-500">
-                                        {item.type}
+                                        {t(ITEM_STATUS_LABELS[item.status])} • {t(item.type)}
                                     </p>
 
                                     {/* Price and Add Button */}
@@ -332,9 +337,18 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('')
     const [selectedSort, setSelectedSort] = useState<(typeof SORT_OPTIONS)[number]['value']>('featured')
     const [selectedItem, setSelectedItem] = useState<ShopItemFilterData | null>(null)
+    const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null)
+    const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
+
+    const openImageModal = (imageUrl: string) => setModalImageUrl(imageUrl)
+    const closeImageModal = () => setModalImageUrl(null)
+    const handleModalOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) closeImageModal()
+    }
     const [cartItems, setCartItems] = useState<CartItem[]>([])
     const [isCartSheetOpen, setIsCartSheetOpen] = useState(false)
     const [userInfo, setUserInfo] = useState<UserInfoProps | null>(null)
+    const [isSubscribed, setIsSubscribed] = useState(false)
 
     // Fetch user info
     useEffect(() => {
@@ -349,6 +363,23 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         fetchUserInfo()
     }, [])
 
+    // Fetch subscription status once userInfo is available
+    useEffect(() => {
+        if (!userInfo?.id) {
+            setIsSubscribed(false)
+            return
+        }
+        let isMounted = true
+        checkSubscription(userInfo.id)
+            .then((subscribed) => {
+                if (isMounted) setIsSubscribed(Boolean(subscribed))
+            })
+            .catch(() => {
+                if (isMounted) setIsSubscribed(false)
+            })
+        return () => { isMounted = false }
+    }, [userInfo?.id])
+
     const handleAddItemToCart = useCallback((item: ShopItemFilterData) => {
         setCartItems((prev) => {
             const existingIndex = prev.findIndex((ci) => ci.item.id === item.id)
@@ -362,6 +393,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             }
             return [...prev, { item, quantity: 1 }]
         })
+
         setIsCartSheetOpen(true)
     }, [])
 
@@ -382,10 +414,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                     title: item.title,
                     price: item.price,
                     currency: item.currency,
-          stripePriceId: item.stripePriceId ?? '',
-          stripeProductId: item.stripeProductId ?? '',
-          discountMemberPercent: item.discountMemberPercent ?? null,
-          subscribedStripePriceId: item.subscribedStripePriceId ?? null,
+                    stripePriceId: item.stripePriceId ?? '',
+                    stripeProductId: item.stripeProductId ?? '',
+                    discountMemberPercent: item.discountMemberPercent ?? null,
+                    subscribedStripePriceId: item.subscribedStripePriceId ?? null,
                     quantity,
                     imageUrl: item.imageUrl,
                 }))
@@ -474,15 +506,33 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         [publishedShops, selectedShopId, selectedType, selectedTag, selectedStatus]
     )
 
+    const STATUS_SORT_ORDER: Record<ShopItemFilterData['status'], number> = {
+        AVAILABLE: 0,
+        COMING_SOON: 1,
+        OUT_OF_STOCK: 2,
+        DISCONTINUED: 3,
+    }
+
     const sortedItems = useMemo(() => {
         const cloned = [...filteredItems]
         if (selectedSort === 'title-asc') {
-            return cloned.sort((a, b) => a.title.localeCompare(b.title))
+            return cloned.sort((a, b) =>
+                Number(b.isFeatured) - Number(a.isFeatured) ||
+                STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status] ||
+                a.title.localeCompare(b.title)
+            )
         }
         if (selectedSort === 'title-desc') {
-            return cloned.sort((a, b) => b.title.localeCompare(a.title))
+            return cloned.sort((a, b) =>
+                Number(b.isFeatured) - Number(a.isFeatured) ||
+                STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status] ||
+                b.title.localeCompare(a.title)
+            )
         }
-        return cloned.sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
+        return cloned.sort((a, b) =>
+            Number(b.isFeatured) - Number(a.isFeatured) ||
+            STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]
+        )
     }, [filteredItems, selectedSort])
 
     // Get up to 6 featured items per shop (or latest updated if not enough featured)
@@ -536,7 +586,12 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
             }
 
             if (selectedItems.length > 0) {
-                result.push({ shop, items: selectedItems })
+                const statusSortedItems = [...selectedItems].sort(
+                    (a, b) =>
+                        Number(b.isFeatured) - Number(a.isFeatured) ||
+                        STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]
+                )
+                result.push({ shop, items: statusSortedItems })
             }
         })
 
@@ -607,8 +662,8 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                         setSelectedItem(null)
                                                     }}
                                                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${isActive
-                                                            ? 'bg-bgColor-brand900 text-white font-medium'
-                                                            : 'text-gray-700 hover:bg-gray-100'
+                                                        ? 'bg-bgColor-brand900 text-white font-medium'
+                                                        : 'text-gray-700 hover:bg-gray-100'
                                                         }`}
                                                 >
                                                     <div className="flex items-center justify-between">
@@ -774,32 +829,93 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                     <div className="mb-8 flex flex-col gap-4 rounded-lg border bg-white p-4 md:flex-row">
                                         {/* Left: Image */}
                                         <div className="w-full md:w-1/2">
-                                            <div className="relative aspect-video w-full overflow-hidden rounded-md bg-gray-100">
-                                                {selectedItem.imageUrl ? (
-                                                    <Image
-                                                        src={selectedItem.imageUrl}
-                                                        alt={selectedItem.title}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-gray-400">
-                                                        No Image
-                                                    </div>
-                                                )}
-                                            </div>
+                                            {/* Main image with tag overlays */}
+                                            {(() => {
+                                                const displayUrl = activeImageUrl ?? selectedItem.imageUrl
+                                                return (
+                                                    <div
+                                                        className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-md bg-gray-100 transition-transform hover:scale-[1.01]"
+                                                        onClick={() => { if (displayUrl) openImageModal(displayUrl) }}
+                                                    >
+                                                        {displayUrl ? (
+                                                            <Image
+                                                                src={displayUrl}
+                                                                alt={selectedItem.title}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                                                No Image
+                                                            </div>
+                                                        )}
 
-                                            {/* Tags under image */}
-                                            {selectedItem.tags.length > 0 && (
-                                                <div className="mt-3 flex flex-wrap gap-2">
-                                                    {selectedItem.tags.map((tag, idx) => (
-                                                        <Badge
-                                                            key={`${selectedItem.id}-tag-${idx}`}
-                                                            variant="secondary"
-                                                            className="text-xs bg-gray-100 text-gray-700"
+                                                        {/* Tags overlay — top-left corner */}
+                                                        {selectedItem.tags.length > 0 && (
+                                                            <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                                                                {selectedItem.tags.map((tag, idx) => (
+                                                                    <Badge
+                                                                        key={`${selectedItem.id}-tag-${idx}`}
+                                                                        className="text-[10px] bg-black/60 text-white border-0 backdrop-blur-sm"
+                                                                    >
+                                                                        {tag}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        {/* Hover magnifier overlay */}
+                                                        {displayUrl && (
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-10">
+                                                                <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                                                                    <Search className="h-5 w-5 text-gray-700" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )
+                                            })()}
+
+                                            {/* Thumbnail strip */}
+                                            {selectedItem.images && selectedItem.images.length > 0 && (
+                                                <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                                                    {/* Main image as first thumbnail */}
+                                                    {selectedItem.imageUrl && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setActiveImageUrl(null)}
+                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${
+                                                                activeImageUrl === null
+                                                                    ? 'border-blue-500'
+                                                                    : 'border-transparent hover:border-gray-300'
+                                                            }`}
                                                         >
-                                                            {tag}
-                                                        </Badge>
+                                                            <Image
+                                                                src={selectedItem.imageUrl}
+                                                                alt="Main image"
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </button>
+                                                    )}
+                                                    {selectedItem.images.map((imgUrl, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => setActiveImageUrl(imgUrl)}
+                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${
+                                                                activeImageUrl === imgUrl
+                                                                    ? 'border-blue-500'
+                                                                    : 'border-transparent hover:border-gray-300'
+                                                            }`}
+                                                        >
+                                                            <Image
+                                                                src={imgUrl}
+                                                                alt={`Image ${idx + 1}`}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </button>
                                                     ))}
                                                 </div>
                                             )}
@@ -820,8 +936,8 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                             </p>
                                             {selectedItem.discountMemberPercent != null &&
                                                 selectedItem.discountMemberPercent > 0 && (
-                                                    <p className="text-sm text-green-700">
-                                                        {t('member-price')}:{' '}
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-bgColor-secondary400 bg-bgColor-secondary50 px-2 py-0.5 text-xs font-medium text-amber-700 w-fit">
+                                                        ✦ {t('member-price')}:{' '}
                                                         {(() => {
                                                             const numericPrice =
                                                                 typeof selectedItem.price === 'string'
@@ -838,11 +954,11 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
 
                                                             return `$${discounted.toFixed(2)} ${selectedItem.currency} (${selectedItem.discountMemberPercent}% off)`
                                                         })()}
-                                                    </p>
+                                                    </span>
                                                 )}
 
                                             {selectedItem.description && (
-                                                <div className="prose max-w-none text-sm text-gray-700">
+                                                <div className="max-w-none text-sm text-gray-700">
                                                     <TextPreview value={selectedItem.description || ''} />
                                                 </div>
                                             )}
@@ -863,78 +979,78 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                 {/* Product cards grid */}
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                     {sortedItems.map((item) => {
-                                    const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price
-                                    const formattedPrice = isNaN(price) ? '0.00' : price.toFixed(2)
+                                        const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price
+                                        const formattedPrice = isNaN(price) ? '0.00' : price.toFixed(2)
 
-                                    return (
-                                        <div
-                                            key={item.id}
+                                        return (
+                                            <div
+                                                key={item.id}
                                                 className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md cursor-pointer transition-transform duration-200 hover:scale-105"
-                                                onClick={() => setSelectedItem(item)}
-                                        >
-                                            {/* Image Container */}
-                                            <div className="relative w-full h-48 bg-gray-100">
-                                                {item.imageUrl ? (
-                                                    <Image
-                                                        src={item.imageUrl}
-                                                        alt={item.title}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                        No Image
+                                                onClick={() => { setSelectedItem(item); setActiveImageUrl(null) }}
+                                            >
+                                                {/* Image Container */}
+                                                <div className="relative w-full h-48 bg-gray-100">
+                                                    {item.imageUrl ? (
+                                                        <Image
+                                                            src={item.imageUrl}
+                                                            alt={item.title}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            No Image
+                                                        </div>
+                                                    )}
+
+                                                    {/* Tags in top left */}
+                                                    {item.tags.length > 0 && (
+                                                        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                                                            {item.tags.slice(0, 2).map((tag, idx) => (
+                                                                <Badge
+                                                                    key={idx}
+                                                                    variant="secondary"
+                                                                    className="text-xs bg-white/90 text-gray-700"
+                                                                >
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Content */}
+                                                <div className="p-4 space-y-2">
+                                                    <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
+                                                        {item.title}
+                                                    </h3>
+
+                                                    {/* Item Type under title */}
+                                                    <p className="text-sm text-gray-500">
+                                                        {t(ITEM_STATUS_LABELS[item.status])} • {t(item.type)}
+                                                    </p>
+
+                                                    {/* Price and Add Button */}
+                                                    <div className="flex items-center justify-between pt-2">
+                                                        <span className="text-xl font-bold text-gray-900">
+                                                            ${formattedPrice} {item.currency}
+                                                        </span>
+                                                        <Button
+                                                            size="sm"
+                                                            className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleAddItemToCart(item)
+                                                            }}
+                                                        >
+                                                            <ShoppingCart className="h-4 w-4 mr-1" />
+                                                            {t('add')}
+                                                        </Button>
                                                     </div>
-                                                )}
-
-                                                {/* Tags in top left */}
-                                                {item.tags.length > 0 && (
-                                                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                                                        {item.tags.slice(0, 2).map((tag, idx) => (
-                                                            <Badge
-                                                                key={idx}
-                                                                variant="secondary"
-                                                                className="text-xs bg-white/90 text-gray-700"
-                                                            >
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className="p-4 space-y-2">
-                                                <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
-                                                    {item.title}
-                                                </h3>
-
-                                                {/* Item Type under title */}
-                                                <p className="text-sm text-gray-500">
-                                                    {t(item.type)}
-                                                </p>
-
-                                                {/* Price and Add Button */}
-                                                <div className="flex items-center justify-between pt-2">
-                                                    <span className="text-xl font-bold text-gray-900">
-                                                        ${formattedPrice} {item.currency}
-                                                    </span>
-                                                    <Button
-                                                        size="sm"
-                                                        className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            handleAddItemToCart(item)
-                                                        }}
-                                                    >
-                                                        <ShoppingCart className="h-4 w-4 mr-1" />
-                                                        {t('add')}
-                                                    </Button>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    })}
                                 </div>
                             </>
                         ) : (
@@ -963,6 +1079,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                             onItemClick={(item) => {
                                                 setSelectedShopId(shop.id)
                                                 setSelectedItem(item)
+                                                setActiveImageUrl(null)
                                             }}
                                             onAddToCart={handleAddItemToCart}
                                         />
@@ -1004,11 +1121,38 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                 onRemoveItem={handleRemoveCartItem}
                                 onUpdateQuantity={handleUpdateQuantity}
                                 userInfo={userInfo}
+                                isSubscribed={isSubscribed}
+                                discounts={selectedShop?.shopDiscounts ?? []}
                             />
                         )}
                     </div>
                 </SheetContent>
             </Sheet>
+
+            {/* Image lightbox modal */}
+            {modalImageUrl && (
+                <div
+                    className="fixed inset-0 z-[90] m-0 flex items-center justify-center bg-black/80 p-0 [margin-top:0!important]"
+                    onClick={handleModalOverlayClick}
+                >
+                    <div className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-lg">
+                        <Image
+                            src={modalImageUrl}
+                            alt="Full size image"
+                            width={800}
+                            height={600}
+                            className="h-auto max-h-[90vh] w-auto max-w-[90vw] object-contain"
+                            sizes="90vw"
+                        />
+                        <button
+                            onClick={closeImageModal}
+                            className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 transition-all duration-200 hover:bg-opacity-100"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

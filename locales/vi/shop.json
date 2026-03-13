@@ -5,7 +5,7 @@
     "item-type-all": "Loại sản phẩm (Tất cả)",
     "tags-all": "Tags (Tất cả)",
     "item-status-all": "Trạng thái (Tất cả)",
-    "General": "Nhiều mặt hàng / Chung",
+    "General": "Chung",
     "Food": "Thực phẩm",
     "Clothes": "Quần áo",
     "Event": "Sự kiện",
@@ -36,5 +36,17 @@
     "remove": "Xóa",
     "member-price": "Giá thành viên",
     "checkout-membership-discount": "Giảm giá thành viên",
-    "buy-button": "Mua"
+    "buy-button": "Mua",
+    "guest-checkout-title": "Thanh toán",
+    "checkout-description-first-line": "Vui lòng cung cấp thông tin liên hệ của bạn để hoàn tất việc mua hàng.",
+    "more-over-encouraged": "Hơn nữa, chúng mình khuyến khích bạn",
+    "guest-checkout-login-link": "đăng nhập",
+    "guest-checkout-login-text": "để mua các sản phẩm cho việc quản lý mua hàng dễ dàng hơn.",
+    "reserve-button": "Nhấp vào đây để thanh toán",
+    "available-discounts": "Các giảm giá có sẵn",
+    "effective-discount": "Giảm giá hiệu quả:",
+    "toggle-hide-discount-details": "Ẩn chi tiết giảm giá",
+    "no-discounts-applied": "Không có giảm giá nào được áp dụng",
+    "toggle-show-discount-details": "Hiện chi tiết giảm giá",
+    "percent-off-applied": "{{percent}}% off applied"
 }   

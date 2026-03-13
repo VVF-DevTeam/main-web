@@ -1536,20 +1536,9 @@ export default function EventCartCheckout({
                 <span>{t('checkout-subtotal')}</span>
                 <span>
                   {selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
-                  {priceBreakdown.baseTotal.toFixed(2)}
+                  {priceBreakdown.totalAfterMembership.toFixed(2)}
                 </span>
               </div>
-
-              {/* Membership Discount */}
-              {priceBreakdown.membershipDiscountAmount > 0 && (
-                <div className="flex items-center justify-between text-green-600">
-                  <span>{t('checkout-membership-discount')}</span>
-                  <span>
-                    -{selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
-                    {priceBreakdown.membershipDiscountAmount.toFixed(2)}
-                  </span>
-                </div>
-              )}
 
               {/* Event Discounts (Bulk / Min Total / Code combined) */}
               {priceBreakdown.bulkDiscountAmount > 0 && (
@@ -1578,55 +1567,35 @@ export default function EventCartCheckout({
                     )}
                   </span>
                   <span>
-                    {priceBreakdown.ticketTypeDiscounts &&
-                      priceBreakdown.ticketTypeDiscounts.length > 0 ? (
-                      (() => {
-                        const percentPortion = priceBreakdown.ticketTypeDiscounts.reduce(
-                          (sum, d) => sum + d.discountAmount,
-                          0
-                        )
-                        const flatAmountPortion = Math.max(
-                          0,
-                          priceBreakdown.bulkDiscountAmount - percentPortion
-                        )
-                        // Round to 2 decimals to avoid floating point precision issues
-                        const roundedFlatAmount = Math.round(flatAmountPortion * 100) / 100
+                    {(() => {
+                      const currency =
+                        selectedSeatsWithTickets[0]?.ticket.currency ||
+                        selectedTickets[0]?.ticket.currency ||
+                        'CAD'
+                      const flatAmount = priceBreakdown.effectiveAmount > 0
+                        ? priceBreakdown.effectiveAmount
+                        : 0
 
+                      if (priceBreakdown.effectivePercent > 0 && flatAmount > 0) {
                         return (
-                          <span className="flex flex-wrap items-center max-w-[150px] md:max-w-full justify-end">
-                            - (
-                            {priceBreakdown.ticketTypeDiscounts.map(
-                              (discount, index) => (
-                                <span key={index} className="whitespace-nowrap">
-                                  ${discount.perUnitDiscount.toFixed(2)} ×{' '}
-                                  {discount.quantity}
-                                  {index <
-                                    priceBreakdown.ticketTypeDiscounts.length -
-                                    1 && <span className="ml-1">+</span>}
-                                </span>
-                              )
-                            )}
-                            {roundedFlatAmount > 0 && priceBreakdown.effectiveAmount > 0 && (
-                              <>
-                                {priceBreakdown.ticketTypeDiscounts.length >
-                                  0 && <span className="ml-1">+</span>}
-                                <span className="whitespace-nowrap">
-                                  ${roundedFlatAmount.toFixed(2)}
-                                </span>
-                              </>
-                            )}
-                            )
+                          <span className="whitespace-nowrap">
+                            - (${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
                           </span>
                         )
-                      })()
-                    ) : (
-                      <span>
-                        -{selectedSeatsWithTickets[0]?.ticket.currency ||
-                          selectedTickets[0]?.ticket.currency ||
-                          'CAD'}{' '}
-                        ${priceBreakdown.bulkDiscountAmount.toFixed(2)}
-                      </span>
-                    )}
+                      }
+                      if (priceBreakdown.effectivePercent > 0) {
+                        return (
+                          <span className="whitespace-nowrap">
+                            - ${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}%
+                          </span>
+                        )
+                      }
+                      return (
+                        <span className="whitespace-nowrap">
+                          -{currency} ${flatAmount.toFixed(2)}
+                        </span>
+                      )
+                    })()}
                   </span>
                 </div>
               )}
