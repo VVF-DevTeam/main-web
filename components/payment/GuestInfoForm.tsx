@@ -82,7 +82,7 @@ export default function GuestInfoForm({
   totalItemCount = 1,
 }: GuestInfoFormProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
-  const { t } = useTranslation(['signIn-signUp', 'event'])
+  const { t } = useTranslation(['event'])
 
   const parsedPhone = parsePhone(mainUserPhone)
 
@@ -325,17 +325,15 @@ export default function GuestInfoForm({
 
         <div className="pt-4 border-t">
           <Button type="submit" className="w-full group">
-            {buttonText || t('event:reserve-button')}
+            {buttonText || t('reserve-button')}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Button>
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          {t('event:guest-checkout-disclaimer')}
+          {t('guest-checkout-disclaimer')}
         </p>
       </form>
     </Form>
   )
 }
-
-

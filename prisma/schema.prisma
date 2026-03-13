@@ -311,12 +311,14 @@ model CheckoutSessionData {
   guestEmail      String?
   guestPhone      String?
   
-  // Seat and ticket data
+  // Seat and ticket data (for event)
   seatNumbers     Json?
-  ticketMetadata  Json             // Required - always present
+  ticketMetadata  Json?
+  // Shop item data  (for shopping)
+  shopItemMetadata Json?               
   otherGuestsInfo Json?            // Other guests (array)
   
-  // Event form responses
+  // form responses
   formResponses   Json?            // Custom event registration form answers
   
   stripeSessionId String? @unique // Optional initially, set after session creation

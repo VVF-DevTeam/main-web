@@ -338,7 +338,7 @@ const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
   const onItemSubmit = async (values: ShopItemFormData) => {
     try {
       setIsLoading(true)
-      const itemTitle = `${shop.title} - ${values.type} Shop Item`
+      const itemTitle = `${shop.title} - ${values.title}`
       const shopUrl = shop.slug ? `https://www.vietvibe.org/en/shop/${shop.slug}` : ''
 
       // Process images array - remove empty strings
@@ -378,7 +378,7 @@ const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
           })
         }
 
-        // Check if price or discount changed
+        // Check if price, discount, or title changed
         const existingItem = items.find((i) => i.id === editingItemId)
         const priceChanged =
           existingItem && Number(existingItem.price) !== values.price
@@ -386,9 +386,11 @@ const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
           existingItem &&
           (existingItem.discountMemberPercent ?? null) !==
           (values.discountMemberPercent ?? null)
+        const titleChanged =
+          existingItem && existingItem.title.trim() !== values.title.trim()
 
-        // Update Stripe if price or discount changed
-        if (priceChanged || discountChanged) {
+        // Update Stripe if price, discount, or title changed
+        if (priceChanged || discountChanged || titleChanged) {
           const { data } = await axiosInstance.put<StripeShopItemDataEdit>(
             '/api/payment/stripe-prices/shop-items',
             {

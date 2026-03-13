@@ -113,7 +113,8 @@ export default {
           secondary400: 'hsl(var(--secondary-color-400))',
           secondary200: 'hsl(var(--secondary-color-200))',
           secondary100: 'hsl(var(--secondary-color-100))',
-
+          secondary50: 'hsl(var(--secondary-color-50))',
+          
           gray500: 'hsl(var(--gray-color-500))',
           gray300: 'hsl(var(--gray-color-300))',
           gray100: 'hsl(var(--gray-color-100))',
@@ -142,6 +143,7 @@ export default {
           secondary400: 'hsl(var(--secondary-color-400))',
           secondary200: 'hsl(var(--secondary-color-200))',
           secondary100: 'hsl(var(--secondary-color-100))',
+          secondary50: 'hsl(var(--secondary-color-50))',
 
           gray500: 'hsl(var(--gray-color-500))',
           gray300: 'hsl(var(--gray-color-300))',

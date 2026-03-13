@@ -1,12 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { loadStripe } from '@stripe/stripe-js'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import { isAxiosError } from 'axios'
-import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import Loader from '@/components/loader/Loader'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Plus, Minus } from 'lucide-react'
@@ -14,6 +13,19 @@ import Image from 'next/image'
 import { GuestInfo } from '@/components/payment/GuestInfoForm'
 import { EventCheckoutDialog } from '@/components/payment/EventCheckoutDialog'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { JsonValue } from '@prisma/client/runtime/library'
+
+// Shape of discounts stored in shop.shopDiscounts JSON field
+interface ShopDiscountJson {
+  id?: string
+  type?: string
+  discountAmount?: number
+  discountUnit?: 'percentage' | 'amount'
+  minQuantity?: number | null
+  minTotal?: number | null
+  code?: string | null
+  cannotBeStacked?: boolean | null
+}
 
 type SelectedShopItem = {
   id: string
@@ -36,26 +48,29 @@ interface ShoppingSheetCheckoutProps {
   onRemoveItem: (itemId: string) => void
   onUpdateQuantity?: (itemId: string, quantity: number) => void
   userInfo?: UserInfoProps | null
+  isSubscribed?: boolean
+  discounts?: JsonValue
 }
 
 export default function ShoppingSheetCheckout({
   shopSlug,
   shopId,
   selectedShopItems,
+  discounts = [],
   onClearCart,
   onRemoveItem,
   onUpdateQuantity,
   userInfo,
+  isSubscribed = false,
 }: ShoppingSheetCheckoutProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('shop')
 
-  // Check subscription status for member pricing (if shops support it)
-  const [isSubscribed, setIsSubscribed] = useState(false)
-  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
+  const [isLoadingSubscription] = useState(false)
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [guestInfo, setGuestInfo] = useState<{ representativeGuest?: GuestInfo; otherGuests?: GuestInfo[] }>({})
+  const [isDiscountsExpanded, setIsDiscountsExpanded] = useState(false)
 
   const userId = userInfo?.id || null
   const isGuestCheckout = !userId || userId.trim() === ''
@@ -63,35 +78,22 @@ export default function ShoppingSheetCheckout({
   // Total item count
   const totalItemCount = selectedShopItems.reduce((sum, item) => sum + item.quantity, 0)
 
-  useEffect(() => {
-    console.log('selectedShopItems', selectedShopItems)
-    let isMounted = true
-    const fetchSubscription = async () => {
-      try {
-        if (userId) {
-          const subscribed = await checkSubscription(userId)
-          if (isMounted) {
-            setIsSubscribed(Boolean(subscribed))
-          }
-        }
-      } catch (error) {
-        console.error('Error checking subscription:', error)
-      } finally {
-        if (isMounted) {
-          setIsLoadingSubscription(false)
-        }
-      }
+  // Normalize discounts JSON into a typed array for easier rendering/calculation
+  const discountList: ShopDiscountJson[] = useMemo(() => {
+    if (Array.isArray(discounts)) {
+      return discounts as ShopDiscountJson[]
     }
-    fetchSubscription()
-    return () => {
-      isMounted = false
-    }
-  }, [userId])
+    return []
+  }, [discounts])
 
-  // Calculate total price
+  // Helper to safely read discountAmount
+  const getDiscountAmountValue = (d: ShopDiscountJson | null | undefined): number =>
+    d && typeof d.discountAmount === 'number' ? d.discountAmount : 0
+
+  // Calculate total price with membership & shop discounts applied
   const priceBreakdown = useMemo(() => {
+    // Base total: sum of all cart item prices (before any discounts)
     let baseTotal = 0
-    let finalTotal = 0
 
     selectedShopItems.forEach((item) => {
       const numericPrice =
@@ -100,28 +102,134 @@ export default function ShoppingSheetCheckout({
 
       const itemBaseTotal = safePrice * item.quantity
       baseTotal += itemBaseTotal
-
-      let effectivePrice = safePrice
-      if (
-        isSubscribed &&
-        item.discountMemberPercent != null &&
-        item.discountMemberPercent > 0
-      ) {
-        effectivePrice =
-          safePrice * (1 - item.discountMemberPercent / 100)
-      }
-
-      finalTotal += effectivePrice * item.quantity
     })
 
-    const membershipDiscountAmount = Math.max(baseTotal - finalTotal, 0)
+    // Apply membership discounts (per‑item) if subscribed
+    let membershipDiscountAmount = 0
+
+    if (isSubscribed) {
+      selectedShopItems.forEach((item) => {
+        const numericPrice =
+          typeof item.price === 'string' ? parseFloat(item.price) : item.price
+        const safePrice = Number.isNaN(numericPrice) ? 0 : numericPrice
+
+        const discountPercent = item.discountMemberPercent || 0
+        if (discountPercent > 0) {
+          const itemDiscount =
+            safePrice * item.quantity * (discountPercent / 100)
+          membershipDiscountAmount += itemDiscount
+        }
+      })
+    }
+
+    const totalAfterMembership = baseTotal - membershipDiscountAmount
+
+    // Apply shop discounts (Bulk / Minimum Total) using a simplified version
+    // of the EventCartCheckout stacking rules, but always based on subtotal (baseTotal)
+    let bulkDiscountAmount = 0
+    let effectivePercent = 0
+    let effectiveAmount = 0
+
+    if (discountList.length > 0) {
+      // Pick the best qualifying percentage discount and amount discount
+      let bestBulkPercent: ShopDiscountJson | null = null
+      let bestMinTotalPercent: ShopDiscountJson | null = null
+      let bestBulkAmount: ShopDiscountJson | null = null
+      let bestMinTotalAmount: ShopDiscountJson | null = null
+
+      discountList.forEach((discount) => {
+        const value = discount.discountAmount ?? 0
+        if (value <= 0) return
+
+        const unit = discount.discountUnit ?? 'percentage'
+
+        if (discount.type === 'Bulk Discount') {
+          const minQty = discount.minQuantity ?? 0
+          const qualifies = totalItemCount >= minQty
+          if (!qualifies) return
+
+          if (unit === 'amount') {
+            if (!bestBulkAmount || (bestBulkAmount.minQuantity ?? 0) < minQty) {
+              bestBulkAmount = discount
+            }
+          } else {
+            if (
+              !bestBulkPercent ||
+              (bestBulkPercent.minQuantity ?? 0) < minQty
+            ) {
+              bestBulkPercent = discount
+            }
+          }
+        } else if (discount.type === 'Minimum Total Discount') {
+          const minTotal = discount.minTotal ?? 0
+          const qualifies = baseTotal >= minTotal
+          if (!qualifies) return
+
+          if (unit === 'amount') {
+            if (
+              !bestMinTotalAmount ||
+              (bestMinTotalAmount.minTotal ?? 0) < minTotal
+            ) {
+              bestMinTotalAmount = discount
+            }
+          } else {
+            if (
+              !bestMinTotalPercent ||
+              (bestMinTotalPercent.minTotal ?? 0) < minTotal
+            ) {
+              bestMinTotalPercent = discount
+            }
+          }
+        }
+      })
+
+      // For shops we simplify: choose ONE percentage discount and ONE amount discount,
+      // then pick whichever saves more money on the cart total.
+      const percentCandidate: ShopDiscountJson | null =
+        getDiscountAmountValue(bestBulkPercent) >
+        getDiscountAmountValue(bestMinTotalPercent)
+          ? bestBulkPercent
+          : bestMinTotalPercent
+
+      const amountCandidate: ShopDiscountJson | null =
+        getDiscountAmountValue(bestBulkAmount) >
+        getDiscountAmountValue(bestMinTotalAmount)
+          ? bestBulkAmount
+          : bestMinTotalAmount
+
+      const percentValue = getDiscountAmountValue(percentCandidate)
+      const amountValue = getDiscountAmountValue(amountCandidate)
+
+    // Compare approximate savings, based on subtotal (baseTotal)
+    const percentSavings = baseTotal * (percentValue / 100)
+      const amountSavings = amountValue
+
+    if (percentSavings >= amountSavings && percentValue > 0) {
+      effectivePercent = percentValue
+      bulkDiscountAmount = percentSavings
+    } else if (amountSavings > 0) {
+      effectiveAmount = amountValue
+      bulkDiscountAmount = amountSavings
+    }
+    }
+
+    const totalAfterBulk = baseTotal - bulkDiscountAmount
+    const finalTotal = Math.max(
+      0,
+      baseTotal - membershipDiscountAmount - bulkDiscountAmount
+    )
 
     return {
       baseTotal,
-      finalTotal,
+      totalAfterMembership,
+      totalAfterBulk,
       membershipDiscountAmount,
+      bulkDiscountAmount,
+      finalTotal,
+      effectivePercent,
+      effectiveAmount,
     }
-  }, [selectedShopItems, isSubscribed])
+  }, [selectedShopItems, isSubscribed, discountList, totalItemCount, getDiscountAmountValue])
 
   // Master checkout handler for multiple shop items
   const handleMasterCheckout = useCallback(async (
@@ -310,10 +418,21 @@ export default function ShoppingSheetCheckout({
               const safePrice = Number.isNaN(numericPrice) ? 0 : numericPrice
               const totalPrice = safePrice * item.quantity
               const currency = item.currency || 'CAD'
+              const discountPercent = item.discountMemberPercent || 0
+              const hasMemberDiscount = isSubscribed && discountPercent > 0
+              const memberTotalPrice = hasMemberDiscount
+                ? safePrice * (1 - discountPercent / 100) * item.quantity
+                : null
 
               const handleQuantityChange = (delta: number) => {
+                const newQuantity = Math.max(0, item.quantity + delta)
+
+                if (newQuantity === 0) {
+                  onRemoveItem(item.id)
+                  return
+                }
+
                 if (onUpdateQuantity) {
-                  const newQuantity = Math.max(1, item.quantity + delta)
                   onUpdateQuantity(item.id, newQuantity)
                 }
               }
@@ -345,14 +464,6 @@ export default function ShoppingSheetCheckout({
                         <h4 className="flex-1 text-sm font-medium text-white">
                           {item.title}
                         </h4>
-                        <button
-                          type="button"
-                          onClick={() => onRemoveItem(item.id)}
-                          className="text-sm text-white underline hover:text-gray-300"
-                          disabled={isLoading}
-                        >
-                          {t('remove')}
-                        </button>
                       </div>
 
                       {/* Bottom row: Quantity selector and Price */}
@@ -364,7 +475,7 @@ export default function ShoppingSheetCheckout({
                             size="sm"
                             onClick={() => handleQuantityChange(-1)}
                             className="h-8 w-8 rounded-l p-0 text-white hover:bg-gray-700"
-                            disabled={isLoading || item.quantity <= 1}
+                            disabled={isLoading}
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
@@ -383,11 +494,20 @@ export default function ShoppingSheetCheckout({
                         </div>
 
                         {/* Price on the right */}
-                        <span className="text-sm font-semibold text-white text-right">
+                        <div className="flex flex-col items-end gap-0.5">
+                          {hasMemberDiscount && (
+                            <span className="text-xs text-gray-400 line-through">
                           {currency === 'VND' || currency === '₫'
                             ? `${totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}₫`
                             : `${currency} $${totalPrice.toFixed(2)}`}
                         </span>
+                          )}
+                          <span className={`text-sm font-semibold text-right ${hasMemberDiscount ? 'text-green-400' : 'text-white'}`}>
+                            {currency === 'VND' || currency === '₫'
+                              ? `${(hasMemberDiscount ? memberTotalPrice! : totalPrice).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}₫`
+                              : `${currency} $${(hasMemberDiscount ? memberTotalPrice! : totalPrice).toFixed(2)}`}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -401,6 +521,223 @@ export default function ShoppingSheetCheckout({
             })}
           </div>
 
+          {/* Discount Information (shop-level discounts only, excludes membership) */}
+          {(priceBreakdown.effectivePercent > 0 ||
+            priceBreakdown.effectiveAmount > 0 ||
+            discountList.length > 0) && (
+            <div className="mt-4 space-y-2 rounded-md border border-green-200 bg-green-50 p-3">
+              <h4 className="text-sm font-semibold text-green-900">
+                {t('available-discounts')}
+              </h4>
+              <div className="space-y-1 text-xs text-gray-700">
+                <p>
+                  <strong>{t('effective-discount')}</strong>{' '}
+                  {priceBreakdown.effectivePercent > 0 &&
+                  priceBreakdown.effectiveAmount > 0 ? (
+                    <>
+                      {t('percent-off-applied', {
+                        percent: priceBreakdown.effectivePercent,
+                      })}{' '}
+                      + $
+                      {priceBreakdown.effectiveAmount.toFixed(2)} off
+                    </>
+                  ) : priceBreakdown.effectivePercent > 0 ? (
+                    <>
+                      {t('percent-off-applied', {
+                        percent: priceBreakdown.effectivePercent,
+                      })}
+                    </>
+                  ) : priceBreakdown.effectiveAmount > 0 ? (
+                    <>${priceBreakdown.effectiveAmount.toFixed(2)} off</>
+                  ) : (
+                    <>{t('no-discounts-applied')}</>
+                  )}
+                </p>
+              </div>
+
+              {isDiscountsExpanded && (
+                <div className="mt-2 space-y-3">
+                  {discountList.length === 0 && (
+                    <p className="text-xs text-gray-600">
+                      No discounts available for this shop.
+                    </p>
+                  )}
+
+                  {/* Bulk Discounts Group */}
+                  {discountList.some((d) => d.type === 'Bulk Discount') && (
+                    <div className="space-y-1 text-xs">
+                      <p className="font-semibold text-green-900">
+                        Bulk Discounts
+                      </p>
+                      {discountList
+                        .filter((d) => d.type === 'Bulk Discount')
+                        .sort(
+                          (a, b) =>
+                            (a.discountAmount ?? 0) - (b.discountAmount ?? 0)
+                        )
+                        .map((discount, index) => {
+                          const key = discount.id || `bulk-${index}`
+                          const amount = discount.discountAmount ?? 0
+                          const unit = discount.discountUnit ?? 'percentage'
+                          const minQty = discount.minQuantity ?? 0
+                          const qualifies = totalItemCount >= minQty
+
+                          const isApplied =
+                            qualifies &&
+                            ((unit === 'percentage' &&
+                              amount === priceBreakdown.effectivePercent) ||
+                              (unit === 'amount' &&
+                                amount === priceBreakdown.effectiveAmount))
+
+                          const needed = Math.max(0, minQty - totalItemCount)
+
+                          return (
+                            <div
+                              key={key}
+                              className="flex items-start gap-2"
+                            >
+                              <span
+                                className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full ${
+                                  isApplied
+                                    ? 'bg-green-200 text-green-900'
+                                    : 'bg-gray-200 text-gray-500'
+                                }`}
+                              >
+                                {isApplied ? '✓' : '✗'}
+                              </span>
+                              <span
+                                className={
+                                  isApplied
+                                    ? 'text-green-800 pt-1'
+                                    : 'text-gray-600 pt-1'
+                                }
+                              >
+                                <strong>
+                                  {unit === 'percentage'
+                                    ? `${amount}% off when buying at least ${minQty} items`
+                                    : `$${amount.toFixed(
+                                        2
+                                      )} off when buying at least ${minQty} items`}
+                                </strong>
+                                {isApplied
+                                  ? ` (applied; you have ${totalItemCount} items)`
+                                  : needed > 0
+                                  ? ` (add ${needed} more item(s) to qualify)`
+                                  : ' (not applied)'}
+                              </span>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  )}
+
+                  {/* Minimum Total Discounts Group */}
+                  {discountList.some(
+                    (d) => d.type === 'Minimum Total Discount'
+                  ) && (
+                    <div className="space-y-1 text-xs">
+                      <p className="font-semibold text-green-900">
+                        Minimum Total Discounts
+                      </p>
+                      {discountList
+                        .filter((d) => d.type === 'Minimum Total Discount')
+                        .sort(
+                          (a, b) =>
+                            (a.discountAmount ?? 0) - (b.discountAmount ?? 0)
+                        )
+                        .map((discount, index) => {
+                          const key = discount.id || `minTotal-${index}`
+                          const amount = discount.discountAmount ?? 0
+                          const unit = discount.discountUnit ?? 'percentage'
+                          const minTotal = discount.minTotal ?? 0
+                          const cartTotal = priceBreakdown.baseTotal
+                          const qualifies = cartTotal >= minTotal
+
+                          const isApplied =
+                            qualifies &&
+                            ((unit === 'percentage' &&
+                              amount === priceBreakdown.effectivePercent) ||
+                              (unit === 'amount' &&
+                                amount === priceBreakdown.effectiveAmount))
+
+                          const needed = Math.max(0, minTotal - cartTotal)
+
+                          return (
+                            <div
+                              key={key}
+                              className="flex items-start gap-2"
+                            >
+                              <span
+                                className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full ${
+                                  isApplied
+                                    ? 'bg-green-200 text-green-900'
+                                    : 'bg-gray-200 text-gray-500'
+                                }`}
+                              >
+                                {isApplied ? '✓' : '✗'}
+                              </span>
+                              <span
+                                className={
+                                  isApplied
+                                    ? 'text-green-800 pt-1'
+                                    : 'text-gray-600 pt-1'
+                                }
+                              >
+                                <strong>
+                                  {unit === 'percentage'
+                                    ? `${amount}% off for orders over $${minTotal.toFixed(
+                                        2
+                                      )}`
+                                    : `$${amount.toFixed(
+                                        2
+                                      )} off for orders over $${minTotal.toFixed(
+                                        2
+                                      )}`}
+                                </strong>
+                                {isApplied
+                                  ? ` (applied; cart total $${cartTotal.toFixed(
+                                      2
+                                    )})`
+                                  : needed > 0
+                                  ? ` (add $${needed.toFixed(
+                                      2
+                                    )} more to qualify)`
+                                  : ' (not applied)'}
+                              </span>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Expand / Collapse Toggle */}
+              {discountList.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIsDiscountsExpanded((prev) => !prev)
+                  }
+                  className="flex w-full items-center justify-center gap-1 text-xs font-medium text-green-800 hover:text-green-900"
+                >
+                  <span>
+                    {isDiscountsExpanded
+                      ? t('toggle-hide-discount-details')
+                      : t('toggle-show-discount-details')}
+                  </span>
+                  <span
+                    className={`transition-transform ${
+                      isDiscountsExpanded ? 'rotate-180' : 'rotate-0'
+                    }`}
+                  >
+                    ▼
+                  </span>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Total Price */}
           <div className="mt-4 space-y-2 border-t pt-4">
             {/* Price Breakdown */}
@@ -409,17 +746,56 @@ export default function ShoppingSheetCheckout({
                 <span>{t('checkout-subtotal')}</span>
                 <span>
                   {selectedShopItems[0]?.currency || 'CAD'} $
-                  {priceBreakdown.baseTotal.toFixed(2)}
+                  {priceBreakdown.totalAfterMembership.toFixed(2)}
                 </span>
               </div>
 
-              {/* Membership Discount */}
-              {priceBreakdown.membershipDiscountAmount > 0 && (
+              {/* Shop Discounts (Bulk / Min Total combined) */}
+              {priceBreakdown.bulkDiscountAmount > 0 && (
                 <div className="flex items-center justify-between text-green-600">
-                  <span>{t('checkout-membership-discount')}</span>
+                  <span className="max-w-[150px] md:max-w-[250px]">
+                    {priceBreakdown.effectivePercent > 0 &&
+                    priceBreakdown.effectiveAmount > 0 ? (
+                      <>
+                        Shop discounts: {priceBreakdown.effectivePercent}% off + $
+                        {priceBreakdown.effectiveAmount.toFixed(2)} off
+                      </>
+                    ) : priceBreakdown.effectivePercent > 0 ? (
+                      <>Shop discounts: {priceBreakdown.effectivePercent}% off</>
+                    ) : (
+                      <>
+                        Shop discounts - $
+                        {priceBreakdown.effectiveAmount.toFixed(2)} off
+                      </>
+                    )}
+                  </span>
                   <span>
-                    -{selectedShopItems[0]?.currency || 'CAD'} $
-                    {priceBreakdown.membershipDiscountAmount.toFixed(2)}
+                    {(() => {
+                      const currency = selectedShopItems[0]?.currency || 'CAD'
+                      const flatAmount = priceBreakdown.effectiveAmount > 0
+                        ? priceBreakdown.effectiveAmount
+                        : 0
+
+                      if (priceBreakdown.effectivePercent > 0 && flatAmount > 0) {
+                        return (
+                          <span className="whitespace-nowrap">
+                            - (${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
+                          </span>
+                        )
+                      }
+                      if (priceBreakdown.effectivePercent > 0) {
+                        return (
+                          <span className="whitespace-nowrap">
+                            - ${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}%
+                          </span>
+                        )
+                      }
+                      return (
+                        <span className="whitespace-nowrap">
+                          -{currency} ${flatAmount.toFixed(2)}
+                        </span>
+                      )
+                    })()}
                   </span>
                 </div>
               )}
