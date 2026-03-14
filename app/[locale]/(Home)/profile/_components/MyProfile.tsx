@@ -41,6 +41,7 @@ const paymentTypeMap = {
   Concert: 'Concert',
   Camping: 'Camping',
   Event: 'Event',
+  Shop: 'Shop',
 }
 
 const MyProfile = async ({

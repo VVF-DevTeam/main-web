@@ -17,6 +17,7 @@ const paymentTypeMap = {
   Concert: 'Concert',
   Camping: 'Camping',
   Event: 'Event',
+  Shop: 'Shop',
 }
 
 export default async function PaymentManagement({

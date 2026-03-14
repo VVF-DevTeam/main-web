@@ -518,6 +518,7 @@ enum PaymentType {
   Camping
   Event
   Class
+  Shop
 }
 
 enum PaymentMethod {

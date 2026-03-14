@@ -77,6 +77,8 @@ const resolvePaymentType = (
       return PaymentType.Camping
     case 'Event':
       return PaymentType.Event
+    case 'Shop':
+      return PaymentType.Shop
     default:
       return PaymentType.Event
   }

@@ -416,6 +416,10 @@ export async function POST(req: NextRequest) {
         seatNumbers: string[]
         quantity?: number
       }>
+      shopItemMetadata: Array<{
+        shopItemId: string
+        quantity: number
+      }> | null
       otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null
       formResponses: any | null
     } | null = null
@@ -430,6 +434,7 @@ export async function POST(req: NextRequest) {
             guestPhone: true,
             seatNumbers: true,
             ticketMetadata: true,
+            shopItemMetadata: true,
             otherGuestsInfo: true,
             formResponses: true,
           },
@@ -445,6 +450,10 @@ export async function POST(req: NextRequest) {
               seatNumbers: string[]
               quantity?: number
             }>,
+            shopItemMetadata: data.shopItemMetadata as Array<{
+              shopItemId: string
+              quantity: number
+            }> | null,
             otherGuestsInfo: data.otherGuestsInfo as Array<{ name: string; email: string; phone: string }> | null,
             formResponses: data.formResponses,
           }
@@ -535,8 +544,88 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      ////// FOR SHOP CHECKOUT //////
+      if (metadata.type === 'Shop') {
+        const shopItemMetadata = checkoutSessionData?.shopItemMetadata
+
+        if (shopItemMetadata && shopItemMetadata.length > 0) {
+          // Fetch all shop items to get their prices
+          const shopItemIds = shopItemMetadata.map((item) => item.shopItemId)
+          const shopItems = await prisma.shopItem.findMany({
+            where: { id: { in: shopItemIds } },
+          })
+          const shopItemMap = new Map(shopItems.map((item) => [item.id, item]))
+
+          // Calculate total expected price for proportional pricePaid allocation
+          let totalExpectedPrice = 0
+          for (const itemInfo of shopItemMetadata) {
+            const shopItem = shopItemMap.get(itemInfo.shopItemId)
+            if (shopItem) {
+              totalExpectedPrice += Number(shopItem.price) * itemInfo.quantity
+            }
+          }
+
+          const actualTotal = chargedAmount / 100
+          // priceRatio accounts for discrepancies between DB prices and what Stripe actually charged.
+          // e.g. a promo code reduces the Stripe total but DB prices remain full price.
+          // Multiplying each item's pricePaid by this ratio ensures all records sum to the exact charge.
+          // (ratio = 1.0 when no discount was applied, so it is a no-op in the normal case)
+          const priceRatio =
+            totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
+
+          for (const itemInfo of shopItemMetadata) {
+            const shopItem = shopItemMap.get(itemInfo.shopItemId)
+            if (!shopItem) {
+              console.warn(
+                `[WEBHOOK_WARNING] ShopItem with id ${itemInfo.shopItemId} not found. Skipping payment creation.`
+              )
+              continue
+            }
+
+            const itemPricePaid =
+              Number(shopItem.price) * itemInfo.quantity * priceRatio
+
+            await prisma.payment.create({
+              data: {
+                userId:
+                  metadata.userId && metadata.userId.trim() !== ''
+                    ? metadata.userId
+                    : null,
+                stripePaymentId: paymentId,
+                pricePaid: itemPricePaid,
+                type: metadata.type as PaymentType,
+                quantity: itemInfo.quantity,
+                guestName: guestName,
+                guestEmail: guestEmail,
+                guestPhone: guestPhone,
+                otherGuests: otherGuestsInfo || undefined,
+              },
+            })
+          }
+        } else {
+          // Fallback: no per-item breakdown available, so create one consolidated record.
+          // chargedAmount / 100 is already the exact amount Stripe charged — no ratio needed.
+          await prisma.payment.create({
+            data: {
+              userId:
+                metadata.userId && metadata.userId.trim() !== ''
+                  ? metadata.userId
+                  : null,
+              stripePaymentId: paymentId,
+              pricePaid: chargedAmount / 100,
+              type: metadata.type as PaymentType,
+              quantity: quantity || 1,
+              guestName: guestName,
+              guestEmail: guestEmail,
+              guestPhone: guestPhone,
+              otherGuests: otherGuestsInfo || undefined,
+            },
+          })
+        }
+      }
+
       ////// FOR MULTI-TICKET CHECKOUT //////
-      if (ticketMetadata && ticketMetadata.length > 0) {
+      else if (ticketMetadata && ticketMetadata.length > 0) {
         // Multi-ticket checkout: create payment record for each ticket type
         // Fetch all tickets to get their actual prices
         const ticketIds = ticketMetadata.map((t) => t.ticketId)
@@ -567,7 +656,10 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // Calculate price ratio if there's a discrepancy (due to discounts, rounding, etc.)
+        // priceRatio accounts for discrepancies between DB prices and what Stripe actually charged.
+        // e.g. a promo code reduces the Stripe total but DB prices remain full price.
+        // Multiplying each item's pricePaid by this ratio ensures all records sum to the exact charge.
+        // (ratio = 1.0 when no discount was applied, so it is a no-op in the normal case)
         const actualTotal = chargedAmount / 100
         const priceRatio =
           totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
@@ -618,6 +710,7 @@ export async function POST(req: NextRequest) {
           })
         }
       } else {
+        ////// FOR SINGLE TICKET CHECKOUT //////
         // Single ticket checkout (backward compatibility)
         // Validate eventTicketId exists if provided
         // For Membership payments, eventTicketId should always be null

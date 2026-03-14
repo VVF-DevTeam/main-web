@@ -95,7 +95,7 @@ export async function POST(req: Request) {
         guestName: guestName || undefined,
         guestEmail: mainEmail || undefined,
         guestPhone: guestPhone || undefined,
-        // Shop item data (using ticketMetadata field for shop items)
+        // Shop item data
         shopItemMetadata: shopItemMetadata.map((item) => ({
           shopItemId: item.shopItemId,
           quantity: item.quantity,
@@ -119,6 +119,7 @@ export async function POST(req: Request) {
       metadata: {
         userId: userId || '',
         shopId: shopId,
+        type: 'Shop',
         shopSlug: shopSlug,
         checkoutDataId: checkoutSessionData.id, // Store reference ID - all data is in CheckoutSessionData
         description: `Shop Purchase - ${shopItemMetadata.length} item${shopItemMetadata.length > 1 ? 's' : ''}`,
