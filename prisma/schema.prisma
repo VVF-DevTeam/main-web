@@ -517,6 +517,7 @@ enum PaymentType {
   Concert
   Camping
   Event
+  Class
 }
 
 enum PaymentMethod {
