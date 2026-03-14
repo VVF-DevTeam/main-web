@@ -11,6 +11,7 @@ import { UserInfoProps } from '@/lib/types/userInfo'
 
 const paymentTypeMap = {
   Membership: 'Membership',
+  Class: 'Class',
   ClassDropIn: 'Class Drop-in',
   ClassFullCourse: 'Class Full Course',
   Concert: 'Concert',

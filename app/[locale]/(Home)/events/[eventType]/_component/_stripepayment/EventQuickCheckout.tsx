@@ -160,7 +160,7 @@ export default function EventQuickCheckout({
         eventId={eventId}
         userId={userId}
         ticketId={ticketId}
-        type={type === "Class" ? "ClassDropIn" : type as PaymentType}
+        type={type === "Class" ? PaymentType.ClassDropIn : type as PaymentType}
       />
     </Elements>
   )
