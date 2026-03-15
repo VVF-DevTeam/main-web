@@ -593,6 +593,8 @@ export async function POST(req: NextRequest) {
                   metadata.userId && metadata.userId.trim() !== ''
                     ? metadata.userId
                     : null,
+                shopId: metadata.shopId || null,
+                shopItemId: itemInfo.shopItemId,
                 stripePaymentId: paymentId,
                 pricePaid: itemPricePaid,
                 type: metadata.type as PaymentType,
@@ -613,6 +615,7 @@ export async function POST(req: NextRequest) {
                 metadata.userId && metadata.userId.trim() !== ''
                   ? metadata.userId
                   : null,
+              shopId: metadata.shopId || null,
               stripePaymentId: paymentId,
               pricePaid: chargedAmount / 100,
               type: metadata.type as PaymentType,

@@ -292,10 +292,13 @@ model Payment {
   userId          String?
   eventId         String?
   eventTicketId   String?
+  shopId          String?
+  shopItemId      String?
   event           Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
   user            User?        @relation(fields: [userId], references: [id])
   eventTicket     EventTicket? @relation(fields: [eventTicketId], references: [id])
-
+  shop            Shop?        @relation(fields: [shopId], references: [id])
+  shopItem        ShopItem?    @relation(fields: [shopItemId], references: [id])
 }
 
 model CheckoutSessionData {
@@ -421,6 +424,7 @@ model Shop {
   termsUrl     String?
   
   shopItems   ShopItem[]   @relation("ShopToShopItem")
+  payments    Payment[]
   event       Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
 }
 
@@ -474,6 +478,7 @@ model ShopItem {
   // Relations
   shops       Shop[]        @relation("ShopToShopItem")
   tags        ShopItemTag[] @relation("ShopItemTagToShopItem")
+  payments    Payment[]
 }
 
 model ShopItemTag {
