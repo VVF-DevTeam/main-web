@@ -5,10 +5,11 @@ import ShopBrowsePanel from './_components/ShopBrowsePanel'
 
 interface ShopPageProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ shopSlug?: string }>
 }
 
-const ShopPage = async ({ params }: ShopPageProps) => {
-  const { locale } = await params
+const ShopPage = async ({ params, searchParams }: ShopPageProps) => {
+  const [{ locale }, { shopSlug }] = await Promise.all([params, searchParams])
   await initTranslations(locale, ['shop'])
   const rawShops = await getAllShops()
   const shops = rawShops.map((shop) => ({
@@ -24,7 +25,7 @@ const ShopPage = async ({ params }: ShopPageProps) => {
 
   return (
     <div className="mx-auto w-full">
-      <ShopBrowsePanel shops={shops} />
+      <ShopBrowsePanel shops={shops} initialShopSlug={shopSlug} />
     </div>
   )
 }

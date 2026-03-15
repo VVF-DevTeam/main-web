@@ -59,6 +59,17 @@ const getPaymentHistory = (userId: string) =>
           location: true,
         },
       },
+      shop: {
+        select: {
+          title: true,
+          slug: true,
+        },
+      },
+      shopItem: {
+        select: {
+          title: true,
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   })

@@ -53,5 +53,7 @@
     "checkout-profile-link": "tài khoản của bạn",
     "checkout-fill-empty-fields": "Vui lòng điền các trường trống khác. Xin cảm ơn!",
     "continue-shopping": "Tiếp tục mua sắm",
-    "back-to-cart": "Quay lại giỏ hàng"
+    "back-to-cart": "Quay lại giỏ hàng",
+    "shop-not-found": "Cửa hàng không tồn tại hoặc đã bị xóa. Hiển thị tất cả cửa hàng.",
+    "shop-not-found-description": "Vui lòng liên hệ admin qua email/mạng xã hội của chúng mình để được hỗ trợ."
 }   

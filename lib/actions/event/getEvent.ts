@@ -18,6 +18,9 @@ export const getAllPublishedEvents = unstable_cache(
           id: true,
           title: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       })
       return events
     } catch (error) {

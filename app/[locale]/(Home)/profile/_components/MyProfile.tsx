@@ -1,4 +1,4 @@
-import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi'
+import { FiUser, FiMail, FiPhone, FiMapPin, FiHeart, FiShoppingCart } from 'react-icons/fi'
 
 import { RiCalendarEventFill } from 'react-icons/ri'
 
@@ -30,6 +30,13 @@ type PaymentHistoryItem = {
     startDate: Date | null
     endDate: Date
     location: string | null
+  } | null
+  shopItem: {
+    title: string
+  } | null
+  shop: {
+    title: string
+    slug: string | null
   } | null
 }
 
@@ -131,12 +138,12 @@ const MyProfile = async ({
             </div>
           </div>
 
-          {/* Order History Section */}
+          {/* Event Order History Section */}
           <div className="relative col-span-1 flex h-full flex-col rounded-lg bg-bgColor-white p-6 shadow-lg lg:col-span-3">
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
             <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
               <RiCalendarEventFill />
-              {t('order-history')}
+              {t('event-order-history')}
             </h3>
 
             <div className="flex max-h-96 flex-grow flex-col overflow-hidden rounded-md border">
@@ -159,78 +166,80 @@ const MyProfile = async ({
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {paymentHistory.length > 0 ? (
+                    {paymentHistory.some((p) => p.type !== 'Shop') ? (
                       paymentHistory.map(
                         (payment: PaymentHistoryItem, index: number) => {
-                          // payment details
-                          const event = payment.event
-                          const startDate = new Date(
-                            payment.type === 'Membership'
-                              ? payment.createdAt
-                              : event!.startDate!
-                          )
-                          const endDate = new Date(
-                            payment.type === 'Membership'
-                              ? payment!.expiresAt!
-                              : event!.endDate
-                          )
-                          const status = getPaymentStatus(payment)
-                          const statusColor = getStatusColor(status)
-                          return (
-                            <tr
-                              key={index}
-                              className="cursor-pointer border-b bg-bgColor-white"
-                            >
-                              <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
-                                {payment.type === 'Membership' ? (
-                                  <Link
-                                    href={`/profile?section=subscription`}
-                                  >
-                                    Membership
-                                  </Link>
-                                ) : (
-                                  <Link
-                                    href={`/events/class/${event!.keyName}`}
-                                  >
-                                    {event!.title}
-                                  </Link>
-                                )}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {startDate.toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {endDate.toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {payment.type === 'Membership'
-                                  ? '-'
-                                  : event!.location!}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                ${Number(payment.pricePaid).toFixed(2)}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {payment.quantity}/{payment.seatNumber || '-'}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {paymentTypeMap[payment.type]}
-                              </td>
-                              <td
-                                className={`px-4 py-3 font-medium ${statusColor} text-center`}
+                          if (payment.type !== 'Shop') {
+                            // payment details
+                            const event = payment.event
+                            const startDate = new Date(
+                              payment.type === 'Membership'
+                                ? payment.createdAt
+                                : event!.startDate!
+                            )
+                            const endDate = new Date(
+                              payment.type === 'Membership'
+                                ? payment!.expiresAt!
+                                : event!.endDate
+                            )
+                            const status = getPaymentStatus(payment)
+                            const statusColor = getStatusColor(status)
+                            return (
+                              <tr
+                                key={index}
+                                className="cursor-pointer border-b bg-bgColor-white"
                               >
-                                {status}
-                              </td>
-                            </tr>
-                          )
+                                <td className="px-4 py-3 text-center text-textColor-blue hover:underline">
+                                  {payment.type === 'Membership' ? (
+                                    <Link
+                                      href={`/profile?section=subscription`}
+                                    >
+                                      Membership
+                                    </Link>
+                                  ) : (
+                                    <Link
+                                      href={`/events/class/${event!.keyName}`}
+                                    >
+                                      {event!.title}
+                                    </Link>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {startDate.toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {endDate.toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {payment.type === 'Membership'
+                                    ? '-'
+                                    : event!.location!}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  ${Number(payment.pricePaid).toFixed(2)}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {payment.quantity}/{payment.seatNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {paymentTypeMap[payment.type]}
+                                </td>
+                                <td
+                                  className={`px-4 py-3 font-medium ${statusColor} text-center`}
+                                >
+                                  {status}
+                                </td>
+                              </tr>
+                            )
+                          }
                         }
                       )
                     ) : (
@@ -250,6 +259,96 @@ const MyProfile = async ({
           </div>
         </div>
 
+        {/* Shop Order History Section */}
+        <div className="relative mb-8 rounded-lg bg-bgColor-white p-6 shadow-lg">
+          <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+            <FiShoppingCart />
+            {t('shop-order-history')}
+          </h3>
+
+          <div className="flex max-h-96 flex-grow flex-col overflow-hidden rounded-md border">
+            <div className="flex-grow overflow-auto">
+              <table className="w-full">
+                <thead className="sticky top-0 bg-bgColor-brand100 shadow-md">
+                  <tr className="border-b">
+                    <th className="px-4 py-3 text-center">{t('title')}</th>
+                    <th className="px-4 py-3 text-center">{t('date')}</th>
+                    <th className="px-4 py-3 text-center">{t('price')}</th>
+                    <th className="px-4 py-3 text-center">{t('quantity')}</th>
+                    <th className="px-4 py-3 text-center">{t('status')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {paymentHistory.some((p) => p.type === 'Shop') ? (
+                    paymentHistory
+                      .filter((payment) => payment.type === 'Shop')
+                      .map((payment: PaymentHistoryItem, index: number) => {
+                        const shopSlugOrTitle = payment.shop?.slug || payment.shop?.title
+                        const shopLink = shopSlugOrTitle
+                          ? `/shop?shopSlug=${encodeURIComponent(shopSlugOrTitle)}`
+                          : '/shop'
+                        return (
+                          <tr
+                            key={index}
+                            className="border-b bg-bgColor-white"
+                          >
+                            <td className="px-4 py-3 text-center">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-medium">
+                                  {payment.shopItem?.title || '-'}
+                                </span>
+                                {payment.shop && (
+                                  <Link
+                                    href={shopLink}
+                                    className="text-sm text-textColor-blue hover:underline"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {payment.shop.title}
+                                  </Link>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {new Date(payment.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              ${Number(payment.pricePaid).toFixed(2)}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {payment.quantity}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {payment.refunded ? (
+                                <span className="font-medium text-red-500">Refunded</span>
+                              ) : (
+                                <span className="font-medium text-green-600">Paid</span>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="text-textColor-gray/50 px-4 py-3 text-center"
+                      >
+                        {t('no-shop-order')}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         {/* Wishlist Section */}
         <div className="relative mb-8 rounded-lg bg-bgColor-white p-6 shadow-lg">
           <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-bgColor-brand900"></div>
@@ -258,15 +357,13 @@ const MyProfile = async ({
             {t('upcoming-event')}
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {upcoming_events.map((event) => (
+            {upcoming_events.slice(0, 4).map((event) => (
               <Link
+                key={event.id}
                 href={`/events/${event.eventType.toLowerCase()}/${event.keyName}`}
                 className="text-center text-textColor-white"
               >
-                <div
-                  key={event.id}
-                  className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl group"
-                >
+                <div className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl">
                   <Image
                     src={event.imgUrl!}
                     alt={event.title}
@@ -274,7 +371,6 @@ const MyProfile = async ({
                     height={140}
                     className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-100">
                     <div className="p-4 text-center text-textColor-white">
                       {event.title}
@@ -283,6 +379,24 @@ const MyProfile = async ({
                 </div>
               </Link>
             ))}
+
+            {/* See More card */}
+            <Link href="/events" className="text-center text-textColor-white">
+              <div className="group relative overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl">
+                <Image
+                  src="https://drive.google.com/thumbnail?id=1rq8yi8jxSDNPSkzUoh4__dsuCrhz1DnR"
+                  alt="View all events"
+                  width={140}
+                  height={140}
+                  className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-100">
+                  <div className="p-4 text-center text-textColor-white font-semibold">
+                    {t('view-all-events')} →
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

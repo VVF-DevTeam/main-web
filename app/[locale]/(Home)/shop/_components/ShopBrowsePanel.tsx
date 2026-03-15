@@ -28,6 +28,7 @@ import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { JsonValue } from "@prisma/client/runtime/library"
 
 type ShopItemFilterData = {
@@ -76,6 +77,7 @@ type CartItem = {
 
 interface ShopBrowsePanelProps {
     shops: ShopWithItems[]
+    initialShopSlug?: string
 }
 
 const ITEM_STATUS_LABELS: Record<ShopItemFilterData['status'], string> = {
@@ -312,7 +314,7 @@ function ShopItemCarousel({
     )
 }
 
-export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
+export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePanelProps) {
     // @ts-ignore: useTranslation will always throw an error for typescript
     const { t } = useTranslation(['shop'])
     // Only show published shops in the browse UI, ordered by sortOrder (lower first),
@@ -333,6 +335,31 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         })
     }, [shops])
     const [selectedShopId, setSelectedShopId] = useState<string>('')
+
+    // Auto-select shop from URL param (e.g. coming from profile order history link)
+    useEffect(() => {
+        if (!initialShopSlug) return
+        const match = publishedShops.find(
+            (shop) => shop.slug === initialShopSlug || shop.title === initialShopSlug
+        )
+        if (match) {
+            setSelectedShopId(match.id)
+        } else {
+            toast.error(t('shop-not-found'),
+                {
+                    description: (
+                        <span style={{ color: 'var(--muted-foreground)' }}>
+                            {t('shop-not-found-description')}
+                        </span>
+                    ),
+                    style: {
+                        color: '#ef4444', // red-500 color
+                    }
+                }
+            )
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialShopSlug, publishedShops.length])
     const [selectedShopType, setSelectedShopType] = useState<string>('')
     const [selectedType, setSelectedType] = useState<string>('')
     const [selectedTag, setSelectedTag] = useState<string>('')
@@ -924,11 +951,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                         <button
                                                             type="button"
                                                             onClick={() => setActiveImageUrl(null)}
-                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${
-                                                                activeImageUrl === null
+                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${activeImageUrl === null
                                                                     ? 'border-blue-500'
                                                                     : 'border-transparent hover:border-gray-300'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             <Image
                                                                 src={selectedItem.imageUrl}
@@ -943,11 +969,10 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                             key={idx}
                                                             type="button"
                                                             onClick={() => setActiveImageUrl(imgUrl)}
-                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${
-                                                                activeImageUrl === imgUrl
+                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${activeImageUrl === imgUrl
                                                                     ? 'border-blue-500'
                                                                     : 'border-transparent hover:border-gray-300'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             <Image
                                                                 src={imgUrl}
@@ -1154,37 +1179,8 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                 {t('no-items-selected')}
                             </p>
                         ) : /* ── Specific-shop view: always show checkout directly ── */
-                        selectedShopId ? (
-                            checkoutItems.length === 0 ? (
-                                <p className="text-sm text-red-600">
-                                    These items are not yet configured for online checkout.
-                                </p>
-                            ) : (
-                                <ShoppingSheetCheckout
-                                    shopSlug={activeCheckoutShop?.slug ?? activeCheckoutShop?.id ?? ''}
-                                    shopId={activeCheckoutShop?.id ?? ''}
-                                    selectedShopItems={checkoutItems}
-                                    onClearCart={() => setCartItems([])}
-                                    onRemoveItem={handleRemoveCartItem}
-                                    onUpdateQuantity={handleUpdateQuantity}
-                                    userInfo={userInfo}
-                                    isSubscribed={isSubscribed}
-                                    discounts={activeCheckoutShop?.shopDiscounts ?? []}
-                                />
-                            )
-                        ) : /* ── All-shops view ── */
-                        activeShopIdInSheet ? (
-                            /* Per-shop checkout */
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveShopIdInSheet(null)}
-                                    className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
-                                >
-                                    <ArrowLeft className="h-4 w-4" />
-                                    {t('back-to-cart')}
-                                </button>
-                                {checkoutItems.length === 0 ? (
+                            selectedShopId ? (
+                                checkoutItems.length === 0 ? (
                                     <p className="text-sm text-red-600">
                                         These items are not yet configured for online checkout.
                                     </p>
@@ -1200,66 +1196,95 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                         isSubscribed={isSubscribed}
                                         discounts={activeCheckoutShop?.shopDiscounts ?? []}
                                     />
-                                )}
-                            </>
-                        ) : (
-                            /* Per-shop preview list */
-                            <div className="space-y-4">
-                                {cartItemsByShop.map(({ shopId, shopTitle, items: shopCartItems }) => {
-                                    const previewItems = shopCartItems.slice(0, 3)
-                                    const leftover = shopCartItems.length - 3
-                                    const totalQty = shopCartItems.reduce((sum, ci) => sum + ci.quantity, 0)
-                                    return (
-                                        <div key={shopId} className="rounded-lg border border-gray-200 p-4 space-y-3">
-                                            {/* Shop name + item count */}
-                                            <div className="flex items-center justify-between">
-                                                <h4 className="font-semibold text-gray-900">{shopTitle}</h4>
-                                                <span className="text-xs text-gray-500">{totalQty} item{totalQty !== 1 ? 's' : ''}</span>
-                                            </div>
+                                )
+                            ) : /* ── All-shops view ── */
+                                activeShopIdInSheet ? (
+                                    /* Per-shop checkout */
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveShopIdInSheet(null)}
+                                            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
+                                        >
+                                            <ArrowLeft className="h-4 w-4" />
+                                            {t('back-to-cart')}
+                                        </button>
+                                        {checkoutItems.length === 0 ? (
+                                            <p className="text-sm text-red-600">
+                                                These items are not yet configured for online checkout.
+                                            </p>
+                                        ) : (
+                                            <ShoppingSheetCheckout
+                                                shopSlug={activeCheckoutShop?.slug ?? activeCheckoutShop?.id ?? ''}
+                                                shopId={activeCheckoutShop?.id ?? ''}
+                                                selectedShopItems={checkoutItems}
+                                                onClearCart={() => setCartItems([])}
+                                                onRemoveItem={handleRemoveCartItem}
+                                                onUpdateQuantity={handleUpdateQuantity}
+                                                userInfo={userInfo}
+                                                isSubscribed={isSubscribed}
+                                                discounts={activeCheckoutShop?.shopDiscounts ?? []}
+                                            />
+                                        )}
+                                    </>
+                                ) : (
+                                    /* Per-shop preview list */
+                                    <div className="space-y-4">
+                                        {cartItemsByShop.map(({ shopId, shopTitle, items: shopCartItems }) => {
+                                            const previewItems = shopCartItems.slice(0, 3)
+                                            const leftover = shopCartItems.length - 3
+                                            const totalQty = shopCartItems.reduce((sum, ci) => sum + ci.quantity, 0)
+                                            return (
+                                                <div key={shopId} className="rounded-lg border border-gray-200 p-4 space-y-3">
+                                                    {/* Shop name + item count */}
+                                                    <div className="flex items-center justify-between">
+                                                        <h4 className="font-semibold text-gray-900">{shopTitle}</h4>
+                                                        <span className="text-xs text-gray-500">{totalQty} item{totalQty !== 1 ? 's' : ''}</span>
+                                                    </div>
 
-                                            {/* Thumbnail strip */}
-                                            <div className="flex items-center gap-2">
-                                                {previewItems.map((ci) => (
-                                                    <div
-                                                        key={ci.item.id}
-                                                        className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100"
-                                                    >
-                                                        {ci.item.imageUrl ? (
-                                                            <Image
-                                                                src={ci.item.imageUrl}
-                                                                alt={ci.item.title}
-                                                                fill
-                                                                className="object-cover"
-                                                                sizes="64px"
-                                                            />
-                                                        ) : (
-                                                            <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
-                                                                No Image
+                                                    {/* Thumbnail strip */}
+                                                    <div className="flex items-center gap-2">
+                                                        {previewItems.map((ci) => (
+                                                            <div
+                                                                key={ci.item.id}
+                                                                className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100"
+                                                            >
+                                                                {ci.item.imageUrl ? (
+                                                                    <Image
+                                                                        src={ci.item.imageUrl}
+                                                                        alt={ci.item.title}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                        sizes="64px"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
+                                                                        No Image
+                                                                    </div>
+                                                                )}
                                                             </div>
+                                                        ))}
+                                                        {leftover > 0 && (
+                                                            <span className="text-sm font-semibold text-gray-600">
+                                                                +{leftover}
+                                                            </span>
                                                         )}
                                                     </div>
-                                                ))}
-                                                {leftover > 0 && (
-                                                    <span className="text-sm font-semibold text-gray-600">
-                                                        +{leftover}
-                                                    </span>
-                                                )}
-                                            </div>
 
-                                            {/* Continue Shopping button */}
-                                            <Button
-                                                size="sm"
-                                                className="w-full bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
-                                                onClick={() => setActiveShopIdInSheet(shopId)}
-                                            >
-                                                {t('continue-shopping')}
-                                                <ArrowRight className="h-4 w-4 ml-1" />
-                                            </Button>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )}
+                                                    {/* Continue Shopping button */}
+                                                    <Button
+                                                        size="sm"
+                                                        className="w-full bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                                        onClick={() => setActiveShopIdInSheet(shopId)}
+                                                    >
+                                                        {t('continue-shopping')}
+                                                        <ArrowRight className="h-4 w-4 ml-1" />
+                                                    </Button>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
                     </div>
                 </SheetContent>
             </Sheet>

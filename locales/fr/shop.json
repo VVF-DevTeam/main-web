@@ -53,5 +53,7 @@
     "checkout-profile-link": "votre profil",
     "checkout-fill-empty-fields": "Veuillez remplir tous les autres champs vides. Merci !",
     "continue-shopping": "Continuer les achats",
-    "back-to-cart": "Retour au panier"
+    "back-to-cart": "Retour au panier",
+    "shop-not-found": "Boutique introuvable ou supprimée. Affichage de toutes les boutiques.",
+    "shop-not-found-description": "Veuillez contacter notre administrateur par e-mail ou sur les réseaux sociaux."
 }

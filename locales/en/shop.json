@@ -53,5 +53,7 @@
     "checkout-profile-link": "your profile",
     "checkout-fill-empty-fields": "Please fill any other empty fields. Thank you!",
     "continue-shopping": "Continue Shopping",
-    "back-to-cart": "Back to Cart"
+    "back-to-cart": "Back to Cart",
+    "shop-not-found": "Shop not found or no longer available. Showing all shops.",
+    "shop-not-found-description": "Please contact our admin through email/media for further assistance."
 }
