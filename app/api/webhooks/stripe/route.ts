@@ -545,7 +545,9 @@ export async function POST(req: NextRequest) {
       }
 
       ////// FOR SHOP CHECKOUT //////
-      if (metadata.type === 'Shop') {
+      // Also check metadata.shopId as a fallback for sessions created before `type` was added to metadata
+      if (metadata.type === 'Shop' || (!metadata.type && metadata.shopId)) {
+        metadata.type = 'Shop' // Ensure type is set for payment creation below
         const shopItemMetadata = checkoutSessionData?.shopItemMetadata
 
         if (shopItemMetadata && shopItemMetadata.length > 0) {
