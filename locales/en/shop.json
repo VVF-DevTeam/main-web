@@ -48,5 +48,10 @@
     "toggle-hide-discount-details": "Hide discount details",
     "no-discounts-applied": "No discounts currently applied",
     "toggle-show-discount-details": "Show discount details",
-    "percent-off-applied": "{{percent}}% off applied"
+    "percent-off-applied": "{{percent}}% off applied",
+    "checkout-description-first-form-filled": "The first form has been filled with information from",
+    "checkout-profile-link": "your profile",
+    "checkout-fill-empty-fields": "Please fill any other empty fields. Thank you!",
+    "continue-shopping": "Continue Shopping",
+    "back-to-cart": "Back to Cart"
 }

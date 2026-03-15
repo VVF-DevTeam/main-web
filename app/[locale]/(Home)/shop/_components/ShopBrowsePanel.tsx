@@ -70,6 +70,8 @@ type ShopWithItems = {
 type CartItem = {
     item: ShopItemFilterData
     quantity: number
+    shopId: string
+    shopTitle: string
 }
 
 interface ShopBrowsePanelProps {
@@ -345,10 +347,29 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
     const handleModalOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) closeImageModal()
     }
-    const [cartItems, setCartItems] = useState<CartItem[]>([])
+    const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+        if (typeof window === 'undefined') return []
+        try {
+            const saved = localStorage.getItem('shop_cart')
+            return saved ? (JSON.parse(saved) as CartItem[]) : []
+        } catch {
+            return []
+        }
+    })
     const [isCartSheetOpen, setIsCartSheetOpen] = useState(false)
     const [userInfo, setUserInfo] = useState<UserInfoProps | null>(null)
     const [isSubscribed, setIsSubscribed] = useState(false)
+    // Which shop's checkout is active inside the cart sheet (only used in all-shops view)
+    const [activeShopIdInSheet, setActiveShopIdInSheet] = useState<string | null>(null)
+
+    // Persist cart to localStorage whenever it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('shop_cart', JSON.stringify(cartItems))
+        } catch {
+            // Storage quota exceeded or unavailable — silently ignore
+        }
+    }, [cartItems])
 
     // Fetch user info
     useEffect(() => {
@@ -380,7 +401,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         return () => { isMounted = false }
     }, [userInfo?.id])
 
-    const handleAddItemToCart = useCallback((item: ShopItemFilterData) => {
+    const handleAddItemToCart = useCallback((item: ShopItemFilterData, shopId: string, shopTitle: string) => {
         setCartItems((prev) => {
             const existingIndex = prev.findIndex((ci) => ci.item.id === item.id)
             if (existingIndex !== -1) {
@@ -391,7 +412,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                 }
                 return updated
             }
-            return [...prev, { item, quantity: 1 }]
+            return [...prev, { item, quantity: 1, shopId, shopTitle }]
         })
 
         setIsCartSheetOpen(true)
@@ -406,26 +427,44 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
         [cartItems]
     )
 
-    const checkoutItems = useMemo(
-        () =>
-            cartItems
-                .map(({ item, quantity }) => ({
-                    id: item.id,
-                    title: item.title,
-                    price: item.price,
-                    currency: item.currency,
-                    stripePriceId: item.stripePriceId ?? '',
-                    stripeProductId: item.stripeProductId ?? '',
-                    discountMemberPercent: item.discountMemberPercent ?? null,
-                    subscribedStripePriceId: item.subscribedStripePriceId ?? null,
-                    quantity,
-                    imageUrl: item.imageUrl,
-                }))
-                .filter(
-                    (ci) => ci.stripePriceId && ci.stripeProductId
-                ),
-        [cartItems]
-    )
+    // The shop whose checkout is currently shown inside the cart sheet
+    const activeCheckoutShop = useMemo(() => {
+        const id = selectedShopId || activeShopIdInSheet
+        return id ? publishedShops.find((shop) => shop.id === id) ?? null : null
+    }, [publishedShops, selectedShopId, activeShopIdInSheet])
+
+    // Cart items grouped by shop for the all-shops preview
+    const cartItemsByShop = useMemo(() => {
+        const map = new Map<string, { shopId: string; shopTitle: string; items: CartItem[] }>()
+        cartItems.forEach((ci) => {
+            if (!map.has(ci.shopId)) {
+                map.set(ci.shopId, { shopId: ci.shopId, shopTitle: ci.shopTitle, items: [] })
+            }
+            map.get(ci.shopId)!.items.push(ci)
+        })
+        return Array.from(map.values())
+    }, [cartItems])
+
+    const checkoutItems = useMemo(() => {
+        const shopId = activeCheckoutShop?.id
+        const relevantItems = shopId
+            ? cartItems.filter((ci) => ci.shopId === shopId)
+            : cartItems
+        return relevantItems
+            .map(({ item, quantity }) => ({
+                id: item.id,
+                title: item.title,
+                price: item.price,
+                currency: item.currency,
+                stripePriceId: item.stripePriceId ?? '',
+                stripeProductId: item.stripeProductId ?? '',
+                discountMemberPercent: item.discountMemberPercent ?? null,
+                subscribedStripePriceId: item.subscribedStripePriceId ?? null,
+                quantity,
+                imageUrl: item.imageUrl,
+            }))
+            .filter((ci) => ci.stripePriceId && ci.stripeProductId)
+    }, [cartItems, activeCheckoutShop])
 
     const handleUpdateQuantity = useCallback((itemId: string, quantity: number) => {
         setCartItems((prev) =>
@@ -437,6 +476,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
 
     const handleCartSheetOpenChange = (open: boolean) => {
         setIsCartSheetOpen(open)
+        if (!open) setActiveShopIdInSheet(null)
     }
 
     const selectedShop = useMemo(
@@ -966,7 +1006,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                             <div>
                                                 <Button
                                                     className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600"
-                                                    onClick={() => selectedItem && handleAddItemToCart(selectedItem)}
+                                                    onClick={() => selectedItem && handleAddItemToCart(selectedItem, selectedShopId, selectedShop?.title ?? '')}
                                                 >
                                                     <ShoppingCart className="mr-2 h-4 w-4" />
                                                     {t('add-to-cart')}
@@ -1040,7 +1080,7 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                             className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
-                                                                handleAddItemToCart(item)
+                                                                handleAddItemToCart(item, selectedShopId, selectedShop?.title ?? '')
                                                             }}
                                                         >
                                                             <ShoppingCart className="h-4 w-4 mr-1" />
@@ -1081,7 +1121,12 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                                                 setSelectedItem(item)
                                                 setActiveImageUrl(null)
                                             }}
-                                            onAddToCart={handleAddItemToCart}
+                                            onAddToCart={(item) => {
+                                                setSelectedShopId(shop.id)
+                                                setSelectedItem(item)
+                                                setActiveImageUrl(null)
+                                                handleAddItemToCart(item, shop.id, shop.title)
+                                            }}
                                         />
                                     </div>
                                 ))}
@@ -1108,22 +1153,112 @@ export default function ShopBrowsePanel({ shops }: ShopBrowsePanelProps) {
                             <p className="text-sm text-gray-500">
                                 {t('no-items-selected')}
                             </p>
-                        ) : checkoutItems.length === 0 ? (
-                            <p className="text-sm text-red-600">
-                                These items are not yet configured for online checkout.
-                            </p>
+                        ) : /* ── Specific-shop view: always show checkout directly ── */
+                        selectedShopId ? (
+                            checkoutItems.length === 0 ? (
+                                <p className="text-sm text-red-600">
+                                    These items are not yet configured for online checkout.
+                                </p>
+                            ) : (
+                                <ShoppingSheetCheckout
+                                    shopSlug={activeCheckoutShop?.slug ?? activeCheckoutShop?.id ?? ''}
+                                    shopId={activeCheckoutShop?.id ?? ''}
+                                    selectedShopItems={checkoutItems}
+                                    onClearCart={() => setCartItems([])}
+                                    onRemoveItem={handleRemoveCartItem}
+                                    onUpdateQuantity={handleUpdateQuantity}
+                                    userInfo={userInfo}
+                                    isSubscribed={isSubscribed}
+                                    discounts={activeCheckoutShop?.shopDiscounts ?? []}
+                                />
+                            )
+                        ) : /* ── All-shops view ── */
+                        activeShopIdInSheet ? (
+                            /* Per-shop checkout */
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveShopIdInSheet(null)}
+                                    className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    {t('back-to-cart')}
+                                </button>
+                                {checkoutItems.length === 0 ? (
+                                    <p className="text-sm text-red-600">
+                                        These items are not yet configured for online checkout.
+                                    </p>
+                                ) : (
+                                    <ShoppingSheetCheckout
+                                        shopSlug={activeCheckoutShop?.slug ?? activeCheckoutShop?.id ?? ''}
+                                        shopId={activeCheckoutShop?.id ?? ''}
+                                        selectedShopItems={checkoutItems}
+                                        onClearCart={() => setCartItems([])}
+                                        onRemoveItem={handleRemoveCartItem}
+                                        onUpdateQuantity={handleUpdateQuantity}
+                                        userInfo={userInfo}
+                                        isSubscribed={isSubscribed}
+                                        discounts={activeCheckoutShop?.shopDiscounts ?? []}
+                                    />
+                                )}
+                            </>
                         ) : (
-                            <ShoppingSheetCheckout
-                                shopSlug={selectedShop?.slug ?? selectedShop?.id ?? ''}
-                                shopId={selectedShop?.id ?? ''}
-                                selectedShopItems={checkoutItems}
-                                onClearCart={() => setCartItems([])}
-                                onRemoveItem={handleRemoveCartItem}
-                                onUpdateQuantity={handleUpdateQuantity}
-                                userInfo={userInfo}
-                                isSubscribed={isSubscribed}
-                                discounts={selectedShop?.shopDiscounts ?? []}
-                            />
+                            /* Per-shop preview list */
+                            <div className="space-y-4">
+                                {cartItemsByShop.map(({ shopId, shopTitle, items: shopCartItems }) => {
+                                    const previewItems = shopCartItems.slice(0, 3)
+                                    const leftover = shopCartItems.length - 3
+                                    const totalQty = shopCartItems.reduce((sum, ci) => sum + ci.quantity, 0)
+                                    return (
+                                        <div key={shopId} className="rounded-lg border border-gray-200 p-4 space-y-3">
+                                            {/* Shop name + item count */}
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="font-semibold text-gray-900">{shopTitle}</h4>
+                                                <span className="text-xs text-gray-500">{totalQty} item{totalQty !== 1 ? 's' : ''}</span>
+                                            </div>
+
+                                            {/* Thumbnail strip */}
+                                            <div className="flex items-center gap-2">
+                                                {previewItems.map((ci) => (
+                                                    <div
+                                                        key={ci.item.id}
+                                                        className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100"
+                                                    >
+                                                        {ci.item.imageUrl ? (
+                                                            <Image
+                                                                src={ci.item.imageUrl}
+                                                                alt={ci.item.title}
+                                                                fill
+                                                                className="object-cover"
+                                                                sizes="64px"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
+                                                                No Image
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {leftover > 0 && (
+                                                    <span className="text-sm font-semibold text-gray-600">
+                                                        +{leftover}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Continue Shopping button */}
+                                            <Button
+                                                size="sm"
+                                                className="w-full bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                                onClick={() => setActiveShopIdInSheet(shopId)}
+                                            >
+                                                {t('continue-shopping')}
+                                                <ArrowRight className="h-4 w-4 ml-1" />
+                                            </Button>
+                                        </div>
+                                    )
+                                })}
+                            </div>
                         )}
                     </div>
                 </SheetContent>
