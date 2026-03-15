@@ -143,10 +143,14 @@ function ShopItemCarousel({
     items,
     onItemClick,
     onAddToCart,
+    extraCount,
+    onSeeMore,
 }: {
     items: ShopItemFilterData[]
     onItemClick: (item: ShopItemFilterData) => void
     onAddToCart: (item: ShopItemFilterData) => void
+    extraCount?: number
+    onSeeMore?: () => void
 }) {
     const [currentIndex, setCurrentIndex] = useState(0)
     // @ts-ignore: useTranslation will always throw an error for typescript
@@ -173,9 +177,9 @@ function ShopItemCarousel({
         return () => window.removeEventListener('resize', handleResize)
     }, [getItemsPerView]) // Need useCallback so this doesn't change on every render
 
-    // Calculate max index - can scroll until the last item is visible
-    const maxIndex = Math.max(0, items.length - itemsPerView)
-
+    // Calculate max index — include the "see more" slot if present
+    const totalCarouselItems = items.length + (extraCount && extraCount > 0 ? 1 : 0)
+    const maxIndex = Math.max(0, totalCarouselItems - itemsPerView)
     const changeSlide = (direction: 'left' | 'right') => {
         setCurrentIndex((prev) => {
             if (direction === 'left') {
@@ -192,6 +196,7 @@ function ShopItemCarousel({
     const itemWidthPercent = 100 / itemsPerView
 
     return (
+        <>
         <div className="relative w-full overflow-hidden rounded-lg">
             <div
                 className="flex transition-transform duration-500 ease-out"
@@ -262,6 +267,7 @@ function ShopItemCarousel({
                                         <Button
                                             size="sm"
                                             className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                            disabled={item.status !== 'AVAILABLE'}
                                             onClick={(e) => {
                                                 e.stopPropagation()
                                                 onAddToCart(item)
@@ -276,10 +282,27 @@ function ShopItemCarousel({
                         </div>
                     )
                 })}
+
+                {/* "See more" circle — last slot in the carousel */}
+                {extraCount && extraCount > 0 ? (
+                    <div
+                        className="flex-shrink-0 px-3 flex items-center justify-center"
+                        style={{ width: `${itemWidthPercent}%` }}
+                    >
+                        <button
+                            type="button"
+                            onClick={onSeeMore}
+                            className="group flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-full bg-bgColor-brand900 text-white shadow-md transition-all duration-200 hover:bg-bgColor-brand600 hover:shadow-lg hover:scale-110 active:scale-95"
+                        >
+                            <span className="text-lg font-extrabold leading-none">+{extraCount}</span>
+                            <span className="text-[10px] font-medium uppercase tracking-wide leading-none">more</span>
+                        </button>
+                    </div>
+                ) : null}
             </div>
 
             {/* Navigation Buttons */}
-            {items.length > itemsPerView && (
+            {totalCarouselItems > itemsPerView && (
                 <>
                     <button
                         aria-label="prev-items"
@@ -299,7 +322,7 @@ function ShopItemCarousel({
             )}
 
             {/* Indicators - show dots for each possible position */}
-            {items.length > itemsPerView && (
+            {totalCarouselItems > itemsPerView && (
                 <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2">
                     {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
                         <span
@@ -311,6 +334,8 @@ function ShopItemCarousel({
                 </div>
             )}
         </div>
+
+        </>
     )
 }
 
@@ -605,7 +630,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
     // Get up to 6 featured items per shop (or latest updated if not enough featured)
     // Also applies item filters (type, tag, status) when no shop is selected
     const featuredItemsByShop = useMemo(() => {
-        const result: Array<{ shop: ShopWithItems; items: ShopItemFilterData[] }> = []
+        const result: Array<{ shop: ShopWithItems; items: ShopItemFilterData[]; extraCount: number }> = []
 
         publishedShops.forEach((shop) => {
             if (shop.shopItems.length === 0) return
@@ -652,13 +677,16 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                 selectedItems.push(...nonFeaturedItems.slice(0, remainingSlots))
             }
 
+            // Any filtered items beyond what's shown in the carousel
+            const extraCount = Math.max(0, filteredShopItems.length - selectedItems.length)
+
             if (selectedItems.length > 0) {
                 const statusSortedItems = [...selectedItems].sort(
                     (a, b) =>
                         Number(b.isFeatured) - Number(a.isFeatured) ||
                         STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]
                 )
-                result.push({ shop, items: statusSortedItems })
+                result.push({ shop, items: statusSortedItems, extraCount })
             }
         })
 
@@ -1031,6 +1059,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                             <div>
                                                 <Button
                                                     className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600"
+                                                    disabled={selectedItem.status !== 'AVAILABLE'}
                                                     onClick={() => selectedItem && handleAddItemToCart(selectedItem, selectedShopId, selectedShop?.title ?? '')}
                                                 >
                                                     <ShoppingCart className="mr-2 h-4 w-4" />
@@ -1103,6 +1132,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                                         <Button
                                                             size="sm"
                                                             className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                                            disabled={item.status !== 'AVAILABLE'}
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
                                                                 handleAddItemToCart(item, selectedShopId, selectedShop?.title ?? '')
@@ -1129,7 +1159,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                     <div className="flex-1 p-6">
                         {featuredItemsByShop.length > 0 ? (
                             <div className="space-y-8">
-                                {featuredItemsByShop.map(({ shop, items }) => (
+                                {featuredItemsByShop.map(({ shop, items, extraCount }) => (
                                     <div key={shop.id} className="space-y-4">
                                         <button
                                             type="button"
@@ -1141,6 +1171,8 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                         </button>
                                         <ShopItemCarousel
                                             items={items}
+                                            extraCount={extraCount}
+                                            onSeeMore={() => setSelectedShopId(shop.id)}
                                             onItemClick={(item) => {
                                                 setSelectedShopId(shop.id)
                                                 setSelectedItem(item)

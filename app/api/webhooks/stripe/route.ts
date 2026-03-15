@@ -5,6 +5,7 @@ import { PaymentType } from '@prisma/client'
 import { revalidateTag } from 'next/cache'
 import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
 import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail'
+import { sendShopOrderConfirmationEmail, ShopOrderItem } from '@/lib/actions/email/sendShopOrderConfirmationEmail'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -575,6 +576,9 @@ export async function POST(req: NextRequest) {
           const priceRatio =
             totalExpectedPrice > 0 ? actualTotal / totalExpectedPrice : 1
 
+          // Collect email order items while creating payment records
+          const emailOrderItems: ShopOrderItem[] = []
+
           for (const itemInfo of shopItemMetadata) {
             const shopItem = shopItemMap.get(itemInfo.shopItemId)
             if (!shopItem) {
@@ -605,6 +609,38 @@ export async function POST(req: NextRequest) {
                 otherGuests: otherGuestsInfo || undefined,
               },
             })
+
+            emailOrderItems.push({
+              title: shopItem.title,
+              quantity: itemInfo.quantity,
+              unitPrice: Number(shopItem.price) * priceRatio,
+              currency: shopItem.currency || 'CAD',
+              imageUrl: shopItem.imageUrl,
+            })
+          }
+
+          // Send shop order confirmation email
+          if (guestEmail && emailOrderItems.length > 0) {
+            try {
+              const shopRecord = metadata.shopId
+                ? await prisma.shop.findUnique({
+                    where: { id: metadata.shopId },
+                    select: { title: true, slug: true },
+                  })
+                : null
+
+              await sendShopOrderConfirmationEmail({
+                firstName: guestName?.split(' ')[0] || 'Valued Customer',
+                to: guestEmail,
+                totalPricePaid: chargedAmount / 100,
+                currency: emailOrderItems[0]?.currency || 'CAD',
+                shopName: shopRecord?.title || null,
+                shopSlug: shopRecord?.slug || metadata.shopSlug || null,
+                orderItems: emailOrderItems,
+              })
+            } catch (emailError) {
+              console.error('[SHOP_ORDER_CONFIRMATION_EMAIL_ERROR]', emailError)
+            }
           }
         } else {
           // Fallback: no per-item breakdown available, so create one consolidated record.
@@ -626,6 +662,30 @@ export async function POST(req: NextRequest) {
               otherGuests: otherGuestsInfo || undefined,
             },
           })
+
+          // Send fallback shop order confirmation email (no item breakdown)
+          if (guestEmail) {
+            try {
+              const shopRecord = metadata.shopId
+                ? await prisma.shop.findUnique({
+                    where: { id: metadata.shopId },
+                    select: { title: true, slug: true },
+                  })
+                : null
+
+              await sendShopOrderConfirmationEmail({
+                firstName: guestName?.split(' ')[0] || 'Valued Customer',
+                to: guestEmail,
+                totalPricePaid: chargedAmount / 100,
+                currency: 'CAD',
+                shopName: shopRecord?.title || null,
+                shopSlug: shopRecord?.slug || metadata.shopSlug || null,
+                orderItems: [],
+              })
+            } catch (emailError) {
+              console.error('[SHOP_ORDER_CONFIRMATION_EMAIL_ERROR]', emailError)
+            }
+          }
         }
       }
 
@@ -1032,7 +1092,8 @@ export async function POST(req: NextRequest) {
           console.error('[PAYMENT_CONFIRMATION_EMAIL_ERROR]', emailError)
         }
       }
-
+      
+      
       // Update event ticket sold count
       // Revalidate payment cache after creating new payment
       revalidateTag('payments')
