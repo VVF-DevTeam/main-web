@@ -48,5 +48,10 @@
     "toggle-hide-discount-details": "Ẩn chi tiết giảm giá",
     "no-discounts-applied": "Không có giảm giá nào được áp dụng",
     "toggle-show-discount-details": "Hiện chi tiết giảm giá",
-    "percent-off-applied": "{{percent}}% off applied"
+    "percent-off-applied": "{{percent}}% off applied",
+    "checkout-description-first-form-filled": "Form đầu tiên đã được điền với thông tin từ",
+    "checkout-profile-link": "tài khoản của bạn",
+    "checkout-fill-empty-fields": "Vui lòng điền các trường trống khác. Xin cảm ơn!",
+    "continue-shopping": "Tiếp tục mua sắm",
+    "back-to-cart": "Quay lại giỏ hàng"
 }   
