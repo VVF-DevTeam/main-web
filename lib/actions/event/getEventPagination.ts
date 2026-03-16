@@ -32,6 +32,7 @@ export const getCachedEventPagination = unstable_cache(
             capacity: true,
             days: true,
             endDate: true,
+            keyName: true,
           },
           where: {
             title: {

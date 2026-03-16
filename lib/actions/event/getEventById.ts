@@ -19,6 +19,8 @@ const getCachedEventById = unstable_cache(
           endTime: true,
           formLink: true,
           endDate: true,
+          keyName: true,
+          eventType: true,
           hosts: {
             select: {
               name: true,
