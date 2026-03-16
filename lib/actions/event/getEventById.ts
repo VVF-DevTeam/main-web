@@ -21,6 +21,13 @@ const getCachedEventById = unstable_cache(
           endDate: true,
           keyName: true,
           eventType: true,
+          tickets: {
+            select: {
+              id: true,
+              type: true,
+              price: true,
+            },
+          },
           hosts: {
             select: {
               name: true,
