@@ -43,7 +43,7 @@ const EmailTemplateAccountVerification = ({
       style={{
         fontFamily: 'Arial, sans-serif',
         padding: '20px',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'rgb(236,236,236)',
       }}
     >
       <div
@@ -55,6 +55,38 @@ const EmailTemplateAccountVerification = ({
           padding: '20px',
         }}
       >
+        {/* Logo Header */}
+        <table cellPadding={0} cellSpacing={0} style={{ marginBottom: '24px' }}>
+          <tbody>
+            <tr>
+              <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://www.vietvibe.org/logo/main-logo-1.png"
+                  alt="Viet Vibe Foundation Logo"
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </td>
+              <td style={{ verticalAlign: 'middle' }}>
+                <span
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#767676',
+                  }}
+                >
+                  Viet Vibe Foundation
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <h1
           style={{ fontSize: '24px', marginBottom: '10px', color: '#111827' }}
         >
@@ -138,7 +170,7 @@ const EmailTemplateForgotPassword = ({
       style={{
         fontFamily: 'Arial, sans-serif',
         padding: '20px',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'rgb(236,236,236)',
       }}
     >
       <div
@@ -150,6 +182,38 @@ const EmailTemplateForgotPassword = ({
           padding: '20px',
         }}
       >
+        {/* Logo Header */}
+        <table cellPadding={0} cellSpacing={0} style={{ marginBottom: '24px' }}>
+          <tbody>
+            <tr>
+              <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://www.vietvibe.org/logo/main-logo-1.png"
+                  alt="Viet Vibe Foundation Logo"
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </td>
+              <td style={{ verticalAlign: 'middle' }}>
+                <span
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#767676',
+                  }}
+                >
+                  Viet Vibe Foundation
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <h1
           style={{ fontSize: '24px', marginBottom: '10px', color: '#111827' }}
         >

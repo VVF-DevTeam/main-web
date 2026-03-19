@@ -72,12 +72,41 @@ export async function sendEmail({
       )
     : undefined
 
+  const logoHeader = `
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tbody>
+        <tr>
+          <td style="vertical-align:middle;padding-right:8px;">
+            <img
+              src="https://www.vietvibe.org/logo/main-logo-1.png"
+              alt="Viet Vibe Foundation Logo"
+              style="width:24px;height:24px;object-fit:contain;display:block;"
+            />
+          </td>
+          <td style="vertical-align:middle;">
+            <span style="font-size:16px;font-weight:bold;color:#767676;">
+              Viet Vibe Foundation
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `
+
+  const emailBody = `
+    <div style="background-color:rgb(236,236,236);padding:32px 0;">
+      <div style="max-width:600px;margin:0 auto;background-color:#ffffff;padding:32px;">
+        ${logoHeader}
+        ${convertQuillToInlineEmailStyles(content)}
+      </div>
+    </div>
+  `
+
   const { error } = await resend.emails.send({
     from: fromEmail,
     to: recipients,
     subject: subject,
-    // html: content,
-    html: convertQuillToInlineEmailStyles(content),
+    html: emailBody,
     attachments: preparedAttachments,
   })
 

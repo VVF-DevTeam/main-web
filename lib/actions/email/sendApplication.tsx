@@ -123,7 +123,47 @@ const EmailTemplate = ({
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   return (
-    <div>
+    <div style={{ backgroundColor: 'rgb(236,236,236)', padding: '32px 0' }}>
+      <div
+        style={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          backgroundColor: '#ffffff',
+          padding: '32px',
+        }}
+      >
+      {/* Logo Header */}
+      <table cellPadding={0} cellSpacing={0} style={{ marginBottom: '24px' }}>
+        <tbody>
+          <tr>
+            <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://www.vietvibe.org/logo/main-logo-1.png"
+                alt="Viet Vibe Foundation Logo"
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </td>
+            <td style={{ verticalAlign: 'middle' }}>
+              <span
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  color: '#767676',
+                }}
+              >
+                Viet Vibe Foundation
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
       {isHostApplication ? (
         <h1>
           {firstName} {lastName}&apos;s Application for hosting event:{' '}
@@ -175,6 +215,7 @@ const EmailTemplate = ({
           </li>
         )}
       </ul>
+      </div>
     </div>
   )
 }
