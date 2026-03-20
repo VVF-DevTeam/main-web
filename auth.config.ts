@@ -84,14 +84,18 @@ export default {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id as string
         token.email = user.email as string
         token.name = user.name as string
-        // Set default USER role for new users who don't have roles yet
+        token.image = user.image as string
         token.role =
           user.role && user.role.length > 0 ? (user.role as Role[]) : ['USER']
+      }
+      if (trigger === 'update' && session) {
+        if (session.name) token.name = session.name
+        if (session.image) token.image = session.image
       }
       return token
     },
@@ -99,6 +103,7 @@ export default {
       session.user.id = token.id as string
       session.user.email = token.email as string
       session.user.name = token.name as string
+      session.user.image = token.image as string
       session.user.role = token.role as Role[]
       return session
     },

@@ -1,11 +1,11 @@
 'use client'
 
 // Libraries
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-// Components
 
+// Components
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,26 +25,25 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
   const pathname = usePathname()
   const isActive = pathname.toLowerCase().includes('registration')
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
   const classNames = (...classes: (string | boolean | undefined)[]) => {
     return classes.filter(Boolean).join(' ')
   }
 
+  const handleMouseEnter = () => {
+    if (mode === 'desktop') setIsOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    if (mode === 'desktop') setIsOpen(false)
+  }
+
   return (
-    <div ref={dropdownRef} className="relative -mr-1 w-full">
+    <div
+      ref={dropdownRef}
+      className="relative -mr-1 w-full"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         className={classNames(
           'flex items-center justify-center text-lg transition-all xl:text-xl',
@@ -57,15 +56,14 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
             : `mt-2 h-full w-full gap-x-4 rounded-md p-4 ${
                 isActive
                   ? 'text-textColor-brand600'
-                  : 'px-5 text-slate-200 hover:bg-bgColor-brand900'
+                  : 'px-5 text-slate-200 hover:bg-bgColor-brand900/50'
               }`
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {/* <ClipboardList className="h-5 w-5" /> */}
         <span>{t('main-navRegistration')}</span>
         <ChevronDown
-          className={`lg:h-6 lg:w-6 h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`lg:h-5 lg:w-5 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -82,7 +80,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
             'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(false)}
         >
           {t('job-navMembership')}
         </Link>
@@ -93,7 +91,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
             'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(false)}
         >
           {t('job-navRegistration')}
         </Link>
@@ -104,33 +102,10 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
             'flex items-center justify-center p-2 text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
             mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
           )}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(false)}
         >
           {t('job-navBecomeHost')}
         </Link>
-        {/* <div className="border-b border-gray-200" />
-        <Link
-          href="/about/members"
-          className={classNames(
-            'flex items-center justify-center p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
-            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
-          )}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {directors}
-        </Link> */}
-
-        {/* <div className="border-b border-gray-200" />
-        <Link
-          href="/about/founders"
-          className={classNames(
-            'flex p-2 text-center text-textColor transition-all hover:rounded-md hover:bg-gray-100 hover:text-textColor-brand900',
-            mode === 'desktop' ? 'whitespace-nowrap text-sm' : 'text-xl'
-          )}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {founders}
-        </Link> */}
       </div>
     </div>
   )

@@ -2,9 +2,7 @@
 
 // Libraries
 import React from 'react'
-import { User2 } from 'lucide-react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 
 // Components
 import MobileSidebar from './_navbar/mobileSidebar'
@@ -13,8 +11,6 @@ import CustomIcon from '@/components/icon/CustomIcon'
 
 // Main Component
 const Navbar = () => {
-  const { data: session } = useSession()
-
   return (
     <nav className="sticky top-0 z-50 flex h-[100px] w-full items-center bg-white shadow-md md:px-2 lg:px-6">
       {/* NextJS Image and Dark Overlay (add relative to parent code)*/}
@@ -29,24 +25,14 @@ const Navbar = () => {
 
       {/* Nav Links */}
 
-      <div className="flex-between w-full items-center gap-x-4 px-2 md:px-4 lg:px-8">
+      <div className="flex-between w-full items-center gap-x-4 px-2 lg:pl-8 md:pr-6 lg:pr-16">
         <div className="flex h-[70px] w-full items-center gap-x-4 pl-2">
           {/* Company Logo with Slogan*/}
           <Link href="/" className="">
             <CustomIcon />
           </Link>
 
-          {/* User Button */}
-          {session?.user?.id && (
-            <Link
-              className="flex-center gap-x-[5px] text-textColor transition-all hover:text-textColor-brand900"
-              href={`/profile`}
-              aria-label="Go to user profile"
-            >
-              <User2 className="h-5 w-5" />
-              <span>{session?.user?.name?.split(' ')[0]}</span>
-            </Link>
-          )}
+
         </div>
 
         {/* Nav Links */}
