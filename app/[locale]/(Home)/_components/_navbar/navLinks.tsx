@@ -63,7 +63,7 @@ const NavLinks = ({ mode }: NavLinkProps) => {
 
       {/* Mobile App Links */}
       {mode === 'mobile' && (
-        <div className="flex-between gap-x-2 text-textColor-white">
+        <div className="flex-between gap-x-2 text-textColor-white mr-5">
           {/* Android App Link */}
           <TooltipProvider>
             <Tooltip>

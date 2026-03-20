@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
+import { useSession } from 'next-auth/react'
 
 const profileSchema = z.object({
   email: z.string().email('Invalid email').nonempty(),
@@ -51,6 +52,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('profile')
+  const { update: updateSession } = useSession()
   const [imagePreview, setImagePreview] = useState(user.image || '')
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<ProfileFormValues>({
@@ -107,6 +109,7 @@ const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
       const fullPhone = data.phone ? `${phoneExtension}${data.phone}` : ''
       const response = await updateUser({ ...data, phone: fullPhone })
       if (response.success) {
+        await updateSession({ image: data.image, name: data.name })
         toast.success('Profile updated successfully!', {
           style: {
             color: '#22c55e',

@@ -155,10 +155,10 @@ function ShopItemCarousel({
     const getItemsPerView = useCallback(() => {
         if (typeof window === 'undefined') return 1
         const width = window.innerWidth
-        if (width >= 1280) return 4 // xl
-        if (width >= 1024) return 3 // lg
-        if (width >= 768) return 2 // md
-        return 1 // sm (default)
+        if (width >= 1280) return 5 // xl
+        if (width >= 1024) return 4 // lg
+        if (width >= 768) return 3 // md
+        return 2 // sm (default)
     }, [])
 
     const [itemsPerView, setItemsPerView] = useState(() => getItemsPerView())
@@ -205,7 +205,7 @@ function ShopItemCarousel({
                     return (
                         <div
                             key={item.id}
-                            className="flex-shrink-0 px-3"
+                            className="flex-shrink-0 px-1 lg:px-2"
                             style={{ width: `${itemWidthPercent}%` }}
                         >
                             <div
@@ -256,19 +256,19 @@ function ShopItemCarousel({
 
                                     {/* Price and Add Button */}
                                     <div className="flex items-center justify-between pt-2">
-                                        <span className="text-xl font-bold text-gray-900">
+                                        <span className="text-base font-bold text-gray-900 shrink-0 pr-2">
                                             ${formattedPrice} {item.currency}
                                         </span>
                                         <Button
                                             size="sm"
-                                            className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white"
+                                            className="bg-bgColor-brand900 hover:bg-bgColor-brand600 text-white shrink min-w-0"
                                             onClick={(e) => {
                                                 e.stopPropagation()
                                                 onAddToCart(item)
                                             }}
                                         >
-                                            <ShoppingCart className="h-4 w-4 mr-1" />
-                                            {t('add')}
+                                            <ShoppingCart className="h-4 w-4 shrink-0" />
+                                            <span className="truncate">{t('add')}</span>
                                         </Button>
                                     </div>
                                 </div>
@@ -685,7 +685,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* Left Sidebar - Shops grouped by type */}
-            <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto hidden md:block md:w-[180px] lg:w-[220px] xl:w-[240px]">
                 <div className="p-4">
                     <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">
                         {t('shops')}
@@ -754,7 +754,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
             </aside>
 
             {/* Right Content Area */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 min-w-0 flex flex-col">
                 {/* Header */}
                 <header className="relative overflow-hidden px-6 py-8 text-color-white bg-[#1F2937]">
                     <div className="absolute inset-y-0 right-0 z-0 w-full max-w-[30%] lg:max-w-[23%] flex items-start justify-end gap-4 pr-4">
@@ -801,15 +801,19 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 </>
                             )}
                         </div>
-
-                        <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
-                            <div className="flex flex-wrap items-center gap-3">
+                        
+                        {/* Item Filters Buttons */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-4 text-sm 2xl:text-base">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <Select value={selectedType || 'all'} onValueChange={(value) => setSelectedType(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-[180px] rounded-xl border border-white/20 bg-white/5 px-4 text-base text-textColor-white">
-                                        <SelectValue placeholder="Item Type" />
+                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                        <SelectValue placeholder={t('item-type')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">{t('item-type-all')}</SelectItem>
+                                        <SelectItem value="all">
+                                            <span className="xl:hidden">{t('item-type')}</span>
+                                            <span className="hidden xl:inline">{t('item-type-all')}</span>
+                                        </SelectItem>
                                         {allTypes.map((type) => (
                                             <SelectItem key={type} value={type}>
                                                 {t(type)}
@@ -819,11 +823,14 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 </Select>
 
                                 <Select value={selectedTag || 'all'} onValueChange={(value) => setSelectedTag(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-[160px] rounded-xl border border-white/20 bg-white/5 px-4 text-base text-textColor-white">
-                                        <SelectValue placeholder="Tags" />
+                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                        <SelectValue placeholder={t('tags')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">{t('tags-all')}</SelectItem>
+                                        <SelectItem value="all">
+                                            <span className="xl:hidden">{t('tags')}</span>
+                                            <span className="hidden xl:inline">{t('tags-all')}</span>
+                                        </SelectItem>
                                         {allTags.map((tag) => (
                                             <SelectItem key={tag} value={tag}>
                                                 {tag}
@@ -833,11 +840,14 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 </Select>
 
                                 <Select value={selectedStatus || 'all'} onValueChange={(value) => setSelectedStatus(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-[180px] rounded-xl border border-white/20 bg-white/5 px-4 text-base text-textColor-white">
-                                        <SelectValue placeholder="Item Status" />
+                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                        <SelectValue placeholder={t('item-status')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">{t('item-status-all')}</SelectItem>
+                                        <SelectItem value="all">
+                                            <span className="xl:hidden">{t('item-status')}</span>
+                                            <span className="hidden xl:inline">{t('item-status-all')}</span>
+                                        </SelectItem>
                                         {allStatuses.map((status) => (
                                             <SelectItem key={status} value={status}>
                                                 {t(ITEM_STATUS_LABELS[status])}
@@ -849,7 +859,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    className="h-11 gap-2 text-base text-textColor-white/80 hover:bg-white/10 hover:text-textColor-white"
+                                    className="h-11 gap-2 text-textColor-white/80 hover:bg-white/10 hover:text-textColor-white px-2"
                                     onClick={() => {
                                         setSelectedType('')
                                         setSelectedTag('')
@@ -857,11 +867,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                     }}
                                 >
                                     <RotateCcw className="h-4 w-4" />
-                                    {t('reset')}
                                 </Button>
                             </div>
 
-                            <div className="flex items-center gap-4 text-lg">
+                            <div className="flex items-center gap-4">
                                 <p className="text-textColor-white/80">
                                     {t('showing')} <span className="font-bold text-textColor-white">{sortedItems.length}</span>{' '}
                                     {t('products')}
@@ -869,7 +878,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 <div className="flex items-center gap-2">
                                     <span className="text-textColor-white/80">{t('sort-by')}:</span>
                                     <Select value={selectedSort} onValueChange={(value) => setSelectedSort(value as (typeof SORT_OPTIONS)[number]['value'])}>
-                                        <SelectTrigger className="h-11 w-[180px] rounded-xl border border-white/20 bg-white/5 px-4 text-base text-textColor-white">
+                                        <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
                                             <SelectValue placeholder={t('featured')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -1097,7 +1106,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
 
                                                     {/* Price and Add Button */}
                                                     <div className="flex items-center justify-between pt-2">
-                                                        <span className="text-xl font-bold text-gray-900">
+                                                        <span className="text-base font-bold text-gray-900">
                                                             ${formattedPrice} {item.currency}
                                                         </span>
                                                         <Button

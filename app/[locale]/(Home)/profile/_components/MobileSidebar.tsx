@@ -90,7 +90,7 @@ export default function MobileSidebar({
 
       {/* Sidebar Menu */}
       {isOpen && (
-        <div className="mt-2 rounded-lg bg-bgColor-gray300 p-4 shadow-md">
+        <div className="mt-2 rounded-lg bg-bgColor-white p-4 shadow-md">
           <ul className="space-y-4">
             {Object.entries(sections).map(([key, label]) => {
               if (key.includes('admin')) return null

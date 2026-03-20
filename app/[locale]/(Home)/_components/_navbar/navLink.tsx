@@ -39,7 +39,7 @@ const NavLink = ({ label, path, mode }: NavLinkProps) => {
   const inactiveColor =
     mode === 'desktop'
       ? 'text-textColor hover:text-textColor-brand900 hover:underline'
-      : 'text-textColor-white hover:bg-bgColor-brand900'
+      : 'text-textColor-white hover:bg-bgColor-brand900/50'
   const layoutClasses =
     mode === 'desktop'
       ? 'gap-x-[5px] text-lg xl:text-xl'
