@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils'
 
 // Components
 import NavLink from './navLink'
-import AuthButtons from './authButtons'
 import NavAbout from './navAbout'
+import AuthButtons from './authButtons'
 import NavRegistration from './navRegistration'
 import {
   Tooltip,
@@ -35,7 +35,7 @@ const NavLinks = ({ mode }: NavLinkProps) => {
     <div
       className={cn(
         mode === 'desktop'
-          ? 'flex-center h-full w-full gap-x-4 md:gap-x-8 lg:gap-x-[2vw] xl:gap-x-[4vw]'
+          ? 'flex-center h-full w-full gap-x-4 md:gap-x-8 lg:gap-x-[3vw] xl:gap-x-[4vw]'
           : 'flex-col-center h-full w-full gap-y-4'
       )}
     >
@@ -59,7 +59,7 @@ const NavLinks = ({ mode }: NavLinkProps) => {
         mode={mode}
       />
 
-      <AuthButtons mode={mode} />
+      {mode === 'mobile' && <AuthButtons mode="mobile" />}
 
       {/* Mobile App Links */}
       {mode === 'mobile' && (

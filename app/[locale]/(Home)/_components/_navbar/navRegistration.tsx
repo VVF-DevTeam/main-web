@@ -21,6 +21,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
   const { t } = useTranslation('homePage')
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const pathname = usePathname()
   const isActive = pathname.toLowerCase().includes('registration')
@@ -30,11 +31,14 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
   }
 
   const handleMouseEnter = () => {
-    if (mode === 'desktop') setIsOpen(true)
+    if (mode !== 'desktop') return
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setIsOpen(true)
   }
 
   const handleMouseLeave = () => {
-    if (mode === 'desktop') setIsOpen(false)
+    if (mode !== 'desktop') return
+    closeTimer.current = setTimeout(() => setIsOpen(false), 1000)
   }
 
   return (
