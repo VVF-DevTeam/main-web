@@ -29,6 +29,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const pathname = usePathname()
   const isActive = pathname.toLowerCase().includes('about')
@@ -38,11 +39,14 @@ const NavAbout: React.FC<NavAboutProps> = ({
   }
 
   const handleMouseEnter = () => {
-    if (mode === 'desktop') setIsOpen(true)
+    if (mode !== 'desktop') return
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setIsOpen(true)
   }
 
   const handleMouseLeave = () => {
-    if (mode === 'desktop') setIsOpen(false)
+    if (mode !== 'desktop') return
+    closeTimer.current = setTimeout(() => setIsOpen(false), 1000)
   }
 
   return (

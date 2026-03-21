@@ -785,7 +785,8 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                         <h1 className="flex-1 text-center text-4xl font-bold text-textColor-white">
                             {selectedShop?.title ?? t('all-shops')}
                         </h1>
-
+                        
+                        {/* Breadcrumb Navigation */}
                         <div className="flex items-center gap-2 text-textColor-white">
                             <button
                                 type="button"
@@ -802,6 +803,8 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                             )}
                         </div>
                         
+                        {/* Shop and Shop Type Selectors (for sm view only ) */}
+
                         {/* Item Filters Buttons */}
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-4 text-sm 2xl:text-base">
                             <div className="flex flex-wrap items-center gap-2">
