@@ -160,7 +160,7 @@ const AuthButtons = ({ mode }: { mode: string }) => {
 
           <div
             className={cn(
-              'absolute right-0 lg:-right-20 z-50 mt-2 w-96 rounded-md border border-gray-200 bg-white shadow-lg transition-all',
+              'absolute right-0 lg:-right-12 z-50 mt-2 w-96 rounded-md border border-gray-200 bg-white shadow-lg transition-all',
               isProfileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
             )}
           >
