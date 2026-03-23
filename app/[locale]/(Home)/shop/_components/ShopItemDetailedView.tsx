@@ -43,7 +43,7 @@ export default function ShopItemDetailedView({
             >
                 {/* Modal Header */}
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
-                    <h2 className="text-xl font-bold text-gray-900 line-clamp-1">{item.title}</h2>
+                    <h2 className="text-xl font-bold text-gray-900 line-clamp-2">{item.title}</h2>
                     <button
                         type="button"
                         onClick={onClose}
@@ -60,7 +60,7 @@ export default function ShopItemDetailedView({
                     <div className="w-full md:w-1/2 md:flex md:flex-col">
                         {/* Main image */}
                         <div
-                            className="group relative aspect-[4/3] w-full flex-none cursor-pointer overflow-hidden rounded-md bg-gray-100 transition-transform hover:scale-[1.01]"
+                            className="group relative h-72 md:h-96 w-full flex-none cursor-pointer overflow-hidden rounded-md bg-gray-100 transition-transform hover:scale-[1.01]"
                             onClick={() => { if (displayUrl) onOpenImageModal(displayUrl) }}
                         >
                             {displayUrl ? (
