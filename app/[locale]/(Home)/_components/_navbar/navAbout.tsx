@@ -46,7 +46,7 @@ const NavAbout: React.FC<NavAboutProps> = ({
 
   const handleMouseLeave = () => {
     if (mode !== 'desktop') return
-    closeTimer.current = setTimeout(() => setIsOpen(false), 1000)
+    closeTimer.current = setTimeout(() => setIsOpen(false), 200)
   }
 
   return (

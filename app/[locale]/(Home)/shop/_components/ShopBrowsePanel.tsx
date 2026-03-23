@@ -11,8 +11,6 @@ import {
     Search,
 } from "lucide-react"
 import Image from 'next/image'
-import TextPreview from '@/components/quill/TextPreview'
-
 import {
     Select,
     SelectContent,
@@ -24,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import ShoppingSheetCheckout from './ShoppingSheetCheckout'
+import ShopItemDetailedView from './ShopItemDetailedView'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { UserInfoProps } from '@/lib/types/userInfo'
@@ -31,7 +30,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { JsonValue } from "@prisma/client/runtime/library"
 
-type ShopItemFilterData = {
+export type ShopItemFilterData = {
     id: string
     title: string
     type: 'General' | 'Limit' | 'Discount'
@@ -80,7 +79,7 @@ interface ShopBrowsePanelProps {
     initialShopSlug?: string
 }
 
-const ITEM_STATUS_LABELS: Record<ShopItemFilterData['status'], string> = {
+export const ITEM_STATUS_LABELS: Record<ShopItemFilterData['status'], string> = {
     AVAILABLE: 'Available',
     OUT_OF_STOCK: 'Out Of Stock',
     DISCONTINUED: 'Discontinued',
@@ -250,7 +249,7 @@ function ShopItemCarousel({
                                     </h3>
 
                                     {/* Item Type under title */}
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-gray-500 line-clamp-1">
                                         {t(ITEM_STATUS_LABELS[item.status])} • {t(item.type)}
                                     </p>
 
@@ -267,7 +266,7 @@ function ShopItemCarousel({
                                                 onAddToCart(item)
                                             }}
                                         >
-                                            <ShoppingCart className="h-4 w-4 shrink-0" />
+                                            <ShoppingCart className="h-4 w-4 shrink-0 pl-1" />
                                             <span className="truncate">{t('add')}</span>
                                         </Button>
                                     </div>
@@ -299,7 +298,7 @@ function ShopItemCarousel({
             )}
 
             {/* Indicators - show dots for each possible position */}
-            {items.length > itemsPerView && (
+            {/* {items.length > itemsPerView && (
                 <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2">
                     {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
                         <span
@@ -309,7 +308,7 @@ function ShopItemCarousel({
                         />
                     ))}
                 </div>
-            )}
+            )} */}
         </div>
     )
 }
@@ -366,7 +365,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
     const [selectedStatus, setSelectedStatus] = useState<string>('')
     const [selectedSort, setSelectedSort] = useState<(typeof SORT_OPTIONS)[number]['value']>('featured')
     const [selectedItem, setSelectedItem] = useState<ShopItemFilterData | null>(null)
-    const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null)
+    const [selectedItemShop, setSelectedItemShop] = useState<{ id: string; title: string } | null>(null)
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
 
     const openImageModal = (imageUrl: string) => setModalImageUrl(imageUrl)
@@ -384,6 +383,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
         }
     })
     const [isCartSheetOpen, setIsCartSheetOpen] = useState(false)
+    const [isShopSelectModalOpen, setIsShopSelectModalOpen] = useState(false)
     const [userInfo, setUserInfo] = useState<UserInfoProps | null>(null)
     const [isSubscribed, setIsSubscribed] = useState(false)
     // Which shop's checkout is active inside the cart sheet (only used in all-shops view)
@@ -757,11 +757,11 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
             <div className="flex-1 min-w-0 flex flex-col">
                 {/* Header */}
                 <header className="relative overflow-hidden px-6 py-8 text-color-white bg-[#1F2937]">
-                    <div className="absolute inset-y-0 right-0 z-0 w-full max-w-[30%] lg:max-w-[23%] flex items-start justify-end gap-4 pr-4">
+                    <div className="absolute inset-y-0 right-0 z-0 w-full max-w-[50%] md:max-w-[30%] lg:max-w-[23%]">
                         <button
                             type="button"
                             onClick={() => setIsCartSheetOpen(true)}
-                            className="relative mt-1 flex h-10 w-10 items-center justify-center rounded-full text-textColor-secondary100"
+                            className="absolute right-4 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full text-textColor-secondary100"
                         >
                             <ShoppingBag className="h-6 w-6" />
                             {cartItemCount > 0 && (
@@ -776,18 +776,18 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 alt={selectedShop?.title ?? 'Shop header background'}
                                 fill
                                 sizes="(min-width: 1024px) 33vw, 50vw"
-                                className="object-fill object-right opacity-40"
+                                className="object-fill object-right opacity-25 md:opacity-35"
                             />
                         </div>
                     </div>
 
                     <div className="relative z-20 flex flex-col gap-2">
-                        <h1 className="flex-1 text-center text-4xl font-bold text-textColor-white">
+                        <h1 className="flex-1 text-center text-4xl font-bold text-textColor-white pb-2">
                             {selectedShop?.title ?? t('all-shops')}
                         </h1>
-                        
+
                         {/* Breadcrumb Navigation */}
-                        <div className="flex items-center gap-2 text-textColor-white">
+                        <div className="items-center gap-2 text-textColor-white hidden md:flex">
                             <button
                                 type="button"
                                 onClick={() => setSelectedShopId('')}
@@ -797,17 +797,27 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                             </button>
                             {selectedShop && (
                                 <>
-                                    <ChevronRight className="h-4 w-4" />
-                                    <span>{selectedShop.title}</span>
+                                    <ChevronRight className="h-4 w-4 shrink-0" />
+                                    <span className="text-nowrap">{selectedShop.title}</span>
                                 </>
                             )}
                         </div>
-                        
-                        {/* Shop and Shop Type Selectors (for sm view only ) */}
+
+                        {/* Shop selector button — only visible on small screens (sidebar is hidden) */}
+                        <button
+                            type="button"
+                            onClick={() => setIsShopSelectModalOpen(true)}
+                            className="md:hidden mt-3 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-textColor-white hover:bg-white/10 transition-colors"
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                            {selectedShop ? selectedShop.title : t('shops')}
+                            <ChevronRight className="h-4 w-4 opacity-60" />
+                        </button>
 
                         {/* Item Filters Buttons */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-4 text-sm 2xl:text-base">
-                            <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-4 md:gap-y-2 pt-4 text-sm 2xl:text-base">
+                            {/* Left Side — mr-auto pushes showing & sort-by to the right */}
+                            <div className="flex flex-wrap items-center gap-2 mr-auto">
                                 <Select value={selectedType || 'all'} onValueChange={(value) => setSelectedType(value === 'all' ? '' : value)}>
                                     <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
                                         <SelectValue placeholder={t('item-type')} />
@@ -842,57 +852,60 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                     </SelectContent>
                                 </Select>
 
-                                <Select value={selectedStatus || 'all'} onValueChange={(value) => setSelectedStatus(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
-                                        <SelectValue placeholder={t('item-status')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">
-                                            <span className="xl:hidden">{t('item-status')}</span>
-                                            <span className="hidden xl:inline">{t('item-status-all')}</span>
-                                        </SelectItem>
-                                        {allStatuses.map((status) => (
-                                            <SelectItem key={status} value={status}>
-                                                {t(ITEM_STATUS_LABELS[status])}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className="h-11 gap-2 text-textColor-white/80 hover:bg-white/10 hover:text-textColor-white px-2"
-                                    onClick={() => {
-                                        setSelectedType('')
-                                        setSelectedTag('')
-                                        setSelectedStatus('')
-                                    }}
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                </Button>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <p className="text-textColor-white/80">
-                                    {t('showing')} <span className="font-bold text-textColor-white">{sortedItems.length}</span>{' '}
-                                    {t('products')}
-                                </p>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-textColor-white/80">{t('sort-by')}:</span>
-                                    <Select value={selectedSort} onValueChange={(value) => setSelectedSort(value as (typeof SORT_OPTIONS)[number]['value'])}>
+                                    <Select value={selectedStatus || 'all'} onValueChange={(value) => setSelectedStatus(value === 'all' ? '' : value)}>
                                         <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
-                                            <SelectValue placeholder={t('featured')} />
+                                            <SelectValue placeholder={t('item-status')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {SORT_OPTIONS.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {t(option.label)}
+                                            <SelectItem value="all">
+                                                <span className="xl:hidden">{t('item-status')}</span>
+                                                <span className="hidden xl:inline">{t('item-status-all')}</span>
+                                            </SelectItem>
+                                            {allStatuses.map((status) => (
+                                                <SelectItem key={status} value={status}>
+                                                    {t(ITEM_STATUS_LABELS[status])}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
+
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className="h-11 gap-2 text-textColor-white/80 hover:bg-white/10 hover:text-textColor-white px-2 hidden md:block"
+                                        onClick={() => {
+                                            setSelectedType('')
+                                            setSelectedTag('')
+                                            setSelectedStatus('')
+                                        }}
+                                    >
+                                        <RotateCcw className="h-4 w-4" />
+                                    </Button>
                                 </div>
+                            </div>
+
+                            {/* Showing products */}
+                            <p className="text-textColor-white/80">
+                                {t('showing')} <span className="font-bold text-textColor-white">{sortedItems.length}</span>{' '}
+                                {t('products')}
+                            </p>
+
+                            {/* Sort by — last item so it wraps first */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-textColor-white/80">{t('sort-by')}:</span>
+                                <Select value={selectedSort} onValueChange={(value) => setSelectedSort(value as (typeof SORT_OPTIONS)[number]['value'])}>
+                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                        <SelectValue placeholder={t('featured')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {SORT_OPTIONS.map((option) => (
+                                            <SelectItem key={option.value} value={option.value}>
+                                                {t(option.label)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </div>
@@ -903,156 +916,6 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                     <div className="flex-1 p-6">
                         {sortedItems.length > 0 ? (
                             <>
-                                {/* Selected item detail view */}
-                                {selectedItem && (
-                                    <div className="mb-8 flex flex-col gap-4 rounded-lg border bg-white p-4 md:flex-row">
-                                        {/* Left: Image */}
-                                        <div className="w-full md:w-1/2">
-                                            {/* Main image with tag overlays */}
-                                            {(() => {
-                                                const displayUrl = activeImageUrl ?? selectedItem.imageUrl
-                                                return (
-                                                    <div
-                                                        className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-md bg-gray-100 transition-transform hover:scale-[1.01]"
-                                                        onClick={() => { if (displayUrl) openImageModal(displayUrl) }}
-                                                    >
-                                                        {displayUrl ? (
-                                                            <Image
-                                                                src={displayUrl}
-                                                                alt={selectedItem.title}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="flex h-full w-full items-center justify-center text-gray-400">
-                                                                No Image
-                                                            </div>
-                                                        )}
-
-                                                        {/* Tags overlay — top-left corner */}
-                                                        {selectedItem.tags.length > 0 && (
-                                                            <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                                                                {selectedItem.tags.map((tag, idx) => (
-                                                                    <Badge
-                                                                        key={`${selectedItem.id}-tag-${idx}`}
-                                                                        className="text-[10px] bg-black/60 text-white border-0 backdrop-blur-sm"
-                                                                    >
-                                                                        {tag}
-                                                                    </Badge>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Hover magnifier overlay */}
-                                                        {displayUrl && (
-                                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-10">
-                                                                <div className="rounded-full bg-white bg-opacity-90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                                                    <Search className="h-5 w-5 text-gray-700" />
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )
-                                            })()}
-
-                                            {/* Thumbnail strip */}
-                                            {selectedItem.images && selectedItem.images.length > 0 && (
-                                                <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-                                                    {/* Main image as first thumbnail */}
-                                                    {selectedItem.imageUrl && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setActiveImageUrl(null)}
-                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${activeImageUrl === null
-                                                                    ? 'border-blue-500'
-                                                                    : 'border-transparent hover:border-gray-300'
-                                                                }`}
-                                                        >
-                                                            <Image
-                                                                src={selectedItem.imageUrl}
-                                                                alt="Main image"
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </button>
-                                                    )}
-                                                    {selectedItem.images.map((imgUrl, idx) => (
-                                                        <button
-                                                            key={idx}
-                                                            type="button"
-                                                            onClick={() => setActiveImageUrl(imgUrl)}
-                                                            className={`relative h-14 w-20 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${activeImageUrl === imgUrl
-                                                                    ? 'border-blue-500'
-                                                                    : 'border-transparent hover:border-gray-300'
-                                                                }`}
-                                                        >
-                                                            <Image
-                                                                src={imgUrl}
-                                                                alt={`Image ${idx + 1}`}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Right: Info */}
-                                        <div className="w-full space-y-3 md:w-1/2">
-                                            <h2 className="text-2xl font-bold text-gray-900">
-                                                {selectedItem.title}
-                                            </h2>
-                                            <p className="text-sm text-gray-500">
-                                                {t(selectedItem.type)} • {t(ITEM_STATUS_LABELS[selectedItem.status])}
-                                            </p>
-                                            <p className="text-xl font-semibold text-gray-900">
-                                                {typeof selectedItem.price === 'string'
-                                                    ? `$${parseFloat(selectedItem.price).toFixed(2)} ${selectedItem.currency}`
-                                                    : `$${selectedItem.price.toFixed(2)} ${selectedItem.currency}`}
-                                            </p>
-                                            {selectedItem.discountMemberPercent != null &&
-                                                selectedItem.discountMemberPercent > 0 && (
-                                                    <span className="inline-flex items-center gap-1 rounded-full border border-bgColor-secondary400 bg-bgColor-secondary50 px-2 py-0.5 text-xs font-medium text-amber-700 w-fit">
-                                                        ✦ {t('member-price')}:{' '}
-                                                        {(() => {
-                                                            const numericPrice =
-                                                                typeof selectedItem.price === 'string'
-                                                                    ? parseFloat(selectedItem.price)
-                                                                    : selectedItem.price
-                                                            const safePrice = Number.isNaN(numericPrice)
-                                                                ? 0
-                                                                : numericPrice
-                                                            const discounted =
-                                                                safePrice *
-                                                                (1 -
-                                                                    selectedItem.discountMemberPercent! /
-                                                                    100)
-
-                                                            return `$${discounted.toFixed(2)} ${selectedItem.currency} (${selectedItem.discountMemberPercent}% off)`
-                                                        })()}
-                                                    </span>
-                                                )}
-
-                                            {selectedItem.description && (
-                                                <div className="max-w-none text-sm text-gray-700">
-                                                    <TextPreview value={selectedItem.description || ''} />
-                                                </div>
-                                            )}
-
-                                            <div>
-                                                <Button
-                                                    className="bg-bgColor-brand900 text-white hover:bg-bgColor-brand600"
-                                                    onClick={() => selectedItem && handleAddItemToCart(selectedItem, selectedShopId, selectedShop?.title ?? '')}
-                                                >
-                                                    <ShoppingCart className="mr-2 h-4 w-4" />
-                                                    {t('add-to-cart')}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
                                 {/* Product cards grid */}
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                     {sortedItems.map((item) => {
@@ -1063,7 +926,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                             <div
                                                 key={item.id}
                                                 className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md cursor-pointer transition-transform duration-200 hover:scale-105"
-                                                onClick={() => { setSelectedItem(item); setActiveImageUrl(null) }}
+                                                onClick={() => setSelectedItem(item)}
                                             >
                                                 {/* Image Container */}
                                                 <div className="relative w-full h-48 bg-gray-100">
@@ -1154,14 +1017,12 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                         <ShopItemCarousel
                                             items={items}
                                             onItemClick={(item) => {
-                                                setSelectedShopId(shop.id)
                                                 setSelectedItem(item)
-                                                setActiveImageUrl(null)
+                                                setSelectedItemShop({ id: shop.id, title: shop.title })
                                             }}
                                             onAddToCart={(item) => {
-                                                setSelectedShopId(shop.id)
                                                 setSelectedItem(item)
-                                                setActiveImageUrl(null)
+                                                setSelectedItemShop({ id: shop.id, title: shop.title })
                                                 handleAddItemToCart(item, shop.id, shop.title)
                                             }}
                                         />
@@ -1176,6 +1037,20 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                     </div>
                 )}
             </div>
+
+            {/* Item detail modal — shown in both single-shop and all-shops views */}
+            {selectedItem && (
+                <ShopItemDetailedView
+                    item={selectedItem}
+                    onClose={() => { setSelectedItem(null); setSelectedItemShop(null) }}
+                    onAddToCart={() => {
+                        const shopId = selectedItemShop?.id ?? selectedShopId
+                        const shopTitle = selectedItemShop?.title ?? selectedShop?.title ?? ''
+                        handleAddItemToCart(selectedItem, shopId, shopTitle)
+                    }}
+                    onOpenImageModal={openImageModal}
+                />
+            )}
 
             <Sheet open={isCartSheetOpen} onOpenChange={handleCartSheetOpenChange}>
                 <SheetContent
@@ -1322,6 +1197,106 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                         >
                             ✕
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Shop Select Modal — small screens only */}
+            {isShopSelectModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center"
+                    onClick={() => setIsShopSelectModalOpen(false)}
+                >
+                    <div
+                        className="mx-0 max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl sm:mx-4 sm:max-w-sm sm:rounded-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="mb-4 flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-gray-800">{t('shops')}</h2>
+                            <button
+                                type="button"
+                                onClick={() => setIsShopSelectModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Shop Type Filter */}
+                        <div className="mb-4">
+                            <Select value={selectedShopType || 'all'} onValueChange={(value) => setSelectedShopType(value === 'all' ? '' : value)}>
+                                <SelectTrigger className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700">
+                                    <SelectValue placeholder={t('all-shop-types')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">{t('all-shop-types')}</SelectItem>
+                                    {SHOP_TYPE_OPTIONS.map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                            {t(type)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Shop List */}
+                        <div className="space-y-4">
+                            {/* All shops option */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSelectedShopId('')
+                                    setSelectedItem(null)
+                                    setIsShopSelectModalOpen(false)
+                                }}
+                                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${!selectedShopId
+                                    ? 'bg-bgColor-brand900 text-white font-medium'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                    }`}
+                            >
+                                {t('all-shops')}
+                            </button>
+
+                            {SHOP_TYPE_OPTIONS.map((shopType) => {
+                                const shopsInType = shopsGroupedByType[shopType]
+                                if (!shopsInType || shopsInType.length === 0) return null
+                                if (selectedShopType && selectedShopType !== shopType) return null
+
+                                return (
+                                    <div key={shopType} className="space-y-1">
+                                        <h3 className="px-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                            {t(shopType)}
+                                        </h3>
+                                        {shopsInType.map((shop) => {
+                                            const isActive = shop.id === selectedShopId
+                                            return (
+                                                <button
+                                                    key={shop.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedShopId(shop.id)
+                                                        setSelectedItem(null)
+                                                        setIsShopSelectModalOpen(false)
+                                                    }}
+                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all ${isActive
+                                                        ? 'bg-bgColor-brand900 text-white font-medium'
+                                                        : 'text-gray-700 hover:bg-gray-100'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span>{shop.title}</span>
+                                                        <span className={`text-xs ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
+                                                            {shop.shopItems.length}
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
             )}

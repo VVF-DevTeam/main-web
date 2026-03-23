@@ -155,7 +155,7 @@ const EventDescription = ({ event }: EventDescriptionProps) => {
           Add a description for this event.
         </p>
       ) : (
-        <div className="text-muted-foreground">
+        <div className="text-muted-foreground text-pretty">
           <TextPreview value={event.description} />
         </div>
       )}

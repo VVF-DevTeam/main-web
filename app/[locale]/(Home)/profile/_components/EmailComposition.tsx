@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import Loader from '@/components/loader/Loader'
 
-import 'react-quill/dist/quill.snow.css'
+import 'react-quill-new/dist/quill.snow.css'
 
 import {
   Form,
