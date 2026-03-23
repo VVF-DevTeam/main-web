@@ -77,7 +77,7 @@ const AuthButtons = ({ mode }: { mode: string }) => {
         <Link
           href="/signUp"
           className={cn(
-            'hidden items-center justify-center whitespace-nowrap rounded-md px-6 py-[10px] text-xl text-textColor-brand900 transition-all hover:underline lg:flex',
+            'hidden items-center justify-center whitespace-nowrap rounded-md px-2 py-[10px] text-xl text-textColor-brand900 transition-all hover:underline lg:flex',
             mode === 'desktop' ? 'gap-x-[5px]' : 'mt-2 h-full w-full gap-x-4 rounded-md p-4'
           )}
         >
@@ -106,7 +106,7 @@ const AuthButtons = ({ mode }: { mode: string }) => {
           <button
             onClick={() => handleAuth('login')}
             className={cn(
-              'h-[28px] max-w-[120px] items-center justify-center whitespace-nowrap rounded-md px-4 py-5 text-lg text-textColor-white transition-all lg:px-12 bg-bgColor-brand900',
+              'h-[28px] max-w-[120px] items-center justify-center whitespace-nowrap rounded-md px-4 py-5 text-lg text-textColor-white transition-all lg:px-6 bg-bgColor-brand900',
               isActive ? 'hidden' : 'flex hover:bg-bgColor-brand900/80'
             )}
           >

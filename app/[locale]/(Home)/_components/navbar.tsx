@@ -25,7 +25,7 @@ const Navbar = () => {
       </div>
 
       {/* Desktop: 3-col grid — logo | nav links | auth */}
-      <div className="hidden md:grid w-full grid-cols-3 items-center px-2 md:pr-6 lg:pl-8 lg:pr-16">
+      <div className="hidden md:grid w-full grid-cols-3 items-center px-2 md:pr-4 lg:pl-8 lg:pr-8">
         <div className="flex h-[70px] items-center pl-2">
           <Link href="/">
             <CustomIcon />
