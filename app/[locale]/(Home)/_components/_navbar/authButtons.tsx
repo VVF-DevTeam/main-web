@@ -145,7 +145,7 @@ const AuthButtons = ({ mode }: { mode: string }) => {
             setIsProfileOpen(true)
           }}
           onMouseLeave={() => {
-            closeTimer.current = setTimeout(() => setIsProfileOpen(false), 1500)
+            closeTimer.current = setTimeout(() => setIsProfileOpen(false), 1000)
           }}
         >
           <Link

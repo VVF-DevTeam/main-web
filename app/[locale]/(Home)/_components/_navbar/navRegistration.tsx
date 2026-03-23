@@ -38,7 +38,7 @@ const NavRegistration: React.FC<NavRegistrationProps> = ({ mode }) => {
 
   const handleMouseLeave = () => {
     if (mode !== 'desktop') return
-    closeTimer.current = setTimeout(() => setIsOpen(false), 1000)
+    closeTimer.current = setTimeout(() => setIsOpen(false), 200)
   }
 
   return (

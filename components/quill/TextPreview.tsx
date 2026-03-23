@@ -1,18 +1,19 @@
 'use client'
-import React, { useMemo } from 'react'
-import dynamic from 'next/dynamic'
+import React from 'react'
 
-import 'react-quill/dist/quill.snow.css'
+import 'react-quill-new/dist/quill.bubble.css'
+
 interface TextPreviewProps {
   value: string
 }
-const TextPreview = ({ value }: TextPreviewProps) => {
-  const ReactQuill = useMemo(
-    () => dynamic(() => import('react-quill-new'), { ssr: false }),
-    []
-  )
 
-  return <ReactQuill className="h-fit" theme="bubble" value={value} readOnly />
+const TextPreview = ({ value }: TextPreviewProps) => {
+  return (
+    <div
+      className="ql-editor !py-0 !min-h-0 !h-auto"
+      dangerouslySetInnerHTML={{ __html: value }}
+    />
+  )
 }
 
 export default TextPreview
