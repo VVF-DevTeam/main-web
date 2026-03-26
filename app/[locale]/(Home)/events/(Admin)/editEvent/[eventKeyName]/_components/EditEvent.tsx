@@ -338,7 +338,7 @@ export default function EditEvent({
           </div>
 
           {/* Event Form */}
-          <div className="flex flex-col gap-y-8">
+          <div className="col-span-full flex flex-col gap-y-8">
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step XXII :</span> Event Form (Optional)
             </h2>

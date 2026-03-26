@@ -76,10 +76,12 @@ interface Payment {
 type FormResponse = {
   questionId: string
   question: string
-  answer: string
+  answer: string | string[]
   questionType: string
   required: boolean
   options: string[]
+  /** 1-based index of the registration form this answer belongs to */
+  formNumber?: number
 }
 
 type FormResponsesData = {
@@ -709,43 +711,51 @@ export default function EventStatistics({
   )
 }
 
-// Component to display form responses grouped by question
+type QuestionAggregate = {
+  question: string
+  questionType: string
+  required: boolean
+  options: string[]
+  responses: Array<{
+    paymentId: string
+    customerName: string
+    customerEmail: string
+    answer: string | string[]
+  }>
+}
+
+// Component to display form responses grouped by form number, then by question
 function FormResponsesView({ payments }: { payments: Payment[] }) {
-  // Aggregate all form responses by question
-  const questionMap = new Map<
-    string,
-    {
-      question: string
-      questionType: string
-      required: boolean
-      options: string[]
-      responses: Array<{
-        paymentId: string
-        customerName: string
-        customerEmail: string
-        answer: string
-      }>
-    }
-  >()
+  const byFormNumber = new Map<number, Map<string, QuestionAggregate>>()
 
   payments.forEach((payment) => {
     if (!payment.formResponses) return
 
     const formData = payment.formResponses as FormResponsesData
     if (!formData.responses || !Array.isArray(formData.responses)) return
-
+    console.log(formData)
     const customerName =
       payment.guestName || payment.user?.name || 'Unknown'
     const customerEmail =
       payment.guestEmail || payment.user?.email || 'Unknown'
 
     formData.responses.forEach((response: FormResponse) => {
+      const formNumber =
+        typeof response.formNumber === 'number' && response.formNumber > 0
+          ? response.formNumber
+          : 1
+
+      if (!byFormNumber.has(formNumber)) {
+        byFormNumber.set(formNumber, new Map())
+      }
+      const questionMap = byFormNumber.get(formNumber)!
+
       if (!questionMap.has(response.questionId)) {
         questionMap.set(response.questionId, {
           question: response.question,
           questionType: response.questionType,
           required: response.required,
-          options: response.options,
+          options: response.options ?? [],
           responses: [],
         })
       }
@@ -759,7 +769,11 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
     })
   })
 
-  if (questionMap.size === 0) {
+  const sortedFormNumbers = Array.from(byFormNumber.keys()).sort(
+    (a, b) => a - b
+  )
+
+  if (sortedFormNumbers.length === 0) {
     return (
       <div className="text-center text-muted-foreground p-8">
         No form responses available
@@ -768,149 +782,232 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
   }
 
   return (
-    <div className="space-y-8">
-      {Array.from(questionMap.entries()).map(([questionId, data]) => (
-        <div key={questionId} className="border-b pb-6 last:border-b-0">
-          <div className="mb-4">
-            <h4 className="text-base font-semibold text-gray-900">
-              {data.question}
-              {data.required && (
-                <span className="ml-2 text-xs text-red-500">*Required</span>
-              )}
-            </h4>
-            <p className="text-xs text-gray-500 mt-1">
-              Type: {data.questionType.replace('_', ' ')}
-              {data.options.length > 0 &&
-                ` • Options: ${data.options.join(', ')}`}
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-300 bg-gray-50">
-                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                    Customer Name
-                  </th>
-                  <th className="px-4 py-2 text-left font-semibold text-gray-700 hidden md:table-cell">
-                    Email
-                  </th>
-                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
-                    Answer
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.responses.map((response, index) => (
-                  <tr
-                    key={`${response.paymentId}-${index}`}
-                    className="border-b border-gray-200 last:border-0"
-                  >
-                    <td className="px-4 py-3 text-gray-700">
-                      {response.customerName}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700 hidden md:table-cell">
-                      {response.customerEmail}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {renderAnswer(response.answer, data.questionType)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Summary for choice questions */}
-          {(data.questionType === 'single_choice' ||
-            data.questionType === 'multi_choice') &&
-            (() => {
-              const summary = getSummary(data.responses, data.questionType)
-              if (summary.length === 0) return null
-              const total = summary.reduce((sum, item) => sum + item.count, 0)
-              return (
-                <div className="mt-3 rounded-md bg-blue-50 p-3">
-                  <p className="text-xs font-semibold text-blue-900 mb-2">
-                    Summary:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {summary.map((item, idx) => {
-                      const percentage = ((item.count / total) * 100).toFixed(1)
-                      return (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
-                        >
-                          {item.value}: {item.count} ({percentage}%)
+    <div className="space-y-10">
+      {sortedFormNumbers.map((formNumber) => {
+        const questionMap = byFormNumber.get(formNumber)!
+        return (
+          <section key={formNumber} className="space-y-6">
+            <div className="border-b border-gray-200 pb-3">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Form {formNumber}
+              </h3>
+            </div>
+            <div className="space-y-8">
+              {Array.from(questionMap.entries()).map(([questionId, data]) => (
+                <div key={questionId} className="border-b pb-6 last:border-0">
+                  <div className="mb-4">
+                    <h4 className="text-base font-semibold text-gray-900">
+                      {data.question}
+                      {data.required && (
+                        <span className="ml-2 text-xs text-red-500">
+                          *Required
                         </span>
-                      )
-                    })}
+                      )}
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Type: {data.questionType.replace('_', ' ')}
+                      {data.options.length > 0 &&
+                        ` • Options: ${data.options.join(', ')}`}
+                    </p>
                   </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-300 bg-gray-50">
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Customer Name
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700 hidden md:table-cell">
+                            Email
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Answer
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.responses.map((response, index) => (
+                          <tr
+                            key={`${response.paymentId}-${index}`}
+                            className="border-b border-gray-200 last:border-0"
+                          >
+                            <td className="px-4 py-3 text-gray-700">
+                              {response.customerName}
+                            </td>
+                            <td className="px-4 py-3 text-gray-700 hidden md:table-cell">
+                              {response.customerEmail}
+                            </td>
+                            <td className="px-4 py-3 text-gray-700">
+                              {renderAnswer(
+                                response.answer,
+                                data.questionType
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {(data.questionType === 'single_choice' ||
+                    data.questionType === 'multi_choice') &&
+                    (() => {
+                      const summary = getSummary(
+                        data.responses,
+                        data.questionType
+                      )
+                      if (summary.length === 0) return null
+                      const total = summary.reduce(
+                        (sum, item) => sum + item.count,
+                        0
+                      )
+                      return (
+                        <div className="mt-3 rounded-md bg-blue-50 p-3">
+                          <p className="text-xs font-semibold text-blue-900 mb-2">
+                            Summary:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {summary.map((item, idx) => {
+                              const percentage = (
+                                (item.count / total) *
+                                100
+                              ).toFixed(1)
+                              return (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+                                >
+                                  {item.value}: {item.count} ({percentage}%)
+                                </span>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })()}
                 </div>
-              )
-            })()}
-        </div>
-      ))}
+              ))}
+            </div>
+          </section>
+        )
+      })}
     </div>
   )
 }
 
 // Helper function to render answer based on question type
-function renderAnswer(answer: string, questionType: string): React.ReactNode {
+function renderAnswer(
+  answer: string | string[],
+  questionType: string
+): React.ReactNode {
   if (!answer) return <span className="text-gray-400 italic">No answer</span>
+  if (Array.isArray(answer) && answer.length === 0) {
+    return <span className="text-gray-400 italic">No answer</span>
+  }
+
+  const answerString = Array.isArray(answer) ? answer[0] : answer
 
   switch (questionType) {
     case 'date':
       try {
-        const date = new Date(answer)
+        const date = new Date(answerString)
         return date.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         })
       } catch {
-        return answer
+        return answerString
       }
     case 'multi_choice':
+      const CUSTOM_INPUT_TOKEN = ':$customInput$'
+      const items = Array.isArray(answer)
+        ? answer
+        : answer.split(',').map((s) => s.trim()).filter(Boolean)
       return (
         <div className="flex flex-wrap gap-1">
-          {answer.split(',').map((item, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800"
-            >
-              {item.trim()}
-            </span>
-          ))}
+          {items.map((item, idx) => {
+            const customTokenIdx = item.indexOf(CUSTOM_INPUT_TOKEN)
+            if (customTokenIdx !== -1) {
+              const baseLabel = item.slice(0, customTokenIdx)
+              const tokenEndIdx = customTokenIdx + CUSTOM_INPUT_TOKEN.length
+              const remainder = item.slice(tokenEndIdx) // expected ":'...'"
+
+              if (remainder.startsWith(":'") && remainder.endsWith("'")) {
+                const userText = remainder.slice(2, -1)
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800"
+                  >
+                    {baseLabel}: {userText}
+                  </span>
+                )
+              }
+
+              // Token-only custom selection (no typed text)
+              return (
+                <span
+                  key={idx}
+                  className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800"
+                >
+                  {baseLabel}
+                </span>
+              )
+            }
+
+            return (
+              <span
+                key={idx}
+                className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800"
+              >
+                {item.trim()}
+              </span>
+            )
+          })}
         </div>
       )
     case 'long_text':
-      return <div className="whitespace-pre-wrap">{answer}</div>
+      return <div className="whitespace-pre-wrap">{answerString}</div>
     default:
-      return answer
+      return answerString
   }
 }
 
 // Helper function to get summary for choice questions
 function getSummary(
-  responses: Array<{ answer: string }>,
+  responses: Array<{ answer: string | string[] }>,
   questionType: string
 ): Array<{ value: string; count: number }> {
   const countMap = new Map<string, number>()
 
   responses.forEach((response) => {
     if (questionType === 'multi_choice') {
-      // For multi-choice, split by comma and count each option
-      response.answer.split(',').forEach((item) => {
-        const trimmed = item.trim()
-        // Skip empty values
-        if (trimmed) {
-          countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
-        }
+      const CUSTOM_INPUT_TOKEN = ':$customInput$'
+      const raw = response.answer
+      const items = Array.isArray(raw)
+        ? raw
+        : raw.split(',').map((s) => s.trim()).filter(Boolean)
+
+      // Count each selected option; for custom-input options, count by token-only value.
+      items.forEach((item) => {
+        const trimmed = typeof item === 'string' ? item.trim() : ''
+        if (!trimmed) return
+
+        const tokenIdx = trimmed.indexOf(CUSTOM_INPUT_TOKEN)
+        const normalized =
+          tokenIdx !== -1
+            ? trimmed.slice(0, tokenIdx + CUSTOM_INPUT_TOKEN.length)
+            : trimmed
+
+        countMap.set(normalized, (countMap.get(normalized) || 0) + 1)
       })
     } else {
       // For single choice, count the whole answer
-      const trimmed = response.answer.trim()
+      const trimmed = Array.isArray(response.answer)
+        ? ''
+        : response.answer.trim()
       // Skip empty values
       if (trimmed) {
         countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
