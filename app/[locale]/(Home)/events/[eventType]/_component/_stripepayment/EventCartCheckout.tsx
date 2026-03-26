@@ -830,7 +830,7 @@ export default function EventCartCheckout({
   const handleMasterCheckout = useCallback(async (
     representativeGuest?: GuestInfo,
     otherGuests?: GuestInfo[],
-    eventFormResponses?: Record<string, string>
+    eventFormResponses?: FormResponses
   ) => {
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -901,14 +901,16 @@ export default function EventCartCheckout({
       const formattedFormResponses = eventFormResponses && Object.keys(eventFormResponses).length > 0
         ? {
             responses: Object.entries(eventFormResponses).map(([questionId, answer]) => {
-              const question = eventFormData?.questions.find(q => q.id === questionId)
+              const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
+              const formNumber = answer?.formNumber
               return {
                 questionId,
                 question: question?.question || '',
-                answer,
+                answer: answer?.answer,
                 questionType: question?.type || '',
                 required: question?.required || false,
                 options: question?.options || [],
+                formNumber,
               }
             }),
           }
@@ -1011,7 +1013,7 @@ export default function EventCartCheckout({
     })
     
     // If there's no event form, proceed directly to checkout
-    if (!eventFormData || !eventFormData.questions || eventFormData.questions.length === 0) {
+    if (!eventFormData || !eventFormData.some(f => f.questions.length > 0)) {
       setShowCheckoutDialog(false)
       handleMasterCheckout(
         {

@@ -99,14 +99,16 @@ export default function SingleCheckoutButton({
       const formattedFormResponses = formResponses && Object.keys(formResponses).length > 0
         ? {
             responses: Object.entries(formResponses).map(([questionId, answer]) => {
-              const question = eventFormData?.questions.find(q => q.id === questionId)
+              const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
+              const formNumber = answer?.formNumber
               return {
                 questionId,
                 question: question?.question || '',
-                answer,
+                answer: answer?.answer,
                 questionType: question?.type || '',
                 required: question?.required || false,
                 options: question?.options || [],
+                formNumber,
               }
             }),
           }
@@ -202,7 +204,7 @@ export default function SingleCheckoutButton({
     setGuestInfo(guestInfo)
 
     // If there's no event form, proceed directly to checkout
-    if (!eventFormData || !eventFormData.questions || eventFormData.questions.length === 0) {
+    if (!eventFormData || !eventFormData.some(f => f.questions.length > 0)) {
       setShowCheckoutDialog(false)
       handleCheckout(stripePriceId, guestInfo)
     }
