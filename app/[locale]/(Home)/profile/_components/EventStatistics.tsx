@@ -980,37 +980,55 @@ function getSummary(
   responses: Array<{ answer: string | string[] }>,
   questionType: string
 ): Array<{ value: string; count: number }> {
+  const CUSTOM_INPUT_TOKEN = ':$customInput$'
   const countMap = new Map<string, number>()
+  const normalizeChoiceForSummary = (value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return ''
+
+    // Current stored custom format:
+    // "<option>:$customInput$:'<text>'" (multi)
+    // "<option>:$customInput$:<text>"   (single)
+    const tokenIndex = trimmed.indexOf(CUSTOM_INPUT_TOKEN)
+    if (tokenIndex !== -1) {
+      return trimmed.slice(0, tokenIndex).trim()
+    }
+
+    // Backward-compatible cleanup for values shaped like "<option>:'<text>'".
+    const quotedCustomMatch = trimmed.match(/^(.*?):'(.*)'$/)
+    if (quotedCustomMatch) {
+      return quotedCustomMatch[1].trim()
+    }
+
+    return trimmed
+  }
 
   responses.forEach((response) => {
     if (questionType === 'multi_choice') {
-      const CUSTOM_INPUT_TOKEN = ':$customInput$'
       const raw = response.answer
       const items = Array.isArray(raw)
         ? raw
         : raw.split(',').map((s) => s.trim()).filter(Boolean)
 
-      // Count each selected option; for custom-input options, count by token-only value.
+      // Count each selected option after removing custom-input token.
       items.forEach((item) => {
         const trimmed = typeof item === 'string' ? item.trim() : ''
         if (!trimmed) return
 
-        const tokenIdx = trimmed.indexOf(CUSTOM_INPUT_TOKEN)
-        const normalized =
-          tokenIdx !== -1
-            ? trimmed.slice(0, tokenIdx + CUSTOM_INPUT_TOKEN.length)
-            : trimmed
+        const normalized = normalizeChoiceForSummary(trimmed)
+        if (!normalized) return
 
         countMap.set(normalized, (countMap.get(normalized) || 0) + 1)
       })
     } else {
-      // For single choice, count the whole answer
+      // For single choice, count the answer after removing custom-input token.
       const trimmed = Array.isArray(response.answer)
         ? ''
         : response.answer.trim()
+      const normalized = normalizeChoiceForSummary(trimmed)
       // Skip empty values
-      if (trimmed) {
-        countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+      if (normalized) {
+        countMap.set(normalized, (countMap.get(normalized) || 0) + 1)
       }
     }
   })
