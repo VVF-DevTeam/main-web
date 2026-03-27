@@ -281,7 +281,9 @@ const ClassDescription = async ({
         </div>
 
         {/* Sponsors */}
-        <SponsorsList sponsors={sponsors} headerText={t('headerSponsors')} />
+        {sponsors && sponsors.length > 0 && (
+          <SponsorsList sponsors={sponsors} headerText={t('headerSponsors')} />
+        )}
 
         {/* Schedule */}
         <div className="mt-4 min-w-full">
