@@ -17,11 +17,13 @@ import DeleteJobButton from './DeleteJobButton'
 
 interface EditJobProps {
   job: JobForEditing
+  isSuperAdmin?: boolean
   showBackButton?: boolean
 }
 
 export default function EditJob({
   job,
+  isSuperAdmin = false,
   showBackButton = false,
 }: EditJobProps) {
 
@@ -60,7 +62,7 @@ export default function EditJob({
 
           {/* Buttons */}
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
-            <DeleteJobButton jobId={job.id} />
+            <DeleteJobButton jobId={job.id} isSuperAdmin={isSuperAdmin} />
             <PublishButton
               id={job.id}
               type={'job'}

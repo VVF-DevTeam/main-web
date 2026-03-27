@@ -16,16 +16,25 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface DeleteJobButtonProps {
   jobId: string
+  isSuperAdmin: boolean
 }
 
-const DeleteJobButton = ({ jobId }: DeleteJobButtonProps) => {
+const DeleteJobButton = ({ jobId, isSuperAdmin }: DeleteJobButtonProps) => {
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const deniedMessage =
+    'only superadmin can delete, please contact Khai or Trong'
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -73,36 +82,60 @@ const DeleteJobButton = ({ jobId }: DeleteJobButtonProps) => {
   return (
     <>
       {isDeleting && <Loader />}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant={'destructive'}>Delete Job</Button>
-        </DialogTrigger>
-        <DialogContent className="bg-bgColor-white">
-          <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
-            <DialogDescription className="text-textColor-black">
-              This action cannot be undone. This will permanently delete the job
-              and remove all associated data from the server.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Job'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {!isSuperAdmin ? (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className="inline-block cursor-not-allowed"
+                onClick={() => toast.info(deniedMessage)}
+              >
+                <Button
+                  variant={'destructive'}
+                  disabled
+                  className="pointer-events-none"
+                >
+                  Delete Job
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs bg-bgColor-black">
+              <p className="text-sm text-textColor-brand600">{deniedMessage}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'destructive'}>Delete Job</Button>
+          </DialogTrigger>
+          <DialogContent className="bg-bgColor-white">
+            <DialogHeader>
+              <DialogTitle>Are you sure?</DialogTitle>
+              <DialogDescription className="text-textColor-black">
+                This action cannot be undone. This will permanently delete the
+                job and remove all associated data from the server.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Job'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }

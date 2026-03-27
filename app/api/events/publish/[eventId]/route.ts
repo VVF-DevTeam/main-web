@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { revalidateTag } from 'next/cache'
 
@@ -7,6 +8,11 @@ export const PATCH = async (
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     // extract the id from the params
     const { eventId } = await params
     const eventExists = await prisma.event.findUnique({

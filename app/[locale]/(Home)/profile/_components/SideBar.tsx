@@ -35,7 +35,8 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
 
   const isAdmin = user.role.includes('ADMIN')
   const isHost = user.role.includes('HOST')
-  const isAdminOrHost = isAdmin || isHost
+  const isSuperAdmin = user.role.includes('SUPERADMIN')
+  const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
   const adminSections = [
     { key: 'admin-event-statistics', label: t('event-manager') },
     { key: 'admin-payment-management', label: t('payment-management') },
@@ -109,14 +110,14 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
           })}
         </ul>
 
-        {isAdminOrHost && (
+        {isAdminOrHostOrSuperAdmin && (
           <>
             <div className="my-6 border-b border-bgColor-black"/>
             <h2 className="text-textColor-black mb-4 text-xl font-semibold">
               Admin Section
             </h2>
             <ul className="space-y-4">
-              {isAdmin && adminSections.map(({ key, label }) => (
+              {(isAdmin || isSuperAdmin) && adminSections.map(({ key, label }) => (
                 <li key={key}>
                   <Link
                     href={`/${locale}/profile?section=${key}`}
@@ -170,7 +171,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
                         {t('view-all-events')}
                       </Link>
                     </li>
-                    {isAdmin && (
+                    {(isAdmin || isSuperAdmin) && (
                       <>
                         <li>
                           <Link
@@ -215,7 +216,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               </li>
 
               {/* Manage Jobs Dropdown */}
-              {isAdmin && (
+              {(isAdmin || isSuperAdmin) && (
                 <li>
                   <button
                     onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
@@ -260,7 +261,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               )}
 
               {/* Manage Shops Dropdown */}
-              {isAdmin && (
+              {(isAdmin || isSuperAdmin) && (
                 <li>
                   <button
                     onClick={() => setIsShopsDropdownOpen(!isShopsDropdownOpen)}
@@ -305,7 +306,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               )}
 
               {/* Manage Posts Dropdown */}
-              {isAdmin && (
+              {(isAdmin || isSuperAdmin) && (
                 <li>
                   <button
                     onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}

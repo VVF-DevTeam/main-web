@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { revalidateTag } from 'next/cache'
@@ -38,6 +39,11 @@ export const GET = async (request: Request) => {
 // Create an EventTicket
 export const POST = async (request: Request) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const {
       eventId,
       type,
@@ -123,6 +129,11 @@ export const POST = async (request: Request) => {
 // Update an EventTicket
 export const PUT = async (request: Request) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const {
       id, // EventTicket id (required for update)
       ...values
@@ -235,6 +246,11 @@ export const PUT = async (request: Request) => {
 // Delete an EventTicket
 export const DELETE = async (request: Request) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const { id } = await request.json()
 
     if (!id) {

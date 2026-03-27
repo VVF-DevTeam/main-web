@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { revalidateTag } from 'next/cache'
 
 export const POST = async (request: Request) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     // Destructure the request body
     const { title, eventType, keyName } = await request.json()
 

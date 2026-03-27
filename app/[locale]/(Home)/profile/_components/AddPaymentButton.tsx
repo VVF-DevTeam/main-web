@@ -579,7 +579,7 @@ const AddPaymentButton = ({
     const fetchData = async () => {
       try {
         // get list of events for ADMIN (all events)
-        if (user.role.includes('ADMIN')) {
+        if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
           const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
         } else if (user.role.includes('HOST')) {

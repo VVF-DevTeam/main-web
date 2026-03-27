@@ -19,6 +19,7 @@ const EditJobPage = async ({
   }
 
   const { jobKeyName, locale } = await params
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
 
   // Get current user info
   const user = await getCurrentUserInfo()
@@ -36,6 +37,7 @@ const EditJobPage = async ({
   return (
     <EditJob
       job={job}
+      isSuperAdmin={Boolean(isSuperAdmin)}
       showBackButton={true}
     />
   )

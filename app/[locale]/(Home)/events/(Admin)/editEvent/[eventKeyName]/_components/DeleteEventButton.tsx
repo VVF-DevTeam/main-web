@@ -16,16 +16,25 @@ import {
 } from '@/components/ui/dialog'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Loader from '@/components/loader/Loader'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface DeleteEventButtonProps {
   eventId: string
+  isSuperAdmin: boolean
 }
 
-const DeleteEventButton = ({ eventId }: DeleteEventButtonProps) => {
+const DeleteEventButton = ({ eventId, isSuperAdmin }: DeleteEventButtonProps) => {
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
+  const deniedMessage =
+    'Only Super Admin have delete permission, please contact Director of IT department (Khai) or any other Director'
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -73,36 +82,72 @@ const DeleteEventButton = ({ eventId }: DeleteEventButtonProps) => {
   return (
     <>
       {isDeleting && <Loader />}
-      <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={'destructive'}>Delete Event</Button>
-      </DialogTrigger>
-      <DialogContent className="bg-bgColor-white">
-        <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
-          <DialogDescription className="text-textColor-black">
-            This action cannot be undone. This will permanently delete the event
-            and remove all associated data from the server.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete Event'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      {!isSuperAdmin ? (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className="inline-block cursor-not-allowed"
+                onClick={() => toast.info("You are not authorized to delete this event", {
+                  description: (
+                    <div className="flex flex-col gap-1">
+                      <span>{deniedMessage}</span>
+                      <span style={{ color: 'var(--muted-foreground)' }}>
+                        {currentDateTime}
+                      </span>
+                    </div>
+                  ),
+                  style: {
+                    color: '#ef4444', // red-500 color
+                  },
+                })}
+              >
+                <Button
+                  variant={'destructive'}
+                  disabled
+                  className="pointer-events-none"
+                >
+                  Delete Event
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs bg-bgColor-black">
+              <p className="text-sm text-textColor-brand600">{deniedMessage}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'destructive'}>Delete Event</Button>
+          </DialogTrigger>
+          <DialogContent className="bg-bgColor-white">
+            <DialogHeader>
+              <DialogTitle>Are you sure?</DialogTitle>
+              <DialogDescription className="text-textColor-black">
+                This action cannot be undone. This will permanently delete the
+                event and remove all associated data from the server.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Event'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }

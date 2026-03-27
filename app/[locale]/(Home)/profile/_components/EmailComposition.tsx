@@ -97,7 +97,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
     const fetchData = async () => {
       try {
         // get list of events for user
-        if (user.role.includes('ADMIN')) {
+        if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
           const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
           setFilteredEvents(publishedEvents)

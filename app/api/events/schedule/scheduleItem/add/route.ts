@@ -1,9 +1,15 @@
 import { prisma } from '@/lib/db'
+import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 
 export const POST = async (request: Request) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     // Extract the data from the request
     const { scheduleItemId, ...data } = await request.json()
     // Check if the schedule item is null, if yes, then create a new item and return

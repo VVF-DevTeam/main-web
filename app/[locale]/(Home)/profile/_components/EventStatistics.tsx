@@ -121,7 +121,7 @@ export default function EventStatistics({
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        if (user.role.includes('ADMIN')) {
+        if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
           const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
           setFilteredEvents(publishedEvents)

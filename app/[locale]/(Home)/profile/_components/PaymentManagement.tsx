@@ -30,7 +30,7 @@ export default async function PaymentManagement({
   pageSize?: number
 }) {
   // Check if user has permission
-  if (!user.role.includes('ADMIN') && !user.role.includes('HOST')) {
+  if (!user.role.includes('ADMIN') && !user.role.includes('HOST') && !user.role.includes('SUPERADMIN')) {
     return <div>You are not allowed to view this page</div>
   }
 

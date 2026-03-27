@@ -63,7 +63,8 @@ export default function MobileSidebar({
   )
   const isAdmin = user?.role?.includes('ADMIN') ?? false
   const isHost = user?.role?.includes('HOST') ?? false
-  const isAdminOrHost = isAdmin || isHost
+  const isSuperAdmin = user?.role?.includes('SUPERADMIN') ?? false
+  const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
 
   return (
     <div className="block md:hidden">
@@ -108,14 +109,14 @@ export default function MobileSidebar({
             })}
           </ul>
 
-          {isAdminOrHost && (
+          {isAdminOrHostOrSuperAdmin && (
             <>
               <Separator className="my-6" />
               <h2 className="text-textColor-black mb-4 text-xl font-semibold">
                 Admin Section
               </h2>
               <ul className="space-y-4">
-                {isAdmin &&
+                {(isAdmin || isSuperAdmin) &&
                   Object.entries(sections)
                     .filter(([key]) => key.includes('admin'))
                     .map(([key, label]) => (
@@ -175,7 +176,7 @@ export default function MobileSidebar({
                           {t('view-all-events')}
                         </Link>
                       </li>
-                      {isAdmin && (
+                      {(isAdmin || isSuperAdmin) && (
                         <>
                           <li>
                             <Link
@@ -223,7 +224,7 @@ export default function MobileSidebar({
                 </li>
 
                 {/* Manage Jobs Dropdown */}
-                {isAdmin && (
+                {(isAdmin || isSuperAdmin) && (
                   <li>
                     <button
                       onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
@@ -270,7 +271,7 @@ export default function MobileSidebar({
                 )}
 
                 {/* Manage Shops Dropdown */}
-                {isAdmin && (
+                {(isAdmin || isSuperAdmin) && (
                   <li>
                     <button
                       onClick={() => setIsShopsDropdownOpen(!isShopsDropdownOpen)}
@@ -317,7 +318,7 @@ export default function MobileSidebar({
                 )}
 
                 {/* Manage Posts Dropdown */}
-                {isAdmin && (
+                {(isAdmin || isSuperAdmin) && (
                   <li>
                     <button
                       onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}

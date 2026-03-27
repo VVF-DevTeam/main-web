@@ -36,6 +36,7 @@ interface EditEventProps {
   event: EventForEditing
   categories: EventCategory[]
   allSeries: EventSeries[]
+  isSuperAdmin?: boolean
   showBackButton?: boolean
   categoriesLink?: string
   seriesLink?: string
@@ -46,6 +47,7 @@ export default function EditEvent({
   event,
   categories,
   allSeries,
+  isSuperAdmin = false,
   showBackButton = false,
   categoriesLink,
   seriesLink,
@@ -103,7 +105,10 @@ export default function EditEvent({
 
           {/* Buttons */}
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
-            <DeleteEventButton eventId={event.id} />
+            <DeleteEventButton
+              eventId={event.id}
+              isSuperAdmin={isSuperAdmin}
+            />
             <PublishButton
               id={event.id}
               type={'event'}

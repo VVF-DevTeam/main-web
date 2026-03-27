@@ -19,7 +19,8 @@ const EditEventPage = async ({
   // check if the current user is an admin or host to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
-    !(await roleCheck({ role: 'HOST' }))
+    !(await roleCheck({ role: 'HOST' })) &&
+    !(await roleCheck({ role: 'SUPERADMIN' }))
   ) {
     return redirect('/events')
   }
@@ -38,6 +39,7 @@ const EditEventPage = async ({
     getAllEventCategories(),
     getAllEventSeries(),
   ])
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
 
   if (!event) {
     return <NotFound />
@@ -48,6 +50,7 @@ const EditEventPage = async ({
       event={event}
       categories={categories}
       allSeries={allSeries}
+      isSuperAdmin={Boolean(isSuperAdmin)}
       showBackButton={true}
       categoriesLink="/events/createEventCategory"
       seriesLink="/events/createEventSeries"

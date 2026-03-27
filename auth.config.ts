@@ -128,19 +128,32 @@ export default {
 
         if (request.method !== 'GET') {
           if (!isMobile) {
-            // Check role for web app (cannot use roleCheck or use auth() because it will return useLayoutEffect, which leads to a mismatch between the initial   )
+            // Check role for web app (cannot use roleCheck or use auth() Next.js handles middleware first, 
+            // which will return useLayoutEffect mismatch error as auth() may not be available yet. 
+            // So we use roleCheckToken directly because it uses the incoming NextRequest to check if the user is Super Admin)
+            const isSuperAdmin = await roleCheckToken({ role: 'SUPERADMIN', req: request })
             const isAdmin = await roleCheckToken({
               role: 'ADMIN',
               req: request,
             })
             const isHost = await roleCheckToken({ role: 'HOST', req: request })
-            if (path.includes('categories') && !isAdmin) {
-              //For categories, only allow ADMIN
+            if (path.includes('categories') && !isAdmin && !isSuperAdmin) {
+              //For categories, only allow Super Admin and ADMIN
               return new NextResponse('Forbidden', { status: 403 })
-            } else if (path.includes('events') && !isAdmin && !isHost) {
-              // For events API, only allow Admin and Host
+            } else if (
+              request.method === 'DELETE' &&
+              (path.startsWith('/api/events/delete/') ||
+                path.startsWith('/api/posts/delete/') ||
+                path.startsWith('/api/jobs/delete/')) &&
+              !isSuperAdmin
+            ) {
+              // For destructive delete endpoints of events, posts, and jobs, only allow Super Admin
+              return new NextResponse('Forbidden', { status: 403 })
+            } else if (path.includes('events') && !isAdmin && !isHost && !isSuperAdmin) {
+              // For events API, only allow Super Admin, Admin, Host 
               return new NextResponse('Forbidden', { status: 403 })
             } else if (path.includes('jobs')) {
+              // TODO: Add separate check for each API endpoints of jobs and below
               // Only logged in user can apply
               if (path.includes('apply')) {
                 if (!(await roleCheckToken({ req: request }))) {
@@ -149,20 +162,20 @@ export default {
                   })
                 }
               } else {
-                // For job API, only allow Admin
-                if (!isAdmin) {
+                // For job API, only allow Super Admin and Admin
+                if (!isAdmin && !isSuperAdmin) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }
-            } else if (path.includes('posts') && !isAdmin) {
+            } else if (path.includes('posts') && !isAdmin && !isSuperAdmin) {
               // For Post like API, Only logged in user can like post
               if (path.includes('likes')) {
                 if (!(await roleCheckToken({ req: request }))) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               } else {
-                // For posts API, only allow Admin
-                if (!isAdmin) {
+                // For posts API, only allow Super Admin and Admin
+                if (!isAdmin && !isSuperAdmin) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }
@@ -415,8 +428,7 @@ export default {
         } catch (error) {
           lastError = error
           console.error(
-            `Failed to update emailVerified for user ${user.id} (attempt ${
-              attempt + 1
+            `Failed to update emailVerified for user ${user.id} (attempt ${attempt + 1
             }/${maxRetries + 1}):`,
             error
           )
@@ -475,8 +487,7 @@ export default {
         } catch (error) {
           lastError = error
           console.error(
-            `Failed to set USER role for user ${user.id} (attempt ${
-              attempt + 1
+            `Failed to set USER role for user ${user.id} (attempt ${attempt + 1
             }/${maxRetries + 1}):`,
             error
           )

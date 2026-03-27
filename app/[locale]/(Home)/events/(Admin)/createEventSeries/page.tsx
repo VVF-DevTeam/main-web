@@ -16,7 +16,8 @@ const createEventSeriesPage = async () => {
   // check if the current user is an admin to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
-    !(await roleCheck({ role: 'HOST' }))
+    !(await roleCheck({ role: 'HOST' })) &&
+    !(await roleCheck({ role: 'SUPERADMIN' }))
   ) {
     return redirect('/events')
   }

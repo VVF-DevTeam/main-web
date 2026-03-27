@@ -1,3 +1,4 @@
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
@@ -7,6 +8,11 @@ export const POST = async (
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const { eventId } = await params
     const categories = await request.json()
     const updatedCategories = await prisma.event.update({
@@ -40,7 +46,11 @@ export const DELETE = async (
   { params }: { params: Promise<{ eventId: string }> }
 ) => {
   try {
-    // Check if user is admin
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const { eventId } = await params
     const { categoryId } = await request.json()
     console.log(categoryId)

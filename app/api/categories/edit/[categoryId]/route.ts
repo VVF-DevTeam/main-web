@@ -1,3 +1,4 @@
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { NextResponse, NextRequest } from 'next/server'
 import { revalidateTag } from 'next/cache'
@@ -7,6 +8,11 @@ export const PUT = async (
   { params }: { params: Promise<{ categoryId: string }> }
 ) => {
   try {
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const { categoryId } = await params
     const data = await request.json()
 

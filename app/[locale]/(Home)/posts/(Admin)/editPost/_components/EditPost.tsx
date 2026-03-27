@@ -15,11 +15,13 @@ import DeletePostButton from '../[postId]/_components/DeletePostButton'
 
 interface EditPostProps {
   post: PostForEditing
+  isSuperAdmin?: boolean
   showBackButton?: boolean
 }
 
 export default function EditPost({
   post,
+  isSuperAdmin = false,
   showBackButton = false,
 }: EditPostProps) {
   const postFields = [
@@ -53,7 +55,7 @@ export default function EditPost({
           </div>
           <div className="flex-col-center gap-x-4 gap-y-4 md:flex-row">
             {/* Buttons */}
-            <DeletePostButton postId={post.id} />
+            <DeletePostButton postId={post.id} isSuperAdmin={isSuperAdmin} />
             <PublishButton
               id={post.id}
               canPublish={canPublish}

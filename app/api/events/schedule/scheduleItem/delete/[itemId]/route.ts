@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db'
+import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 
@@ -7,7 +8,11 @@ export const DELETE = async (
   { params }: { params: Promise<{ itemId: string }> }
 ) => {
   try {
-    // Check if user is admin
+    const session = await auth()
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const { itemId } = await params
 
     // Check if the schedule item exists

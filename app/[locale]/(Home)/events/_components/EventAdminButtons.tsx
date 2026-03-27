@@ -11,9 +11,10 @@ const EventAdminButtons = async () => {
   const userRole = session?.user?.role
   const isAdmin = userRole?.includes('ADMIN')
   const isHost = userRole?.includes('HOST')
+  const isSuperAdmin = userRole?.includes('SUPERADMIN')
 
   // Only show buttons for admin or host users
-  if (!isAdmin && !isHost) return null
+  if (!isAdmin && !isHost && !isSuperAdmin) return null
 
   return (
     <div className="flex-col-end flex-end-md my-6 gap-x-4 gap-y-3 px-6 md:flex-row">
@@ -30,7 +31,7 @@ const EventAdminButtons = async () => {
         </Button>
       </Link>
       {/* Create & Edit Tags */}
-      {isAdmin && (
+      {(isAdmin || isSuperAdmin) && (
         <Link href={'/events/createEventCategory'}>
           <Button variant={'gray'} size={'lg'}>
             Create & Edit Tags
@@ -38,7 +39,7 @@ const EventAdminButtons = async () => {
         </Link>
       )}
       {/* Create & Edit Series */}
-      {isAdmin && (
+      {(isAdmin || isSuperAdmin) && (
         <Link href={'/events/createEventSeries'}>
           <Button size={'lg'} className="bg-bgColor-blue hover:bg-bgColor-blue/80">
             Create & Edit Series
@@ -46,7 +47,7 @@ const EventAdminButtons = async () => {
         </Link>
       )}
       {/* Manage Sponsors */}
-      {isAdmin && (
+      {(isAdmin || isSuperAdmin) && (
         <Link href={'/events/manageSponsors'}>
           <Button size={'lg'} className="bg-bgColor-secondary900 hover:bg-bgColor-secondary400">
             Manage Sponsors

@@ -488,6 +488,7 @@ model ShopItemTag {
 }
 
 enum Role {
+  SUPERADMIN
   USER
   ADMIN
   HOST

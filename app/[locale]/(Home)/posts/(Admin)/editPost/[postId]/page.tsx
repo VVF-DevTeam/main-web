@@ -20,6 +20,7 @@ const EditPostPage = async ({ params }: EditPostPageProps) => {
   }
 
   const { postId } = await params
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
 
   // Fetch post by id from database
   const post = await getPostForEditing(postId)
@@ -31,6 +32,7 @@ const EditPostPage = async ({ params }: EditPostPageProps) => {
   return (
     <EditPost
       post={post}
+      isSuperAdmin={Boolean(isSuperAdmin)}
       showBackButton={true}
     />
   )

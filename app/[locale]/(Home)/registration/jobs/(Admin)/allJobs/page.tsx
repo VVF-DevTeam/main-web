@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 // Main Component
 const AllJobs = async () => {
   // check if the current user is an admin to allow access to the job control page
-  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' }))) {
+  if (!(await roleCheck({ role: 'ADMIN' })) && !(await roleCheck({ role: 'HOST' })) && !(await roleCheck({ role: 'SUPERADMIN' }))) {
     return redirect('registration/jobs')
   }
 

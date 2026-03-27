@@ -135,7 +135,7 @@ export default async function ProfilePage({
     case 'admin-payment-management':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         const page = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
         const pageSize = [10, 20, 50].includes(Number(pageSizeStr))
@@ -152,7 +152,7 @@ export default async function ProfilePage({
     case 'admin-email-composition':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         return <EmailComposition user={user} />
       }
@@ -168,7 +168,7 @@ export default async function ProfilePage({
     case 'admin-all-events':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         const allEvents = await getAllEvents()
         return (
@@ -189,7 +189,7 @@ export default async function ProfilePage({
     case 'admin-create-event':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         return <CreateEventForm locale={locale} />
       }
@@ -200,7 +200,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-event-categories':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <EventCategoryManager user={user} />
       }
       return (
@@ -210,7 +210,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-event-series':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <EventSeriesManager user={user} />
       }
       return (
@@ -220,7 +220,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-manage-sponsors':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <SponsorsManagement user={user} />
       }
       return (
@@ -232,7 +232,7 @@ export default async function ProfilePage({
     case 'admin-event-statistics':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         return <EventStatistics user={user} locale={locale} />
       }
@@ -245,7 +245,7 @@ export default async function ProfilePage({
     case 'admin-edit-event':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         if (!eventKeyName) {
           return (
@@ -285,7 +285,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-job':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <CreateJobForm user={user} locale={locale} />
       }
       return (
@@ -295,7 +295,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-jobs':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         const allJobs = await getAllJobs()
         return (
           <JobManagement
@@ -313,7 +313,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-edit-job':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         if (!jobId) {
           return (
             <p className="mt-10 text-center">
@@ -346,7 +346,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-posts':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         const allPosts = await getAllPosts()
         return (
           <PostManagement
@@ -364,7 +364,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-post':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <CreatePostForm user={user} locale={locale} />
       }
       return (
@@ -374,7 +374,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-edit-post':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         if (!postId) {
           return (
             <p className="mt-10 text-center">
@@ -408,7 +408,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-shop':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         return <CreateShopForm ownerId={user.id} locale={locale} />
       }
       return (
@@ -418,7 +418,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-shops':
-      if (user.role && user.role.includes('ADMIN')) {
+      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
         const allShops = await getAllShops()
         return (
           <ShopManagement
@@ -438,7 +438,7 @@ export default async function ProfilePage({
     case 'admin-edit-shop':
       if (
         user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN'))
+        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
         if (!shopId) {
           return (

@@ -18,7 +18,7 @@ async function fetchPaymentsData(
   let payments: PaymentWithRelations[]
   let totalCount: number
 
-  if (user.role.includes('ADMIN')) {
+  if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
     // Admin: get all payments
     const [adminTotalCount, adminPayments] = await Promise.all([
       prisma.payment.count(),

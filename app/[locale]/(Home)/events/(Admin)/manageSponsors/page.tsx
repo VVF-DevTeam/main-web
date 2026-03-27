@@ -16,7 +16,8 @@ const ManageSponsorsPage = async () => {
   // Only ADMIN or HOST can access this page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
-    !(await roleCheck({ role: 'HOST' }))
+    !(await roleCheck({ role: 'HOST' })) &&
+    !(await roleCheck({ role: 'SUPERADMIN' }))
   ) {
     return redirect('/events')
   }
