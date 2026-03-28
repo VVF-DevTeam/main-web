@@ -16,11 +16,13 @@ const EditEventPage = async ({
 }: {
   params: Promise<{ eventKeyName: string; locale: string }>
 }) => {
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
+
   // check if the current user is an admin or host to allow access to the post control page
   if (
     !(await roleCheck({ role: 'ADMIN' })) &&
     !(await roleCheck({ role: 'HOST' })) &&
-    !(await roleCheck({ role: 'SUPERADMIN' }))
+    !isSuperAdmin
   ) {
     return redirect('/events')
   }
@@ -39,7 +41,6 @@ const EditEventPage = async ({
     getAllEventCategories(),
     getAllEventSeries(),
   ])
-  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
 
   if (!event) {
     return <NotFound />

@@ -8,6 +8,7 @@ import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
 import { getAllShops, getShopForEditing } from '@/lib/actions/shop/getShop'
+import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -104,6 +105,7 @@ export default async function ProfilePage({
     shopId?: string
   }>
 }) {
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
   const [
     { section, page: pageStr, pageSize: pageSizeStr, eventKeyName, jobId, postId, shopId },
     { locale },
@@ -275,6 +277,7 @@ export default async function ProfilePage({
             event={event}
             categories={categories}
             allSeries={allSeries}
+            isSuperAdmin={Boolean(isSuperAdmin)}
           />
         )
       }
