@@ -431,6 +431,12 @@ export default function EventSingleCheckOut({
                       )
                     ) : null}
 
+                    {ticket.limit && (
+                      <span className="text-xs text-gray-500 drop-shadow-sm">
+                        Maximum {ticket.limit} ticket(s) per order
+                      </span>
+                    )}
+
                     {/* Valid To Date */}
                     {ticket.validTo && (
                       <span className={`text-xs drop-shadow-sm ${
@@ -469,6 +475,7 @@ export default function EventSingleCheckOut({
                             size="sm"
                             onClick={() => handleQuantityChange(ticket.id, 1)}
                             className="h-8 w-8 rounded-r-md p-0 hover:bg-gray-100"
+                            disabled={getQuantity(ticket.id) >= (ticket.limit ?? 999999)}
                           >
                             <Plus className="h-4 w-4" />
                           </Button>

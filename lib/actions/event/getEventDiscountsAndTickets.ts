@@ -19,6 +19,7 @@ export const getEventDiscountsAndTickets = unstable_cache(
               discountMemberPercent: true,
               capacityPerTicket: true,
               payTotalNumber: true,
+              limit: true,
             },
           },
         },

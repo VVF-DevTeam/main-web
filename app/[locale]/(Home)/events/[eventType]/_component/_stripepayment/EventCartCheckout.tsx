@@ -864,7 +864,7 @@ export default function EventCartCheckout({
             stripePriceId: stripePriceIdForUser,
             stripeProductId: ticket.stripeProductId,
             seatNumbers: seats.map((s) => s.seatName),
-            eventTicketId: ticket.id,
+            eventId: ticket.eventId,
           })
         }
       })
@@ -884,7 +884,7 @@ export default function EventCartCheckout({
             stripePriceId: stripePriceIdForUser,
             stripeProductId: ticket.stripeProductId,
             seatNumbers: [], // Empty for non-seated tickets
-            eventTicketId: ticket.id,
+            eventId: ticket.eventId,
             quantity: item.quantity, // Quantity for non-seated tickets
           })
         }

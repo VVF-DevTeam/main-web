@@ -42,8 +42,8 @@ export type CheckoutItem = {
   stripeProductId: string
   /** Array of seat identifiers (empty for non-seated tickets) */
   seatNumbers: string[]
-  /** Event ticket ID (same as ticketId) */
-  eventTicketId: string
+  /** Parent event id (`EventTicket.eventId`); must match the checkout request `eventId` */
+  eventId: string
   /** Quantity for non-seated tickets (only when seatNumbers is empty) */
   quantity?: number
 }

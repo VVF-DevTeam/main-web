@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     // Create line items: one per seat, grouped by ticket type
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
     const allSeatNumbers: string[] = []
-    const ticketMetadata: Array<{ ticketId: string; seatNumbers: string[] }> = []
+    const ticketMetadata: Array<{ ticketId: string; seatNumbers: string[]; eventId: string }> = []
 
     // Count total items to determine if discount applies
     let totalItemCount = 0
@@ -77,6 +77,67 @@ export async function POST(req: Request) {
 
     // Get event discounts from database (cached)
     const event = await getEventDiscountsAndTickets(eventId)
+
+    if (!event) {
+      return NextResponse.json({ message: 'Event not found' }, { status: 404 })
+    }
+
+    const ticketById = new Map(event.tickets.map((t) => [t.id, t]))
+
+    // Per-order limits: aggregate units per ticket (same tier may not appear twice in normal UI,
+    // but the API must enforce totals even if the client sends duplicate lines).
+    const unitsPerTicket = new Map<string, number>()
+    for (const item of checkoutItems) {
+      if (!item.ticketId) {
+        return NextResponse.json(
+          { message: 'Missing ticket id' },
+          { status: 400 }
+        )
+      }
+      if (!item.eventId || item.eventId !== eventId) {
+        return NextResponse.json(
+          { message: 'Checkout item does not match this event' },
+          { status: 400 }
+        )
+      }
+
+      const ticketId = item.ticketId
+      const dbTicket = ticketById.get(ticketId)
+      if (!dbTicket) {
+        return NextResponse.json(
+          { message: 'Ticket does not belong to this event' },
+          { status: 400 }
+        )
+      }
+
+      let units: number
+      if (item.seatNumbers.length > 0) {
+        units = item.seatNumbers.length
+      } else {
+        const q = item.quantity
+        if (typeof q !== 'number' || !Number.isInteger(q) || q < 1) {
+          return NextResponse.json(
+            { message: 'Valid quantity is required for non-seated tickets' },
+            { status: 400 }
+          )
+        }
+        units = q
+      }
+
+      unitsPerTicket.set(ticketId, (unitsPerTicket.get(ticketId) ?? 0) + units)
+    }
+
+    for (const [ticketId, totalUnits] of unitsPerTicket) {
+      const dbTicket = ticketById.get(ticketId)!
+      if (dbTicket.limit != null && totalUnits > dbTicket.limit) {
+        return NextResponse.json(
+          {
+            message: `Maximum ${dbTicket.limit} ticket(s) per order for this ticket type`,
+          },
+          { status: 400 }
+        )
+      }
+    }
 
     // Calculate total from actual Stripe prices being used (not DB prices)
     // This ensures we use member prices if applicable, matching the frontend calculation
@@ -110,7 +171,7 @@ export async function POST(req: Request) {
     }
 
     // Normalize discounts JSON into a typed array
-    const discountList: EventDiscountJson[] = event?.eventDiscounts && Array.isArray(event.eventDiscounts)
+    const discountList: EventDiscountJson[] = event.eventDiscounts && Array.isArray(event.eventDiscounts)
       ? (event.eventDiscounts as EventDiscountJson[])
       : []
 
@@ -586,11 +647,12 @@ export async function POST(req: Request) {
       }
 
       ticketMetadata.push({
-        ticketId: item.eventTicketId,
+        ticketId: item.ticketId,
         seatNumbers: item.seatNumbers, // Empty array for non-seated tickets
         ...(item.seatNumbers.length === 0 && item.quantity && {
           quantity: item.quantity, // Include quantity for non-seated tickets
         }),
+        eventId: item.eventId,
       })
     }
 
