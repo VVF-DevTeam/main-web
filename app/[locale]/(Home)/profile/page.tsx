@@ -179,6 +179,8 @@ export default async function ProfilePage({
             createEventLink={`/${locale}/profile?section=admin-create-event`}
             editLinkPattern={`/${locale}/profile?section=admin-edit-event&eventKeyName={keyName}`}
             showBackButton={false}
+            userRole={user.role}
+            userId={user.id}
           />
         )
       }

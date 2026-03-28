@@ -192,6 +192,17 @@ const AuthButtons = ({ mode }: { mode: string }) => {
                   <p className="truncate text-xs text-gray-500">
                     {session?.user?.email}
                   </p>
+                  {session?.user?.role &&
+                    session?.user?.role.length > 0 &&
+                    !session?.user?.role.includes('USER') && (
+                      <div className="flex flex-wrap gap-2">
+                        {session?.user?.role.map((role) => (
+                          <span key={role} className="inline-flex items-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-3 py-1 text-xs font-medium text-bgColor-brand900 shadow-sm">
+                            {role}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                 </div>
               </Link>
 

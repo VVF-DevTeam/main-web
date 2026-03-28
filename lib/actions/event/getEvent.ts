@@ -3,6 +3,11 @@
 import { Prisma } from '@prisma/client'
 import { unstable_cache } from 'next/cache'
 
+/** All events row for admin list (`getAllEvents`) */
+export type EventWithHostsForAdmin = Prisma.EventGetPayload<{
+  include: { hosts: true }
+}>
+
 // Cached version of getAllPublishedEvents with revalidateTag support
 // Default: returns minimal fields (id, title) for backward compatibility
 export const getAllPublishedEvents = unstable_cache(
@@ -181,12 +186,15 @@ export const getClosestFutureEvent = unstable_cache(
 // Get all events (published and unpublished) - for admin use only
 // Cached with revalidateTag support - cache is invalidated when events are created/updated/deleted
 export const getAllEvents = unstable_cache(
-  async () => {
+  async (): Promise<EventWithHostsForAdmin[]> => {
     const { prisma } = await import('@/lib/db')
     try {
       const events = await prisma.event.findMany({
         orderBy: {
           updatedAt: 'desc',
+        },
+        include: {
+          hosts: true,
         },
       })
       return events

@@ -135,6 +135,35 @@ const MyProfile = async ({
                   {user.address || 'N/A'}
                 </span>
               </div>
+
+              {user.role &&
+                user.role.length > 0 &&
+                !user.role.includes('USER') && (
+                  <div
+                    className="rounded-lg border border-bgColor-brand900/15 bg-bgColor-brand100/40 p-3 shadow-sm"
+                    role="region"
+                    aria-label={String(t('roles-section'))}
+                  >
+                    <div className="mb-2 flex items-center gap-2 border-b border-bgColor-brand900/10 pb-2">
+                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-bgColor-brand900/10 text-bgColor-brand900">
+                        <FiUser className="text-lg" aria-hidden />
+                      </span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-bgColor-brand900">
+                        {t('roles-section')}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {user.role.map((role) => (
+                        <span
+                          key={role}
+                          className="inline-flex items-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-3 py-1 text-xs font-medium text-bgColor-brand900 shadow-sm"
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
 

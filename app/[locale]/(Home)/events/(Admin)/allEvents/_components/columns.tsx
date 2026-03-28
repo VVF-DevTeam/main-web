@@ -1,7 +1,7 @@
 'use client'
 
 // Components
-import { Event } from '@prisma/client'
+import type { EventWithHostsForAdmin } from '@/lib/actions/event/getEvent'
 import { ColumnDef } from '@tanstack/react-table'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import Link from 'next/link'
 // Function to create columns with optional custom edit link
 export const createEventColumns = (
   editLinkPattern: string
-): ColumnDef<Event>[] => [
+): ColumnDef<EventWithHostsForAdmin>[] => [
   {
     accessorKey: 'title',
     header: () => <div className="text-center font-semibold">Title</div>,

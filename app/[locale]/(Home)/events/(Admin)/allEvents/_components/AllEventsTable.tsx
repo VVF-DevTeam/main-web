@@ -1,13 +1,13 @@
 'use client'
 
 // Components
-import { Event } from '@prisma/client'
 import { useMemo } from 'react'
+import type { EventWithHostsForAdmin } from '@/lib/actions/event/getEvent'
 import { DataTable } from './data-table'
 import { createEventColumns } from './columns'
 
 interface AllEventsTableProps {
-  data: Event[]
+  data: EventWithHostsForAdmin[]
   editLinkPattern: string
 }
 

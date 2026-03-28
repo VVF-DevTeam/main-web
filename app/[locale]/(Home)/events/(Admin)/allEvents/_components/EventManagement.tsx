@@ -1,6 +1,6 @@
 // Libraries
-import { Event } from '@prisma/client'
 import { Button } from '@/components/ui/button'
+import type { EventWithHostsForAdmin } from '@/lib/actions/event/getEvent'
 import Link from 'next/link'
 import { PlusCircle } from 'lucide-react'
 
@@ -9,10 +9,12 @@ import BackButton from '@/components/ui/back-button'
 import AllEventsTable from './AllEventsTable'
 
 interface EventManagementProps {
-  allEvents: Event[]
+  allEvents: EventWithHostsForAdmin[]
   createEventLink: string
   editLinkPattern: string
   showBackButton?: boolean
+  userRole: string[]
+  userId: string
 }
 
 export default function EventManagement({
@@ -20,7 +22,13 @@ export default function EventManagement({
   createEventLink,
   editLinkPattern,
   showBackButton = false,
+  userRole,
+  userId,
 }: EventManagementProps) {
+  if (userRole.includes('HOST') && !userRole.includes('ADMIN') && !userRole.includes('SUPERADMIN')) {
+    allEvents = allEvents.filter((event) => event.hosts.some((host) => host.id === userId))
+  } 
+
   return (
     <div className="width-max-default flex-col-default mx-auto my-20 w-full gap-y-2 p-6">
       {/* Back Button To Parent Page */}

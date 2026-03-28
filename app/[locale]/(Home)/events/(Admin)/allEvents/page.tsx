@@ -1,7 +1,7 @@
 // Libraries
 import { redirect } from 'next/navigation'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { getAllEvents } from '@/lib/actions/event/getEvent'
+import { getCurrentUserRoleAndId } from '@/lib/actions/user/getCurrentUserRoleAndId'
 
 // Components
 import EventManagement from './_components/EventManagement'
@@ -12,11 +12,12 @@ export const dynamic = 'force-dynamic'
 
 // Main Component
 const AllEvents = async () => {
+  const { role, id } = await getCurrentUserRoleAndId()
   // check if the current user is an admin to allow access to the post control page
   if (
-    !(await roleCheck({ role: 'ADMIN' })) &&
-    !(await roleCheck({ role: 'HOST' })) &&
-    !(await roleCheck({ role: 'SUPERADMIN' }))
+    !role.includes('ADMIN') &&
+    !role.includes('HOST') &&
+    !role.includes('SUPERADMIN')
   ) {
     return redirect('/events')
   }
@@ -35,6 +36,8 @@ const AllEvents = async () => {
       createEventLink="/events/createEvent"
       editLinkPattern="/events/editEvent/{keyName}"
       showBackButton={true}
+      userRole={role}
+      userId={id}
     />
   )
 }
