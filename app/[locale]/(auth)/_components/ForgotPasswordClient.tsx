@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import Loader from '@/components/loader/Loader'
+import Turnstile from 'react-turnstile'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: 'Invalid email format' }),
@@ -34,6 +35,7 @@ const ForgotPasswordClient = () => {
   const currentDateTime = getCurrentDateTime()
   const [countDown, setCountDown] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const form = useForm<ForgotPasswordFormValues>({
@@ -55,9 +57,24 @@ const ForgotPasswordClient = () => {
   // Submit email to reset password
   const onSubmitEmail = async (data: ForgotPasswordFormValues) => {
     try {
+      if (!turnstileToken) {
+        toast.error('Please complete captcha verification', {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: {
+            color: '#ef4444',
+          },
+        })
+        return
+      }
+
       setLoading(true)
       const response = await axiosInstance.post('/api/auth/forgotPassword', {
         email: data.email,
+        turnstileToken,
       })
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
@@ -177,10 +194,15 @@ const ForgotPasswordClient = () => {
                     </FormItem>
                   )}
                 />
+                <Turnstile
+                  sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken('')}
+                />
 
                 <Button
                   type="submit"
-                  disabled={countDown > 0 || loading}
+                  disabled={countDown > 0 || loading || !turnstileToken}
                   variant="default"
                   className="h-12 w-full"
                 >

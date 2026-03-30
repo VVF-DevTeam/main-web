@@ -232,10 +232,12 @@ export const getEventTitleByKeyName = unstable_cache(
   }
 )
 
-export async function getEventsOfHost(userId: string) {
+export async function getEventsOfHost(
+  userId: string,
+): Promise<EventWithHostsForAdmin[]> {
   const { prisma } = await import('@/lib/db')
   try {
-    const hosts = await prisma.event.findMany({
+    return await prisma.event.findMany({
       where: {
         hosts: {
           some: {
@@ -243,12 +245,13 @@ export async function getEventsOfHost(userId: string) {
           },
         },
       },
-      select: {
-        id: true,
-        title: true,
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: {
+        hosts: true,
       },
     })
-    return hosts
   } catch (error) {
     console.error('Error getting events of host:', error)
     return []

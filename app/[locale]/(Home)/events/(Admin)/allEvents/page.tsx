@@ -1,6 +1,6 @@
 // Libraries
 import { redirect } from 'next/navigation'
-import { getAllEvents } from '@/lib/actions/event/getEvent'
+import { getAllEvents, getEventsOfHost, type EventWithHostsForAdmin } from '@/lib/actions/event/getEvent'
 import { getCurrentUserRoleAndId } from '@/lib/actions/user/getCurrentUserRoleAndId'
 
 // Components
@@ -23,7 +23,12 @@ const AllEvents = async () => {
   }
 
   // Get all published and unpublished events
-  const allEvents = await getAllEvents()
+  let allEvents: EventWithHostsForAdmin[] = []
+  if (role.includes('HOST')) {
+    allEvents = await getEventsOfHost(id)
+  } else {
+    allEvents = await getAllEvents()
+  }
 
   // Check if there was an error (events should not be null)
   if (!allEvents) {

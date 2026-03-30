@@ -36,7 +36,7 @@ const profileSchema = z.object({
   name: z.string(),
   phone: z
     .string()
-    .min(10, 'Phone number must be at least 10 digits')
+    .min(9, 'Phone number must be at least 9 digits')
     .max(15, 'Phone number must be less than 15 digits'),
   address: z.string().optional(),
   age: z.string().optional(),

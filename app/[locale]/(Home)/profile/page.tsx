@@ -1,7 +1,12 @@
 // Libraries
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { prisma } from '@/lib/db'
-import { getAllPublishedEvents, getAllEvents } from '@/lib/actions/event/getEvent'
+import {
+  getAllPublishedEvents,
+  getAllEvents,
+  getEventsOfHost,
+  type EventWithHostsForAdmin,
+} from '@/lib/actions/event/getEvent'
 import { getAllEventCategories } from '@/lib/actions/event/getEventCategories'
 import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 import { getEventForEditing } from '@/lib/actions/event/getEventById'
@@ -172,7 +177,12 @@ export default async function ProfilePage({
         user.role &&
         (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
       ) {
-        const allEvents = await getAllEvents()
+        let allEvents: EventWithHostsForAdmin[] = []
+        if (user.role.includes('HOST')) {
+          allEvents = await getEventsOfHost(user.id)
+        } else {
+          allEvents = await getAllEvents()
+        }
         return (
           <EventManagement
             allEvents={allEvents}

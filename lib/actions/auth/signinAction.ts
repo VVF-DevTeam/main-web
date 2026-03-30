@@ -5,17 +5,27 @@ import { AuthError } from 'next-auth'
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from '@/lib/db'
 import initTranslation from '@/app/i18n'
+import { verifyTurnstileToken } from '@/lib/security/verifyTurnstile'
 
 export const signinAction = async (data: {
   email: string
   password: string
   locale?: string
+  turnstileToken: string
 }) => {
   // Get translated message once at the top
   const currentLocale = data.locale || 'en'
   const { t } = await initTranslation(currentLocale, ['signIn-signUp'])
   
   try {
+    const turnstileResult = await verifyTurnstileToken(data.turnstileToken)
+    if (!turnstileResult.ok) {
+      return {
+        message: 'Captcha verification failed',
+        success: false,
+      }
+    }
+
     const parsedCredentials = signInSchema.safeParse(data)
     if (!parsedCredentials.success) {
       return {

@@ -9329,6 +9329,11 @@ react-style-singleton@^2.2.2, react-style-singleton@^2.2.3:
     get-nonce "^1.0.0"
     tslib "^2.0.0"
 
+react-turnstile@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/react-turnstile/-/react-turnstile-1.1.5.tgz#96b85bb65fcfa4517a0d53f6ac23084030daee10"
+  integrity sha512-VTL5OeHAatzCEVQxAZox70/TPmhKxEbNgtr++dg+8zm9QrWKuoU9E0+7gqmycOSCDZuJFzvMMLKQb5PVUPLV6w==
+
 react@^19.2.1:
   version "19.2.1"
   resolved "https://registry.yarnpkg.com/react/-/react-19.2.1.tgz#8600fa205e58e2e807f6ef431c9f6492591a2700"
