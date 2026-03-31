@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -47,6 +47,9 @@ const SignUpForm = () => {
   const [turnstileToken, setTurnstileToken] = useState('')
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
   const turnstileTokenRef = useRef('')
+  const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const retryAfterCaptchaFailRef = useRef(false)
+  const pendingSubmissionRef = useRef<z.infer<typeof signUpSchema> | null>(null)
   const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -63,15 +66,34 @@ const SignUpForm = () => {
     },
   })
 
-  const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    try {
-      const token = turnstileTokenRef.current || turnstileToken
-      if (!token) {
-        turnstileRef.current?.execute()
-        return
+  // Cleanup token refresh interval on unmount
+  useEffect(() => {
+    return () => {
+      if (tokenRefreshIntervalRef.current) {
+        clearInterval(tokenRefreshIntervalRef.current)
       }
+    }
+  }, [])
 
-      // Combine extension and phone number
+  const isCaptchaFailure = (message: string) =>
+    message.toLowerCase().includes('captcha verification failed')
+
+  const refreshTurnstileToken = () => {
+    if (!turnstileRef.current) return
+    turnstileRef.current.reset()
+    turnstileRef.current.execute()
+  }
+
+  const onSubmit = async (
+    data: z.infer<typeof signUpSchema>,
+    hasRetried = false
+  ) => {
+    if (!turnstileToken) {
+      toast.error('Captcha is still verifying, please try again in a moment.')
+      return
+    }
+
+    try {
       const fullPhone = data.phoneNumber
         ? `${phoneExtension}${data.phoneNumber}`
         : ''
@@ -79,12 +101,12 @@ const SignUpForm = () => {
         ...data,
         phoneNumber: fullPhone,
         locale: locale,
-        turnstileToken: token,
+        turnstileToken,
       })
-      // Check if the account was created
+
       if (response.success) {
         setShowSuccessMessage(true)
-        form.reset() // Reset the form after successful submission
+        form.reset()
         toast.success(response.message, {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
@@ -96,6 +118,12 @@ const SignUpForm = () => {
           },
         })
       } else {
+        if (!hasRetried && isCaptchaFailure(response.message)) {
+          pendingSubmissionRef.current = data
+          retryAfterCaptchaFailRef.current = true
+          refreshTurnstileToken()
+          return
+        }
         setShowSuccessMessage(false)
         toast.error(response.message, {
           description: (
@@ -107,9 +135,12 @@ const SignUpForm = () => {
             color: '#ef4444', // red-500 color
           },
         })
+        // Rotate token for any failed signup response
+        refreshTurnstileToken()
       }
-      // Show error to the user
     } catch (error) {
+      // Rotate token on unexpected signup errors too
+      refreshTurnstileToken()
       toast.error('Something went wrong', {
         description: (
           <div className="flex flex-col gap-1">
@@ -129,6 +160,10 @@ const SignUpForm = () => {
       })
       throw error
     }
+  }
+
+  const handleFormSubmit = async (data: z.infer<typeof signUpSchema>) => {
+    await onSubmit(data, false)
   }
   return (
     <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-28">
@@ -174,7 +209,7 @@ const SignUpForm = () => {
         <div>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(handleFormSubmit)}
               className="flex-col-default grid-all-cols-2 mb-4 pr-5 pt-2 md:gap-y-8 lg:gap-x-6"
             >
               {/* First Name */}
@@ -401,11 +436,29 @@ const SignUpForm = () => {
                   execution="execute"
                   onLoad={(_, boundTurnstile) => {
                     turnstileRef.current = boundTurnstile
+                    // Run once on load
+                    boundTurnstile.execute()
+                    // Refresh token every 5 minutes
+                    if (tokenRefreshIntervalRef.current) {
+                      clearInterval(tokenRefreshIntervalRef.current)
+                    }
+                    tokenRefreshIntervalRef.current = setInterval(() => {
+                      boundTurnstile.reset()
+                      boundTurnstile.execute()
+                    }, 5 * 60 * 1000)
                   }}
                   onVerify={(token) => {
                     turnstileTokenRef.current = token
                     setTurnstileToken(token)
-                    form.handleSubmit(onSubmit)()
+                    if (
+                      retryAfterCaptchaFailRef.current &&
+                      pendingSubmissionRef.current
+                    ) {
+                      const pendingData = pendingSubmissionRef.current
+                      retryAfterCaptchaFailRef.current = false
+                      pendingSubmissionRef.current = null
+                      void onSubmit(pendingData, true)
+                    }
                   }}
                   onExpire={() => {
                     turnstileTokenRef.current = ''

@@ -39,6 +39,9 @@ const ForgotPasswordClient = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
   const turnstileTokenRef = useRef('')
+  const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const retryAfterCaptchaFailRef = useRef(false)
+  const pendingSubmissionRef = useRef<ForgotPasswordFormValues | null>(null)
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -53,22 +56,36 @@ const ForgotPasswordClient = () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
+      if (tokenRefreshIntervalRef.current) {
+        clearInterval(tokenRefreshIntervalRef.current)
+      }
     }
   }, [])
 
-  // Submit email to reset password
-  const onSubmitEmail = async (data: ForgotPasswordFormValues) => {
-    try {
-      const token = turnstileTokenRef.current || turnstileToken
-      if (!token) {
-        turnstileRef.current?.execute()
-        return
-      }
+  const isCaptchaFailure = (message: string) =>
+    message.toLowerCase().includes('captcha verification')
 
+  const refreshTurnstileToken = () => {
+    if (!turnstileRef.current) return
+    turnstileRef.current.reset()
+    turnstileRef.current.execute()
+  }
+
+  // Submit email to reset password
+  const onSubmitEmail = async (
+    data: ForgotPasswordFormValues,
+    hasRetried = false
+  ) => {
+    if (!turnstileToken) {
+      toast.error('Captcha is still verifying, please try again in a moment.')
+      return
+    }
+
+    try {
       setLoading(true)
       const response = await axiosInstance.post('/api/auth/forgotPassword', {
         email: data.email,
-        turnstileToken: token,
+        turnstileToken,
       })
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
@@ -82,12 +99,10 @@ const ForgotPasswordClient = () => {
           },
         })
 
-        // Clear any existing timer
         if (timerRef.current) {
           clearInterval(timerRef.current)
         }
 
-        // Start countdown
         setCountDown(60)
         timerRef.current = setInterval(() => {
           setCountDown((prevCount) => {
@@ -109,6 +124,13 @@ const ForgotPasswordClient = () => {
           error.response?.data?.message || 'Failed to send reset email'
         const statusCode = error.response?.status || 500
 
+        if (!hasRetried && isCaptchaFailure(errorMessage)) {
+          pendingSubmissionRef.current = data
+          retryAfterCaptchaFailRef.current = true
+          refreshTurnstileToken()
+          return
+        }
+
         toast.error('Verification email not sent', {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
@@ -119,6 +141,8 @@ const ForgotPasswordClient = () => {
             color: '#ef4444', // red-500 color
           },
         })
+        // Rotate token for any failed forgot-password response
+        refreshTurnstileToken()
       } else {
         toast.error('Something went wrong', {
           description: (
@@ -130,10 +154,15 @@ const ForgotPasswordClient = () => {
             color: '#ef4444', // red-500 color
           },
         })
+        refreshTurnstileToken()
       }
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleFormSubmit = async (data: ForgotPasswordFormValues) => {
+    await onSubmitEmail(data, false)
   }
 
   return (
@@ -162,7 +191,7 @@ const ForgotPasswordClient = () => {
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmitEmail)}
+                onSubmit={form.handleSubmit(handleFormSubmit)}
                 className="space-y-6"
               >
                 <FormField
@@ -194,11 +223,29 @@ const ForgotPasswordClient = () => {
                   execution="execute"
                   onLoad={(_, boundTurnstile) => {
                     turnstileRef.current = boundTurnstile
+                    // Run once on load
+                    boundTurnstile.execute()
+                    // Refresh token every 5 minutes
+                    if (tokenRefreshIntervalRef.current) {
+                      clearInterval(tokenRefreshIntervalRef.current)
+                    }
+                    tokenRefreshIntervalRef.current = setInterval(() => {
+                      boundTurnstile.reset()
+                      boundTurnstile.execute()
+                    }, 5 * 60 * 1000)
                   }}
                   onVerify={(token) => {
                     turnstileTokenRef.current = token
                     setTurnstileToken(token)
-                    form.handleSubmit(onSubmitEmail)()
+                    if (
+                      retryAfterCaptchaFailRef.current &&
+                      pendingSubmissionRef.current
+                    ) {
+                      const pendingData = pendingSubmissionRef.current
+                      retryAfterCaptchaFailRef.current = false
+                      pendingSubmissionRef.current = null
+                      void onSubmitEmail(pendingData, true)
+                    }
                   }}
                   onExpire={() => {
                     turnstileTokenRef.current = ''
