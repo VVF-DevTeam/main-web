@@ -21,7 +21,7 @@ export const signinAction = async (data: {
     const turnstileResult = await verifyTurnstileToken(data.turnstileToken)
     if (!turnstileResult.ok) {
       return {
-        message: 'Captcha verification failed',
+        message: 'Too many attempts tried in short period of time. Please wait a moment and try again.',
         success: false,
       }
     }

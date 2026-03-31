@@ -40,7 +40,7 @@ export const signupAction = async (formData: signupActionProps) => {
     const turnstileResult = await verifyTurnstileToken(turnstileToken)
     if (!turnstileResult.ok) {
       return {
-        message: 'Captcha verification failed',
+        message: 'Too many attempts tried in short period of time. Please wait a moment and try again.',
         success: false,
       }
     }

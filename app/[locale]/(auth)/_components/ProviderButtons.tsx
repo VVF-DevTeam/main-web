@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { authAction } from '@/lib/actions/auth/authAction'
 import { authType } from '@/lib/types/authTpes'
 import { FaGithub } from 'react-icons/fa'
@@ -26,44 +26,67 @@ const providers: { id: authType; icon: React.ReactNode }[] = [
 ]
 
 const ProviderButtons = () => {
-  const [pendingProvider, setPendingProvider] = useState<authType | null>(null)
   const [isVerifying, setIsVerifying] = useState(false)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
   const turnstileTokenRef = useRef('')
+  const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const retryAfterCaptchaFailRef = useRef(false)
+  const pendingProviderRef = useRef<authType | null>(null)
 
-  const onSubmit = async (provider: authType) => {
+  useEffect(() => {
+    return () => {
+      if (tokenRefreshIntervalRef.current) {
+        clearInterval(tokenRefreshIntervalRef.current)
+      }
+    }
+  }, [])
+
+  const isCaptchaFailure = (message: string) =>
+    message.toLowerCase().includes('captcha verification failed')
+
+  const refreshTurnstileToken = () => {
+    if (!turnstileRef.current) return
+    turnstileRef.current.reset()
+    turnstileRef.current.execute()
+  }
+
+  const onSubmit = async (provider: authType, hasRetried = false) => {
     try {
-      setPendingProvider(provider)
+      if (!turnstileTokenRef.current) {
+        toast.error('Captcha is still verifying, please try again in a moment.')
+        return
+      }
       setIsVerifying(true)
-      turnstileRef.current?.execute()
+      await authAction(provider, turnstileTokenRef.current)
     } catch (error) {
-      setIsVerifying(false)
+      const errorMessage = error instanceof Error ? error.message : ''
+      if (!hasRetried && isCaptchaFailure(errorMessage)) {
+        pendingProviderRef.current = provider
+        retryAfterCaptchaFailRef.current = true
+        refreshTurnstileToken()
+        return
+      }
+      // Rotate token for any provider auth failure
+      refreshTurnstileToken()
+      toast.error('Captcha verification failed')
       console.log(error)
+    } finally {
+      setIsVerifying(false)
     }
   }
 
-  const handleVerified = async (token: string) => {
-    if (!pendingProvider) {
-      setIsVerifying(false)
-      return
-    }
-
+  const handleVerified = (token: string) => {
     turnstileTokenRef.current = token
-
-    try {
-      await authAction(pendingProvider, token)
-    } catch (error) {
-      toast.error('Captcha verification failed')
-      setIsVerifying(false)
-      setPendingProvider(null)
-      console.log(error)
+    if (retryAfterCaptchaFailRef.current && pendingProviderRef.current) {
+      const provider = pendingProviderRef.current
+      retryAfterCaptchaFailRef.current = false
+      pendingProviderRef.current = null
+      void onSubmit(provider, true)
     }
   }
 
   const handleExpired = () => {
     turnstileTokenRef.current = ''
-    setIsVerifying(false)
-    setPendingProvider(null)
   }
 
   return (
@@ -74,12 +97,21 @@ const ProviderButtons = () => {
         execution="execute"
         onLoad={(_, boundTurnstile) => {
           turnstileRef.current = boundTurnstile
+          // Run once on load
+          boundTurnstile.execute()
+          // Refresh token every 5 minutes
+          if (tokenRefreshIntervalRef.current) {
+            clearInterval(tokenRefreshIntervalRef.current)
+          }
+          tokenRefreshIntervalRef.current = setInterval(() => {
+            boundTurnstile.reset()
+            boundTurnstile.execute()
+          }, 5 * 60 * 1000)
         }}
         onVerify={handleVerified}
         onExpire={handleExpired}
         onError={() => {
           setIsVerifying(false)
-          setPendingProvider(null)
           toast.error('Captcha failed. Please try again.')
         }}
       />
