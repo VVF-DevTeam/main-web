@@ -37,11 +37,20 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
   const isHost = user.role.includes('HOST')
   const isSuperAdmin = user.role.includes('SUPERADMIN')
   const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
-  const adminSections = [
-    { key: 'admin-event-statistics', label: t('event-manager') },
-    { key: 'admin-payment-management', label: t('payment-management') },
-    { key: 'admin-email-composition', label: t('email-composition') },
-  ]
+
+  const adminNavItems: { key: string; label: string; hostVisible?: boolean }[] =
+    [
+      { key: 'admin-event-statistics', label: t('event-manager'), hostVisible: true },
+      { key: 'admin-payment-management', label: t('payment-management') },
+      { key: 'admin-email-composition', label: t('email-composition'), hostVisible: true },
+    ]
+
+  const visibleAdminNavItems = adminNavItems.filter(
+    (item) =>
+      isAdmin ||
+      isSuperAdmin ||
+      (isHost && item.hostVisible === true),
+  )
 
   const eventManagementSections = [
     'admin-create-event',
@@ -117,7 +126,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               Admin Section
             </h2>
             <ul className="space-y-4">
-              {(isAdmin || isSuperAdmin) && adminSections.map(({ key, label }) => (
+              {visibleAdminNavItems.map(({ key, label }) => (
                 <li key={key}>
                   <Link
                     href={`/${locale}/profile?section=${key}`}

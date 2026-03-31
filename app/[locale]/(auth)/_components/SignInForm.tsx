@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -30,6 +30,7 @@ import ProviderButtons from './ProviderButtons'
 import { useSearchParams } from 'next/navigation'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
+import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
@@ -38,7 +39,10 @@ const SignInForm = () => {
   const locale = (params?.locale as string) || 'en'
   const [showPassword, setShowPassword] = useState(false)
   const [shouldRedirect, setShouldRedirect] = useState(false)
-
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileRef = useRef<BoundTurnstileObject | null>(null)
+  const turnstileTokenRef = useRef('')
+  
   const searchParams = useSearchParams()
   const currentDateTime = getCurrentDateTime()
 
@@ -82,9 +86,16 @@ const SignInForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     try {
+      const token = turnstileTokenRef.current || turnstileToken
+      if (!token) {
+        turnstileRef.current?.execute()
+        return
+      }
+
       const response: ServerActionResponse = await signinAction({
         ...data,
         locale: locale,
+        turnstileToken: token,
       })
 
       if (response.success) {
@@ -230,6 +241,23 @@ const SignInForm = () => {
               >
                 {t('forgotPassword')}
               </Link>
+              <Turnstile
+                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                size="invisible"
+                execution="execute"
+                onLoad={(_, boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile
+                }}
+                onVerify={(token) => {
+                  turnstileTokenRef.current = token
+                  setTurnstileToken(token)
+                  form.handleSubmit(onSubmit)()
+                }}
+                onExpire={() => {
+                  turnstileTokenRef.current = ''
+                  setTurnstileToken('')
+                }}
+              />
               <Button
                 type="submit"
                 className="w-full bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand900/80"

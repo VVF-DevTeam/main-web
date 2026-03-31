@@ -8,6 +8,7 @@ import { sendVerificationEmail } from '../email/sendVerificationEmail'
 import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { linkGuestPaymentsToUser } from '../payment/linkGuestPayments'
 import initTranslation from '@/app/i18n'
+import { verifyTurnstileToken } from '@/lib/security/verifyTurnstile'
 
 interface signupActionProps {
   firstName: string
@@ -19,6 +20,7 @@ interface signupActionProps {
   password: string
   confirmPassword: string
   locale?: string
+  turnstileToken: string
 }
 export const signupAction = async (formData: signupActionProps) => {
   try {
@@ -32,7 +34,16 @@ export const signupAction = async (formData: signupActionProps) => {
       password,
       confirmPassword,
       locale,
+      turnstileToken,
     } = formData
+
+    const turnstileResult = await verifyTurnstileToken(turnstileToken)
+    if (!turnstileResult.ok) {
+      return {
+        message: 'Captcha verification failed',
+        success: false,
+      }
+    }
 
     // CHECK IF THE INPUT IS VALID
     const validInput = signUpSchema.safeParse(formData)

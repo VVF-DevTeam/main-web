@@ -66,6 +66,17 @@ export default function MobileSidebar({
   const isSuperAdmin = user?.role?.includes('SUPERADMIN') ?? false
   const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
 
+  const adminSectionKeysVisibleToHost = [
+    'admin-event-statistics',
+    'admin-email-composition',
+  ] as const
+
+  const adminTopLinkOrder = [
+    'admin-event-statistics',
+    'admin-payment-management',
+    'admin-email-composition',
+  ] as const
+
   return (
     <div className="block md:hidden">
       {/* Toggle Button */}
@@ -116,10 +127,27 @@ export default function MobileSidebar({
                 Admin Section
               </h2>
               <ul className="space-y-4">
-                {(isAdmin || isSuperAdmin) &&
-                  Object.entries(sections)
-                    .filter(([key]) => key.includes('admin'))
-                    .map(([key, label]) => (
+                {Object.entries(sections)
+                  .filter(([key]) => {
+                    if (!key.includes('admin')) return false
+                    if (isAdmin || isSuperAdmin) return true
+                    return (
+                      isHost &&
+                      adminSectionKeysVisibleToHost.includes(
+                        key as (typeof adminSectionKeysVisibleToHost)[number],
+                      )
+                    )
+                  })
+                  .sort(([a], [b]) => {
+                    const ia = adminTopLinkOrder.indexOf(
+                      a as (typeof adminTopLinkOrder)[number],
+                    )
+                    const ib = adminTopLinkOrder.indexOf(
+                      b as (typeof adminTopLinkOrder)[number],
+                    )
+                    return ia - ib
+                  })
+                  .map(([key, label]) => (
                       <li key={key}>
                         <Link
                           href={`/${locale}/profile?section=${key}`}
