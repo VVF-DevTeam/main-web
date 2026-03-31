@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
@@ -34,7 +34,7 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 import ProviderButtons from './ProviderButtons'
-import Turnstile from 'react-turnstile'
+import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
@@ -45,6 +45,8 @@ const SignUpForm = () => {
   const [phoneExtension, setPhoneExtension] = useState<string>('+1')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileRef = useRef<BoundTurnstileObject | null>(null)
+  const turnstileTokenRef = useRef('')
   const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -63,17 +65,9 @@ const SignUpForm = () => {
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     try {
-      if (!turnstileToken) {
-        toast.error('Please complete captcha verification', {
-          description: (
-            <span style={{ color: 'var(--muted-foreground)' }}>
-              {currentDateTime}
-            </span>
-          ),
-          style: {
-            color: '#ef4444',
-          },
-        })
+      const token = turnstileTokenRef.current || turnstileToken
+      if (!token) {
+        turnstileRef.current?.execute()
         return
       }
 
@@ -85,7 +79,7 @@ const SignUpForm = () => {
         ...data,
         phoneNumber: fullPhone,
         locale: locale,
-        turnstileToken,
+        turnstileToken: token,
       })
       // Check if the account was created
       if (response.success) {
@@ -403,12 +397,23 @@ const SignUpForm = () => {
               <div className="mt-6 flex flex-col gap-y-4 self-stretch">
                 <Turnstile
                   sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                  onVerify={(token) => setTurnstileToken(token)}
-                  onExpire={() => setTurnstileToken('')}
+                  size="invisible"
+                  execution="execute"
+                  onLoad={(_, boundTurnstile) => {
+                    turnstileRef.current = boundTurnstile
+                  }}
+                  onVerify={(token) => {
+                    turnstileTokenRef.current = token
+                    setTurnstileToken(token)
+                    form.handleSubmit(onSubmit)()
+                  }}
+                  onExpire={() => {
+                    turnstileTokenRef.current = ''
+                    setTurnstileToken('')
+                  }}
                 />
                 <Button
                   type="submit"
-                  disabled={!turnstileToken}
                   className="max-w-60 bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand600"
                 >
                   {t('createAccount')}

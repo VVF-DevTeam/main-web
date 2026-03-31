@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import Loader from '@/components/loader/Loader'
-import Turnstile from 'react-turnstile'
+import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: 'Invalid email format' }),
@@ -37,6 +37,8 @@ const ForgotPasswordClient = () => {
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const turnstileRef = useRef<BoundTurnstileObject | null>(null)
+  const turnstileTokenRef = useRef('')
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -57,24 +59,16 @@ const ForgotPasswordClient = () => {
   // Submit email to reset password
   const onSubmitEmail = async (data: ForgotPasswordFormValues) => {
     try {
-      if (!turnstileToken) {
-        toast.error('Please complete captcha verification', {
-          description: (
-            <span style={{ color: 'var(--muted-foreground)' }}>
-              {currentDateTime}
-            </span>
-          ),
-          style: {
-            color: '#ef4444',
-          },
-        })
+      const token = turnstileTokenRef.current || turnstileToken
+      if (!token) {
+        turnstileRef.current?.execute()
         return
       }
 
       setLoading(true)
       const response = await axiosInstance.post('/api/auth/forgotPassword', {
         email: data.email,
-        turnstileToken,
+        turnstileToken: token,
       })
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
@@ -196,13 +190,25 @@ const ForgotPasswordClient = () => {
                 />
                 <Turnstile
                   sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                  onVerify={(token) => setTurnstileToken(token)}
-                  onExpire={() => setTurnstileToken('')}
+                  size="invisible"
+                  execution="execute"
+                  onLoad={(_, boundTurnstile) => {
+                    turnstileRef.current = boundTurnstile
+                  }}
+                  onVerify={(token) => {
+                    turnstileTokenRef.current = token
+                    setTurnstileToken(token)
+                    form.handleSubmit(onSubmitEmail)()
+                  }}
+                  onExpire={() => {
+                    turnstileTokenRef.current = ''
+                    setTurnstileToken('')
+                  }}
                 />
 
                 <Button
                   type="submit"
-                  disabled={countDown > 0 || loading || !turnstileToken}
+                  disabled={countDown > 0 || loading}
                   variant="default"
                   className="h-12 w-full"
                 >
