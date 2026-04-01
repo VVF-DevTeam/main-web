@@ -10,7 +10,7 @@ export const POST = async (req: NextRequest) => {
     const turnstileResult = await verifyTurnstileToken(turnstileToken)
     if (!turnstileResult.ok) {
       return NextResponse.json(
-        { message: 'Captcha verification failed' },
+        { message: 'Captcha verification failed, please retry in a moment.' },
         { status: 400 }
       )
     }

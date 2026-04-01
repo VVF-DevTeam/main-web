@@ -9,7 +9,7 @@ export const authAction = async (
 ) => {
      const turnstileResult = await verifyTurnstileToken(turnstileToken)
      if (!turnstileResult.ok) {
-          throw new Error('Captcha verification failed')
+          throw new Error('Captcha verification failed, please retry in a moment.')
      }
 
      await signIn(provider, { redirectTo: '/events' })

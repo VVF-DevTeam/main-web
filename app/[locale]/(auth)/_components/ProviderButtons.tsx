@@ -98,7 +98,7 @@ const ProviderButtons = () => {
       }
       // Rotate token for any provider auth failure
       refreshTurnstileToken()
-      toast.error('Captcha verification failed')
+      toast.error('Captcha verification failed, please retry in a moment.')
       console.log(error)
     } finally {
       setIsVerifying(false)
