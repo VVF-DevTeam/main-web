@@ -3,6 +3,11 @@ import { i18nRouter } from 'next-i18n-router'
 import i18nConfig from './i18nConfig'
 import NextAuth from 'next-auth'
 import authConfig from './auth.config'
+import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
+
+// app/[locale]/(Home)/posts/page.tsx — listing only (not /posts/[postId] or admin)
+const POSTS_LISTING_PATH =
+  /^\/(?:[a-z]{2}|[a-z]{2}-[A-Z]{2})\/posts\/?$/i
 
 // Patterns for routes that need authentication middleware
 const PROTECTED_PAGE_PATTERNS = [
@@ -53,6 +58,24 @@ export default async function middleware(
   if (staticFiles.includes(pathname)) {
     // Let Next.js handle these as static files
     return NextResponse.next()
+  }
+
+  if (POSTS_LISTING_PATH.test(pathname)) {
+    const clientIp = getClientIp(request.headers.get('x-forwarded-for'))
+    const rate = checkRateLimit({
+      key: `posts-page:${clientIp}`,
+      limit: 100,
+      windowMs: 60000,
+    })
+    if (!rate.allowed) {
+      return new NextResponse('Too many requests. Please try again in 1 minute.', {
+        status: 429,
+        headers: {
+          'Retry-After': String(rate.retryAfterSeconds),
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      })
+    }
   }
 
   if (isProtectedRoute(pathname)) {

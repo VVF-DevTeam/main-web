@@ -9,6 +9,8 @@ import { signUpSchema } from '@/lib/zodSchema/signupSchema'
 import { linkGuestPaymentsToUser } from '../payment/linkGuestPayments'
 import initTranslation from '@/app/i18n'
 import { verifyTurnstileToken } from '@/lib/security/verifyTurnstile'
+import { headers } from 'next/headers'
+import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
 
 interface signupActionProps {
   firstName: string
@@ -36,6 +38,22 @@ export const signupAction = async (formData: signupActionProps) => {
       locale,
       turnstileToken,
     } = formData
+
+    const headerStore = await headers()
+    const clientIp = getClientIp(headerStore.get('x-forwarded-for'))
+    const signupKey = `signup:${clientIp}:${email.toLowerCase()}`
+    const signupLimit = checkRateLimit({
+      key: signupKey,
+      limit: 12,
+      windowMs: 2 * 60 * 1000,
+    })
+
+    if (!signupLimit.allowed) {
+      return {
+        message: `Too many sign-up attempts. Please try again in ${signupLimit.retryAfterSeconds} seconds.`,
+        success: false,
+      }
+    }
 
     const turnstileResult = await verifyTurnstileToken(turnstileToken)
     if (!turnstileResult.ok) {

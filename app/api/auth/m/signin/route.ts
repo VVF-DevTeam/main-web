@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
 import { createToken } from '@/lib/actions/token/tokenFunctions'
 import * as jose from 'jose'
+import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
 
 interface SignInRequest {
   email: string
@@ -23,6 +24,26 @@ export const POST = async (req: NextRequest) => {
         { message: 'Email or password is not formatted' },
         { status: 400 }
       )
+
+    const clientIp = getClientIp(req.headers.get('x-forwarded-for'))
+    const signinLimit = checkRateLimit({
+      key: `m-signin:${clientIp}:${parsedCredentials.data.email.toLowerCase()}`,
+      limit: 12,
+      windowMs: 2 * 60 * 1000,
+    })
+    if (!signinLimit.allowed) {
+      return NextResponse.json(
+        {
+          message: `Too many sign-in attempts. Try again in ${signinLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(signinLimit.retryAfterSeconds),
+          },
+        }
+      )
+    }
 
     // Check if the user exists
     const userExists = await prisma.user.findUnique({
