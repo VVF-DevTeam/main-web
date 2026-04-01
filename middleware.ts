@@ -64,7 +64,7 @@ export default async function middleware(
     const clientIp = getClientIp(request.headers.get('x-forwarded-for'))
     const rate = checkRateLimit({
       key: `posts-page:${clientIp}`,
-      limit: 100,
+      limit: 80,
       windowMs: 60000,
     })
     if (!rate.allowed) {

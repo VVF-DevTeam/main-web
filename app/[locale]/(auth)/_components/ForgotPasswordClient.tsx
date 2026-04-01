@@ -42,6 +42,18 @@ const ForgotPasswordClient = () => {
   const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<ForgotPasswordFormValues | null>(null)
+  /**
+   * Turnstile issues the token asynchronously after execute(). If the user submits before
+   * `onVerify` runs, we show the global Loader briefly instead of a toast.
+   *
+   * We keep the timeout id in a ref so we can: (1) cancel the previous wait if the user
+   * clicks again, (2) cancel the wait when a real submit starts (otherwise the timer could
+   * call setLoading(false) while the API request is still in flight), and (3) clear on
+   * unmount to avoid setState after unmount.
+   */
+  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -50,7 +62,7 @@ const ForgotPasswordClient = () => {
     },
   })
 
-  // Cleanup timer on component unmount
+  // Cleanup timers on unmount (avoid intervals/timeouts firing after this component is gone)
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -58,6 +70,9 @@ const ForgotPasswordClient = () => {
       }
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
+      }
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
       }
     }
   }, [])
@@ -76,9 +91,25 @@ const ForgotPasswordClient = () => {
     data: ForgotPasswordFormValues,
     hasRetried = false
   ) => {
+    // No Turnstile token yet: show Loader for a fixed window (no toast). This path returns
+    // early, so we must hide loading via this timeout — `finally` below does not run.
     if (!turnstileToken) {
-      toast.error('Captcha is still verifying, please try again in a moment.')
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
+      }
+      setLoading(true)
+      captchaWaitTimeoutRef.current = setTimeout(() => {
+        captchaWaitTimeoutRef.current = null
+        setLoading(false)
+      }, 2000)
       return
+    }
+
+    // Token is ready: drop any pending "captcha wait" timer so it cannot turn off loading
+    // while this request is running.
+    if (captchaWaitTimeoutRef.current) {
+      clearTimeout(captchaWaitTimeoutRef.current)
+      captchaWaitTimeoutRef.current = null
     }
 
     try {
@@ -167,6 +198,7 @@ const ForgotPasswordClient = () => {
 
   return (
     <>
+      {/* Forgot-password request or brief captcha-not-ready overlay (see onSubmitEmail) */}
       {loading && <Loader />}
       <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
         {/* Background decoration */}

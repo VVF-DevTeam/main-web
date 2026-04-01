@@ -44,6 +44,14 @@ const SignInForm = () => {
   const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<z.infer<typeof signInSchema> | null>(null)
+  /**
+   * Turnstile token arrives asynchronously. Early submit shows Loader briefly; we keep the
+   * timeout id in a ref to cancel it when a real sign-in runs or when the component unmounts,
+   * so we never flip `loading` false at the wrong time or after unmount.
+   */
+  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
 
   const searchParams = useSearchParams()
   const currentDateTime = getCurrentDateTime()
@@ -78,11 +86,14 @@ const SignInForm = () => {
     redirect('/')
   }, [shouldRedirect])
 
-  // Cleanup token refresh interval on unmount
+  // Cleanup Turnstile refresh interval and captcha-wait timeout on unmount
   useEffect(() => {
     return () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
+      }
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
       }
     }
   }, [])
@@ -108,9 +119,24 @@ const SignInForm = () => {
     data: z.infer<typeof signInSchema>,
     hasRetried = false
   ) => {
+    // No token yet: show Loader (see `{loading && <Loader />}`) for a fixed duration.
+    // Early return means `finally` is skipped — the timeout must reset `loading`.
     if (!turnstileToken) {
-      toast.error('Captcha is still verifying, please try again in a moment.')
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
+      }
+      setLoading(true)
+      captchaWaitTimeoutRef.current = setTimeout(() => {
+        captchaWaitTimeoutRef.current = null
+        setLoading(false)
+      }, 2000)
       return
+    }
+
+    // Token present: cancel any pending wait timer so it cannot unset `loading` mid-request.
+    if (captchaWaitTimeoutRef.current) {
+      clearTimeout(captchaWaitTimeoutRef.current)
+      captchaWaitTimeoutRef.current = null
     }
 
     try {
@@ -184,6 +210,7 @@ const SignInForm = () => {
 
   return (
     <>
+      {/* Sign-in in progress, or 2s captcha-not-ready feedback (see onSubmit) */}
       {loading && <Loader />}
       <div className="mt-8 flex w-full flex-col px-6 py-4 md:py-12 lg:px-14 xl:px-20">
         {/* Form Header */}

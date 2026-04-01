@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/select'
 import ProviderButtons from './ProviderButtons'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
+import Loader from '@/components/loader/Loader'
 
 const SignUpForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
@@ -44,12 +45,23 @@ const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [phoneExtension, setPhoneExtension] = useState<string>('+1')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
   const turnstileTokenRef = useRef('')
   const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<z.infer<typeof signUpSchema> | null>(null)
+  /**
+   * Same pattern as sign-in/forgot-password: invisible Turnstile may not have called `onVerify`
+   * yet when the user submits. We show Loader for 2s without running `signupAction`.
+   *
+   * Ref holds the timeout id so we clear/replace it on repeat clicks, cancel it when submit
+   * proceeds with a token, and clear on unmount.
+   */
+  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
   const currentDateTime = getCurrentDateTime()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -66,11 +78,14 @@ const SignUpForm = () => {
     },
   })
 
-  // Cleanup token refresh interval on unmount
+  // Cleanup Turnstile refresh interval and captcha-wait timeout on unmount
   useEffect(() => {
     return () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
+      }
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
       }
     }
   }, [])
@@ -88,9 +103,24 @@ const SignUpForm = () => {
     data: z.infer<typeof signUpSchema>,
     hasRetried = false
   ) => {
+    // Captcha not ready: Loader only (no toast). This branch returns before `try`, so only
+    // the timeout clears `loading`; signup does not use `loading` in `finally`.
     if (!turnstileToken) {
-      toast.error('Captcha is still verifying, please try again in a moment.')
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
+      }
+      setLoading(true)
+      captchaWaitTimeoutRef.current = setTimeout(() => {
+        captchaWaitTimeoutRef.current = null
+        setLoading(false)
+      }, 2000)
       return
+    }
+
+    // Avoid the wait timer firing after the user submits with a valid token.
+    if (captchaWaitTimeoutRef.current) {
+      clearTimeout(captchaWaitTimeoutRef.current)
+      captchaWaitTimeoutRef.current = null
     }
 
     try {
@@ -166,7 +196,10 @@ const SignUpForm = () => {
     await onSubmit(data, false)
   }
   return (
-    <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-28">
+    <>
+      {/* Only used for the captcha-not-ready window; email signup itself does not set loading */}
+      {loading && <Loader />}
+      <div className="flex h-full w-full flex-col px-8 py-16 md:pr-12 lg:pl-16 xl:pl-28">
       {/* Form Header */}
       <h1 className="header-font-default mt-8 text-3xl font-semibold text-textColor-brand900 lg:mt-12">
         {t('register')}
@@ -467,6 +500,7 @@ const SignUpForm = () => {
                 />
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="max-w-60 bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand600"
                 >
                   {t('createAccount')}
@@ -493,6 +527,7 @@ const SignUpForm = () => {
         </p>
       </div>
     </div>
+    </>
   )
 }
 

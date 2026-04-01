@@ -7,6 +7,7 @@ import { FcGoogle } from 'react-icons/fc'
 import Image from 'next/image'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 import { toast } from 'sonner'
+import Loader from '@/components/loader/Loader'
 
 const providers: { id: authType; icon: React.ReactNode }[] = [
   { id: 'google', icon: <FcGoogle className="h-6 w-6" /> },
@@ -32,11 +33,25 @@ const ProviderButtons = () => {
   const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingProviderRef = useRef<authType | null>(null)
+  /**
+   * Invisible Turnstile fills `turnstileTokenRef` in `onVerify`, which may lag behind the
+   * user's first click. If they click a provider before the token exists, we show Loader and
+   * re-enable buttons after 2s instead of a toast.
+   *
+   * Stored in a ref so we can cancel/replace the timer (double-clicks, or starting OAuth
+   * once the token arrives) and clear it on unmount.
+   */
+  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  )
 
   useEffect(() => {
     return () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
+      }
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
       }
     }
   }, [])
@@ -52,9 +67,24 @@ const ProviderButtons = () => {
 
   const onSubmit = async (provider: authType, hasRetried = false) => {
     try {
+      // Pre-token click: Loader + disabled buttons; `finally` will not run because we return
+      // before `await`, so the timeout must clear `isVerifying`.
       if (!turnstileTokenRef.current) {
-        toast.error('Captcha is still verifying, please try again in a moment.')
+        if (captchaWaitTimeoutRef.current) {
+          clearTimeout(captchaWaitTimeoutRef.current)
+        }
+        setIsVerifying(true)
+        captchaWaitTimeoutRef.current = setTimeout(() => {
+          captchaWaitTimeoutRef.current = null
+          setIsVerifying(false)
+        }, 2000)
         return
+      }
+      // Real OAuth attempt: cancel any scheduled "wait" callback so it cannot set
+      // isVerifying false while `authAction` is still running.
+      if (captchaWaitTimeoutRef.current) {
+        clearTimeout(captchaWaitTimeoutRef.current)
+        captchaWaitTimeoutRef.current = null
       }
       setIsVerifying(true)
       await authAction(provider, turnstileTokenRef.current)
@@ -91,6 +121,8 @@ const ProviderButtons = () => {
 
   return (
     <>
+      {/* Covers both the 2s “wait for Turnstile” state and the in-flight OAuth redirect */}
+      {isVerifying && <Loader />}
       <Turnstile
         sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
         size="invisible"
