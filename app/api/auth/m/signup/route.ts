@@ -7,6 +7,7 @@ import { createToken } from '@/lib/actions/token/tokenFunctions'
 import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail'
 import { linkGuestPaymentsToUser } from '@/lib/actions/payment/linkGuestPayments'
 import initTranslation from '@/app/i18n'
+import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
 
 interface SignupActionProps {
   firstName: string
@@ -42,6 +43,27 @@ export const POST = async (request: NextRequest) => {
         },
         { status: 400 }
       )
+
+    const clientIp = getClientIp(request.headers.get('x-forwarded-for'))
+    const signupLimit = checkRateLimit({
+      key: `m-signup:${clientIp}:${parsedCredentials.data.email.toLowerCase()}`,
+      limit: 12,
+      windowMs: 2 * 60 * 1000,
+    })
+    if (!signupLimit.allowed) {
+      return NextResponse.json(
+        {
+          message: `Too many sign-up attempts. Try again in ${signupLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(signupLimit.retryAfterSeconds),
+          },
+        }
+      )
+    }
+
     const existedUser = await prisma.user.findUnique({
       where: {
         email: parsedCredentials.data.email,

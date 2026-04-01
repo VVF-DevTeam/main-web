@@ -6,6 +6,8 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from '@/lib/db'
 import initTranslation from '@/app/i18n'
 import { verifyTurnstileToken } from '@/lib/security/verifyTurnstile'
+import { headers } from 'next/headers'
+import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
 
 export const signinAction = async (data: {
   email: string
@@ -18,6 +20,22 @@ export const signinAction = async (data: {
   const { t } = await initTranslation(currentLocale, ['signIn-signUp'])
   
   try {
+    const headerStore = await headers()
+    const clientIp = getClientIp(headerStore.get('x-forwarded-for'))
+    const signinKey = `signin:${clientIp}:${data.email.toLowerCase()}`
+    const signinLimit = checkRateLimit({
+      key: signinKey,
+      limit: 12,
+      windowMs: 2 * 60 * 1000,
+    })
+
+    if (!signinLimit.allowed) {
+      return {
+        message: `Too many sign-in attempts. Please try again in ${signinLimit.retryAfterSeconds} seconds.`,
+        success: false,
+      }
+    }
+
     const turnstileResult = await verifyTurnstileToken(data.turnstileToken)
     if (!turnstileResult.ok) {
       return {
