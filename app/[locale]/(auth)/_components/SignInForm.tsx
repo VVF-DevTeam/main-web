@@ -183,10 +183,11 @@ const SignInForm = () => {
         }
       }
 
-      // If token resolved via retry flow, suppress only the original submit path.
-      if (!hasRetried && tokenResolvedViaRetryRef.current) {
+      // If token was marked as "resolved by retry flow", clear the marker immediately.
+      // Only suppress the original waiting submit path. Retried path must continue.
+      if (tokenResolvedViaRetryRef.current) {
         tokenResolvedViaRetryRef.current = false
-        return
+        if (!hasRetried) return
       }
 
       const response: ServerActionResponse = await signinAction({

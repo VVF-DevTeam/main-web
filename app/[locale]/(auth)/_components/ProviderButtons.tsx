@@ -120,11 +120,11 @@ const ProviderButtons = () => {
       }
 
       // If token resolved via the retry flow, so retry submission will be handled by 'handleVerified' 
-      // so we, suppress this submit path.
-      // The retried call uses `hasRetried = true` and should continue to `authAction`.
-      if (!hasRetried && tokenResolvedViaRetryRef.current) {
+      // If token was marked as "resolved by retry flow", clear the marker immediately.
+      // Only suppress the original waiting submit path. Retried path must continue.
+      if (tokenResolvedViaRetryRef.current) {
         tokenResolvedViaRetryRef.current = false
-        return
+        if (!hasRetried) return
       }
 
       if (!turnstileTokenRef.current) return
