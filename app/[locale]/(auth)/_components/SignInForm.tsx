@@ -163,6 +163,19 @@ const SignInForm = () => {
         try {
           await waitForTurnstileToken(10000)
         } catch {
+          toast.error(
+            'Could not connect to the server, please refresh the page and try again.',
+            {
+              description: (
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
+              ),
+              style: {
+                color: '#ef4444', // red-500 color
+              },
+            }
+          )
           return
         }
       }
@@ -186,7 +199,7 @@ const SignInForm = () => {
         })
         setShouldRedirect(true)
       } else {
-        if (!hasRetried && isCaptchaFailure(response.message)) {
+        if (!hasRetried) {
           pendingSubmissionRef.current = data
           retryAfterCaptchaFailRef.current = true
           refreshTurnstileToken()

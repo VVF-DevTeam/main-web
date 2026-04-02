@@ -130,6 +130,20 @@ const ForgotPasswordClient = () => {
         try {
           await waitForTurnstileToken(10000)
         } catch {
+          setLoading(false)
+          toast.error(
+            'Could not connect to the server, please refresh the page and try again.',
+            {
+              description: (
+                <span style={{ color: 'var(--muted-foreground)' }}>
+                  {currentDateTime}
+                </span>
+              ),
+              style: {
+                color: '#ef4444', // red-500 color
+              },
+            }
+          )
           return
         }
       }
@@ -175,7 +189,7 @@ const ForgotPasswordClient = () => {
           error.response?.data?.message || 'Failed to send reset email'
         const statusCode = error.response?.status || 500
 
-        if (!hasRetried && isCaptchaFailure(errorMessage)) {
+        if (!hasRetried) {
           pendingSubmissionRef.current = data
           retryAfterCaptchaFailRef.current = true
           refreshTurnstileToken()

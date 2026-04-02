@@ -142,6 +142,19 @@ const SignUpForm = () => {
         await waitForTurnstileToken(10000)
       } catch {
         setLoading(false)
+        toast.error(
+          'Could not connect to the server, please refresh the page and try again.',
+          {
+            description: (
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            ),
+            style: {
+              color: '#ef4444', // red-500 color
+            },
+          }
+        )
         return
       }
       // Signup API itself doesn't use `loading`; hide Loader before the request.
@@ -173,7 +186,7 @@ const SignUpForm = () => {
           },
         })
       } else {
-        if (!hasRetried && isCaptchaFailure(response.message)) {
+        if (!hasRetried) {
           pendingSubmissionRef.current = data
           retryAfterCaptchaFailRef.current = true
           refreshTurnstileToken()

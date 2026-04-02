@@ -106,7 +106,15 @@ const ProviderButtons = () => {
         try {
           await waitForTurnstileToken(10000)
         } catch {
-          // No toast here: the UX is "show loader for 2 seconds, then stop".
+          setIsVerifying(false)
+          toast.error(
+            'Could not connect to the provider, please refresh the page and try again.',
+            {
+              style: {
+                color: '#ef4444', // red-500 color
+              },
+            }
+          )
           return
         }
       }
@@ -122,8 +130,11 @@ const ProviderButtons = () => {
 
       await authAction(provider, turnstileTokenRef.current)
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : ''
-      if (!hasRetried && isCaptchaFailure(errorMessage)) {
+      // const errorMessage = error instanceof Error ? error.message : ''
+      // First failure of any kind: refresh token and auto-retry once.
+      // We keep the old captcha check for readability/intent, but broaden behavior
+      // so transient provider/network issues get one automatic retry too.
+      if (!hasRetried) {
         pendingProviderRef.current = provider
         retryAfterCaptchaFailRef.current = true
 
