@@ -173,7 +173,6 @@ const ProviderButtons = () => {
       {isVerifying && <Loader />}
       <Turnstile
         sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        size="invisible"
         execution="execute"
         onLoad={(_, boundTurnstile) => {
           turnstileRef.current = boundTurnstile
@@ -192,7 +191,7 @@ const ProviderButtons = () => {
         onExpire={handleExpired}
         onError={() => {
           setIsVerifying(false)
-          toast.error('Captcha failed. Please try again.')
+          toast.error('Could not connect to the provider, please refresh the page and try again.')
         }}
       />
       <div className="flex w-full flex-col justify-between gap-x-2 gap-y-4 xl:flex-row xl:gap-x-4">
