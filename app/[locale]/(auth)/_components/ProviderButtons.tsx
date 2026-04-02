@@ -68,7 +68,7 @@ const ProviderButtons = () => {
     turnstileRef.current.execute()
   }
 
-  const waitForTurnstileToken = (ms = 2000) => {
+  const waitForTurnstileToken = (ms = 10000) => {
     // If we already have a token, no need to wait.
     if (turnstileTokenRef.current) {
       return Promise.resolve(turnstileTokenRef.current)
@@ -104,7 +104,7 @@ const ProviderButtons = () => {
       // Wait for the Turnstile token to be verified before calling the server.
       if (!turnstileTokenRef.current) {
         try {
-          await waitForTurnstileToken(2000)
+          await waitForTurnstileToken(10000)
         } catch {
           // No toast here: the UX is "show loader for 2 seconds, then stop".
           return

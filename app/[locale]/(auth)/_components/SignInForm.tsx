@@ -116,7 +116,7 @@ const SignInForm = () => {
     turnstileRef.current.execute()
   }
 
-  const waitForTurnstileToken = (ms = 2000) => {
+  const waitForTurnstileToken = (ms = 10000) => {
     // Fast path if token is already present.
     if (turnstileTokenRef.current) {
       return Promise.resolve(turnstileTokenRef.current)
@@ -161,7 +161,7 @@ const SignInForm = () => {
       // No toast: UX is "show Loader briefly, then stop if timeout".
       if (!turnstileTokenRef.current) {
         try {
-          await waitForTurnstileToken(2000)
+          await waitForTurnstileToken(10000)
         } catch {
           return
         }

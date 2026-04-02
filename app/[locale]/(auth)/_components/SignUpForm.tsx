@@ -98,7 +98,7 @@ const SignUpForm = () => {
     turnstileRef.current.execute()
   }
 
-  const waitForTurnstileToken = (ms = 2000) => {
+  const waitForTurnstileToken = (ms = 10000) => {
     if (turnstileTokenRef.current) {
       return Promise.resolve(turnstileTokenRef.current)
     }
@@ -139,7 +139,7 @@ const SignUpForm = () => {
     if (!turnstileTokenRef.current) {
       setLoading(true)
       try {
-        await waitForTurnstileToken(2000)
+        await waitForTurnstileToken(10000)
       } catch {
         setLoading(false)
         return

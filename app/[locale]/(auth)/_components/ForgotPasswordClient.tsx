@@ -83,7 +83,7 @@ const ForgotPasswordClient = () => {
     turnstileRef.current.execute()
   }
 
-  const waitForTurnstileToken = (ms = 2000) => {
+  const waitForTurnstileToken = (ms = 10000) => {
     if (turnstileTokenRef.current) {
       return Promise.resolve(turnstileTokenRef.current)
     }
@@ -128,7 +128,7 @@ const ForgotPasswordClient = () => {
       // If token isn't ready yet, show Loader and wait (max 2s) for Turnstile.
       if (!turnstileTokenRef.current) {
         try {
-          await waitForTurnstileToken(2000)
+          await waitForTurnstileToken(10000)
         } catch {
           return
         }
