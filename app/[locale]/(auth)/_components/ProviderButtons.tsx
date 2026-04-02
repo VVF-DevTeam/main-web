@@ -188,7 +188,6 @@ const ProviderButtons = () => {
       {isVerifying && <Loader />}
       <Turnstile
         sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        size="invisible"
         execution="execute"
         onLoad={(_, boundTurnstile) => {
           turnstileRef.current = boundTurnstile

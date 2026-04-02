@@ -3,7 +3,7 @@ import { getAllPublishedEventsWithRelations } from '@/lib/actions/event/getEvent
 
 // Components
 import EventListHorizontal from './_components/EventListHorizontal'
-import EventAdminButtons from './_components/EventAdminButtons'
+// import EventAdminButtons from './_components/EventAdminButtons'
 // import EventHeroImage from './_components/EventHeroImage'
 import EventInstruction from './_components/EventInstruction'
 import EventCalendar from './_components/EventCalendar'
@@ -71,8 +71,8 @@ const EventsPage = async ({
         currentPage={upcomingPageNum}
         totalPages={totalPagesUpcoming}
         totalItems={upcomingEvents.length}
-      />
-      <EventAdminButtons />
+      />z
+      {/* <EventAdminButtons /> */}
       <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
         <EventListHorizontal

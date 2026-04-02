@@ -1,13 +1,11 @@
-import Link from 'next/link'
-import { PlusCircle, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import SearchBox from '../../../../components/searchAndFilter/SearchBox'
 import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
 import { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
 import initTranslations from '@/app/i18n'
 import PublishedPosts from './_components/PublishedPosts'
 import PaginatedSocialPosts from '../_components/_socialmediaposts/PaginatedSocialPosts'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
+// import { roleCheck } from '@/lib/actions/user/roleCheck'
 import { auth } from '@/auth'
 import AddReviewButton from '@/components/review/AddReviewButton'
 import ReviewsDisplay from './_components/ReviewsDisplay'
@@ -61,7 +59,8 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
   const socialPostsPerPage = 4
 
   // Check if user is admin
-  const isAdmin = Boolean(await roleCheck({ role: 'ADMIN' }))
+  // const isAdmin = Boolean(await roleCheck({ role: 'ADMIN' }))
+  // const isSuperAdmin = Boolean(await roleCheck({ role: 'SUPERADMIN' }))
 
   // Get current user session
   const session = await auth()
@@ -175,7 +174,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
             </Suspense>
 
             {/* Admin Buttons */}
-            {isAdmin && (
+            {/* {(isAdmin || isSuperAdmin) && (
               <div className="flex-end mt-6 w-full flex-wrap gap-x-4 pl-4 sm:px-6">
                 <Link href="/posts/allPosts" className="group mb-2 py-6">
                   <Button
@@ -197,7 +196,7 @@ const Posts = async ({ params, searchParams }: PostsProps) => {
                   </Button>
                 </Link>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Social Posts */}
