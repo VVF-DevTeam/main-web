@@ -119,9 +119,10 @@ const ProviderButtons = () => {
         }
       }
 
-      // If token resolved via the "retry after captcha failure" flow, the retry
-      // submission will already be handled by `handleVerified`.
-      if (tokenResolvedViaRetryRef.current) {
+      // If token resolved via the retry flow, so retry submission will be handled by 'handleVerified' 
+      // so we, suppress this submit path.
+      // The retried call uses `hasRetried = true` and should continue to `authAction`.
+      if (!hasRetried && tokenResolvedViaRetryRef.current) {
         tokenResolvedViaRetryRef.current = false
         return
       }
@@ -163,6 +164,9 @@ const ProviderButtons = () => {
       tokenWaitResolveRef.current(token)
     }
 
+    // Because retry needs a fresh Turnstile token, 
+    // and handleVerified is the first reliable point where that new token is guaranteed to exist.
+    // So we can call `onSubmit` with `hasRetried = true` to handle the retry.
     if (retryAfterCaptchaFailRef.current && pendingProviderRef.current) {
       const provider = pendingProviderRef.current
       retryAfterCaptchaFailRef.current = false
@@ -184,6 +188,7 @@ const ProviderButtons = () => {
       {isVerifying && <Loader />}
       <Turnstile
         sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        size="invisible"
         execution="execute"
         onLoad={(_, boundTurnstile) => {
           turnstileRef.current = boundTurnstile

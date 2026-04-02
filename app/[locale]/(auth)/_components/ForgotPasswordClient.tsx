@@ -49,6 +49,9 @@ const ForgotPasswordClient = () => {
    */
   const tokenWaitResolveRef = useRef<((token: string) => void) | null>(null)
   const tokenWaitRejectRef = useRef<((err: unknown) => void) | null>(null)
+  // If token is resolved by retry flow, prevent the original waiting submit
+  // from continuing so we avoid duplicate submissions.
+  const tokenResolvedViaRetryRef = useRef(false)
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -146,6 +149,12 @@ const ForgotPasswordClient = () => {
           )
           return
         }
+      }
+
+      // If token resolved via retry flow, suppress only the original submit path.
+      if (!hasRetried && tokenResolvedViaRetryRef.current) {
+        tokenResolvedViaRetryRef.current = false
+        return
       }
 
       const response = await axiosInstance.post('/api/auth/forgotPassword', {
@@ -303,6 +312,10 @@ const ForgotPasswordClient = () => {
                   onVerify={(token) => {
                     turnstileTokenRef.current = token
                     setTurnstileToken(token)
+                    const isRetryFlow =
+                      retryAfterCaptchaFailRef.current &&
+                      pendingSubmissionRef.current
+                    tokenResolvedViaRetryRef.current = Boolean(isRetryFlow)
                     if (tokenWaitResolveRef.current) {
                       tokenWaitResolveRef.current(token)
                     }
