@@ -43,17 +43,12 @@ const ForgotPasswordClient = () => {
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<ForgotPasswordFormValues | null>(null)
   /**
-   * Turnstile issues the token asynchronously after execute(). If the user submits before
-   * `onVerify` runs, we show the global Loader briefly instead of a toast.
-   *
-   * We keep the timeout id in a ref so we can: (1) cancel the previous wait if the user
-   * clicks again, (2) cancel the wait when a real submit starts (otherwise the timer could
-   * call setLoading(false) while the API request is still in flight), and (3) clear on
-   * unmount to avoid setState after unmount.
+   * Promise-based waiting for Turnstile token verification.
+   * If the user submits before `onVerify(token)` runs, we show Loader and wait
+   * up to 2 seconds before calling the API.
    */
-  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  )
+  const tokenWaitResolveRef = useRef<((token: string) => void) | null>(null)
+  const tokenWaitRejectRef = useRef<((err: unknown) => void) | null>(null)
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -71,9 +66,8 @@ const ForgotPasswordClient = () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
       }
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-      }
+      tokenWaitResolveRef.current = null
+      tokenWaitRejectRef.current = null
     }
   }, [])
 
@@ -82,8 +76,46 @@ const ForgotPasswordClient = () => {
 
   const refreshTurnstileToken = () => {
     if (!turnstileRef.current) return
+    // Clear token immediately so the next submit waits for a fresh `onVerify`.
+    turnstileTokenRef.current = ''
+    setTurnstileToken('')
     turnstileRef.current.reset()
     turnstileRef.current.execute()
+  }
+
+  const waitForTurnstileToken = (ms = 2000) => {
+    if (turnstileTokenRef.current) {
+      return Promise.resolve(turnstileTokenRef.current)
+    }
+
+    // Prevent hanging if a new submit starts a new wait.
+    if (tokenWaitRejectRef.current) {
+      tokenWaitRejectRef.current(
+        new Error('Superseded by a newer token wait')
+      )
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(new Error('Turnstile token timeout'))
+      }, ms)
+
+      tokenWaitResolveRef.current = (token) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        resolve(token)
+      }
+
+      tokenWaitRejectRef.current = (err) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(err)
+      }
+    })
   }
 
   // Submit email to reset password
@@ -91,32 +123,20 @@ const ForgotPasswordClient = () => {
     data: ForgotPasswordFormValues,
     hasRetried = false
   ) => {
-    // No Turnstile token yet: show Loader for a fixed window (no toast). This path returns
-    // early, so we must hide loading via this timeout — `finally` below does not run.
-    if (!turnstileToken) {
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-      }
-      setLoading(true)
-      captchaWaitTimeoutRef.current = setTimeout(() => {
-        captchaWaitTimeoutRef.current = null
-        setLoading(false)
-      }, 2000)
-      return
-    }
-
-    // Token is ready: drop any pending "captcha wait" timer so it cannot turn off loading
-    // while this request is running.
-    if (captchaWaitTimeoutRef.current) {
-      clearTimeout(captchaWaitTimeoutRef.current)
-      captchaWaitTimeoutRef.current = null
-    }
-
     try {
       setLoading(true)
+      // If token isn't ready yet, show Loader and wait (max 2s) for Turnstile.
+      if (!turnstileTokenRef.current) {
+        try {
+          await waitForTurnstileToken(2000)
+        } catch {
+          return
+        }
+      }
+
       const response = await axiosInstance.post('/api/auth/forgotPassword', {
         email: data.email,
-        turnstileToken,
+        turnstileToken: turnstileTokenRef.current,
       })
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
@@ -269,6 +289,9 @@ const ForgotPasswordClient = () => {
                   onVerify={(token) => {
                     turnstileTokenRef.current = token
                     setTurnstileToken(token)
+                    if (tokenWaitResolveRef.current) {
+                      tokenWaitResolveRef.current(token)
+                    }
                     if (
                       retryAfterCaptchaFailRef.current &&
                       pendingSubmissionRef.current
@@ -282,6 +305,9 @@ const ForgotPasswordClient = () => {
                   onExpire={() => {
                     turnstileTokenRef.current = ''
                     setTurnstileToken('')
+                    if (tokenWaitRejectRef.current) {
+                      tokenWaitRejectRef.current(new Error('Turnstile expired'))
+                    }
                   }}
                 />
 

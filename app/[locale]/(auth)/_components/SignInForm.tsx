@@ -45,13 +45,12 @@ const SignInForm = () => {
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<z.infer<typeof signInSchema> | null>(null)
   /**
-   * Turnstile token arrives asynchronously. Early submit shows Loader briefly; we keep the
-   * timeout id in a ref to cancel it when a real sign-in runs or when the component unmounts,
-   * so we never flip `loading` false at the wrong time or after unmount.
+   * Turnstile is invisible: `onVerify(token)` can run after the user clicks submit.
+   * This Promise lets us deterministically wait for a verified token (or timeout)
+   * before calling `signinAction`.
    */
-  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  )
+  const tokenWaitResolveRef = useRef<((token: string) => void) | null>(null)
+  const tokenWaitRejectRef = useRef<((err: unknown) => void) | null>(null)
 
   const searchParams = useSearchParams()
   const currentDateTime = getCurrentDateTime()
@@ -92,9 +91,8 @@ const SignInForm = () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
       }
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-      }
+      tokenWaitResolveRef.current = null
+      tokenWaitRejectRef.current = null
     }
   }, [])
 
@@ -111,40 +109,68 @@ const SignInForm = () => {
 
   const refreshTurnstileToken = () => {
     if (!turnstileRef.current) return
+    // Clear token immediately so the next submit waits for a fresh `onVerify`.
+    turnstileTokenRef.current = ''
+    setTurnstileToken('')
     turnstileRef.current.reset()
     turnstileRef.current.execute()
+  }
+
+  const waitForTurnstileToken = (ms = 2000) => {
+    // Fast path if token is already present.
+    if (turnstileTokenRef.current) {
+      return Promise.resolve(turnstileTokenRef.current)
+    }
+
+    // Avoid hanging if a second submit starts a new wait: reject the previous one.
+    if (tokenWaitRejectRef.current) {
+      tokenWaitRejectRef.current(new Error('Superseded by a newer token wait'))
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(new Error('Turnstile token timeout'))
+      }, ms)
+
+      tokenWaitResolveRef.current = (token) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        resolve(token)
+      }
+
+      tokenWaitRejectRef.current = (err) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(err)
+      }
+    })
   }
 
   const onSubmit = async (
     data: z.infer<typeof signInSchema>,
     hasRetried = false
   ) => {
-    // No token yet: show Loader (see `{loading && <Loader />}`) for a fixed duration.
-    // Early return means `finally` is skipped — the timeout must reset `loading`.
-    if (!turnstileToken) {
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-      }
-      setLoading(true)
-      captchaWaitTimeoutRef.current = setTimeout(() => {
-        captchaWaitTimeoutRef.current = null
-        setLoading(false)
-      }, 2000)
-      return
-    }
-
-    // Token present: cancel any pending wait timer so it cannot unset `loading` mid-request.
-    if (captchaWaitTimeoutRef.current) {
-      clearTimeout(captchaWaitTimeoutRef.current)
-      captchaWaitTimeoutRef.current = null
-    }
-
     try {
       setLoading(true)
+
+      // If token isn't ready yet, wait for Turnstile verification (max 2s).
+      // No toast: UX is "show Loader briefly, then stop if timeout".
+      if (!turnstileTokenRef.current) {
+        try {
+          await waitForTurnstileToken(2000)
+        } catch {
+          return
+        }
+      }
+
       const response: ServerActionResponse = await signinAction({
         ...data,
         locale: locale,
-        turnstileToken,
+        turnstileToken: turnstileTokenRef.current,
       })
 
       if (response.success) {
@@ -327,6 +353,10 @@ const SignInForm = () => {
                   onVerify={(token) => {
                     turnstileTokenRef.current = token
                     setTurnstileToken(token)
+                    // Resolve any `waitForTurnstileToken()` created by a pre-token submit.
+                    if (tokenWaitResolveRef.current) {
+                      tokenWaitResolveRef.current(token)
+                    }
                     if (
                       retryAfterCaptchaFailRef.current &&
                       pendingSubmissionRef.current
@@ -340,10 +370,14 @@ const SignInForm = () => {
                   onExpire={() => {
                     turnstileTokenRef.current = ''
                     setTurnstileToken('')
+                    if (tokenWaitRejectRef.current) {
+                      tokenWaitRejectRef.current(new Error('Turnstile expired'))
+                    }
                   }}
                 />
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="w-full bg-bgColor-brand900 font-[600] text-textColor-white transition-all hover:scale-105 hover:bg-bgColor-brand900/80"
                 >
                   {t('login')}

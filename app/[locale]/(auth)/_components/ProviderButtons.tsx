@@ -34,25 +34,25 @@ const ProviderButtons = () => {
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingProviderRef = useRef<authType | null>(null)
   /**
-   * Invisible Turnstile fills `turnstileTokenRef` in `onVerify`, which may lag behind the
-   * user's first click. If they click a provider before the token exists, we show Loader and
-   * re-enable buttons after 2s instead of a toast.
+   * Promise-based waiting for Turnstile verification.
    *
-   * Stored in a ref so we can cancel/replace the timer (double-clicks, or starting OAuth
-   * once the token arrives) and clear it on unmount.
+   * Turnstile is "invisible" and may verify after the user clicks a provider.
+   * To guarantee we only call `authAction` after `handleVerified` ran, we wait
+   * for the next `onVerify(token)` via a Promise.
    */
-  const captchaWaitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  )
+  const tokenWaitResolveRef = useRef<((token: string) => void) | null>(null)
+  const tokenWaitRejectRef = useRef<((err: unknown) => void) | null>(null)
+  // If the token arrives because of a "retry after captcha failure" flow,
+  // we don't want the pre-token click handler to submit again.
+  const tokenResolvedViaRetryRef = useRef(false)
 
   useEffect(() => {
     return () => {
       if (tokenRefreshIntervalRef.current) {
         clearInterval(tokenRefreshIntervalRef.current)
       }
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-      }
+      tokenWaitResolveRef.current = null
+      tokenWaitRejectRef.current = null
     }
   }, [])
 
@@ -61,44 +61,80 @@ const ProviderButtons = () => {
 
   const refreshTurnstileToken = () => {
     if (!turnstileRef.current) return
+    // Clear any existing token immediately so we can't accidentally reuse it
+    // while the new `execute()` is still in flight.
+    turnstileTokenRef.current = ''
     turnstileRef.current.reset()
     turnstileRef.current.execute()
   }
 
+  const waitForTurnstileToken = (ms = 2000) => {
+    // If we already have a token, no need to wait.
+    if (turnstileTokenRef.current) {
+      return Promise.resolve(turnstileTokenRef.current)
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(new Error('Turnstile token timeout'))
+      }, ms)
+
+      tokenWaitResolveRef.current = (token) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        resolve(token)
+      }
+
+      tokenWaitRejectRef.current = (err) => {
+        window.clearTimeout(timeoutId)
+        tokenWaitResolveRef.current = null
+        tokenWaitRejectRef.current = null
+        reject(err)
+      }
+    })
+  }
+
   const onSubmit = async (provider: authType, hasRetried = false) => {
     try {
-      // Pre-token click: Loader + disabled buttons; `finally` will not run because we return
-      // before `await`, so the timeout must clear `isVerifying`.
+      setIsVerifying(true)
+
+      // Wait for the Turnstile token to be verified before calling the server.
       if (!turnstileTokenRef.current) {
-        if (captchaWaitTimeoutRef.current) {
-          clearTimeout(captchaWaitTimeoutRef.current)
+        try {
+          await waitForTurnstileToken(2000)
+        } catch {
+          // No toast here: the UX is "show loader for 2 seconds, then stop".
+          return
         }
-        setIsVerifying(true)
-        captchaWaitTimeoutRef.current = setTimeout(() => {
-          captchaWaitTimeoutRef.current = null
-          setIsVerifying(false)
-        }, 2000)
+      }
+
+      // If token resolved via the "retry after captcha failure" flow, the retry
+      // submission will already be handled by `handleVerified`.
+      if (tokenResolvedViaRetryRef.current) {
+        tokenResolvedViaRetryRef.current = false
         return
       }
-      // Real OAuth attempt: cancel any scheduled "wait" callback so it cannot set
-      // isVerifying false while `authAction` is still running.
-      if (captchaWaitTimeoutRef.current) {
-        clearTimeout(captchaWaitTimeoutRef.current)
-        captchaWaitTimeoutRef.current = null
-      }
-      setIsVerifying(true)
+
+      if (!turnstileTokenRef.current) return
+
       await authAction(provider, turnstileTokenRef.current)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : ''
       if (!hasRetried && isCaptchaFailure(errorMessage)) {
         pendingProviderRef.current = provider
         retryAfterCaptchaFailRef.current = true
+
+        // refreshTurnstileToken will trigger onVerify/handleVerified again, which has a check to call onSubmit again if it is isCaptchaFailure
         refreshTurnstileToken()
         return
       }
+
       // Rotate token for any provider auth failure
       refreshTurnstileToken()
-      toast.error('Captcha verification failed, please retry in a moment.')
+      toast.error(`Could not connect to ${provider}, please try again or refresh the page.`)
       console.log(error)
     } finally {
       setIsVerifying(false)
@@ -107,6 +143,15 @@ const ProviderButtons = () => {
 
   const handleVerified = (token: string) => {
     turnstileTokenRef.current = token
+    const isRetryFlow =
+      retryAfterCaptchaFailRef.current && pendingProviderRef.current
+    tokenResolvedViaRetryRef.current = Boolean(isRetryFlow)
+
+    // Resolve any pending `waitForTurnstileToken()` promise.
+    if (tokenWaitResolveRef.current) {
+      tokenWaitResolveRef.current(token)
+    }
+
     if (retryAfterCaptchaFailRef.current && pendingProviderRef.current) {
       const provider = pendingProviderRef.current
       retryAfterCaptchaFailRef.current = false
@@ -117,6 +162,9 @@ const ProviderButtons = () => {
 
   const handleExpired = () => {
     turnstileTokenRef.current = ''
+    if (tokenWaitRejectRef.current) {
+      tokenWaitRejectRef.current(new Error('Turnstile expired'))
+    }
   }
 
   return (
