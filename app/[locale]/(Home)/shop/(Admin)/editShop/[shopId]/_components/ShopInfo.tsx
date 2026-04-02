@@ -40,7 +40,7 @@ const ShopInfoSchema = z.object({
         .refine((val) => !val || val.length >= 3, {
             message: 'Contact phone must be at least 3 characters',
         }),
-    termsUrl: z
+    termsAndConditions: z
         .string()
         .min(10, { message: 'Terms and Conditions must be at least 10 characters' })
         .optional(),
@@ -57,7 +57,7 @@ const ShopInfo = ({ shop }: ShopInfoProps) => {
         defaultValues: {
             contactEmail: shop?.contactEmail || '',
             contactPhone: shop?.contactPhone || '',
-            termsUrl: shop?.termsUrl || '',
+            termsAndConditions: shop?.termsAndConditions || '',
         },
     })
 
@@ -98,7 +98,7 @@ const ShopInfo = ({ shop }: ShopInfoProps) => {
     }
 
     const hasAnyInfo =
-        !!shop.contactEmail || !!shop.contactPhone || !!shop.termsUrl
+        !!shop.contactEmail || !!shop.contactPhone || !!shop.termsAndConditions
 
     return (
         <>
@@ -177,7 +177,7 @@ const ShopInfo = ({ shop }: ShopInfoProps) => {
                             />
 
                             <FormField
-                                name="termsUrl"
+                                name="termsAndConditions"
                                 control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
@@ -219,8 +219,8 @@ const ShopInfo = ({ shop }: ShopInfoProps) => {
                         <div>
                             <span className="font-semibold">Terms and Conditions:</span>
                             <div className="mt-2">
-                                {shop.termsUrl ? (
-                                    <TextPreview value={shop.termsUrl} />
+                                {shop.termsAndConditions ? (
+                                    <TextPreview value={shop.termsAndConditions} />
                                 ) : (
                                     <span>—</span>
                                 )}

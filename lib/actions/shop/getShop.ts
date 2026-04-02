@@ -22,6 +22,7 @@ export const getAllShops = unstable_cache(
           isPublished: true,
           sortOrder: true,
           updatedAt: true,
+          termsAndConditions: true,
           shopDiscounts: true,
           event: {
             select: {

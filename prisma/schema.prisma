@@ -421,8 +421,8 @@ model Shop {
   // Contact/Business info
   contactEmail String?
   contactPhone String?
-  termsUrl     String?
-  
+  termsAndConditions String?
+
   shopItems   ShopItem[]   @relation("ShopToShopItem")
   payments    Payment[]
   event       Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)

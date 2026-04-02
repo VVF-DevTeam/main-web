@@ -8,7 +8,6 @@ import {
     ArrowLeft,
     ArrowRight,
     ShoppingBag,
-    Search,
 } from "lucide-react"
 import Image from 'next/image'
 import {
@@ -29,6 +28,7 @@ import { UserInfoProps } from '@/lib/types/userInfo'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { JsonValue } from "@prisma/client/runtime/library"
+import TextPreview from "@/components/quill/TextPreview"
 
 export type ShopItemFilterData = {
     id: string
@@ -60,6 +60,7 @@ type ShopWithItems = {
     type: ShopType
     isPublished: boolean
     sortOrder: number | null
+    termsAndConditions?: string | null
     shopItems: ShopItemFilterData[]
     event?: {
         title: string
@@ -359,6 +360,11 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialShopSlug, publishedShops.length])
+
+    useEffect(() => {
+        setTermsModalOpen(false)
+    }, [selectedShopId])
+
     const [selectedShopType, setSelectedShopType] = useState<string>('')
     const [selectedType, setSelectedType] = useState<string>('')
     const [selectedTag, setSelectedTag] = useState<string>('')
@@ -367,6 +373,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
     const [selectedItem, setSelectedItem] = useState<ShopItemFilterData | null>(null)
     const [selectedItemShop, setSelectedItemShop] = useState<{ id: string; title: string } | null>(null)
     const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
+    const [termsModalOpen, setTermsModalOpen] = useState(false)
 
     const openImageModal = (imageUrl: string) => setModalImageUrl(imageUrl)
     const closeImageModal = () => setModalImageUrl(null)
@@ -908,6 +915,23 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 </Select>
                             </div>
                         </div>
+
+                        {/* Shop Terms and Conditions */}
+                        {selectedShop && (
+                            <div className="text-sm text-textColor-white">
+                                {selectedShop.termsAndConditions ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setTermsModalOpen(true)}
+                                        className="underline underline-offset-2 hover:text-white/90 mt-2"
+                                    >
+                                        Terms & Conditions
+                                    </button>
+                                ) : (
+                                    <span>—</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </header>
 
@@ -1050,6 +1074,35 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                     }}
                     onOpenImageModal={openImageModal}
                 />
+            )}
+
+            {termsModalOpen && selectedShop?.termsAndConditions && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setTermsModalOpen(false)
+                    }}
+                >
+                    <div
+                        className="relative mx-auto max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
+                            <h2 className="text-xl font-bold text-gray-900">Terms & Conditions</h2>
+                            <button
+                                type="button"
+                                onClick={() => setTermsModalOpen(false)}
+                                className="ml-4 flex-shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                                aria-label="Close"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div className="max-w-none p-6 text-sm text-gray-700">
+                            <TextPreview value={selectedShop.termsAndConditions} />
+                        </div>
+                    </div>
+                </div>
             )}
 
             <Sheet open={isCartSheetOpen} onOpenChange={handleCartSheetOpenChange}>
