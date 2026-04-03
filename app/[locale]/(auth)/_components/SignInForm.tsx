@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { signinAction } from '@/lib/actions/auth/signinAction'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -22,9 +22,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { signInSchema } from '@/lib/zodSchema/signinSchema'
-import { redirect } from 'next/navigation'
 import ProviderButtons from './ProviderButtons'
-import { useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
@@ -33,10 +32,11 @@ import Loader from '@/components/loader/Loader'
 const SignInForm = () => {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('signIn-signUp')
+  const router = useRouter()
+  const { update: updateSession } = useSession()
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   const [showPassword, setShowPassword] = useState(false)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
   const [loading, setLoading] = useState(false)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
@@ -79,14 +79,6 @@ const SignInForm = () => {
       })
     }
   }, [searchParams])
-
-  useEffect(() => {
-    // Redirect to home page if the user is already logged in
-    if (!shouldRedirect) {
-      return
-    }
-    redirect('/')
-  }, [shouldRedirect])
 
   // Cleanup Turnstile refresh interval and captcha-wait timeout on unmount
   useEffect(() => {
@@ -207,7 +199,9 @@ const SignInForm = () => {
             color: '#22c55e', // green-500 color
           },
         })
-        setShouldRedirect(true)
+        await updateSession()
+        router.replace(`/${locale}`)
+        router.refresh()
       } else {
         if (!hasRetried) {
           pendingSubmissionRef.current = data

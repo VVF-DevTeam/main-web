@@ -108,9 +108,9 @@ const ClassImage = async ({
                 <Image
                   src={h.image}
                   alt={h.name || 'Host avatar'}
-                  width={24}
-                  height={24}
-                  className="ml-[2px] inline-block rounded-full"
+                  width={36}
+                  height={36}
+                  className="ml-[2px] inline-block rounded-full object-cover h-9 w-9"
                 />
               )}
               {index < hosts.length - 1 && ', '}
