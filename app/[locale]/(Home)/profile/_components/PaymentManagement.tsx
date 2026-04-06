@@ -4,7 +4,8 @@ import {
   getStatusColor,
 } from '@/lib/actions/payment/paymentStatus'
 import { getPaginatedPayments } from '@/lib/actions/payment/getPaginatedPayments'
-import AddPaymentButton from './AddPaymentButton'
+import AddPaymentButton from './AddEventPaymentButton'
+import AddShopPaymentButton from './AddShopPaymentButton'
 import PaymentPagination from './PaymentPagination'
 import PaymentPageSizeSelect from './PaymentPageSizeSelect'
 import { UserInfoProps } from '@/lib/types/userInfo'
@@ -51,7 +52,10 @@ export default async function PaymentManagement({
         {/* Headers & Add Record Button */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">All Payments Management</h1>
-          <AddPaymentButton user={user} />
+          <div className="flex items-center gap-2">
+            <AddPaymentButton user={user} />
+            <AddShopPaymentButton user={user} />
+          </div>
         </div>
 
         {/* Controls */}

@@ -13,7 +13,6 @@ import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
 import { getAllShops, getShopForEditing } from '@/lib/actions/shop/getShop'
-import { roleCheck } from '@/lib/actions/user/roleCheck'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -31,6 +30,7 @@ import EventSeriesManager from './_components/EventSeriesManager'
 import SponsorsManagement from './_components/SponsorsManagement'
 import EditEvent from '../events/(Admin)/editEvent/[eventKeyName]/_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
+import ShopStatistics from './_components/ShopStatistics'
 import CreateJobForm from './_components/CreateJobForm'
 import EditJob from '../registration/_components/_jobs/_editJob/EditJob'
 import JobManagement from '../registration/_components/_jobs/_allJob/JobManagement'
@@ -110,12 +110,17 @@ export default async function ProfilePage({
     shopId?: string
   }>
 }) {
-  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
   const [
     { section, page: pageStr, pageSize: pageSizeStr, eventKeyName, jobId, postId, shopId },
     { locale },
     user,
   ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
+
+  const isSuperAdmin = user?.role?.includes('SUPERADMIN')
+  const isAdmin = user?.role?.includes('ADMIN')
+  const isHost = user?.role?.includes('HOST')
+  const isWriter = user?.role?.includes('WRITER')
+  const isShopOwner = user?.role?.includes('SHOPOWNER')
 
   // Return if user is not logged in
   if (!user) {
@@ -141,8 +146,7 @@ export default async function ProfilePage({
 
     case 'admin-payment-management':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         const page = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
         const pageSize = [10, 20, 50].includes(Number(pageSizeStr))
@@ -158,8 +162,7 @@ export default async function ProfilePage({
 
     case 'admin-email-composition':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         return <EmailComposition user={user} />
       }
@@ -174,8 +177,7 @@ export default async function ProfilePage({
 
     case 'admin-all-events':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         let allEvents: EventWithHostsForAdmin[] = []
         if (user.role.includes('HOST')) {
@@ -202,8 +204,7 @@ export default async function ProfilePage({
 
     case 'admin-create-event':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         return <CreateEventForm locale={locale} />
       }
@@ -214,7 +215,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-event-categories':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         return <EventCategoryManager user={user} />
       }
       return (
@@ -224,7 +225,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-event-series':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         return <EventSeriesManager user={user} />
       }
       return (
@@ -234,7 +235,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-manage-sponsors':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         return <SponsorsManagement user={user} />
       }
       return (
@@ -245,8 +246,7 @@ export default async function ProfilePage({
 
     case 'admin-event-statistics':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         return <EventStatistics user={user} locale={locale} />
       }
@@ -256,10 +256,21 @@ export default async function ProfilePage({
         </p>
       )
 
+    case 'admin-shop-statistics':
+      if (
+        isSuperAdmin || isAdmin || isShopOwner
+      ) {
+        return <ShopStatistics user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
     case 'admin-edit-event':
       if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
+        isSuperAdmin || isAdmin || isHost
       ) {
         if (!eventKeyName) {
           return (
@@ -300,7 +311,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-job':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         return <CreateJobForm user={user} locale={locale} />
       }
       return (
@@ -310,7 +321,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-jobs':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         const allJobs = await getAllJobs()
         return (
           <JobManagement
@@ -328,7 +339,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-edit-job':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin) {
         if (!jobId) {
           return (
             <p className="mt-10 text-center">
@@ -361,7 +372,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-posts':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin || isWriter) {
         const allPosts = await getAllPosts()
         return (
           <PostManagement
@@ -379,7 +390,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-post':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin || isWriter) {
         return <CreatePostForm user={user} locale={locale} />
       }
       return (
@@ -389,7 +400,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-edit-post':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin || isWriter) {
         if (!postId) {
           return (
             <p className="mt-10 text-center">
@@ -423,7 +434,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-create-shop':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin || isShopOwner) {
         return <CreateShopForm ownerId={user.id} locale={locale} />
       }
       return (
@@ -433,7 +444,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-all-shops':
-      if (user.role && (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))) {
+      if (isSuperAdmin || isAdmin || isShopOwner) {
         const allShops = await getAllShops()
         return (
           <ShopManagement
@@ -451,10 +462,7 @@ export default async function ProfilePage({
       )
 
     case 'admin-edit-shop':
-      if (
-        user.role &&
-        (user.role.includes('HOST') || user.role.includes('ADMIN') || user.role.includes('SUPERADMIN'))
-      ) {
+      if (isSuperAdmin || isAdmin || isHost || isShopOwner) {
         if (!shopId) {
           return (
             <p className="mt-10 text-center">

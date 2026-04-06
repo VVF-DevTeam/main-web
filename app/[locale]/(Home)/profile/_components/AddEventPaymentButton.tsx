@@ -153,7 +153,7 @@ const AddClientModal = ({
       >
         {/* Modal Header */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Add Payment Record</h2>
+          <h2 className="text-2xl font-bold">Add Event Payment Record</h2>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -504,7 +504,9 @@ const AddClientModal = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {Object.values(PaymentType).map((type) => (
+                          {Object.values(PaymentType)
+                            .filter((type) => type !== 'Shop')
+                            .map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
                             </SelectItem>
@@ -545,7 +547,7 @@ const AddClientModal = ({
 
             {/* Submit Button */}
             <Button type="submit">
-              Add Payment
+              Add Event Payment
             </Button>
           </form>
         </Form>
@@ -699,7 +701,7 @@ const AddPaymentButton = ({
 
   return (
     <>
-      <Button onClick={() => setShowAddClientModal(true)}>Add Payment</Button>
+      <Button onClick={() => setShowAddClientModal(true)}>Add Event Payment</Button>
       {showAddClientModal && (
         <AddClientModal
           form={form}

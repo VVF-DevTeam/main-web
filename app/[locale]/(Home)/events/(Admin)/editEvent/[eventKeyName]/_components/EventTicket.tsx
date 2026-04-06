@@ -1,9 +1,9 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Event, EventTicket } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Pencil, Plus, Trash2, X } from 'lucide-react'
+import { Eye, EyeClosed, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import DatePicker from '@/components/ui/DatePicker'
 
@@ -142,6 +142,14 @@ const EventTickets = ({ event }: EventTicketsProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const currentDateTime = getCurrentDateTime()
   const tickets = event.tickets || []
+  const sortedTickets = useMemo(
+    () =>
+      [...tickets].sort((a, b) => {
+        if (a.disabled === b.disabled) return 0
+        return a.disabled ? 1 : -1
+      }),
+    [tickets]
+  )
 
   // Form for EventTicket
   const ticketForm = useForm<EventTicketFormData>({
@@ -533,6 +541,71 @@ const EventTickets = ({ event }: EventTicketsProps) => {
     }
   }
 
+  const handleToggleDisabled = async (ticketId: string, disabled: boolean) => {
+    try {
+      setIsLoading(true)
+      await axiosInstance.put('/api/events/tickets', {
+        id: ticketId,
+        disabled,
+      })
+      toast.success(
+        disabled ? 'Ticket hidden from checkout' : 'Ticket visible again',
+        {
+          description: (
+            <span style={{ color: 'var(--muted-foreground)' }}>
+              {currentDateTime}
+            </span>
+          ),
+          style: { color: '#22c55e' },
+        }
+      )
+      router.refresh()
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        let errorMessage = 'An unknown error occurred'
+        if (error.response?.data) {
+          if (typeof error.response.data === 'string') {
+            errorMessage = error.response.data
+          } else if (
+            typeof error.response.data === 'object' &&
+            error.response.data !== null
+          ) {
+            errorMessage =
+              (error.response.data as { message?: string }).message ||
+              JSON.stringify(error.response.data)
+          }
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+        toast.error('Failed to update ticket', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>{errorMessage}</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            </div>
+          ),
+          style: { color: '#ef4444' },
+        })
+      } else {
+        toast.error('Error', {
+          description: (
+            <div className="flex flex-col gap-1">
+              <span>Something went wrong. Please contact the admin.</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            </div>
+          ),
+          style: { color: '#ef4444' },
+        })
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const { isSubmitting: isTicketSubmitting, isValid: isTicketValid } =
     ticketForm.formState
   const isEditingTicket = editingTicketId !== null || isAddingNew
@@ -563,7 +636,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
 
         <p className="text-sm italic text-muted-foreground text-slate-500">
           NOTE 1: Avoid changing capacity after there are purchases, it may
-          confuse the customers.
+          confuse the customers. In addition, tickets which have sold count greater than 0 cannot be deleted.
         </p>
         <p className="text-sm italic text-muted-foreground text-slate-500">
           NOTE 2: Ticket will be hidden after the Valid To date.
@@ -580,7 +653,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
         {/* Ticket List */}
         {!isEditingTicket && tickets.length > 0 && (
           <div className="flex flex-col gap-y-4">
-            {tickets.map((ticket) => {
+            {sortedTickets.map((ticket) => {
               // Calculate display price, payTotalNumber is number of session this ticket has
               const displayPrice =
                 Number(ticket.price) *
@@ -594,11 +667,26 @@ const EventTickets = ({ event }: EventTicketsProps) => {
               return (
                 <div
                   key={ticket.id}
-                  className="flex items-center gap-4 rounded-md border bg-white p-4"
+                  className={cn(
+                    'flex items-center gap-4 rounded-md border p-4 transition-colors',
+                    ticket.disabled
+                      ? 'border-slate-200 bg-slate-100'
+                      : 'border-slate-200 bg-white'
+                  )}
                 >
                   {/* Content */}
-                  <div className="flex flex-1 flex-col gap-y-1">
+                  <div
+                    className={cn(
+                      'flex flex-1 flex-col gap-y-1',
+                      ticket.disabled && 'text-slate-500'
+                    )}
+                  >
                     <div className="font-semibold">
+                      {ticket.disabled && (
+                        <span className="mr-2 rounded bg-slate-300 px-1.5 py-0.5 text-xs font-medium text-slate-700">
+                          Hidden
+                        </span>
+                      )}
                       {ticket.type} - ${displayPrice.toFixed(2)}{' '}
                       {ticket.currency}
                       {ticket.payTotalNumber && ticket.payTotalNumber > 1 && (
@@ -627,7 +715,12 @@ const EventTickets = ({ event }: EventTicketsProps) => {
 
                   {/* Background Image - Middle */}
                   {ticketImageUrl && (
-                    <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-md">
+                    <div
+                      className={cn(
+                        'relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-md',
+                        ticket.disabled && 'opacity-55'
+                      )}
+                    >
                       <Image
                         src={ticketImageUrl}
                         alt={`${ticket.type} ticket background`}
@@ -638,9 +731,34 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                     </div>
                   )}
 
-                  {/* Buttons */}
-                  <div className="flex gap-x-2">
+                  {/* Buttons — keep full contrast when row is disabled */}
+                  <div
+                    className={cn(
+                      'flex shrink-0 gap-x-2',
+                      ticket.disabled && 'text-slate-900'
+                    )}
+                  >
                     <button
+                      type="button"
+                      onClick={() =>
+                        handleToggleDisabled(ticket.id, !ticket.disabled)
+                      }
+                      disabled={isLoading}
+                      className="rounded p-2 hover:bg-gray-100"
+                      title={
+                        ticket.disabled
+                          ? 'Show ticket in checkout'
+                          : 'Hide ticket from checkout'
+                      }
+                    >
+                      {ticket.disabled ? (
+                        <EyeClosed className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => loadTicketIntoForm(ticket)}
                       disabled={isLoading}
                       className="rounded p-2 hover:bg-gray-100"
@@ -649,10 +767,19 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(ticket.id)}
-                      disabled={isLoading}
-                      className="rounded p-2 text-red-600 hover:bg-red-50"
-                      title="Delete ticket"
+                      disabled={isLoading || soldCount > 0}
+                      className={cn(
+                        'rounded p-2 text-red-600 hover:bg-red-50',
+                        (isLoading || soldCount > 0) &&
+                          'cursor-not-allowed opacity-40 hover:bg-transparent'
+                      )}
+                      title={
+                        soldCount > 0
+                          ? 'Cannot delete a ticket that has sales'
+                          : 'Delete ticket'
+                      }
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

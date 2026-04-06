@@ -30,17 +30,27 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'admin-payment-management': t('payment-management'),
     'admin-email-composition': t('email-composition'),
     'admin-event-statistics': t('event-manager'),
+    'admin-shop-statistics': 'Shop Manager',
     'privacy-policy': t('privacy-policy'),
   }
 
   const isAdmin = user.role.includes('ADMIN')
   const isHost = user.role.includes('HOST')
   const isSuperAdmin = user.role.includes('SUPERADMIN')
+  const isWriter = user.role.includes('WRITER')
+  const isShopOwner = user.role.includes('SHOPOWNER')
   const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
+  const isWriterOnly =
+    isWriter && !isAdmin && !isSuperAdmin && !isHost
+  const isShopOwnerOnly =
+    isShopOwner && !isAdmin && !isSuperAdmin && !isHost
+  const showAdminSection =
+    isAdminOrHostOrSuperAdmin || isWriterOnly || isShopOwnerOnly
 
   const adminNavItems: { key: string; label: string; hostVisible?: boolean }[] =
     [
       { key: 'admin-event-statistics', label: t('event-manager'), hostVisible: true },
+      { key: 'admin-shop-statistics', label: 'Shop Manager' },
       { key: 'admin-payment-management', label: t('payment-management') },
       { key: 'admin-email-composition', label: t('email-composition'), hostVisible: true },
     ]
@@ -49,6 +59,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     (item) =>
       isAdmin ||
       isSuperAdmin ||
+      (isShopOwner && item.key === 'admin-shop-statistics') ||
       (isHost && item.hostVisible === true),
   )
 
@@ -119,110 +130,113 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
           })}
         </ul>
 
-        {isAdminOrHostOrSuperAdmin && (
+        {showAdminSection && (
           <>
             <div className="my-6 border-b border-bgColor-black"/>
             <h2 className="text-textColor-black mb-4 text-xl font-semibold">
               Admin Section
             </h2>
             <ul className="space-y-4">
-              {visibleAdminNavItems.map(({ key, label }) => (
-                <li key={key}>
-                  <Link
-                    href={`/${locale}/profile?section=${key}`}
-                    className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
-                      currentSection === key
-                        ? 'text-textColor-black bg-white font-medium shadow-sm'
-                        : 'text-textColor-black hover:bg-bgColor-white'
-                    }`}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-              
+              {isAdminOrHostOrSuperAdmin &&
+                visibleAdminNavItems.map(({ key, label }) => (
+                  <li key={key}>
+                    <Link
+                      href={`/${locale}/profile?section=${key}`}
+                      className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
+                        currentSection === key
+                          ? 'text-textColor-black bg-white font-medium shadow-sm'
+                          : 'text-textColor-black hover:bg-bgColor-white'
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+
               {/* Manage Events Dropdown */}
-              <li>
-                <button
-                  onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
-                  className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
-                >
-                  <span>{t('manage-events')}</span>
-                  <ChevronDown
-                    className={`h-5 w-5 transition-transform ${
-                      isEventsDropdownOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {isEventsDropdownOpen && (
-                  <ul className="mt-2 space-y-2 pl-4">
-                    <li>
-                      <Link
-                        href={`/${locale}/profile?section=admin-create-event`}
-                        className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                          currentSection === 'admin-create-event'
-                            ? 'text-textColor-black bg-white font-medium shadow-sm'
-                            : 'text-textColor-black hover:bg-bgColor-white'
-                        }`}
-                      >
-                        {t('create-event')}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href={`/${locale}/profile?section=admin-all-events`}
-                        className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                          currentSection === 'admin-all-events'
-                            ? 'text-textColor-black bg-white font-medium shadow-sm'
-                            : 'text-textColor-black hover:bg-bgColor-white'
-                        }`}
-                      >
-                        {t('view-all-events')}
-                      </Link>
-                    </li>
-                    {(isAdmin || isSuperAdmin) && (
-                      <>
-                        <li>
-                          <Link
-                            href={`/${locale}/profile?section=admin-event-categories`}
-                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                              currentSection === 'admin-event-categories'
-                                ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                : 'text-textColor-black hover:bg-bgColor-white'
-                            }`}
-                          >
-                            {t('create-edit-tags')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href={`/${locale}/profile?section=admin-event-series`}
-                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                              currentSection === 'admin-event-series'
-                                ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                : 'text-textColor-black hover:bg-bgColor-white'
-                            }`}
-                          >
-                            {t('create-edit-series')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href={`/${locale}/profile?section=admin-manage-sponsors`}
-                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                              currentSection === 'admin-manage-sponsors'
-                                ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                : 'text-textColor-black hover:bg-bgColor-white'
-                            }`}
-                          >
-                            {t('manage-sponsors')}
-                          </Link>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                )}
-              </li>
+              {isAdminOrHostOrSuperAdmin && (
+                <li>
+                  <button
+                    onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
+                    className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                  >
+                    <span>{t('manage-events')}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 transition-transform ${
+                        isEventsDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {isEventsDropdownOpen && (
+                    <ul className="mt-2 space-y-2 pl-4">
+                      <li>
+                        <Link
+                          href={`/${locale}/profile?section=admin-create-event`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-create-event'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          {t('create-event')}
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={`/${locale}/profile?section=admin-all-events`}
+                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                            currentSection === 'admin-all-events'
+                              ? 'text-textColor-black bg-white font-medium shadow-sm'
+                              : 'text-textColor-black hover:bg-bgColor-white'
+                          }`}
+                        >
+                          {t('view-all-events')}
+                        </Link>
+                      </li>
+                      {(isAdmin || isSuperAdmin) && (
+                        <>
+                          <li>
+                            <Link
+                              href={`/${locale}/profile?section=admin-event-categories`}
+                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                currentSection === 'admin-event-categories'
+                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                  : 'text-textColor-black hover:bg-bgColor-white'
+                              }`}
+                            >
+                              {t('create-edit-tags')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href={`/${locale}/profile?section=admin-event-series`}
+                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                currentSection === 'admin-event-series'
+                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                  : 'text-textColor-black hover:bg-bgColor-white'
+                              }`}
+                            >
+                              {t('create-edit-series')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href={`/${locale}/profile?section=admin-manage-sponsors`}
+                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                currentSection === 'admin-manage-sponsors'
+                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                  : 'text-textColor-black hover:bg-bgColor-white'
+                              }`}
+                            >
+                              {t('manage-sponsors')}
+                            </Link>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  )}
+                </li>
+              )}
 
               {/* Manage Jobs Dropdown */}
               {(isAdmin || isSuperAdmin) && (
@@ -270,7 +284,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               )}
 
               {/* Manage Shops Dropdown */}
-              {(isAdmin || isSuperAdmin) && (
+              {(isAdmin || isSuperAdmin || isShopOwner) && (
                 <li>
                   <button
                     onClick={() => setIsShopsDropdownOpen(!isShopsDropdownOpen)}
@@ -315,7 +329,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               )}
 
               {/* Manage Posts Dropdown */}
-              {(isAdmin || isSuperAdmin) && (
+              {(isAdmin || isSuperAdmin || isWriter) && (
                 <li>
                   <button
                     onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}

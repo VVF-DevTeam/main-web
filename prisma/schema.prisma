@@ -55,7 +55,7 @@ model Event {
   // Relations
   seriesId           String?
   sponsors           SponsorOnEvent[]
-  series             EventSeries?    @relation(fields: [seriesId], references: [id])
+  series             EventSeries?    @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   schedules          EventSchedule[]
   tickets            EventTicket[]
   payments           Payment[]
@@ -122,6 +122,7 @@ model EventTicket {
   type      String
   imageUrl  String?    // Background for the ticket
   limit     Int?
+  disabled  Boolean    @default(false)
 
   // Price and payment mode
   price     Decimal
@@ -187,6 +188,7 @@ model User {
   Review               Review[]
   Devices              UserDevice[]
   EventHost            Event[]       @relation("EventToUser")
+  Shops                Shop[]
 }
 
 model UserDevice {
@@ -255,8 +257,8 @@ model Application {
   userId          String
   positionToApply String?
   reasonToApply   String?
-  job             Job?     @relation(fields: [jobId], references: [id])
-  user            User     @relation(fields: [userId], references: [id])
+  job             Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  user            User     @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([jobId, userId])
   @@index([id])
@@ -295,10 +297,10 @@ model Payment {
   shopId          String?
   shopItemId      String?
   event           Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
-  user            User?        @relation(fields: [userId], references: [id])
-  eventTicket     EventTicket? @relation(fields: [eventTicketId], references: [id])
-  shop            Shop?        @relation(fields: [shopId], references: [id])
-  shopItem        ShopItem?    @relation(fields: [shopItemId], references: [id])
+  user            User?        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  eventTicket     EventTicket? @relation(fields: [eventTicketId], references: [id], onDelete: Restrict)
+  shop            Shop?        @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  shopItem        ShopItem?    @relation(fields: [shopItemId], references: [id], onDelete: Restrict)
 }
 
 model CheckoutSessionData {
@@ -426,13 +428,15 @@ model Shop {
   shopItems   ShopItem[]   @relation("ShopToShopItem")
   payments    Payment[]
   event       Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  user        User         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
 }
 
 model ShopItem {
   id          String       @id @default(cuid())
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  
+  disabled    Boolean      @default(false)
+
   title       String
   description String?      @db.Text  // Detailed description
   sku         String?      @unique   // Stock keeping unit
@@ -492,6 +496,8 @@ enum Role {
   USER
   ADMIN
   HOST
+  WRITER
+  SHOPOWNER
 }
 
 enum EventType {

@@ -96,6 +96,67 @@ export const getAllPublishedShops = unstable_cache(
   }
 )
 
+// Alias used by ShopStatistics for naming consistency
+export const getAllPublishedShop = unstable_cache(
+  async () => {
+    const { prisma } = await import('@/lib/db')
+    try {
+      return await prisma.shop.findMany({
+        where: {
+          isPublished: true,
+        },
+        select: {
+          id: true,
+          title: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      })
+    } catch (error) {
+      console.error('Error getting all published shop:', error)
+      return []
+    }
+  },
+  ['shops-published-list-v1'],
+  {
+    revalidate: 604800,
+    tags: ['shops'],
+  }
+)
+
+export async function getShopsOfShopOwner(ownerId: string) {
+  const cachedFunction = unstable_cache(
+    async () => {
+      const { prisma } = await import('@/lib/db')
+      try {
+        return await prisma.shop.findMany({
+          where: {
+            ownerId,
+          },
+          select: {
+            id: true,
+            title: true,
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        })
+      } catch (error) {
+        console.error('Error getting shops of shop owner:', error)
+        return []
+      }
+    },
+    [`shops-by-owner-v1-${ownerId}`],
+    {
+      revalidate: 604800,
+      tags: ['shops'],
+    }
+  )
+
+  return await cachedFunction()
+}
+
 // Get shop by ID
 export const getShopById = unstable_cache(
   async (shopId: string) => {
