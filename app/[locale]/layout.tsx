@@ -18,17 +18,15 @@ import '@/lib/ui/css/globals.css'
 import { beVietnamPro } from '@/lib/ui/fonts/BeVietnamPro'
 import { lato } from '@/lib/ui/fonts/Lato'
 
-const toCamelCase = (segment: string) => {
-  const parts = segment.split(/[-_]+/).filter(Boolean)
-  if (parts.length === 0) return segment
-  if (parts.length === 1) return parts[0]
-
-  const [first, ...rest] = parts
-  return (
-    first.toLowerCase() +
-    rest.map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
-  )
-}
+const toTitleWords = (segment: string) =>
+  segment
+    .replace(/[-_]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 
 const formatPathTitle = (pathname: string) => {
   const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?:-[A-Z]{2})?(?=\/|$)/, '')
@@ -39,8 +37,7 @@ const formatPathTitle = (pathname: string) => {
   }
 
   const lastSegment = segments[segments.length - 1]
-  const camel = toCamelCase(lastSegment)
-  return camel.charAt(0).toUpperCase() + camel.slice(1)
+  return toTitleWords(lastSegment)
 }
 
 // Metadata fallback for routes without page-level metadata
