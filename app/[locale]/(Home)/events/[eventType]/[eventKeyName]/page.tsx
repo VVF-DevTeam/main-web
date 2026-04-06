@@ -23,10 +23,10 @@ export async function generateMetadata({
 
   return {
     title: publishedClass?.title,
-    description: publishedClass?.title + ' from Viet Vibe Foundation',
+    description: 'Make reservations for ' + publishedClass?.title + ' from Viet Vibe Foundation to secure your spot today',
     openGraph: {
       title: publishedClass?.title,
-      description: publishedClass?.title + ' from Viet Vibe Foundation',
+      description: 'Make reservations for ' + publishedClass?.title + ' from Viet Vibe Foundation to secure your spot today',
       images: {
         url: publishedClass?.imgUrl!,
         alt: publishedClass?.title,

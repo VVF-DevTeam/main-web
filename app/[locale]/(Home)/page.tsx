@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Homepage - Viet Vibe Foundation',
     description: 'Homepage - Viet Vibe Foundation',
+    images: {
+      url: '/logo/main-logo-white.jpg',
+      alt: 'Homepage - Viet Vibe Foundation',
+    },
   },
 }
 

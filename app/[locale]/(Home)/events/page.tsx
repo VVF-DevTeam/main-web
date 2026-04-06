@@ -1,5 +1,6 @@
 // Libraries
 import { getAllPublishedEventsWithRelations } from '@/lib/actions/event/getEvent'
+import { Metadata } from 'next'
 
 // Components
 import EventListHorizontal from './_components/EventListHorizontal'
@@ -10,6 +11,26 @@ import EventCalendar from './_components/EventCalendar'
 
 // Note: Pages with searchParams are dynamic and cannot be edge-cached by Vercel
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ eventKeyName: string }>
+}): Promise<Metadata> {
+
+  return {
+    title: 'Latest events from Viet Vibe Foundation',
+    description: 'Check out the latest events from Viet Vibe Foundation',
+    openGraph: {
+      title: 'Latest events from Viet Vibe Foundation',
+      description: 'Check out the latest events from Viet Vibe Foundation',
+      images: {
+        url: 'https://drive.google.com/thumbnail?id=18z0sFU-V7n8G6crX1ywpL33TdWzfnoU7&sz=w1200',
+        alt: 'Latest events from Viet Vibe Foundation',
+      },
+    },
+  }
+}
 
 // Main Component
 const EventsPage = async ({
