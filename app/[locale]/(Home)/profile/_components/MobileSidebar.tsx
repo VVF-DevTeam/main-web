@@ -64,15 +64,28 @@ export default function MobileSidebar({
   const isAdmin = user?.role?.includes('ADMIN') ?? false
   const isHost = user?.role?.includes('HOST') ?? false
   const isSuperAdmin = user?.role?.includes('SUPERADMIN') ?? false
+  const isWriter = user?.role?.includes('WRITER') ?? false
+  const isShopOwner = user?.role?.includes('SHOPOWNER') ?? false
   const isAdminOrHostOrSuperAdmin = isAdmin || isHost || isSuperAdmin
+  const isWriterOnly =
+    isWriter && !isAdmin && !isSuperAdmin && !isHost
+  const isShopOwnerOnly =
+    isShopOwner && !isAdmin && !isSuperAdmin && !isHost
+  const showAdminSection =
+    isAdminOrHostOrSuperAdmin || isWriterOnly || isShopOwnerOnly
 
   const adminSectionKeysVisibleToHost = [
     'admin-event-statistics',
     'admin-email-composition',
   ] as const
 
+  const adminSectionKeysVisibleToShopOwner = [
+    'admin-shop-statistics',
+  ] as const
+
   const adminTopLinkOrder = [
     'admin-event-statistics',
+    'admin-shop-statistics',
     'admin-payment-management',
     'admin-email-composition',
   ] as const
@@ -120,34 +133,43 @@ export default function MobileSidebar({
             })}
           </ul>
 
-          {isAdminOrHostOrSuperAdmin && (
+          {showAdminSection && (
             <>
               <Separator className="my-6" />
               <h2 className="text-textColor-black mb-4 text-xl font-semibold">
                 Admin Section
               </h2>
               <ul className="space-y-4">
-                {Object.entries(sections)
-                  .filter(([key]) => {
-                    if (!key.includes('admin')) return false
-                    if (isAdmin || isSuperAdmin) return true
-                    return (
-                      isHost &&
-                      adminSectionKeysVisibleToHost.includes(
-                        key as (typeof adminSectionKeysVisibleToHost)[number],
+                {isAdminOrHostOrSuperAdmin &&
+                  Object.entries(sections)
+                    .filter(([key]) => {
+                      if (!key.includes('admin')) return false
+                      if (isAdmin || isSuperAdmin) return true
+                      if (
+                        isShopOwner &&
+                        adminSectionKeysVisibleToShopOwner.includes(
+                          key as (typeof adminSectionKeysVisibleToShopOwner)[number],
+                        )
+                      ) {
+                        return true
+                      }
+                      return (
+                        isHost &&
+                        adminSectionKeysVisibleToHost.includes(
+                          key as (typeof adminSectionKeysVisibleToHost)[number],
+                        )
                       )
-                    )
-                  })
-                  .sort(([a], [b]) => {
-                    const ia = adminTopLinkOrder.indexOf(
-                      a as (typeof adminTopLinkOrder)[number],
-                    )
-                    const ib = adminTopLinkOrder.indexOf(
-                      b as (typeof adminTopLinkOrder)[number],
-                    )
-                    return ia - ib
-                  })
-                  .map(([key, label]) => (
+                    })
+                    .sort(([a], [b]) => {
+                      const ia = adminTopLinkOrder.indexOf(
+                        a as (typeof adminTopLinkOrder)[number],
+                      )
+                      const ib = adminTopLinkOrder.indexOf(
+                        b as (typeof adminTopLinkOrder)[number],
+                      )
+                      return ia - ib
+                    })
+                    .map(([key, label]) => (
                       <li key={key}>
                         <Link
                           href={`/${locale}/profile?section=${key}`}
@@ -162,94 +184,96 @@ export default function MobileSidebar({
                         </Link>
                       </li>
                     ))}
-                
+
                 {/* Manage Events Dropdown */}
-                <li>
-                  <button
-                    onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
-                    className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
-                  >
-                    <span>{t('manage-events')}</span>
-                    <ChevronDown
-                      className={`h-5 w-5 transition-transform ${
-                        isEventsDropdownOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {isEventsDropdownOpen && (
-                    <ul className="mt-2 space-y-2 pl-4">
-                      <li>
-                        <Link
-                          href={`/${locale}/profile?section=admin-create-event`}
-                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                            currentSection === 'admin-create-event'
-                              ? 'text-textColor-black bg-white font-medium shadow-sm'
-                              : 'text-textColor-black hover:bg-bgColor-white'
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {t('create-event')}
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href={`/${locale}/profile?section=admin-all-events`}
-                          className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                            currentSection === 'admin-all-events'
-                              ? 'text-textColor-black bg-white font-medium shadow-sm'
-                              : 'text-textColor-black hover:bg-bgColor-white'
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {t('view-all-events')}
-                        </Link>
-                      </li>
-                      {(isAdmin || isSuperAdmin) && (
-                        <>
-                          <li>
-                            <Link
-                              href={`/${locale}/profile?section=admin-event-categories`}
-                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                                currentSection === 'admin-event-categories'
-                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                  : 'text-textColor-black hover:bg-bgColor-white'
-                              }`}
-                              onClick={() => setIsOpen(false)}
-                            >
-                              {t('create-edit-tags')}
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              href={`/${locale}/profile?section=admin-event-series`}
-                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                                currentSection === 'admin-event-series'
-                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                  : 'text-textColor-black hover:bg-bgColor-white'
-                              }`}
-                              onClick={() => setIsOpen(false)}
-                            >
-                              {t('create-edit-series')}
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              href={`/${locale}/profile?section=admin-manage-sponsors`}
-                              className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
-                                currentSection === 'admin-manage-sponsors'
-                                  ? 'text-textColor-black bg-white font-medium shadow-sm'
-                                  : 'text-textColor-black hover:bg-bgColor-white'
-                              }`}
-                              onClick={() => setIsOpen(false)}
-                            >
-                              {t('manage-sponsors')}
-                            </Link>
-                          </li>
-                        </>
-                      )}
-                    </ul>
-                  )}
-                </li>
+                {isAdminOrHostOrSuperAdmin && (
+                  <li>
+                    <button
+                      onClick={() => setIsEventsDropdownOpen(!isEventsDropdownOpen)}
+                      className="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left text-lg transition-colors text-textColor-black hover:bg-bgColor-white"
+                    >
+                      <span>{t('manage-events')}</span>
+                      <ChevronDown
+                        className={`h-5 w-5 transition-transform ${
+                          isEventsDropdownOpen ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    {isEventsDropdownOpen && (
+                      <ul className="mt-2 space-y-2 pl-4">
+                        <li>
+                          <Link
+                            href={`/${locale}/profile?section=admin-create-event`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-create-event'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('create-event')}
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href={`/${locale}/profile?section=admin-all-events`}
+                            className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                              currentSection === 'admin-all-events'
+                                ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                : 'text-textColor-black hover:bg-bgColor-white'
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t('view-all-events')}
+                          </Link>
+                        </li>
+                        {(isAdmin || isSuperAdmin) && (
+                          <>
+                            <li>
+                              <Link
+                                href={`/${locale}/profile?section=admin-event-categories`}
+                                className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                  currentSection === 'admin-event-categories'
+                                    ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                    : 'text-textColor-black hover:bg-bgColor-white'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {t('create-edit-tags')}
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href={`/${locale}/profile?section=admin-event-series`}
+                                className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                  currentSection === 'admin-event-series'
+                                    ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                    : 'text-textColor-black hover:bg-bgColor-white'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {t('create-edit-series')}
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href={`/${locale}/profile?section=admin-manage-sponsors`}
+                                className={`block w-full rounded-lg px-4 py-2 text-left text-base transition-colors ${
+                                  currentSection === 'admin-manage-sponsors'
+                                    ? 'text-textColor-black bg-white font-medium shadow-sm'
+                                    : 'text-textColor-black hover:bg-bgColor-white'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {t('manage-sponsors')}
+                              </Link>
+                            </li>
+                          </>
+                        )}
+                      </ul>
+                    )}
+                  </li>
+                )}
 
                 {/* Manage Jobs Dropdown */}
                 {(isAdmin || isSuperAdmin) && (
@@ -299,7 +323,7 @@ export default function MobileSidebar({
                 )}
 
                 {/* Manage Shops Dropdown */}
-                {(isAdmin || isSuperAdmin) && (
+                {(isAdmin || isSuperAdmin || isShopOwner) && (
                   <li>
                     <button
                       onClick={() => setIsShopsDropdownOpen(!isShopsDropdownOpen)}
@@ -346,7 +370,7 @@ export default function MobileSidebar({
                 )}
 
                 {/* Manage Posts Dropdown */}
-                {(isAdmin || isSuperAdmin) && (
+                {(isAdmin || isSuperAdmin || isWriter) && (
                   <li>
                     <button
                       onClick={() => setIsPostsDropdownOpen(!isPostsDropdownOpen)}

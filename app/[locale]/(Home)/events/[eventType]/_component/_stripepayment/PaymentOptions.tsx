@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import Link from 'next/link'
 import {
   SeatingMap,
   SeatValue,

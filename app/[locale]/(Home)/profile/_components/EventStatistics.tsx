@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Fragment } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { FiCopy, FiMail, FiEdit, FiChevronUp, FiChevronDown } from 'react-icons/fi'
+import { FiCopy, FiEdit, FiChevronUp, FiChevronDown, FiMail } from 'react-icons/fi'
 import { ArrowUpDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -20,9 +20,10 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { getEventPayments } from './getEventPayments'
+import { getEventPayments } from '../../../../../lib/actions/payment/getEventPayments'
+import { getEventShopPayments } from '../../../../../lib/actions/payment/getEventShopPayments'
 import { PaymentMethod, PaymentType } from '@prisma/client'
-import AddPaymentButton from './AddPaymentButton'
+import AddPaymentButton from './AddEventPaymentButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { JsonValue } from '@prisma/client/runtime/library'
 
@@ -73,6 +74,31 @@ interface Payment {
   } | null
 }
 
+interface ShopPayment {
+  id: string
+  createdAt: Date
+  pricePaid: number
+  quantity: number
+  method: PaymentMethod
+  type: PaymentType
+  guestName: string | null
+  guestEmail: string | null
+  guestPhone: string | null
+  user: {
+    name: string | null
+    email: string
+    phone: string | null
+  } | null
+  shop: {
+    id: string
+    title: string
+  } | null
+  shopItem: {
+    id: string
+    title: string
+  } | null
+}
+
 type FormResponse = {
   questionId: string
   question: string
@@ -101,13 +127,14 @@ export default function EventStatistics({
   const [eventSearchTerm, setEventSearchTerm] = useState('')
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [payments, setPayments] = useState<Payment[]>([])
+  const [shopPayments, setShopPayments] = useState<ShopPayment[]>([])
   const [loading, setLoading] = useState(false)
   const [sortConfig, setSortConfig] = useState<{
     column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod' | null
     order: 'asc' | 'desc' | null
   }>({ column: null, order: null })
   const [expandedPayments, setExpandedPayments] = useState<Record<string, boolean>>({})
-  const [activeTab, setActiveTab] = useState<'tickets' | 'answers'>('tickets')
+  const [activeTab, setActiveTab] = useState<'tickets' | 'shopPayments' | 'answers'>('tickets')
 
   // Initialize from URL params if present
   useEffect(() => {
@@ -142,8 +169,12 @@ export default function EventStatistics({
     if (!selectedEventId) return
     setLoading(true)
     try {
-      const eventPayments = await getEventPayments(selectedEventId)
+      const [eventPayments, eventShopPayments] = await Promise.all([
+        getEventPayments(selectedEventId),
+        getEventShopPayments(selectedEventId),
+      ])
       setPayments(eventPayments)
+      setShopPayments(eventShopPayments)
     } catch (error) {
       console.error('Error fetching payments:', error)
       toast.error('Failed to load event payments')
@@ -158,6 +189,7 @@ export default function EventStatistics({
       reloadPayments()
     } else {
       setPayments([])
+      setShopPayments([])
     }
   }, [selectedEventId, reloadPayments])
 
@@ -190,7 +222,7 @@ export default function EventStatistics({
       sum + payment.quantity * (payment.eventTicket?.capacityPerTicket ?? 1),
     0
   )
-  const totalEarned = payments.reduce((sum, payment) => {
+  const totalEventEarned = payments.reduce((sum, payment) => {
     const price =
       typeof payment.pricePaid === 'number'
         ? payment.pricePaid
@@ -198,8 +230,8 @@ export default function EventStatistics({
     return sum + price
   }, 0)
 
-  // Get unique emails for copy functionality (include guest emails)
-  const participantEmails = Array.from(
+  // Get unique emails for copy functionality based on active tab
+  const ticketParticipantEmails = Array.from(
     new Set(
       payments
         .map((p) => (p.user?.email || p.guestEmail)?.trim())
@@ -212,6 +244,17 @@ export default function EventStatistics({
         )
     )
   )
+
+  const shopParticipantEmails = Array.from(
+    new Set(
+      shopPayments
+        .map((p) => (p.user?.email || p.guestEmail)?.trim())
+        .filter((email): email is string => !!email && email.length > 0)
+    )
+  )
+
+  const participantEmails =
+    activeTab === 'shopPayments' ? shopParticipantEmails : ticketParticipantEmails
 
   const selectedEventKeyName = payments[0]?.event?.keyName
 
@@ -251,6 +294,10 @@ export default function EventStatistics({
     router.push(
       `/${locale}/profile?section=admin-edit-event&eventKeyName=${selectedEventKeyName}`
     )
+  }
+
+  const handleManageShop = () => {
+    router.push(`/${locale}/profile?section=admin-all-shops`)
   }
 
   const handleSort = (column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod') => {
@@ -312,6 +359,12 @@ export default function EventStatistics({
       return valueB.localeCompare(valueA)
     }
   })
+
+  const totalShopRevenue = shopPayments.reduce(
+    (sum, payment) => sum + payment.pricePaid,
+    0
+  )
+  const totalItemsSold = shopPayments.reduce((sum, payment) => sum + payment.quantity, 0)
 
   return (
     <div className="min-h-screen p-4">
@@ -377,6 +430,15 @@ export default function EventStatistics({
                   >
                     Answers
                   </button>
+                  <button
+                    onClick={() => setActiveTab('shopPayments')}
+                    className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'shopPayments'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    Shop
+                  </button>
                 </nav>
               </div>
             </div>
@@ -385,7 +447,9 @@ export default function EventStatistics({
               {/* Left Side - Statistics */}
               <div className="lg:col-span-1">
                 <div className="rounded-lg border bg-white p-6 shadow-sm">
-                  <h2 className="mb-4 text-xl font-semibold">Event Overview</h2>
+                  <h2 className="mb-4 text-xl font-semibold">
+                    {activeTab === 'shopPayments' ? 'Shop Overview' : 'Event Overview'}
+                  </h2>
 
                   {/* Event Details */}
                   {payments.length > 0 && payments[0]?.event && (
@@ -439,16 +503,18 @@ export default function EventStatistics({
                   <div className="mb-6 space-y-4">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        Total Participants
+                        {activeTab === 'shopPayments' ? 'Total Item Sold' : 'Total Participants'}
                       </p>
-                      <p className="text-2xl font-bold">{totalParticipants}</p>
+                      <p className="text-2xl font-bold">
+                        {activeTab === 'shopPayments' ? totalItemsSold : totalParticipants}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">
                         Total Earned
                       </p>
                       <p className="text-2xl font-bold">
-                        ${totalEarned.toFixed(2)}
+                        ${(activeTab === 'shopPayments' ? totalShopRevenue : totalEventEarned).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -460,14 +526,16 @@ export default function EventStatistics({
                       preSelectedEventId={selectedEventId}
                       onPaymentAdded={reloadPayments}
                     />
-                    <Button
-                      onClick={handleSendEmail}
-                      className="w-full"
-                      variant="default"
-                    >
-                      <FiMail className="mr-2 h-4 w-4" />
-                      Send Email
-                    </Button>
+                    {activeTab !== 'shopPayments' && (
+                      <Button
+                        onClick={handleSendEmail}
+                        className="w-full"
+                        variant="default"
+                      >
+                        <FiMail className="mr-2 h-4 w-4" />
+                        Send Email
+                      </Button>
+                    )}
                     <Button
                       onClick={handleCopyEmails}
                       className="w-full"
@@ -477,12 +545,16 @@ export default function EventStatistics({
                       Copy Email List
                     </Button>
                     <Button
-                      onClick={handleManageEvent}
+                      onClick={
+                        activeTab === 'shopPayments'
+                          ? handleManageShop
+                          : handleManageEvent
+                      }
                       className="w-full"
                       variant="outline"
                     >
                       <FiEdit className="mr-2 h-4 w-4" />
-                      Manage Event
+                      {activeTab === 'shopPayments' ? 'Manage Shop' : 'Manage Event'}
                     </Button>
                   </div>
                 </div>
@@ -671,6 +743,83 @@ export default function EventStatistics({
                       </div>
                     )}
                   </>
+                ) : activeTab === 'shopPayments' ? (
+                  <div className="rounded-lg border bg-white shadow-sm">
+                    <h3 className="border-b px-4 py-3 text-lg font-semibold">
+                      Shop Payment Summary
+                    </h3>
+                    <div className="space-y-4 p-4">
+                      {loading ? (
+                        <div className="flex items-center justify-center p-8">
+                          <p>Loading...</p>
+                        </div>
+                      ) : shopPayments.length > 0 ? (
+                        <div className="overflow-x-auto rounded-md border">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th className="px-4 py-3 text-left">Shop</th>
+                                <th className="px-4 py-3 text-left">Item</th>
+                                <th className="px-4 py-3 text-left">Customer</th>
+                                <th className="max-w-[140px] break-words px-4 py-3 text-left">
+                                  Email
+                                </th>
+                                <th className="max-w-[120px] break-words px-4 py-3 text-left">
+                                  Phone
+                                </th>
+                                <th className="px-4 py-3 text-left">Amount</th>
+                                <th className="px-4 py-3 text-left">Qty</th>
+                                <th className="px-4 py-3 text-left">Method</th>
+                                <th className="px-4 py-3 text-left">Date</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              {shopPayments.map((payment) => {
+                                const customerName =
+                                  payment.guestName || payment.user?.name || '-'
+                                const customerEmail =
+                                  payment.guestEmail || payment.user?.email || '-'
+                                const customerPhone =
+                                  payment.guestPhone || payment.user?.phone || '-'
+
+                                return (
+                                  <tr key={payment.id} className="bg-white">
+                                    <td className="px-4 py-3">{payment.shop?.title || '-'}</td>
+                                    <td className="px-4 py-3">{payment.shopItem?.title || '-'}</td>
+                                    <td className="px-4 py-3">{customerName}</td>
+                                    <td className="max-w-[140px] break-words px-4 py-3">
+                                      {customerEmail}
+                                    </td>
+                                    <td className="max-w-[120px] break-words px-4 py-3">
+                                      {customerPhone}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      ${payment.pricePaid.toFixed(2)}
+                                    </td>
+                                    <td className="px-4 py-3">{payment.quantity}</td>
+                                    <td className="px-4 py-3">{payment.method}</td>
+                                    <td className="px-4 py-3">
+                                      {new Date(payment.createdAt).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center p-8">
+                          <p className="text-muted-foreground">
+                            No shop payments found for this event
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   // Answers Tab
                   <div className="rounded-lg border bg-white shadow-sm">

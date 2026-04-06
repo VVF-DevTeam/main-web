@@ -49,6 +49,7 @@ export async function POST(req: Request) {
             ticketId: eventTicketId,
             seatNumbers: seatNumber ? [seatNumber] : [],
             quantity: 1,
+            type: type,
           }],
           formResponses: formResponses || undefined,
           status: 'PENDING',

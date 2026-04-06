@@ -130,7 +130,7 @@ export const POST = async (request: Request) => {
 export const PUT = async (request: Request) => {
   try {
     const session = await auth()
-    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('SUPERADMIN') && !session?.user?.role?.includes('HOST')) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

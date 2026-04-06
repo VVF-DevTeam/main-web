@@ -236,52 +236,80 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
 #### 29. `getEventPayments`
-- **File**: `app/[locale]/(Home)/profile/_components/getEventPayments.ts`
-- **Cache Key**: `['event-payments-${eventId}']` (per event)
+- **File**: `lib/actions/payment/getEventPayments.ts`
+- **Cache Key**: `['event-payments-v7-${eventId}']` (per event)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 86400 seconds (1 day)
 - **Description**: Returns all non-refunded payments for a specific event with user and event details. Used by Event Manager to display sold tickets table and calculate statistics. Cached per event to reduce loading time when switching between events.
+
+#### 30. `getEventShopPayments`
+- **File**: `lib/actions/payment/getEventShopPayments.ts`
+- **Cache Key**: `['event-shop-payments-v1-${eventId}']` (per event)
+- **Tags**: `['payments', 'shops']`
+- **Revalidate Time**: 86400 seconds (1 day)
+- **Description**: Returns all non-refunded payments where the payment belongs to a shop linked to the selected event (`shop.eventId = eventId`). Used by Event Manager Shop tab to display shop payment summary and details. Cached per event to reduce loading time when switching between events.
+
+#### 31. `getShopPayments`
+- **File**: `lib/actions/payment/getShopPayments.ts`
+- **Cache Key**: `['shop-payments-v1-${shopId}']` (per shop)
+- **Tags**: `['payments', 'shops']`
+- **Revalidate Time**: 86400 seconds (1 day)
+- **Description**: Returns all non-refunded payments for a specific shop (`payment.shopId = shopId`) with user, shop, and shop item details. Used by Shop Manager and reusable Shop payment summary component.
 
 ---
 
 ### Shops
 
-#### 30. `getAllShops`
+#### 32. `getAllShops`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-all']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all shops (published and unpublished) for admin use only, ordered by updatedAt descending. Includes event relation (title).
 
-#### 31. `getAllPublishedShops`
+#### 33. `getAllPublishedShops`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-published-all']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published shops with optional select fields. Default returns minimal fields (id, title) for backward compatibility.
 
-#### 32. `getShopById`
+#### 34. `getAllPublishedShop`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shops-published-list-v1']`
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns published shops with minimal fields (`id`, `title`) ordered by `updatedAt desc`. Alias-style function created for Shop Manager dropdown usage.
+
+#### 35. `getShopsOfShopOwner`
+- **File**: `lib/actions/shop/getShop.ts`
+- **Cache Key**: `['shops-by-owner-v1-${ownerId}']` (per owner)
+- **Tags**: `['shops']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Returns shops owned by a specific shop owner (`ownerId`) with minimal fields (`id`, `title`) ordered by `updatedAt desc`. Used for shop-owner scoped dropdowns.
+
+#### 36. `getShopById`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-by-id']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns a single shop by ID with shopItems and event relations.
 
-#### 33. `getShopBySlug`
+#### 37. `getShopBySlug`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-by-slug']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns a single shop by slug with shopItems and event relations. Used for shop detail pages.
 
-#### 34. `getShopForEditing`
+#### 38. `getShopForEditing`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-for-editing']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 86400 seconds (1 hour)
 - **Description**: Returns a single shop by ID specifically for editing, with shopItems (ordered by createdAt) and event relation (id, title, keyName). Used in admin edit shop pages.
  
-#### 35. `getAllShopItemTags`
+#### 39. `getAllShopItemTags`
 - **File**: `lib/actions/shop/shopItem/tag/getShopItemTag.ts`
 - **Cache Key**: `['shop-item-tags-all']`
 - **Tags**: `['shops']`
@@ -609,6 +637,9 @@ This document provides a comprehensive overview of all functions using `unstable
 
 **Cached Functions Affected:**
 - `getPaginatedPayments`
+- `getEventPayments`
+- `getShopPayments` (also tagged with 'shops')
+- `getEventShopPayments` (also tagged with 'shops')
 
 **Functions Calling `revalidateTag('payments')`:**
 
@@ -631,9 +662,13 @@ This document provides a comprehensive overview of all functions using `unstable
 **Cached Functions Affected:**
 - `getAllShops`
 - `getAllPublishedShops`
+- `getAllPublishedShop`
+- `getShopsOfShopOwner`
 - `getShopById`
 - `getShopBySlug`
 - `getShopForEditing`
+- `getShopPayments` (also tagged with 'payments')
+- `getEventShopPayments` (also tagged with 'payments')
 
 **Functions Calling `revalidateTag('shops')`:**
 
@@ -680,8 +715,8 @@ This document provides a comprehensive overview of all functions using `unstable
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
 | `users` | 2 functions | 6 revalidation points | ✅ Fully covered |
 | `jobs` | 3 functions | 5 API routes | ✅ Fully covered |
-| `payments` | 2 functions | 3 mutation points | ✅ Fully covered |
-| `shops` | 6 functions | 5 API routes | ✅ Fully covered |
+| `payments` | 4 functions | 3 mutation points | ✅ Fully covered |
+| `shops` | 10 functions | 5 API routes | ✅ Fully covered |
 
 ---
 
@@ -695,6 +730,8 @@ This document provides a comprehensive overview of all functions using `unstable
    - Job for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Post for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Shop for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
+   - Event payments and event shop payments: 1 day (86400 seconds) to improve admin event analytics performance
+   - Shop payments by shop: 1 day (86400 seconds) to improve Shop Manager analytics performance
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 

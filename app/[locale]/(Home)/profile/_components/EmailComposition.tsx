@@ -223,7 +223,7 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
             ? error.message || 'Something went wrong. Please contact the admin.'
             : 'Something went wrong. Please contact the admin.'
 
-      toast.error('Failed to send email', {
+      toast.error('Failed to send email. Only emails with @vietvibe.org domain can be used to send emails.', {
         description: (
           <div className="flex flex-col gap-1">
             <span>{errorMessage}</span>

@@ -177,7 +177,12 @@ export default function EventSingleCheckOut({
       currentDate.setHours(0, 0, 0, 0) // Set to start of day
 
       return tickets
-        .filter((ticket) => ticket.stripePriceId && ticket.stripeProductId)
+        .filter(
+          (ticket) =>
+            ticket.stripePriceId &&
+            ticket.stripeProductId &&
+            !ticket.disabled
+        )
         .sort((a, b) => {
           // Helper function to check if ticket is expired
           const isTicketExpired = (ticket: EventTicket) => {

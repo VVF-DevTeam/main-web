@@ -93,6 +93,8 @@ export default {
         token.role =
           user.role && user.role.length > 0 ? (user.role as Role[]) : ['USER']
       }
+
+      // In UpdateProfileForm.tsx, we use update trigger to update the user profile
       if (trigger === 'update' && session) {
         if (session.name) token.name = session.name
         if (session.image) token.image = session.image

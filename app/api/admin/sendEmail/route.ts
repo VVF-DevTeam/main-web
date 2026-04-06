@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/actions/email/sendEmail';
-import { sendApplication } from '@/lib/actions/email/sendApplication';
-import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail';
-import { sendRefundConfirmationEmail } from '@/lib/actions/email/sendRefundConfirmationEmail';
-import { sendShopOrderConfirmationEmail } from '@/lib/actions/email/sendShopOrderConfirmationEmail';
-import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail';
-import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail';
+// import { sendApplication } from '@/lib/actions/email/sendApplication';
+// import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail';
+// import { sendRefundConfirmationEmail } from '@/lib/actions/email/sendRefundConfirmationEmail';
+// import { sendShopOrderConfirmationEmail } from '@/lib/actions/email/sendShopOrderConfirmationEmail';
+// import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail';
+// import { sendVerificationEmail } from '@/lib/actions/email/sendVerificationEmail';
 
 export const POST = async (request: Request) => {
   try {
