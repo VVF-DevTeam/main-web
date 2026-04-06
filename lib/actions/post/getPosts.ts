@@ -238,6 +238,34 @@ export const getPostForEditing = unstable_cache(
   }
 )
 
+// Get post by id for public post detail page
+export const getPostById = unstable_cache(
+  async (postId: string) => {
+    try {
+      return await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Error getting post by id:', error)
+      return null
+    }
+  },
+  ['post-by-id'],
+  {
+    revalidate: 604800,
+    tags: ['posts'],
+  }
+)
+
 // Type inference: Extract the return type of getPostForEditing and unwrap Promise and null
 export type PostForEditing = NonNullable<
   Awaited<ReturnType<typeof getPostForEditing>>

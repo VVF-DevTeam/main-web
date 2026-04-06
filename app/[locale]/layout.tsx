@@ -20,7 +20,20 @@ import { lato } from '@/lib/ui/fonts/Lato'
 // Metadata
 export const metadata: Metadata = {
   title: 'Viet Vibe Foundation',
-  description: 'Viet Vibe Foundation',
+  description: 'Connect the Vietnamese community in Vancouver through art, sport, and music',
+  icons: {
+    icon: '/logo/main-logo-white.jpg',
+    shortcut: '/logo/main-logo-white.jpg',
+    apple: '/logo/main-logo-white.jpg',
+  },
+  openGraph: {
+    images: [
+      {
+        url: '/logo/main-logo-white.jpg',
+        alt: 'Viet Vibe Foundation',
+      },
+    ],
+  },
 }
 
 // namespaces for translations

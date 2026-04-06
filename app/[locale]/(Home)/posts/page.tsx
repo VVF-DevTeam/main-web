@@ -3,6 +3,7 @@ import SearchBox from '../../../../components/searchAndFilter/SearchBox'
 import PostsSkeleton from '@/components/loadingSkeleton/PostsSkeleton'
 import { Suspense } from 'react'
 import initTranslations from '@/app/i18n'
+import { Metadata } from 'next'
 import PublishedPosts from './_components/PublishedPosts'
 import PaginatedSocialPosts from '../_components/_socialmediaposts/PaginatedSocialPosts'
 // import { roleCheck } from '@/lib/actions/user/roleCheck'
@@ -21,6 +22,18 @@ import ScrollToReviews from './_components/ScrollToReviews'
 // Note: Pages with searchParams are dynamic and cannot be edge-cached by Vercel
 export const dynamic = 'force-dynamic'
 
+export const metadata: Metadata = {
+  title: 'Posts - Viet Vibe Foundation',
+  description: 'Read the latest posts from Viet Vibe Foundation',
+  openGraph: {
+    title: 'Posts - Viet Vibe Foundation',
+    description: 'Read the latest posts from Viet Vibe Foundation',
+    images: {
+      url: 'https://drive.google.com/thumbnail?id=1isQLlXpgwMauJTKe17aJ7OqBLZOmJdrJ&sz=w800',
+      alt: 'Posts - Viet Vibe Foundation',
+    },
+  },
+}
 interface PostsProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{

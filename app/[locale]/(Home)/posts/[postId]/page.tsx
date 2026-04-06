@@ -2,14 +2,36 @@
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
+import { Metadata } from 'next'
+import { getPostById } from '@/lib/actions/post/getPosts'
 
 // Components
 import PostBody from '@/app/[locale]/(Home)/posts/[postId]/_components/PostBody'
 import BackButton from '@/components/ui/back-button'
-
 // Interfaces
 interface PostPageProps {
   params: Promise<{ postId: string }>
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ postId: string }>
+}): Promise<Metadata> {
+  const { postId } = await params
+  const post = await getPostById(postId)
+  return {
+    title: post?.title,
+    description: post?.summary ?? 'Read the latest post from Viet Vibe Foundation',
+    openGraph: {
+      title: post?.title,
+      description: post?.summary ?? 'Read the latest post from Viet Vibe Foundation',
+      images: {
+        url: post?.imgUrl!,
+        alt: post?.title,
+      },
+    },
+  }
 }
 
 // Main Component
@@ -20,18 +42,7 @@ const PostPage = async ({ params }: PostPageProps) => {
   if (!postId) return redirect('/')
 
   // get the post along with author
-  const post = await prisma.post.findUnique({
-    where: {
-      id: postId,
-    },
-    include: {
-      user: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  })
+  const post = await getPostById(postId)
   if (!post) return null
 
   const isLoggedIn = session?.user?.id

@@ -2,10 +2,23 @@ import initTranslations from '@/app/i18n'
 import React from 'react'
 import { getAllShops } from '@/lib/actions/shop/getShop'
 import ShopBrowsePanel from './_components/ShopBrowsePanel'
-
+import { Metadata } from 'next'
 interface ShopPageProps {
   params: Promise<{ locale: string }>
   searchParams: Promise<{ shopSlug?: string }>
+}
+
+export const metadata: Metadata = {
+  title: 'Shop - Viet Vibe Foundation',
+  description: 'Browse our shop and find the perfect item for you',
+  openGraph: {
+    title: 'Shop - Viet Vibe Foundation',
+    description: 'Browse our shop and find the perfect item for you',
+    images: {
+      url: 'https://drive.google.com/thumbnail?id=1PXKYQic5fhczpFJjMHPK4AyYTjSC-zya&sz=w800',
+      alt: 'Browse our shop and find the perfect item for you',
+    },
+  },
 }
 
 const ShopPage = async ({ params, searchParams }: ShopPageProps) => {
