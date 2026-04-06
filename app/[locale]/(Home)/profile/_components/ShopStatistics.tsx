@@ -193,11 +193,16 @@ export default function ShopStatistics({ user, locale }: ShopStatisticsProps) {
                   }}
                 />
               </div>
-              {filteredShops.map((shop: ShopOption) => (
-                <SelectItem key={shop.id} value={shop.id}>
-                  {shop.title}
-                </SelectItem>
-              ))}
+
+              {filteredShops.length > 0 ? (
+                filteredShops.map((shop: ShopOption) => (
+                  <SelectItem key={shop.id} value={shop.id}>
+                    {shop.title}
+                  </SelectItem>
+                ))
+              ) : (
+                <div className="text-muted-foreground text-center py-2">You have no shops yet. Please create a shop first.</div>
+              )}
             </SelectContent>
           </Select>
         </div>

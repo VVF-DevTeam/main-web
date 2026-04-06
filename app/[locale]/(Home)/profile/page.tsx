@@ -12,7 +12,7 @@ import { getAllEventSeries } from '@/lib/actions/event/getEventSeries'
 import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
-import { getAllShops, getShopForEditing } from '@/lib/actions/shop/getShop'
+import { getAllShops, getShopForEditing, getShopsOfShopOwner } from '@/lib/actions/shop/getShop'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -40,6 +40,7 @@ import EditPost from '../posts/(Admin)/editPost/_components/EditPost'
 import ShopManagement from '../shop/(Admin)/allShops/_components/ShopManagement'
 import CreateShopForm from './_components/CreateShopForm'
 import EditShop from '../shop/(Admin)/editShop/[shopId]/_components/EditShop'
+import { ShopWithEvent } from '../shop/(Admin)/allShops/_components/columns'
 
 // Helper to fetch payment history
 const getPaymentHistory = (userId: string) =>
@@ -445,7 +446,12 @@ export default async function ProfilePage({
 
     case 'admin-all-shops':
       if (isSuperAdmin || isAdmin || isShopOwner) {
-        const allShops = await getAllShops()
+        let allShops: ShopWithEvent[] = []
+        if (user.role.includes('SHOPOWNER')) {
+          allShops = await getShopsOfShopOwner(user.id)
+        } else {
+          allShops = await getAllShops()
+        }
         return (
           <ShopManagement
             allShops={allShops}

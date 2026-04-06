@@ -134,10 +134,6 @@ export async function getShopsOfShopOwner(ownerId: string) {
           where: {
             ownerId,
           },
-          select: {
-            id: true,
-            title: true,
-          },
           orderBy: {
             updatedAt: 'desc',
           },
@@ -147,7 +143,7 @@ export async function getShopsOfShopOwner(ownerId: string) {
         return []
       }
     },
-    [`shops-by-owner-v1-${ownerId}`],
+    [`shops-by-owner-v2-${ownerId}`],
     {
       revalidate: 604800,
       tags: ['shops'],

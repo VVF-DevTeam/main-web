@@ -46,10 +46,9 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     isShopOwner && !isAdmin && !isSuperAdmin && !isHost
   const showAdminSection =
     isAdminOrHostOrSuperAdmin || isWriterOnly || isShopOwnerOnly
-
   const adminNavItems: { key: string; label: string; hostVisible?: boolean }[] =
     [
-      { key: 'admin-event-statistics', label: t('event-manager'), hostVisible: true },
+      { key: 'admin-event-statistics', label: t('event-manager') },
       { key: 'admin-shop-statistics', label: 'Shop Manager' },
       { key: 'admin-payment-management', label: t('payment-management') },
       { key: 'admin-email-composition', label: t('email-composition'), hostVisible: true },
@@ -137,21 +136,20 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
               Admin Section
             </h2>
             <ul className="space-y-4">
-              {isAdminOrHostOrSuperAdmin &&
-                visibleAdminNavItems.map(({ key, label }) => (
-                  <li key={key}>
-                    <Link
-                      href={`/${locale}/profile?section=${key}`}
-                      className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
-                        currentSection === key
-                          ? 'text-textColor-black bg-white font-medium shadow-sm'
-                          : 'text-textColor-black hover:bg-bgColor-white'
-                      }`}
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
+              {visibleAdminNavItems.map(({ key, label }) => (
+                <li key={key}>
+                  <Link
+                    href={`/${locale}/profile?section=${key}`}
+                    className={`block w-full rounded-lg px-4 py-2 text-left text-lg transition-colors ${
+                      currentSection === key
+                        ? 'text-textColor-black bg-white font-medium shadow-sm'
+                        : 'text-textColor-black hover:bg-bgColor-white'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
 
               {/* Manage Events Dropdown */}
               {isAdminOrHostOrSuperAdmin && (
