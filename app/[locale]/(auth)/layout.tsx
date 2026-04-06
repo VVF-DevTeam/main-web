@@ -1,7 +1,59 @@
 import React from 'react'
+import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
 import Footer from '@/app/[locale]/(Home)/_components/footer'
+
+const toCamelCase = (segment: string) => {
+  const parts = segment.split(/[-_]+/).filter(Boolean)
+  if (parts.length === 0) return segment
+  if (parts.length === 1) return parts[0]
+
+  const [first, ...rest] = parts
+  return (
+    first.toLowerCase() +
+    rest.map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
+  )
+}
+
+const formatPathTitle = (pathname: string) => {
+  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?:-[A-Z]{2})?(?=\/|$)/, '')
+  const segments = pathWithoutLocale.split('/').filter(Boolean)
+
+  if (segments.length === 0) {
+    return 'Home'
+  }
+
+  const lastSegment = segments[segments.length - 1]
+  const camel = toCamelCase(lastSegment)
+  return camel.charAt(0).toUpperCase() + camel.slice(1)
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headerStore = await headers()
+  const pathname = headerStore.get('current-path') || '/'
+  const pathTitle = formatPathTitle(pathname)
+
+  return {
+    title: `${pathTitle} | Viet Vibe Foundation`,
+    description:
+      'Connect the Vietnamese community in Vancouver through art, sport, and music',
+    icons: {
+      icon: '/logo/main-logo-white.jpg',
+      shortcut: '/logo/main-logo-white.jpg',
+      apple: '/logo/main-logo-white.jpg',
+    },
+    openGraph: {
+      images: [
+        {
+          url: '/logo/main-logo-white.jpg',
+          alt: 'Viet Vibe Foundation',
+        },
+      ],
+    },
+  }
+}
 
 const Layout = async ({
   children,

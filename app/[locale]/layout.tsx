@@ -21,6 +21,7 @@ import { lato } from '@/lib/ui/fonts/Lato'
 const toCamelCase = (segment: string) => {
   const parts = segment.split(/[-_]+/).filter(Boolean)
   if (parts.length === 0) return segment
+  if (parts.length === 1) return parts[0]
 
   const [first, ...rest] = parts
   return (
