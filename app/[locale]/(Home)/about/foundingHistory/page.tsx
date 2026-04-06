@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Members & Founders - VVF',
     description: 'Meet our VVF Members and Founders',
+    images: {
+      url: '/logo/main-logo-white.jpg',
+      alt: 'Members & Founders - VVF',
+    },
   },
 }
 
