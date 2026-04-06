@@ -1,5 +1,6 @@
 // Libraries
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import TranslationsProvider from '@/components/translator/TranslationsProvider'
 import initTranslation from '@/app/i18n'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -17,23 +18,54 @@ import '@/lib/ui/css/globals.css'
 import { beVietnamPro } from '@/lib/ui/fonts/BeVietnamPro'
 import { lato } from '@/lib/ui/fonts/Lato'
 
-// Metadata
-export const metadata: Metadata = {
-  title: 'Viet Vibe Foundation',
-  description: 'Connect the Vietnamese community in Vancouver through art, sport, and music',
-  icons: {
-    icon: '/logo/main-logo-white.jpg',
-    shortcut: '/logo/main-logo-white.jpg',
-    apple: '/logo/main-logo-white.jpg',
-  },
-  openGraph: {
-    images: [
-      {
-        url: '/logo/main-logo-white.jpg',
-        alt: 'Viet Vibe Foundation',
-      },
-    ],
-  },
+const toCamelCase = (segment: string) => {
+  const parts = segment.split(/[-_]+/).filter(Boolean)
+  if (parts.length === 0) return segment
+
+  const [first, ...rest] = parts
+  return (
+    first.toLowerCase() +
+    rest.map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join('')
+  )
+}
+
+const formatPathTitle = (pathname: string) => {
+  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?:-[A-Z]{2})?(?=\/|$)/, '')
+  const segments = pathWithoutLocale.split('/').filter(Boolean)
+
+  if (segments.length === 0) {
+    return 'Home'
+  }
+
+  const lastSegment = segments[segments.length - 1]
+  const camel = toCamelCase(lastSegment)
+  return camel.charAt(0).toUpperCase() + camel.slice(1)
+}
+
+// Metadata fallback for routes without page-level metadata
+export async function generateMetadata(): Promise<Metadata> {
+  const headerStore = await headers()
+  const pathname = headerStore.get('current-path') || '/'
+  const pathTitle = formatPathTitle(pathname)
+
+  return {
+    title: `${pathTitle} | Viet Vibe Foundation`,
+    description:
+      'Connect the Vietnamese community in Vancouver through art, sport, and music',
+    icons: {
+      icon: '/logo/main-logo-white.jpg',
+      shortcut: '/logo/main-logo-white.jpg',
+      apple: '/logo/main-logo-white.jpg',
+    },
+    openGraph: {
+      images: [
+        {
+          url: '/logo/main-logo-white.jpg',
+          alt: 'Viet Vibe Foundation',
+        },
+      ],
+    },
+  }
 }
 
 // namespaces for translations

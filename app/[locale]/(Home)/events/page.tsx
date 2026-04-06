@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Latest events from Viet Vibe Foundation',
     description: 'Check out the latest events from Viet Vibe Foundation',
     images: {
-      url: 'https://drive.google.com/thumbnail?id=1NtqT8YSy-eV3wIBcNo7zcXUy1-gPm8LW&sz=w800',
+      url: 'https://drive.google.com/thumbnail?id=1p0VsJNq8BvDqsuxG35D9gxnfPF-kBpiJ&sz=w800',
       alt: 'Latest events from Viet Vibe Foundation',
     },
   },
