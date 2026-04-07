@@ -1,0 +1,102 @@
+{
+  "2025-2026": [
+    {
+      "id": 1,
+      "description": "description-TrongNguyen",
+      "bio": "bio-TrongNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u",
+      "name": "Trong Nguyen",
+      "title": "Founder/CEO"
+    },
+    {
+      "id": 2,
+      "description": "description-EattleNguyen",
+      "bio": "bio-EattleNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1gwyOUEkQwoHVOk-pPt1WiV_rHKhirFRT",
+      "name": "Eattle Nguyen",
+      "title": "Co-Founder/CMO"
+    },
+    {
+      "id": 3,
+      "description": "description-KhaiHung",
+      "bio": "bio-KhaiHung",
+      "imageUrl": "https://drive.google.com/thumbnail?id=18cEoRcAUQOdr9Dva_PMSUDbGOA_WI7zQ",
+      "name": "Khai Hung Luong",
+      "title": "CTO"
+    },
+    {
+      "id": 4,
+      "description": "description-JuliaDinh",
+      "bio": "bio-JuliaDinh",
+      "imageUrl": "https://drive.google.com/thumbnail?id=15KWcS6cpEFRhvsZAaEU5HRw_wFmE81sI",
+      "name": "Julia Dinh",
+      "title": "CMO"
+    },
+    {
+      "id": 5,
+      "description": "description-BachCaHeo",
+      "bio": "bio-BachCaHeo",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1nR_r888v6r56E3b70RMy4-9tvKr22Jh6",
+      "name": "Ca Heo (Bach)",
+      "title": "CPO"
+    },
+    {
+      "id": 6,
+      "description": "description-TonyHuynh",
+      "bio": "bio-TonyHuynh",
+      "imageUrl": "https://drive.google.com/thumbnail?id=15WL3sdphYE-t4mI-deO20tBLKdP536Hy",
+      "name": "Tony Huynh",
+      "title": "CHRO"
+    },
+    {
+      "id": 7,
+      "description": "description-TungAnhPham",
+      "bio": "bio-TungAnhPham",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1FJy4XXdRVyzZ6yH8-exNXv8u8RwA7Mee",
+      "name": "Tung Anh Pham",
+      "title": "CFO"
+    }
+  ],
+  "2024-2025": [
+    {
+      "id": 1,
+      "description": "description-TrongNguyen",
+      "bio": "bio-TrongNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=150ts6Imd6vEJDJIu9BSLaoD9xm-FC_4u",
+      "name": "Trong Nguyen",
+      "title": "Founder/CEO"
+    },
+    {
+      "id": 2,
+      "description": "description-EattleNguyen",
+      "bio": "bio-EattleNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1gwyOUEkQwoHVOk-pPt1WiV_rHKhirFRT",
+      "name": "Eattle Nguyen",
+      "title": "Co-Founder/CMO"
+    },
+    {
+      "id": 3,
+      "description": "description-DaoNguyen",
+      "bio": "bio-DaoNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1d_6JXNRDej68-yl_4piUdXe47jTlD71p",
+      "name": "Dao Nguyen",
+      "title": "CPO"
+    },
+    {
+      "id": 4,
+      "description": "description-KhaiHung",
+      "bio": "bio-KhaiHung",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1YMgUuzIrWmXjc3e_z-ojg6BK5Qr--YcG",
+      "name": "Khai Hung Luong",
+      "title": "CTO"
+    },
+    {
+      "id": 5,
+      "description": "description-LunaNguyen",
+      "bio": "bio-LunaNguyen",
+      "imageUrl": "https://drive.google.com/thumbnail?id=1L6K_DeDyvcpA5hU3uuo4rlDm3mypn6jn",
+      "name": "Luna Nguyen",
+      "title": "CHRO"
+    }
+  ]
+}
