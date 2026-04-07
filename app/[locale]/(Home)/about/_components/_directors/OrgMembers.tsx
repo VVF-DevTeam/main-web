@@ -26,7 +26,7 @@ const directorPeriodKeys = Object.keys(directorsByYear)
   .sort((a, b) => {
     const yA = parseInt(a.slice(0, 4), 10)
     const yB = parseInt(b.slice(0, 4), 10)
-    return yA - yB
+    return yB - yA
   })
 
 const honoraryMembers = [
