@@ -4,8 +4,21 @@ import React from 'react'
 // Components
 import SignUpForm from '@/app/[locale]/(auth)/_components/SignUpForm'
 import Image from 'next/image'
-
+import type { Metadata } from 'next'
 export const dynamic = 'force-static'
+
+export const metadata: Metadata = {
+  title: 'Sign Up | Viet Vibe Foundation',
+  description: 'Sign up to create your account and reserve our latest events and lessons',
+  openGraph: {
+    title: 'Sign Up | Viet Vibe Foundation',
+    description: 'Sign up to create your account and reserve our latest events and lessons',
+    images: {
+      url: '/logo/main-logo-white.jpg',
+      alt: 'Sign Up | Viet Vibe Foundation',
+    },
+  },
+}
 
 // Main Component
 async function signUpPage() {

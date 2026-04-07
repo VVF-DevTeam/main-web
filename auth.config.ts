@@ -382,16 +382,8 @@ export default {
       // Wrap with the i18n response for internationalization and translations
       const response = i18nRouter(request, i18nConfig)
 
-      // Add current path for both client and Server Components/metadata.
-      // `next/headers()` can only read request headers, so we also override the request header here.
+      // Add a custom header
       response.headers.set('current-path', request.nextUrl.pathname)
-      response.headers.set('x-middleware-request-current-path', request.nextUrl.pathname)
-      const existing = response.headers.get('x-middleware-override-headers')
-      const set = new Set(
-        (existing ? existing.split(',') : []).map((s) => s.trim()).filter(Boolean)
-      )
-      set.add('current-path')
-      response.headers.set('x-middleware-override-headers', Array.from(set).join(','))
 
       return response
     },

@@ -4,8 +4,21 @@ import React from 'react'
 // Components
 import SignInForm from '@/app/[locale]/(auth)/_components/SignInForm'
 import Image from 'next/image'
-
+import type { Metadata } from 'next'
 export const dynamic = 'force-static'
+
+export const metadata: Metadata = {
+  title: 'Sign In | Viet Vibe Foundation',
+  description: 'Sign in to your account to reserve our latest events and lessons',
+  openGraph: {
+    title: 'Sign In | Viet Vibe Foundation',
+    description: 'Sign in to your account to reserve our latest events and lessons',
+    images: {
+      url: '/logo/main-logo-white.jpg',
+      alt: 'Sign In | Viet Vibe Foundation',
+    },
+  },
+}
 
 // Main Component
 async function signInPage() {

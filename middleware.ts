@@ -51,19 +51,13 @@ export default async function middleware(
   event: NextFetchEvent
 ): Promise<NextResponse | Response> {
   const { pathname } = request.nextUrl
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('current-path', pathname)
 
   // Exclude common static files from i18n routing
   // These should be handled as static files, not as locale routes
   const staticFiles = ['/robots.txt', '/sitemap.xml', '/sitemap', '/favicon.ico']
   if (staticFiles.includes(pathname)) {
     // Let Next.js handle these as static files
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    })
+    return NextResponse.next()
   }
 
   if (POSTS_LISTING_PATH.test(pathname)) {
@@ -87,38 +81,15 @@ export default async function middleware(
   if (isProtectedRoute(pathname)) {
     // Protected routes: run through NextAuth middleware
     // This executes the authorized callback in auth.config.ts (handles auth + i18n)
-    const response = (await nextAuthMiddleware(request, event)) as
-      | NextResponse
-      | Response
-    if (response instanceof NextResponse) {
-      response.headers.set('x-middleware-request-current-path', pathname)
-      const existing = response.headers.get('x-middleware-override-headers')
-      const set = new Set(
-        (existing ? existing.split(',') : [])
-          .map((s) => s.trim())
-          .filter(Boolean)
-      )
-      set.add('current-path')
-      response.headers.set('x-middleware-override-headers', Array.from(set).join(','))
-    }
-    return response
+    return nextAuthMiddleware(request, event)
   }
 
   // Public routes: just i18n routing (no auth overhead, bfcache-friendly)
   const response = i18nRouter(request, i18nConfig)
   
-  // Set current-path for public routes too:
-  // - response header: used by client
-  // - request override header: readable via next/headers in Server Components & metadata
+  // Set current-path header for public routes too (needed for BackButton component)
   if (response instanceof NextResponse) {
     response.headers.set('current-path', pathname)
-    response.headers.set('x-middleware-request-current-path', pathname)
-    const existing = response.headers.get('x-middleware-override-headers')
-    const set = new Set(
-      (existing ? existing.split(',') : []).map((s) => s.trim()).filter(Boolean)
-    )
-    set.add('current-path')
-    response.headers.set('x-middleware-override-headers', Array.from(set).join(','))
   }
   
   return response

@@ -20,7 +20,7 @@ const formatPathTitle = (pathname: string) => {
   const segments = pathWithoutLocale.split('/').filter(Boolean)
 
   if (segments.length === 0) {
-    return 'Home'
+    return 'Authentication'
   }
 
   const lastSegment = segments[segments.length - 1]
