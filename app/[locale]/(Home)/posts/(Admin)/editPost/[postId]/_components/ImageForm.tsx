@@ -22,6 +22,7 @@ import {
 import Image from 'next/image'
 import { axiosInstance } from '@/lib/axios'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
 
 interface PostImageProps {
   post: Post
@@ -67,6 +68,57 @@ const PostImage = ({ post }: PostImageProps) => {
     }
   }
 
+  const handlePostImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!e.target.files?.[0]) return
+
+    setIsLoading(true)
+    const file = e.target.files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await axiosInstance.post(
+        '/api/posts/images',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      )
+
+      if (response.status === 200) {
+        form.setValue(
+          'imgUrl',
+          getValidGoogleDriveImageUrl(response.data.url) ?? response.data.url,
+          {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          }
+        )
+        toast.success('Success', {
+          description: 'Image uploaded successfully',
+          style: { color: '#22c55e' },
+        })
+      } else {
+        toast.error('Error', {
+          description: 'Failed to upload image',
+          style: { color: '#ef4444' },
+        })
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Error', {
+        description: 'Failed to upload image',
+        style: { color: '#ef4444' },
+      })
+    } finally {
+      setIsLoading(false)
+      e.target.value = ''
+    }
+  }
+
   return (
     <>
       {isLoading && <Loader />}
@@ -94,7 +146,7 @@ const PostImage = ({ post }: PostImageProps) => {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-20 md:space-y-16"
+              className="space-y-2"
             >
               <FormField
                 control={form.control}
@@ -104,36 +156,43 @@ const PostImage = ({ post }: PostImageProps) => {
                   return (
                     <FormItem className="w-full">
                       <FormControl>
-                        <div className="space-y-2">
-                          <Input
-                            placeholder="Enter Image URL"
-                            {...field}
-                            disabled={isLoading}
-                            onBlur={(e) => {
-                              const raw = e.target.value || ''
-                              const normalized = getValidGoogleDriveImageUrl(raw)
-                              if (normalized && normalized !== field.value) {
-                                field.onChange(normalized)
-                              }
-                              field.onBlur()
-                            }}
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Enter Image URL"
+                              {...field}
+                              disabled={isLoading}
+                              onBlur={(e) => {
+                                const raw = e.target.value || ''
+                                const normalized =
+                                  getValidGoogleDriveImageUrl(raw)
+                                if (normalized && normalized !== field.value) {
+                                  field.onChange(normalized)
+                                }
+                                field.onBlur()
+                              }}
+                            />
+                            {field.value && (
+                              <div className="relative aspect-video max-w-xl">
+                                {validUrl ? (
+                                  <Image
+                                    fill
+                                    src={validUrl}
+                                    alt="Post image preview"
+                                    className="rounded-md object-cover"
+                                  />
+                                ) : (
+                                  <p className="text-xs text-textColor-red">
+                                    Invalid Google Drive image URL
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <ImageUploadButton
+                            onChange={handlePostImageUpload}
+                            disabled={isLoading || isSubmitting}
                           />
-                          {field.value && (
-                            <div className="relative aspect-video max-w-xl">
-                              {validUrl ? (
-                                <Image
-                                  fill
-                                  src={validUrl}
-                                  alt="Post image preview"
-                                  className="rounded-md object-cover"
-                                />
-                              ) : (
-                                <p className="text-xs text-textColor-red">
-                                  Invalid Google Drive image URL
-                                </p>
-                              )}
-                            </div>
-                          )}
                         </div>
                       </FormControl>
                       <FormMessage />

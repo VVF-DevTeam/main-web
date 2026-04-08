@@ -39,6 +39,7 @@ import TextPreview from '@/components/quill/TextPreview'
 import formatKeyName from '@/lib/utilFunctions/keyNameUtils'
 import Image from 'next/image'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
 
 interface ShopItemsProps {
   shop: Shop & {
@@ -1383,18 +1384,10 @@ const ShopItems = ({ shop, allTags }: ShopItemsProps) => {
                                   )}
                                 </div>
 
-                                <div>
-                                  <label className="inline-flex cursor-pointer items-center justify-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-                                    Upload Image File
-                                    <input
-                                      type="file"
-                                      className="hidden"
-                                      accept="image/*"
-                                      onChange={handleMainImageUpload}
-                                      disabled={isLoading}
-                                    />
-                                  </label>
-                                </div>
+                                <ImageUploadButton
+                                  onChange={handleMainImageUpload}
+                                  disabled={isLoading}
+                                />
                               </div>
                             </FormControl>
                             <FormMessage />

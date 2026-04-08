@@ -140,6 +140,7 @@ export default async function EditShop({
             <h2 className="text-xl font-bold md:text-2xl xl:text-3xl">
               <span className="text-gray-500">Step VII :</span> Shop Info
             </h2>
+            <EditorInstructions />
             <ShopInfo shop={shop} />
           </div>
 

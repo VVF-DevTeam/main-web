@@ -22,6 +22,7 @@ import Image from 'next/image'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
 
 interface ShopImageProps {
   shop: Shop
@@ -67,6 +68,57 @@ const ShopImage = ({ shop }: ShopImageProps) => {
     }
   }
 
+  const handleShopImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files?.[0]) return
+
+    setIsLoading(true)
+    const file = event.target.files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await axiosInstance.post(
+        '/api/shops/images',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      )
+
+      if (response.status === 200) {
+        form.setValue(
+          'imageUrl',
+          getValidGoogleDriveImageUrl(response.data.url) ?? response.data.url,
+          {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          }
+        )
+        toast.success('Success', {
+          description: 'Image uploaded successfully',
+          style: { color: '#22c55e' },
+        })
+      } else {
+        toast.error('Error', {
+          description: 'Failed to upload image',
+          style: { color: '#ef4444' },
+        })
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Error', {
+        description: 'Failed to upload image',
+        style: { color: '#ef4444' },
+      })
+    } finally {
+      setIsLoading(false)
+      event.target.value = ''
+    }
+  }
+
   return (
     <>
       {isLoading && <Loader />}
@@ -94,7 +146,7 @@ const ShopImage = ({ shop }: ShopImageProps) => {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-20 md:space-y-16"
+              className="space-y-3"
             >
               <FormField
                 control={form.control}
@@ -104,35 +156,41 @@ const ShopImage = ({ shop }: ShopImageProps) => {
                   return (
                     <FormItem className="w-full">
                       <FormControl>
-                        <div className="space-y-2">
-                          <Input
-                            placeholder="Enter Shop Image URL"
-                            {...field}
-                            onBlur={(e) => {
-                              const raw = e.target.value || ''
-                              const normalized = getValidGoogleDriveImageUrl(raw)
-                              if (normalized && normalized !== field.value) {
-                                field.onChange(normalized)
-                              }
-                              field.onBlur()
-                            }}
-                          />
-                          {field.value && (
-                            <div className="relative aspect-video max-w-xl">
-                              {validUrl ? (
-                                <Image
-                                  fill
-                                  src={validUrl}
-                                  alt="Shop image preview"
-                                  className="rounded-md object-cover"
-                                />
-                              ) : (
-                                <p className="text-xs text-textColor-red">
-                                  Invalid Google Drive image URL
-                                </p>
-                              )}
-                            </div>
-                          )}
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Enter Shop Image URL"
+                              {...field}
+                              onBlur={(e) => {
+                                const raw = e.target.value || ''
+                                const normalized = getValidGoogleDriveImageUrl(raw)
+                                if (normalized && normalized !== field.value) {
+                                  field.onChange(normalized)
+                                }
+                                field.onBlur()
+                              }}
+                            />
+                            {field.value && (
+                              <div className="relative aspect-video max-w-xl">
+                                {validUrl ? (
+                                  <Image
+                                    fill
+                                    src={validUrl}
+                                    alt="Shop image preview"
+                                    className="rounded-md object-cover"
+                                  />
+                                ) : (
+                                  <p className="text-xs text-textColor-red">
+                                    Invalid Google Drive image URL
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                            <ImageUploadButton
+                              onChange={handleShopImageUpload}
+                              disabled={isLoading || isSubmitting}
+                            />
                         </div>
                       </FormControl>
                       <FormMessage />

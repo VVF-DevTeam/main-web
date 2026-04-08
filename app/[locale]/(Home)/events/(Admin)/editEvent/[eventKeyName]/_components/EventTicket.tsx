@@ -34,6 +34,7 @@ import { AxiosError } from 'axios'
 import Loader from '@/components/loader/Loader'
 import Image from 'next/image'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
 
 type TicketWithPayments = EventTicket & {
   payments: Array<{ quantity: number }>
@@ -606,6 +607,57 @@ const EventTickets = ({ event }: EventTicketsProps) => {
     }
   }
 
+  const handleTicketBackgroundImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!e.target.files?.[0]) return
+
+    setIsLoading(true)
+    const file = e.target.files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await axiosInstance.post(
+        '/api/events/tickets/images',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      )
+
+      if (response.status === 200) {
+        ticketForm.setValue(
+          'imageUrl',
+          getValidGoogleDriveImageUrl(response.data.url) ?? response.data.url,
+          {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          }
+        )
+        toast.success('Success', {
+          description: 'Image uploaded successfully',
+          style: { color: '#22c55e' },
+        })
+      } else {
+        toast.error('Error', {
+          description: 'Failed to upload image',
+          style: { color: '#ef4444' },
+        })
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Error', {
+        description: 'Failed to upload image',
+        style: { color: '#ef4444' },
+      })
+    } finally {
+      setIsLoading(false)
+      e.target.value = ''
+    }
+  }
+
   const { isSubmitting: isTicketSubmitting, isValid: isTicketValid } =
     ticketForm.formState
   const isEditingTicket = editingTicketId !== null || isAddingNew
@@ -1054,41 +1106,48 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                             Ticket Background Image URL (Optional)
                           </FormLabel>
                           <FormControl>
-                            <div className="space-y-2">
-                              <Input
-                                type="url"
-                                placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
-                                {...field}
-                                value={field.value ?? ''}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  field.onChange(value === '' ? null : value)
-                                }}
-                                onBlur={(e) => {
-                                  const raw = e.target.value || ''
-                                  const normalized = getValidGoogleDriveImageUrl(raw)
-                                  if (normalized && normalized !== field.value) {
-                                    field.onChange(normalized)
-                                  }
-                                  field.onBlur()
-                                }}
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <Input
+                                  type="url"
+                                  placeholder="https://drive.google.com/thumbnail?id=FILE_ID"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    field.onChange(value === '' ? null : value)
+                                  }}
+                                  onBlur={(e) => {
+                                    const raw = e.target.value || ''
+                                    const normalized =
+                                      getValidGoogleDriveImageUrl(raw)
+                                    if (normalized && normalized !== field.value) {
+                                      field.onChange(normalized)
+                                    }
+                                    field.onBlur()
+                                  }}
+                                />
+                                {field.value && (
+                                  <div className="relative aspect-video max-w-xl">
+                                    {validUrl ? (
+                                      <Image
+                                        fill
+                                        src={validUrl}
+                                        alt="Ticket background image preview"
+                                        className="rounded-md object-cover"
+                                      />
+                                    ) : (
+                                      <p className="text-xs text-textColor-red">
+                                        Invalid Google Drive image URL
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <ImageUploadButton
+                                onChange={handleTicketBackgroundImageUpload}
+                                disabled={isLoading || isTicketSubmitting}
                               />
-                              {field.value && (
-                                <div className="relative aspect-video max-w-xl">
-                                  {validUrl ? (
-                                    <Image
-                                      fill
-                                      src={validUrl}
-                                      alt="Ticket background image preview"
-                                      className="rounded-md object-cover"
-                                    />
-                                  ) : (
-                                    <p className="text-xs text-textColor-red">
-                                      Invalid Google Drive image URL
-                                    </p>
-                                  )}
-                                </div>
-                              )}
                             </div>
                           </FormControl>
                           <FormMessage />

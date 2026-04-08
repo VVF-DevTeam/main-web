@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, type ChangeEvent } from 'react'
 import { Event, EventSponsor, SponsorTier } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -15,6 +15,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Image from 'next/image'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
+import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
 import {
   Select,
   SelectContent,
@@ -57,6 +59,7 @@ const SponsorsManager = ({
     Record<string, { tier: SponsorTier; order: number }>
   >({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [url, setUrl] = useState('')
   const currentDateTime = getCurrentDateTime()
 
@@ -129,6 +132,46 @@ const SponsorsManager = ({
         order,
       },
     }))
+  }
+
+  const handleSponsorImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return
+    setIsUploadingImage(true)
+    const file = e.target.files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const response = await axiosInstance.post(
+        '/api/events/images',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      )
+      if (response.status === 200) {
+        setImgUrl(
+          getValidGoogleDriveImageUrl(response.data.url) ?? response.data.url
+        )
+        toast.success('Success', {
+          description: 'Image uploaded successfully',
+          style: { color: '#22c55e' },
+        })
+      } else {
+        toast.error('Error', {
+          description: 'Failed to upload image',
+          style: { color: '#ef4444' },
+        })
+      }
+    } catch (error) {
+      console.error('Sponsor image upload:', error)
+      toast.error('Error', {
+        description: 'Failed to upload image',
+        style: { color: '#ef4444' },
+      })
+    } finally {
+      setIsUploadingImage(false)
+      e.target.value = ''
+    }
   }
 
   const handleSubmit = async () => {
@@ -251,7 +294,7 @@ const SponsorsManager = ({
 
   return (
     <>
-      {isSubmitting && <Loader />}
+      {(isSubmitting || isUploadingImage) && <Loader />}
       <div className="mt-8 flex flex-col gap-10">
         <h1 className="mb-4 text-center text-2xl font-semibold md:text-3xl lg:text-4xl">
           Manage Sponsors/Partners
@@ -406,25 +449,7 @@ const SponsorsManager = ({
               <label className="mb-1 block text-sm font-medium">
                 Image Link <span className="text-red-500">*</span>
                 <p>
-                  (upload image to{' '}
-                  <a
-                    className="text-blue-700 underline"
-                    href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Google Drive
-                  </a>{' '}
-                  and use format below, check{' '}
-                  <a
-                    className="text-blue-700 underline"
-                    href="https://github.com/Viet-Vibe-Foundation/main-web/wiki/Media-Editors-Content-Creators-Ultimate-Guide#b-post-important-tips"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    here
-                  </a>
-                  . Please use image with transparent background for best
+                  (Please use image with transparent background for best
                   results)
                 </p>
               </label>
@@ -451,6 +476,12 @@ const SponsorsManager = ({
                   </span>
                 </div>
               )}
+              <div className="mt-3">
+                <ImageUploadButton
+                  onChange={handleSponsorImageUpload}
+                  disabled={isSubmitting || isUploadingImage}
+                />
+              </div>
             </div>
 
             {/* Sponsor URL */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { axiosInstance } from '@/lib/axios'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import { getValidGoogleDriveImageUrl } from '@/lib/utilFunctions/gdrive-loader'
+import { ImageUploadButton } from '@/components/button/ImageUploadButton'
 import Image from 'next/image'
 import Loader from '@/components/loader/Loader'
 
@@ -73,9 +74,7 @@ const EventGallery = ({ event }: EventGalleryProps) => {
         description: (
           <span className="text-muted-foreground">{currentDateTime}</span>
         ),
-        style: {
-          color: 'hsl(var(--text-green))', // Using CSS variable for green
-        },
+        style: { color: '#22c55e' },
       })
       router.refresh()
     } catch (error) {
@@ -91,108 +90,170 @@ const EventGallery = ({ event }: EventGalleryProps) => {
             <span className="text-muted-foreground">{currentDateTime}</span>
           </div>
         ),
-        style: {
-          color: 'hsl(var(--text-red))', // Using CSS variable for red
-        },
+        style: { color: '#ef4444' },
       })
     } finally {
       setIsLoading(false)
     }
   }
 
+  const handleGalleryImageUpload =
+    (index: number) => async (e: ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files?.[0]) return
+
+      setIsLoading(true)
+      const file = e.target.files[0]
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await axiosInstance.post(
+          '/api/events/gallery/images',
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          }
+        )
+
+        if (response.status === 200) {
+          const url =
+            getValidGoogleDriveImageUrl(response.data.url) ??
+            response.data.url
+          setGalleryImages((prev) => {
+            const next = [...prev]
+            next[index] = url
+            return next
+          })
+          toast.success('Image uploaded successfully', {
+            description: (
+              <span className="text-muted-foreground">{currentDateTime}</span>
+            ),
+            style: { color: '#22c55e' },
+          })
+        } else {
+          toast.error('Failed to upload image', {
+            description: (
+              <span className="text-muted-foreground">{currentDateTime}</span>
+            ),
+            style: { color: '#ef4444' },
+          })
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        toast.error('Failed to upload image', {
+          description: (
+            <span className="text-muted-foreground">{currentDateTime}</span>
+          ),
+          style: { color: '#ef4444' },
+        })
+      } finally {
+        setIsLoading(false)
+        e.target.value = ''
+      }
+    }
+
   return (
     <>
       {isLoading && <Loader />}
       <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex flex-col gap-y-4">
-        {/* Notification for Google Drive only */}
-        <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">
-          Only Google Drive image file URLs are accepted. Please use links
-          like:
-          <br />
-          <span className="font-mono text-xs">
-            https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
-            <br/> 
-            https://drive.google.com/thumbnail?id=FILE_ID (refer above on how to get image id)
-          </span> <br />
-          Please upload them to Google Drive {' '}
-          <a
-            className="text-blue-700 underline"
-            href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
-            target="_blank"
-            rel="noreferrer"
-          >
-            here
-          </a>.
-        </div>
-        {galleryImages.map((imageUrl, index) => (
-          <div key={index} className="flex items-end gap-x-4">
-            <div className="flex-1">
-              <Label>Image URL {index + 1}</Label>
-              <Input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => handleImageChange(index, e.target.value)}
-                placeholder="Enter Google Drive image file URL"
-              />
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => handleRemoveImage(index)}
-              disabled={isLoading}
-              className="mb-[2px]"
+        <div className="flex flex-col gap-y-4">
+          {/* Notification for Google Drive only */}
+          <div className="mb-2 rounded border border-textColor-yellow px-3 py-2 text-sm">
+            Only Google Drive image file URLs are accepted. Please use links
+            like:
+            <br />
+            <span className="font-mono text-xs">
+              https://drive.google.com/file/d/FILE_ID/view?usp=sharing, or
+              <br />
+              https://drive.google.com/thumbnail?id=FILE_ID (refer above on how to get image id)
+            </span> <br />
+            Please upload them to Google Drive {' '}
+            <a
+              className="text-blue-700 underline"
+              href="https://drive.google.com/drive/folders/1uIa8JaopMOugtjboigiN3frZ1AzAWauB"
+              target="_blank"
+              rel="noreferrer"
             >
-              Remove
-            </Button>
+              here
+            </a>.
           </div>
-        ))}
-      </div>
+          {galleryImages.map((imageUrl, index) => (
+            <div key={index} className="flex items-end gap-x-1">
+              <div className="flex-1">
+                <Label>Image URL {index + 1}</Label>
+                <Input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => handleImageChange(index, e.target.value)}
+                  placeholder="Enter Google Drive image file URL"
+                />
+              </div>
+              <div className="mb-[2px] shrink-0">
+                <ImageUploadButton
+                  onChange={handleGalleryImageUpload(index)}
+                  disabled={isLoading}
+                >
+                  Upload
+                </ImageUploadButton>
+              </div>
+              <Button
+                variant="destructive"
+                onClick={() => handleRemoveImage(index)}
+                disabled={isLoading}
+                className="mb-[2px] shrink-0"
+              >
+                Remove
+              </Button>
 
-      {/* Preview Section */}
-      {galleryImages.filter((url) => url.trim() !== '').length > 0 && (
-        <div className="mt-6">
-          <Label className="text-base font-semibold">Preview</Label>
-          <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {galleryImages
-              .filter((url) => url.trim() !== '')
-              .map((imageUrl, index) => {
-                const validUrl = getValidGoogleDriveImageUrl(imageUrl)
-                return (
-                  <div
-                    key={index}
-                    className="relative flex aspect-square items-center justify-center rounded-md bg-bgColor-gray300"
-                  >
-                    {validUrl ? (
-                      <Image
-                        src={validUrl}
-                        alt={`Gallery Image ${index + 1}`}
-                        fill
-                        sizes="md:75vw 90vw"
-                        className="z-0 rounded-sm object-cover"
-                        onError={(e) => {
-                          // Optionally, you can set a state to show error for this image
-                          e.currentTarget.style.display = 'none'
-                        }}
-                      />
-                    ) : (
-                      <span className="text-center text-xs text-textColor-red">
-                        Invalid image URL
-                      </span>
-                    )}
-                  </div>
-                )
-              })}
-          </div>
+            </div>
+          ))}
         </div>
-      )}
 
-      <div className="flex gap-x-4">
-        <Button onClick={handleAddImage} variant="outline" disabled={isLoading}>
-          Add Gallery Image
-        </Button>
-        <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
+        {/* Preview Section */}
+        {galleryImages.filter((url) => url.trim() !== '').length > 0 && (
+          <div className="mt-6">
+            <Label className="text-base font-semibold">Preview</Label>
+            <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {galleryImages
+                .filter((url) => url.trim() !== '')
+                .map((imageUrl, index) => {
+                  const validUrl = getValidGoogleDriveImageUrl(imageUrl)
+                  return (
+                    <div
+                      key={index}
+                      className="relative flex aspect-square items-center justify-center rounded-md bg-bgColor-gray300"
+                    >
+                      {validUrl ? (
+                        <Image
+                          src={validUrl}
+                          alt={`Gallery Image ${index + 1}`}
+                          fill
+                          sizes="md:75vw 90vw"
+                          className="z-0 rounded-sm object-cover"
+                          onError={(e) => {
+                            // Optionally, you can set a state to show error for this image
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      ) : (
+                        <span className="text-center text-xs text-textColor-red">
+                          Invalid image URL
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-x-4">
+          <Button onClick={handleAddImage} variant="outline" disabled={isLoading}>
+            Add Gallery Image
+          </Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
+        </div>
       </div>
-    </div>
     </>
   )
 }
