@@ -107,7 +107,11 @@ const PostCardVertical = ({
           )}
 
         {/* Read More Link */}
-        <Link href={`posts/${id}`} className="mt-auto">
+        <Link
+          href={`posts/${id}`}
+          className="mt-auto"
+          aria-label={`Read more about post: ${title}`}
+        >
           <Button
             variant={'ghost'}
             className="group/link flex items-center gap-x-2 place-self-end p-0 text-textColor-brand900 hover:text-[#A01829]"

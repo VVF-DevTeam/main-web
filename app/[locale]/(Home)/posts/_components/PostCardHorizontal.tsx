@@ -75,7 +75,11 @@ const PostCardHorizontal = ({
             hasViewed={hasViewed}
           />
 
-          <Link href={`posts/${id}`} className="group ml-auto mt-auto md:pr-4 lg:pr-2 xl:pr-4">
+          <Link
+            href={`posts/${id}`}
+            className="group ml-auto mt-auto md:pr-4 lg:pr-2 xl:pr-4"
+            aria-label={`Read more about post: ${title}`}
+          >
             <Button
               variant={'default'}
               className="flex-center gap-x-2 text-sm md:text-base md:h-9 md:px-4 md:py-2"

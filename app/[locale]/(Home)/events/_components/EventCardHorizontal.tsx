@@ -89,6 +89,7 @@ const EventCardHorizontal = async ({
       <Link
         href={`/events/${event.eventType.toLowerCase()}/${event.keyName}`}
         className="group/link web-button-bold flex-shrink-0 self-start text-bgColor-brand900 transition-all duration-300 hover:text-bgColor-brand600 md:self-center"
+        aria-label={`Read more about event: ${event.title}`}
       >
         <div className="flex items-center gap-2">
           <span>{t('read-more')}</span>

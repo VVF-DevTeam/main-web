@@ -44,8 +44,19 @@ const RegisterDoubleSection = async ({
             <p className="mb-6 max-w-xs drop-shadow-md sm:text-base md:text-lg">
               {t('registerDoubleSection-becomeVolunteerDescription')}
             </p>
-            <Button variant="default" className="px-6 py-2 text-sm font-semibold text-textColor-white md:text-base">
-              <Link href="/registration/jobs" rel="noopener noreferrer" target="_blank">{t('learnMore')}</Link>
+            <Button
+              variant="default"
+              className="px-6 py-2 text-sm font-semibold text-textColor-white md:text-base"
+              asChild
+            >
+              <Link
+                href="/registration/jobs"
+                rel="noopener noreferrer"
+                target="_blank"
+                aria-label="Learn more about volunteer opportunities"
+              >
+                {t('learnMore')}
+              </Link>
             </Button> 
           </div>
         </div>
@@ -70,8 +81,19 @@ const RegisterDoubleSection = async ({
             <p className="mb-6 max-w-xs pl-5 drop-shadow-md md:text-lg">
               {t('registerDoubleSection-becomeHostDescription')}
             </p>
-            <Button variant="default" className="px-6 py-2 text-sm font-semibold text-textColor-white md:text-base">
-              <Link href="/registration/becomeHost" rel="noopener noreferrer" target="_blank">{t('learnMore')}</Link>
+            <Button
+              variant="default"
+              className="px-6 py-2 text-sm font-semibold text-textColor-white md:text-base"
+              asChild
+            >
+              <Link
+                href="/registration/becomeHost"
+                rel="noopener noreferrer"
+                target="_blank"
+                aria-label="Learn more about becoming a host"
+              >
+                {t('learnMore')}
+              </Link>
             </Button>
           </div>
         </div>
