@@ -120,25 +120,32 @@ This document provides a comprehensive overview of all functions using `unstable
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns the FormData JSON from the EventForm table for a specific event. Contains custom registration questions (question, description, type, required, options) that participants must answer when registering for the event. Used in EventForm component to display and edit custom form fields. Tagged with 'events' since event forms are part of event data and should be revalidated when event forms are created/updated/deleted.
 
+#### 16. `getCachedSiblingSeriesGalleryUrls` (used by `getSeriesGalleries`)
+- **File**: `lib/actions/event/getSeriesGalleries.ts`
+- **Cache Key**: `['series-sibling-galleries']` (combined with serialized arguments `seriesId` and `excludeEventId` so each series/current-event pair is cached separately)
+- **Tags**: `['events', 'series']`
+- **Revalidate Time**: 604800 seconds (7 days)
+- **Description**: Loads `imgUrls` from other **published** events in the same `EventSeries`, excluding the current event (`excludeEventId`), for the public event gallery carousel. The exported `getSeriesGalleries` server action merges this list with the current page’s `imageUrls` (normalized, deduped, current event order first). Invalidated whenever `revalidateTag('events')` or `revalidateTag('series')` runs—for example event create/edit/publish/unpublish/delete, series assignment changes, or series create/edit.
+
 ---
 
 ### Jobs
 
-#### 16. `getAllJobs`
+#### 17. `getAllJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-all']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all jobs (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 17. `getPublishedJobs`
+#### 18. `getPublishedJobs`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['jobs-published']`
 - **Tags**: `['jobs']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published jobs with optional filters (title search and event filter). Includes event relation (id, title, keyName) if job is linked to an event. Ordered by updatedAt descending.
 
-#### 18. `getJobForEditing`
+#### 19. `getJobForEditing`
 - **File**: `lib/actions/job/getJob.ts`
 - **Cache Key**: `['job-for-editing']`
 - **Tags**: `['jobs']`
@@ -149,21 +156,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Reviews
 
-#### 19. `getCachedReviewsPaginated`
+#### 20. `getCachedReviewsPaginated`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['reviews-paginated']`
 - **Tags**: `['reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated reviews with search, filtering, and pagination support
 
-#### 20. `getCachedPublishedEventsForReviews`
+#### 21. `getCachedPublishedEventsForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-events-reviews']`
 - **Tags**: `['events', 'reviews']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published events for review filtering with search support
 
-#### 21. `getCachedPublishedSeriesForReviews`
+#### 22. `getCachedPublishedSeriesForReviews`
 - **File**: `lib/actions/review/reviewActions.ts`
 - **Cache Key**: `['published-series-reviews']`
 - **Tags**: `['series', 'reviews']`
@@ -174,21 +181,21 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Posts
 
-#### 22. `getCachedPostsPaginated`
+#### 23. `getCachedPostsPaginated`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-paginated']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns paginated posts with search by title
 
-#### 23. `getAllPosts`
+#### 24. `getAllPosts`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['posts-all']`
 - **Tags**: `['posts']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all posts (published and unpublished) for admin management, ordered by updatedAt descending
 
-#### 24. `getPostForEditing`
+#### 25. `getPostForEditing`
 - **File**: `lib/actions/post/getPosts.ts`
 - **Cache Key**: `['post-for-editing']`
 - **Tags**: `['posts']`
@@ -199,7 +206,7 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Social Media Posts
 
-#### 25. `getCachedSocialMediaPostsPaginated`
+#### 26. `getCachedSocialMediaPostsPaginated`
 - **File**: `lib/actions/post/getSocialPost.ts`
 - **Cache Key**: `['social-media-posts']`
 - **Tags**: `['social-posts']`
@@ -210,14 +217,14 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Users
 
-#### 26. `getUsersSimple` (via `getCachedUsersSimple`)
+#### 27. `getUsersSimple` (via `getCachedUsersSimple`)
 - **File**: `lib/actions/user/getAllUsersSimple.ts`
 - **Cache Key**: `['users-simple']`
 - **Tags**: `['users']`
 - **Revalidate Time**: 3600 seconds (1 hour)
 - **Description**: Returns list of users with optional count limit and name search
 
-#### 27. `getUsersWithRole` (via `getCachedUsersWithRole`)
+#### 28. `getUsersWithRole` (via `getCachedUsersWithRole`)
 - **File**: `lib/actions/user/getUsersWithRole.ts`
 - **Cache Key**: `['users-with-role']`
 - **Tags**: `['users']`
@@ -228,28 +235,28 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Payments
 
-#### 28. `getPaginatedPayments`
+#### 29. `getPaginatedPayments`
 - **File**: `lib/actions/payment/getPaginatedPayments.ts`
 - **Cache Key**: `['payments-*']` (per-request key derived from user role, userId, page, and pageSize)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 300 seconds (5 minutes)
 - **Description**: Returns paginated payments (with user and event relations) for admin/host payment management UI. Cached via `unstable_cache(fetchPaymentsData, [cacheKey], { tags: ['payments'] })`.
 
-#### 29. `getEventPayments`
+#### 30. `getEventPayments`
 - **File**: `lib/actions/payment/getEventPayments.ts`
 - **Cache Key**: `['event-payments-v7-${eventId}']` (per event)
 - **Tags**: `['payments']`
 - **Revalidate Time**: 86400 seconds (1 day)
 - **Description**: Returns all non-refunded payments for a specific event with user and event details. Used by Event Manager to display sold tickets table and calculate statistics. Cached per event to reduce loading time when switching between events.
 
-#### 30. `getEventShopPayments`
+#### 31. `getEventShopPayments`
 - **File**: `lib/actions/payment/getEventShopPayments.ts`
 - **Cache Key**: `['event-shop-payments-v1-${eventId}']` (per event)
 - **Tags**: `['payments', 'shops']`
 - **Revalidate Time**: 86400 seconds (1 day)
 - **Description**: Returns all non-refunded payments where the payment belongs to a shop linked to the selected event (`shop.eventId = eventId`). Used by Event Manager Shop tab to display shop payment summary and details. Cached per event to reduce loading time when switching between events.
 
-#### 31. `getShopPayments`
+#### 32. `getShopPayments`
 - **File**: `lib/actions/payment/getShopPayments.ts`
 - **Cache Key**: `['shop-payments-v1-${shopId}']` (per shop)
 - **Tags**: `['payments', 'shops']`
@@ -260,56 +267,56 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ### Shops
 
-#### 32. `getAllShops`
+#### 33. `getAllShops`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-all']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns all shops (published and unpublished) for admin use only, ordered by updatedAt descending. Includes event relation (title).
 
-#### 33. `getAllPublishedShops`
+#### 34. `getAllPublishedShops`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-published-all']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published shops with optional select fields. Default returns minimal fields (id, title) for backward compatibility.
 
-#### 34. `getAllPublishedShop`
+#### 35. `getAllPublishedShop`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-published-list-v1']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns published shops with minimal fields (`id`, `title`) ordered by `updatedAt desc`. Alias-style function created for Shop Manager dropdown usage.
 
-#### 35. `getShopsOfShopOwner`
+#### 36. `getShopsOfShopOwner`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shops-by-owner-v1-${ownerId}']` (per owner)
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns shops owned by a specific shop owner (`ownerId`) with minimal fields (`id`, `title`) ordered by `updatedAt desc`. Used for shop-owner scoped dropdowns.
 
-#### 36. `getShopById`
+#### 37. `getShopById`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-by-id']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns a single shop by ID with shopItems and event relations.
 
-#### 37. `getShopBySlug`
+#### 38. `getShopBySlug`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-by-slug']`
 - **Tags**: `['shops']`
 - **Revalidate Time**: 604800 seconds (7 days)
 - **Description**: Returns a single shop by slug with shopItems and event relations. Used for shop detail pages.
 
-#### 38. `getShopForEditing`
+#### 39. `getShopForEditing`
 - **File**: `lib/actions/shop/getShop.ts`
 - **Cache Key**: `['shop-for-editing']`
 - **Tags**: `['shops']`
-- **Revalidate Time**: 86400 seconds (1 hour)
+- **Revalidate Time**: 86400 seconds (1 day)
 - **Description**: Returns a single shop by ID specifically for editing, with shopItems (ordered by createdAt) and event relation (id, title, keyName). Used in admin edit shop pages.
  
-#### 39. `getAllShopItemTags`
+#### 40. `getAllShopItemTags`
 - **File**: `lib/actions/shop/shopItem/tag/getShopItemTag.ts`
 - **Cache Key**: `['shop-item-tags-all']`
 - **Tags**: `['shops']`
@@ -335,6 +342,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - `getEventTickets` (via `getCachedEventTickets`)
 - `getEventDiscountsAndTickets`
 - `getEventForm`
+- `getCachedSiblingSeriesGalleryUrls` (via `getSeriesGalleries`; also tagged with `'series'`)
 - `getCachedPublishedEventsForReviews` (also tagged with 'reviews')
 
 **Functions Calling `revalidateTag('events')`:**
@@ -483,6 +491,7 @@ This document provides a comprehensive overview of all functions using `unstable
 **Cached Functions Affected:**
 - `getCachedPublishedSeriesForReviews` (also tagged with 'reviews')
 - `getAllEventSeries`
+- `getCachedSiblingSeriesGalleryUrls` (via `getSeriesGalleries`; also tagged with `'events'`)
 
 **Functions Calling `revalidateTag('series')`:**
 
@@ -495,6 +504,8 @@ This document provides a comprehensive overview of all functions using `unstable
    - Function: `PUT`
    - Line: 36
    - Action: Updates an existing event series
+
+**Note:** Any route that calls `revalidateTag('events')` also refreshes series sibling gallery data, because `getCachedSiblingSeriesGalleryUrls` is tagged with `'events'`. Series-only mutations use `revalidateTag('series')` and invalidate the same cache entries.
 
 ---
 
@@ -706,10 +717,10 @@ This document provides a comprehensive overview of all functions using `unstable
 
 | Tag | Cached Functions | Revalidation Points | Status |
 |-----|-----------------|---------------------|--------|
-| `events` | 13 functions | 17 API routes | ✅ Fully covered |
+| `events` | 14 functions | 17 API routes | ✅ Fully covered |
 | `reviews` | 3 functions | 3 server actions | ✅ Fully covered |
 | `posts` | 3 functions | 5 API routes | ✅ Fully covered |
-| `series` | 2 functions | 2 API routes | ✅ Fully covered |
+| `series` | 3 functions | 2 API routes | ✅ Fully covered |
 | `event-categories` | 1 function | 2 API routes | ✅ Fully covered |
 | `event-sponsors` | 1 function | 2 API routes | ✅ Fully covered |
 | `social-posts` | 1 function | 0 revalidation points | ⚠️ External API (may not need) |
@@ -729,15 +740,17 @@ This document provides a comprehensive overview of all functions using `unstable
    - Event for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Job for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
    - Post for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
-   - Shop for editing: 1 hour (3600 seconds) to ensure editors see recent changes more quickly
+   - Shop for editing: 1 day (86400 seconds) to balance freshness with Shop Manager performance
    - Event payments and event shop payments: 1 day (86400 seconds) to improve admin event analytics performance
    - Shop payments by shop: 1 day (86400 seconds) to improve Shop Manager analytics performance
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 
-3. **Series Revalidation**: The `'series'` tag is now properly revalidated when series are created or updated via the API routes.
+3. **Series Revalidation**: The `'series'` tag is revalidated when series are created or updated via the API routes. Series-linked **event gallery** sibling URLs (`getSeriesGalleries` / `getCachedSiblingSeriesGalleryUrls`) use both `'events'` and `'series'` tags, so they refresh on event mutations and on series mutations.
 
 4. **External Data**: Social media posts fetch from external APIs (Facebook/Instagram), so manual revalidation may not be necessary, but the cache will auto-refresh every 10 minutes.
+
+5. **Event detail gallery**: `EventGalleryCarousel` calls `getSeriesGalleries` from the client; sibling gallery URLs are served through the cached helper above, not through `getEventByKeyName` alone.
 
 ---
 
@@ -750,7 +763,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating or updating event discounts, always call `revalidateTag('events')` (discounts are stored in the event's eventDiscounts JSON field)
 - When creating, updating, or deleting reviews, always call `revalidateTag('reviews')`
 - When creating, updating, or deleting posts, always call `revalidateTag('posts')`
-- When creating or updating series, always call `revalidateTag('series')`
+- When creating or updating series, always call `revalidateTag('series')` (this also invalidates cached series sibling gallery URLs used on event pages)
 - When creating or updating event categories, always call `revalidateTag('event-categories')`
 - When creating or updating event sponsors, always call `revalidateTag('event-sponsors')`
 - **Additionally**, when creating or updating event sponsors (creating/editing sponsor associations or isPartner field), also call `revalidateTag('events')` since sponsors are included in cached event queries

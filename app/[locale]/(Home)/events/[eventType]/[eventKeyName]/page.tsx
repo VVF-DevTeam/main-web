@@ -50,13 +50,6 @@ const ClassPage = async ({ params }: ClassPageProps) => {
     return <NotFound />
   }
 
-  // Check if gallery carousel should be rendered
-  const shouldShowGallery = !!(
-    publishedClass.imgUrls &&
-    Array.isArray(publishedClass.imgUrls as string[]) &&
-    (publishedClass.imgUrls as string[]).length > 0
-  )
-
   return (
     <>
       {publishedClass.eventType === 'CONCERT' ? (
@@ -69,7 +62,6 @@ const ClassPage = async ({ params }: ClassPageProps) => {
               imgUrls: (publishedClass.imgUrls as string[]) || [],
             }}
             locale={locale}
-            shouldShowGallery={shouldShowGallery as boolean}
             reviewsCount={publishedClass._count.Review}
             seriesId={publishedClass.series?.id}
             seatingMap={publishedClass.seatingMap as SeatingMap}
@@ -111,12 +103,12 @@ const ClassPage = async ({ params }: ClassPageProps) => {
             classId={publishedClass.id}
             title={publishedClass.title}
             eventType={publishedClass.eventType}
-            shouldShowGallery={shouldShowGallery as boolean}
-            imageUrls={publishedClass.imgUrls as string[]}
+            imageUrls={(publishedClass.imgUrls as string[]) ?? []}
             tickets={publishedClass.tickets}
             sponsors={publishedClass.sponsors}
             linkedJobs={publishedClass.jobs}
             discounts={publishedClass.eventDiscounts}
+            seriesId={publishedClass.series?.id}
           />
         </div>
       )}

@@ -52,12 +52,12 @@ interface ClassDescriptionProps {
   classId: string
   title: string
   eventType: string
-  shouldShowGallery?: boolean
   imageUrls: string[]
   tickets: EventTicket[]
   sponsors: SponsorOnEvent[]
   linkedJobs: Job[]
   discounts: JsonValue
+  seriesId?: string
 }
 
 const typeMap = {
@@ -85,12 +85,12 @@ const ClassDescription = async ({
   classId,
   eventType,
   capacity,
-  shouldShowGallery = true,
   imageUrls,
   tickets,
   sponsors,
   linkedJobs,
   discounts,
+  seriesId,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -312,12 +312,13 @@ const ClassDescription = async ({
           </div>
         </div>
 
-        {/* Gallery Carousel at the bottom */}
-        {shouldShowGallery && (
-          <div className="mb-8 mt-4">
-            <EventGalleryCarousel imageUrls={imageUrls} />
-          </div>
-        )}
+        {/* Gallery at bottom; carousel returns null when there is nothing to show */}
+        <EventGalleryCarousel
+          className="mb-8 mt-4"
+          imageUrls={imageUrls}
+          eventId={classId}
+          seriesId={seriesId}
+        />
       </div>
     </div>
   )

@@ -68,7 +68,6 @@ type EventWithRelations = {
 interface ConcertDescriptionsProps {
   event: EventWithRelations
   locale: string
-  shouldShowGallery?: boolean
   reviewsCount: number
   seriesId?: string
   seatingMap: SeatingMap
@@ -84,7 +83,6 @@ const typeMap = {
 const ConcertDescriptions = async ({
   event,
   locale,
-  shouldShowGallery = true,
   reviewsCount,
   seriesId,
   seatingMap,
@@ -355,12 +353,13 @@ const ConcertDescriptions = async ({
           </div>
         )}
 
-        {/* Gallery Carousel at the bottom */}
-        {shouldShowGallery && (
-          <div className="my-8">
-            <EventGalleryCarousel imageUrls={event.imgUrls as string[]} />
-          </div>
-        )}
+        {/* Gallery at bottom; carousel returns null when there is nothing to show */}
+        <EventGalleryCarousel
+          className="my-8"
+          imageUrls={(event.imgUrls as string[]) ?? []}
+          eventId={event.id}
+          seriesId={seriesId}
+        />
       </div>
     </div>
   )
