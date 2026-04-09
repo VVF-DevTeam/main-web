@@ -44,6 +44,7 @@ body {
     --secondary-color-50: 48 100% 96%; /* ##FFFBEB */
 
     /* gray variants */
+    --gray-color-700: 228 3% 30%; /* #4A4B4F */
     --gray-color-500: 216 3% 64%; /* #A0A2A5 */
     --gray-color-300: 216 9% 89%; /* #E1E3E6 */
     --gray-color-100: 210 33% 96%; /* #F3F4F6 */
