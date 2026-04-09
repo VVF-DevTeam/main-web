@@ -68,6 +68,7 @@ const Introduction = async ({ locale }: IntroductionProps) => {
               height={255}
               className="h-[255px] w-auto max-w-full"
               priority
+              fetchPriority="high"
             />
             <div className="absolute right-[155px] top-[30px] rotate-[10deg] rounded-2xl bg-bgColor-secondary200 px-3 py-[6px]">
               <p className="web-body-regular">Camping</p>
@@ -112,6 +113,8 @@ const Introduction = async ({ locale }: IntroductionProps) => {
           <Button
             variant={'default'}
             className="web-button-bold h-[52px] w-[260px] text-[18px]"
+            asChild
+            aria-label={`Go to events page`}
           >
             <Link href={'/events'}>{t('button-introduction')}</Link>
           </Button>

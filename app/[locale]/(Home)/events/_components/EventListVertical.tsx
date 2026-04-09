@@ -62,7 +62,7 @@ const EventListVertical = async ({
 
       {/* More Events Button */}
       {fromHomePage && events.length > 0 && (
-        <Button variant="default" className="mt-4 px-8 py-6">
+        <Button variant="default" className="mt-4 px-8 py-6" asChild aria-label={`Go to events page`}>
           <Link href="/events" className="text-base font-bold">{t('more-events')}</Link>
         </Button>
       )}

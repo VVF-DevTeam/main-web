@@ -142,7 +142,7 @@ const EventListHorizontal = async ({
 
       {/* From Home Page button */}
       {fromHomePage && (
-        <Button variant="default" className="px-8 py-6">
+        <Button variant="default" className="px-8 py-6" asChild aria-label={`Go to events page`}>
           <Link href="/events" className="text-base font-bold">
             {t('more-events')}
           </Link>

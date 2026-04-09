@@ -1,7 +1,37 @@
 import type { NextConfig } from 'next'
 import { withBotId } from 'botid/next/config'
 
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;
+  style-src 'self' 'unsafe-inline' https:;
+  img-src 'self' data: blob: https:;
+  font-src 'self' data: https:;
+  connect-src 'self' https:;
+  frame-src 'self' https:;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  upgrade-insecure-requests;
+`
+  .replace(/\s{2,}/g, ' ')
+  .trim()
+
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader,
+          },
+        ],
+      },
+    ]
+  },
   images: {
     loader: 'custom',
     loaderFile: './lib/utilFunctions/gdrive-loader.ts',

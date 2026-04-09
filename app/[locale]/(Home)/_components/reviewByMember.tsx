@@ -59,7 +59,7 @@ const ReviewCard: React.FC<{
         <div className="min-w-0">
           <div className="truncate text-[15px] font-semibold">{name}</div>
           {(displayDate || eventTitle) && (
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-slate-700">
               {displayDate}
               {displayDate && eventTitle && ' - '}
               {eventTitle}
@@ -125,6 +125,7 @@ const ReviewByMember = ({ locale, reviews }: ReviewByMemberProps) => {
             key={i}
             onClick={() => setPageNumber(i + 1)}
             disabled={pageNumber === i + 1}
+            aria-label={`Go to page ${i + 1} of event reviews`}
           >
             <div
               className={`h-[18px] w-[18px] rounded-full ${pageNumber === i + 1 ? 'bg-bgColor-brand900' : 'bg-gray-300'}`}

@@ -121,7 +121,7 @@ const PostListHorizontal = async ({
 
       {/* From Home Page button */}
       {fromHomePage && (
-        <Button variant="default" className="px-8 py-6 text-base">
+        <Button variant="default" className="px-8 py-6 text-base" asChild aria-label={`Go to posts page`}>
           <Link href="/posts">{t('readAllArticles')}</Link>
         </Button>
       )}
