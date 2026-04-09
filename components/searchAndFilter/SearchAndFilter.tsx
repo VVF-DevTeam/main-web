@@ -238,7 +238,10 @@ export default function SearchAndFilter({
               value={filterValues[filter.id]}
               onValueChange={(value) => handleFilterChange(filter.id, value)}
             >
-              <SelectTrigger className="border border-input shadow-sm">
+              <SelectTrigger
+                className="border border-input shadow-sm"
+                aria-label={filter.label}
+              >
                 <SelectValue placeholder={filter.placeholder} />
               </SelectTrigger>
               <SelectContent>

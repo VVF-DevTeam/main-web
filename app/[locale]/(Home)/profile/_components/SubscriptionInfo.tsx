@@ -110,11 +110,11 @@ export default function SubscriptionInfo({
                 className="flex items-center justify-between border-b pb-4 last:border-0"
               >
                 <div>
-                  <p className="text-sm text-textColor-gray500">
+                  <p className="text-sm text-textColor-gray700">
                     {format(new Date(payment.createdAt), 'PPP')}
                   </p>
                   {payment.expiresAt ? (
-                    <p className="text-sm text-textColor-gray500">
+                    <p className="text-sm text-textColor-gray700">
                       - {format(new Date(payment.expiresAt), 'PPP')}
                     </p>
                   ) : (
@@ -126,7 +126,7 @@ export default function SubscriptionInfo({
                 <div className="text-right">
                   <p className="font-medium">${payment.pricePaid.toString()}</p>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-textColor-gray500">{payment.type}</p>
+                    <p className="text-sm text-textColor-gray700">{payment.type}</p>
                     {payment.refunded && (
                       <span className="text-xs text-red-600 font-medium">
                         (Refunded)

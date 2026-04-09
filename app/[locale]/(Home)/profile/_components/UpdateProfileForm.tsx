@@ -175,7 +175,7 @@ const UpdateProfileForm = ({ user }: { user: UserInfoProps }) => {
                   <p className="text-lg font-bold uppercase text-textColor-blue">
                     {t('profile-photo-add')}
                   </p>
-                  <p className="text-sm text-textColor-gray500">
+                  <p className="text-sm text-textColor-gray700">
                     {t('profile-photo-change')}
                   </p>
                 </div>

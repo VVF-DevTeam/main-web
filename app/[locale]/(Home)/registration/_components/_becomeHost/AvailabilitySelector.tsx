@@ -192,7 +192,7 @@ function AvailabilitySelector({
           {/* Time rows */}
           {times.map((time, rowIdx) => (
             <React.Fragment key={`time-row-${rowIdx}`}>
-              <div className="flex h-12 items-center border-r border-t p-2 text-right text-sm text-textColor-gray500">
+              <div className="flex h-12 items-center border-r border-t p-2 text-right text-sm text-textColor-gray700">
                 {time}
               </div>
               {days.map((day, colIdx) => {
@@ -249,7 +249,7 @@ function AvailabilitySelector({
                 }).format(date)
                 const formattedDate = format(date, 'MM-dd-yyyy')
                 return (
-                  <div key={dateStr} className="text-sm text-textColor-gray500">
+                  <div key={dateStr} className="text-sm text-textColor-gray700">
                     <span className="text-textColor-black font-medium capitalize">
                       {t(dayName)} ({formattedDate}):
                     </span>{' '}

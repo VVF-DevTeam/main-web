@@ -33,7 +33,7 @@ const SocialPostCard: React.FC<PostCardProps> = ({
               {post.username}
             </h3>
             <span className="mx-2 text-textColor-gray500">•</span>
-            <p className="text-sm text-textColor-gray500">{post.timestamp}</p>
+            <p className="text-sm text-textColor-gray700">{post.timestamp}</p>
           </div>
           {post.platform === 'facebook' ? (
             <FaFacebook className="text-xl text-textColor-blue" />

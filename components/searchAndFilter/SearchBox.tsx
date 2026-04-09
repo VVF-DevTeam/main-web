@@ -102,6 +102,7 @@ const SearchBox = ({ placeholders }: SearchBoxProps) => {
       <div
         onClick={() => inputRef.current?.focus()}
         className="relative flex w-full items-center overflow-hidden text-[16px]"
+        aria-label="Search for posts"
       >
         <input
           ref={inputRef}
@@ -110,11 +111,12 @@ const SearchBox = ({ placeholders }: SearchBoxProps) => {
           onBlur={() => onBlur()}
           placeholder="Search"
           className="h-full w-full border-none bg-inherit px-3 py-3 text-slate-900 outline-none placeholder:text-slate-600 focus:outline-none"
+          aria-label="Search for posts"
         />
         <div
           id="dynamic-placeholder"
           ref={placeholderRef}
-          className="pointer-events-none absolute left-[70px] top-[9px] animate-placeHolderFade text-slate-600"
+          className="pointer-events-none absolute left-[70px] top-[9px] animate-placeHolderFade text-textColor-gray700"
         >
           <span>{placeholders[index] ? placeholders[index] : ''}</span>
         </div>
