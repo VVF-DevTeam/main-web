@@ -222,7 +222,7 @@ function ShopItemCarousel({
                                             className="object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        <div className="w-full h-full flex items-center justify-center text-gray-700">
                                             No Image
                                         </div>
                                     )}
@@ -245,9 +245,9 @@ function ShopItemCarousel({
 
                                 {/* Content */}
                                 <div className="p-4 space-y-2">
-                                    <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
+                                    <h2 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
                                         {item.title}
-                                    </h3>
+                                    </h2>
 
                                     {/* Item Type under title */}
                                     <p className="text-sm text-gray-500 line-clamp-1">
@@ -699,7 +699,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                     </h2>
                     <div className="mb-6">
                         <Select value={selectedShopType || 'all'} onValueChange={(value) => setSelectedShopType(value === 'all' ? '' : value)}>
-                            <SelectTrigger className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700">
+                            <SelectTrigger
+                                className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700"
+                                aria-label="Filter shops by type"
+                            >
                                 <SelectValue placeholder="Filter by Shop Type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -769,6 +772,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                             type="button"
                             onClick={() => setIsCartSheetOpen(true)}
                             className="absolute right-4 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full text-textColor-secondary100"
+                            aria-label="Open shopping cart"
                         >
                             <ShoppingBag className="h-6 w-6" />
                             {cartItemCount > 0 && (
@@ -826,7 +830,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                             {/* Left Side — mr-auto pushes showing & sort-by to the right */}
                             <div className="flex flex-wrap items-center gap-2 mr-auto">
                                 <Select value={selectedType || 'all'} onValueChange={(value) => setSelectedType(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                    <SelectTrigger
+                                        className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4"
+                                        aria-label="Filter items by type"
+                                    >
                                         <SelectValue placeholder={t('item-type')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -843,7 +850,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 </Select>
 
                                 <Select value={selectedTag || 'all'} onValueChange={(value) => setSelectedTag(value === 'all' ? '' : value)}>
-                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                    <SelectTrigger
+                                        className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4"
+                                        aria-label="Filter items by tag"
+                                    >
                                         <SelectValue placeholder={t('tags')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -861,7 +871,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
 
                                 <div className="flex items-center gap-2">
                                     <Select value={selectedStatus || 'all'} onValueChange={(value) => setSelectedStatus(value === 'all' ? '' : value)}>
-                                        <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                        <SelectTrigger
+                                            className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4"
+                                            aria-label="Filter items by status"
+                                        >
                                             <SelectValue placeholder={t('item-status')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -881,6 +894,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                         type="button"
                                         variant="ghost"
                                         className="h-11 gap-2 text-textColor-white/80 hover:bg-white/10 hover:text-textColor-white px-2 hidden md:block"
+                                        aria-label="Reset item filters"
                                         onClick={() => {
                                             setSelectedType('')
                                             setSelectedTag('')
@@ -902,7 +916,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                             <div className="flex items-center gap-2">
                                 <span className="text-textColor-white/80">{t('sort-by')}:</span>
                                 <Select value={selectedSort} onValueChange={(value) => setSelectedSort(value as (typeof SORT_OPTIONS)[number]['value'])}>
-                                    <SelectTrigger className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4">
+                                    <SelectTrigger
+                                        className="h-11 w-auto rounded-xl border border-white/20 bg-white/5 px-4 text-textColor-white p-2 2xl:px-4"
+                                        aria-label="Sort products"
+                                    >
                                         <SelectValue placeholder={t('featured')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -962,7 +979,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                                             className="object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-00">
                                                             No Image
                                                         </div>
                                                     )}
@@ -985,9 +1002,9 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
 
                                                 {/* Content */}
                                                 <div className="p-4 space-y-2">
-                                                    <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
+                                                    <h2 className="font-semibold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
                                                         {item.title}
-                                                    </h3>
+                                                    </h2>
 
                                                     {/* Item Type under title */}
                                                     <p className="text-sm text-gray-500">
@@ -1247,6 +1264,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                         <button
                             onClick={closeImageModal}
                             className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-80 text-gray-800 transition-all duration-200 hover:bg-opacity-100"
+                            aria-label="Close image preview"
                         >
                             ✕
                         </button>
@@ -1271,6 +1289,7 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                                 type="button"
                                 onClick={() => setIsShopSelectModalOpen(false)}
                                 className="text-gray-400 hover:text-gray-600 transition-colors"
+                                aria-label="Close shop selector"
                             >
                                 ✕
                             </button>
@@ -1279,7 +1298,10 @@ export default function ShopBrowsePanel({ shops, initialShopSlug }: ShopBrowsePa
                         {/* Shop Type Filter */}
                         <div className="mb-4">
                             <Select value={selectedShopType || 'all'} onValueChange={(value) => setSelectedShopType(value === 'all' ? '' : value)}>
-                                <SelectTrigger className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700">
+                                <SelectTrigger
+                                    className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700"
+                                    aria-label="Filter shops by type"
+                                >
                                     <SelectValue placeholder={t('all-shop-types')} />
                                 </SelectTrigger>
                                 <SelectContent>
