@@ -81,11 +81,13 @@ export default function MobileSidebar({
 
   const adminSectionKeysVisibleToShopOwner = [
     'admin-shop-statistics',
+    'admin-vvf-finance',
   ] as const
 
   const adminTopLinkOrder = [
     'admin-event-statistics',
     'admin-shop-statistics',
+    'admin-vvf-finance',
     'admin-payment-management',
     'admin-email-composition',
   ] as const

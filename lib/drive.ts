@@ -12,6 +12,7 @@ const JOBS_FOLDER_ID = '1eMEqan2mCChM4xtRmxCgyTeQPHi6NKDq' // Jobs folder - TECH
 const TICKETS_FOLDER_ID = '11MxAM_oGDL4rU6lW9sfP11u2Q3sxY-Hc' // Tickets folder - TECH/Images/Tickets
 const QUILLED_FOLDER_ID = '1_3vZhgxGrhofnPup0YeRGHv1AHimNacM' // Quilled folder - TECH/Images/Quilled
 const EVENT_GALLERY_FOLDER_ID = '1o0DVPqiIh9LplKyz44Ouazip6M_gDCSl' // Events gallery folder - TECH/Images/Events/Gallery
+const RECEIPTS_FOLDER_ID = '1CC7OXATHsBxvmuFMq5wMlqs8_4kV1VUg' // Receipts folder - TECH/Images/Receipts
 
 const DRIVE_FOLDER_IDS = {
   avatars: AVATARS_FOLDER_ID,
@@ -23,9 +24,10 @@ const DRIVE_FOLDER_IDS = {
   tickets: TICKETS_FOLDER_ID,
   quills: QUILLED_FOLDER_ID,
   eventGallery: EVENT_GALLERY_FOLDER_ID,
+  receipts: RECEIPTS_FOLDER_ID,
 } as const
 
-export async function listDriveImages(type: 'avatars' | 'shop' | 'reviews' | 'events' | 'posts' | 'jobs' | 'tickets' | 'quills' | 'eventGallery') {
+export async function listDriveImages(type: 'avatars' | 'shop' | 'reviews' | 'events' | 'posts' | 'jobs' | 'tickets' | 'quills' | 'eventGallery' | 'receipts') {
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY!),
     scopes: ['https://www.googleapis.com/auth/drive'],
@@ -50,7 +52,7 @@ export async function listDriveImages(type: 'avatars' | 'shop' | 'reviews' | 'ev
 }
 
 export async function uploadDriveImage(
-  type: 'avatars' | 'shop' | 'reviews' | 'events' | 'posts' | 'jobs' | 'tickets' | 'quills' | 'eventGallery',
+  type: 'avatars' | 'shop' | 'reviews' | 'events' | 'posts' | 'jobs' | 'tickets' | 'quills' | 'eventGallery' | 'receipts',
   fileBuffer: Buffer,
   filename: string,
   mimetype: string

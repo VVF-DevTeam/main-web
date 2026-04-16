@@ -24,7 +24,7 @@ const paymentTypeMap = {
 export default async function PaymentManagement({
   user,
   page = 1,
-  pageSize = 20,
+  pageSize = 5,
 }: {
   user: UserInfoProps
   page?: number
@@ -51,7 +51,7 @@ export default async function PaymentManagement({
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
         {/* Headers & Add Record Button */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">All Payments Management</h1>
+          <h1 className="text-3xl font-bold">Client Payment Management</h1>
           <div className="flex items-center gap-2">
             <AddPaymentButton user={user} />
             <AddShopPaymentButton user={user} />

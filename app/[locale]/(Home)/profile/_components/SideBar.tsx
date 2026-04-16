@@ -31,6 +31,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'admin-email-composition': t('email-composition'),
     'admin-event-statistics': t('event-manager'),
     'admin-shop-statistics': 'Shop Manager',
+    'admin-vvf-finance': 'VVF Finance',
     'privacy-policy': t('privacy-policy'),
   }
 
@@ -50,6 +51,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     [
       { key: 'admin-event-statistics', label: t('event-manager') },
       { key: 'admin-shop-statistics', label: 'Shop Manager' },
+      { key: 'admin-vvf-finance', label: 'VVF Finance' },
       { key: 'admin-payment-management', label: t('payment-management') },
       { key: 'admin-email-composition', label: t('email-composition'), hostVisible: true },
     ]
@@ -58,7 +60,8 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     (item) =>
       isAdmin ||
       isSuperAdmin ||
-      (isShopOwner && item.key === 'admin-shop-statistics') ||
+      (isShopOwner &&
+        (item.key === 'admin-shop-statistics' || item.key === 'admin-vvf-finance')) ||
       (isHost && item.hostVisible === true),
   )
 

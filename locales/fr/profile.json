@@ -61,7 +61,7 @@
   "passwordmatch-warning": "Le mot de passe répété ne correspond pas au nouveau mot de passe",
   "password-success": "Votre mot de passe a été changé",
   "password-warning": "Votre mot de passe doit contenir au moins 8 caractères",
-  "payment-management": "Gestion des paiements",
+  "payment-management": "Gestion des paiements clients",
   "phone": "Téléphone",
   "plan-type": "Type de plan",
   "price": "Prix",

@@ -19,7 +19,6 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
 
   // console.log('Cookies:', req.cookies.getAll())  
   if (!token) return false
-  console.log('token', token)
   if (role) {
     return token.role?.includes(role)
   }

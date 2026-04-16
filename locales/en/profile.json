@@ -61,7 +61,7 @@
   "passwordmatch-warning": "The repeat password doesn't match the new password",
   "password-success": "Your password was changed",
   "password-warning": "Your password must be at least 8 characters",
-  "payment-management": "All Payments Management",
+  "payment-management": "Client Payment Management",
   "phone": "Phone",
   "plan-type": "Plan Type",
   "price": "Price",

@@ -13,6 +13,7 @@ import { getEventForEditing } from '@/lib/actions/event/getEventById'
 import { getAllJobs, getJobForEditing } from '@/lib/actions/job/getJob'
 import { getAllPosts, getPostForEditing } from '@/lib/actions/post/getPosts'
 import { getAllShops, getShopForEditing, getShopsOfShopOwner } from '@/lib/actions/shop/getShop'
+import { getAllReceipts } from '@/lib/actions/receipt/getReceipt'
 
 // Components
 import MyProfile from './_components/MyProfile'
@@ -31,6 +32,7 @@ import SponsorsManagement from './_components/SponsorsManagement'
 import EditEvent from '../events/(Admin)/editEvent/[eventKeyName]/_components/EditEvent'
 import EventStatistics from './_components/EventStatistics'
 import ShopStatistics from './_components/ShopStatistics'
+import VVFFinance from './_components/VVFFinance'
 import CreateJobForm from './_components/CreateJobForm'
 import EditJob from '../registration/_components/_jobs/_editJob/EditJob'
 import JobManagement from '../registration/_components/_jobs/_allJob/JobManagement'
@@ -42,7 +44,7 @@ import CreateShopForm from './_components/CreateShopForm'
 import EditShop from '../shop/(Admin)/editShop/[shopId]/_components/EditShop'
 import { ShopWithEvent } from '../shop/(Admin)/allShops/_components/columns'
 
-// Helper to fetch payment history
+// Helper to fetch payment history (no cache because it's based on user id)
 const getPaymentHistory = (userId: string) =>
   prisma.payment.findMany({
     where: { userId },
@@ -150,9 +152,9 @@ export default async function ProfilePage({
         isSuperAdmin || isAdmin || isHost
       ) {
         const page = Math.max(1, Number.parseInt(pageStr || '1', 10) || 1)
-        const pageSize = [10, 20, 50].includes(Number(pageSizeStr))
+        const pageSize = [5, 10, 20, 50].includes(Number(pageSizeStr))
           ? Number(pageSizeStr)
-          : 20
+          : 5
         return <PaymentManagement user={user} page={page} pageSize={pageSize} />
       }
       return (
@@ -262,6 +264,19 @@ export default async function ProfilePage({
         isSuperAdmin || isAdmin || isShopOwner
       ) {
         return <ShopStatistics user={user} locale={locale} />
+      }
+      return (
+        <p className="mt-10 text-center">
+          You do not have permission to view this page.
+        </p>
+      )
+
+    case 'admin-vvf-finance':
+      if (
+        isSuperAdmin || isAdmin || isShopOwner
+      ) {
+        const receipts = await getAllReceipts(Boolean(isSuperAdmin || isAdmin), user.id)
+        return <VVFFinance receipts={receipts} />
       }
       return (
         <p className="mt-10 text-center">

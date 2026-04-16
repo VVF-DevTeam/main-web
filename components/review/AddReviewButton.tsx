@@ -86,7 +86,9 @@ const AddReviewModal = ({
       const formData = new FormData()
       formData.append('file', file)
       try {
-        const response = await axiosInstance.post('/api/reviews/images', formData)
+        const response = await axiosInstance.post('/api/reviews/images', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
         if (response.status === 200) {
           setImagePreview(response.data.url)
           form.setValue('image', response.data.url)
@@ -111,11 +113,9 @@ const AddReviewModal = ({
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-6 w-6 transition-colors ${
-          isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-        } ${
-          i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-        }`}
+        className={`h-6 w-6 transition-colors ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+          } ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+          }`}
         onClick={() => !isLoading && form.setValue('rating', String(i + 1))}
       />
     ))
@@ -144,168 +144,166 @@ const AddReviewModal = ({
             </button>
           </div>
 
-        {/* Form for adding a review */}
-        <Form {...form} key="add-review-form">
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <div className="flex flex-col gap-4">
-              {/* Event */}
-              <FormField
-                control={form.control}
-                name="eventId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Event (Optional)</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={(value) => {
-                          field.onChange(value)
-                        }}
-                        disabled={isLoading}
-                      >
-                        <FormControl>
-                          <SelectTrigger disabled={isLoading}>
-                            <SelectValue placeholder="Select an event (optional)" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            No specific event
-                          </SelectItem>
-                          {events.map((event: Event) => (
-                            <SelectItem key={event.id} value={event.id}>
-                              {event.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-between">
-                {/* Rating */}
+          {/* Form for adding a review */}
+          <Form {...form} key="add-review-form">
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div className="flex flex-col gap-4">
+                {/* Event */}
                 <FormField
                   control={form.control}
-                  name="rating"
+                  name="eventId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rating</FormLabel>
+                      <FormLabel>Event (Optional)</FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2">
-                          {renderStars(Number(field.value) || 0)}
-                          <span className="ml-2 text-sm text-gray-600">
-                            {field.value ? `${field.value}/5` : 'Select rating'}
-                          </span>
-                        </div>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                          }}
+                          disabled={isLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger disabled={isLoading}>
+                              <SelectValue placeholder="Select an event (optional)" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              No specific event
+                            </SelectItem>
+                            {events.map((event: Event) => (
+                              <SelectItem key={event.id} value={event.id}>
+                                {event.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Anonymous */}
+                <div className="flex justify-between">
+                  {/* Rating */}
+                  <FormField
+                    control={form.control}
+                    name="rating"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rating</FormLabel>
+                        <FormControl>
+                          <div className="flex items-center gap-2">
+                            {renderStars(Number(field.value) || 0)}
+                            <span className="ml-2 text-sm text-gray-600">
+                              {field.value ? `${field.value}/5` : 'Select rating'}
+                            </span>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Anonymous */}
+                  <FormField
+                    control={form.control}
+                    name="anonymous"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Anonymous</FormLabel>
+                        <FormControl>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={isLoading}
+                            />
+                            <span className="text-sm text-gray-600">
+                              {field.value ? 'Yes' : 'No'}
+                            </span>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Comment */}
                 <FormField
                   control={form.control}
-                  name="anonymous"
+                  name="comment"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Anonymous</FormLabel>
+                      <FormLabel>Comment</FormLabel>
                       <FormControl>
-                        <div className="flex items-center space-x-2">
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isLoading}
-                          />
-                          <span className="text-sm text-gray-600">
-                            {field.value ? 'Yes' : 'No'}
-                          </span>
-                        </div>
+                        <Textarea
+                          placeholder="Share your experience..."
+                          className="min-h-[100px]"
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={isLoading}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
 
-              {/* Comment */}
-              <FormField
-                control={form.control}
-                name="comment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Comment</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Share your experience..."
-                        className="min-h-[100px]"
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={isLoading}
+              {/* Review Image Upload */}
+              <span>Image (Optional)</span>
+              <div className="flex flex-col">
+                <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
+                  {imagePreview ? (
+                    <div className="flex items-center justify-center">
+                      <Image
+                        src={imagePreview}
+                        alt="Review"
+                        fill
+                        className="rounded-lg object-cover"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
+                        <FiEdit2 className="h-3 w-3 text-white" />
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          accept="image/*"
+                          disabled={isImageLoading}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center space-y-1 text-center">
+                      <ImageIcon className="h-8 w-8 text-gray-400" />
+                      <p className="text-sm font-medium text-gray-600">
+                        Add Photo
+                      </p>
+                      <p className="text-xs text-gray-500">Optional</p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isImageLoading}
+                  />
+                </label>
+                {isImageLoading && <Loader />}
+              </div>
 
-            {/* Review Image Upload */}
-            <span>Image (Optional)</span>
-            <div className="flex flex-col">
-              <label className="relative h-32 w-32 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 hover:bg-gray-50">
-                {imagePreview ? (
-                  <div className="flex items-center justify-center">
-                    <Image
-                      src={imagePreview}
-                      alt="Review"
-                      fill
-                      className="rounded-lg object-cover"
-                    />
-                    <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
-                      <FiEdit2 className="h-3 w-3 text-white" />
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                        accept="image/*"
-                        disabled={isImageLoading}
-                      />
-                    </label>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center space-y-1 text-center">
-                    <ImageIcon className="h-8 w-8 text-gray-400" />
-                    <p className="text-sm font-medium text-gray-600">
-                      Add Photo
-                    </p>
-                    <p className="text-xs text-gray-500">Optional</p>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isImageLoading}
-                />
-              </label>
-              {isImageLoading && (
-                <p className="mt-2 text-sm text-blue-500">Uploading...</p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <Button type="submit" className="mt-4" disabled={isLoading}>
-              {isLoading ? 'Submitting...' : 'Submit Review'}
-            </Button>
-          </form>
-        </Form>
+              {/* Submit Button */}
+              <Button type="submit" className="mt-4" disabled={isLoading}>
+                {isLoading ? 'Submitting...' : 'Submit Review'}
+              </Button>
+            </form>
+          </Form>
         </div>
       </div>
     </>

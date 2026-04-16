@@ -325,6 +325,17 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Receipts
+
+#### 41. `getAllReceipts`
+- **File**: `lib/actions/receipt/getReceipt.ts`
+- **Cache Key**: `['receipts-all']` (argument-sensitive: `canViewAll`, `userId`)
+- **Tags**: `['receipts']`
+- **Revalidate Time**: 86400 seconds (1 day)
+- **Description**: Returns receipts with receipt items for the VVF Finance profile tab. Admin/SuperAdmin can request all receipts; other users are scoped by `userId`.
+
+---
+
 ## Tag-Based Revalidation Mapping
 
 ### Tag: `'events'`
@@ -711,6 +722,16 @@ This document provides a comprehensive overview of all functions using `unstable
 
 ---
 
+### Tag: `'receipts'`
+
+**Cached Functions Affected:**
+- `getAllReceipts`
+
+**Functions Calling `revalidateTag('receipts')`:**
+- **None found yet** - Add `revalidateTag('receipts')` in receipt create/update/delete APIs once those mutation endpoints are added.
+
+---
+
 ## Summary by Tag
 
 ### Complete Tag Coverage
@@ -728,6 +749,7 @@ This document provides a comprehensive overview of all functions using `unstable
 | `jobs` | 3 functions | 5 API routes | ✅ Fully covered |
 | `payments` | 4 functions | 3 mutation points | ✅ Fully covered |
 | `shops` | 10 functions | 5 API routes | ✅ Fully covered |
+| `receipts` | 1 function | 0 revalidation points | ⚠️ Add when receipt mutations are implemented |
 
 ---
 
@@ -743,6 +765,7 @@ This document provides a comprehensive overview of all functions using `unstable
    - Shop for editing: 1 day (86400 seconds) to balance freshness with Shop Manager performance
    - Event payments and event shop payments: 1 day (86400 seconds) to improve admin event analytics performance
    - Shop payments by shop: 1 day (86400 seconds) to improve Shop Manager analytics performance
+   - Receipts list: 1 day (86400 seconds) to improve VVF Finance tab loading
 
 2. **Multi-Tag Functions**: Some functions use multiple tags (e.g., `getCachedPublishedEventsForReviews` uses both `'events'` and `'reviews'`), meaning they will be invalidated when either tag is revalidated.
 
@@ -774,6 +797,7 @@ This document provides a comprehensive overview of all functions using `unstable
 - When creating, updating, or refunding payments, always call `revalidateTag('payments')`
 - When creating, updating, publishing, unpublishing, or deleting shops, always call `revalidateTag('shops')`
 - When creating, updating, or deleting shop items, always call `revalidateTag('shops')` (shop items are included in cached shop queries)
+- When creating, updating, or deleting receipts or receipt items, always call `revalidateTag('receipts')`
 - Social media posts cache automatically refreshes every 10 minutes
 
 

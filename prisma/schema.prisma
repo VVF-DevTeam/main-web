@@ -189,6 +189,7 @@ model User {
   Devices              UserDevice[]
   EventHost            Event[]       @relation("EventToUser")
   Shops                Shop[]
+  receipts             Receipt[]
 }
 
 model UserDevice {
@@ -491,6 +492,62 @@ model ShopItemTag {
   shopItem  ShopItem[]      @relation("ShopItemTagToShopItem")
 }
 
+model Receipt {
+  id                String               @id @default(cuid())
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  // Basic receipt metadata
+  receiptNumber     String?
+  receiptDate       DateTime             @default(now())
+  merchantName      String
+  merchantAddress   String?
+
+  // Financial totals
+  currency          String               @default("CAD")
+  subtotal          Decimal              @default(0)
+  taxAmount         Decimal              @default(0)
+  tipAmount         Decimal              @default(0)
+  discountAmount    Decimal              @default(0)
+  totalAmount       Decimal
+
+  // Spending classification
+  note              String?
+  paymentMethod     ExpensePaymentMethod @default(Other)
+  paymentReference  String? // e.g. card last4, transaction id, cheque number
+  hasReimbursed     Boolean              @default(false)
+
+  // Optional file/ocr payload
+  receiptImageUrl   String?
+  rawText           String?              @db.Text
+
+  // Relations
+  userId            String
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category          ExpenseCategoryType  @default(Other)
+  items             ReceiptItem[]
+
+  @@index([userId, receiptDate])
+}
+
+model ReceiptItem {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  description String
+  quantity    Decimal  @default(1)
+  unitPrice   Decimal
+  taxAmount   Decimal? @default(0)
+  discount    Decimal? @default(0)
+  lineTotal   Decimal
+
+  receiptId   String
+  receipt     Receipt  @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+
+  @@index([receiptId])
+}
+
 enum Role {
   SUPERADMIN
   USER
@@ -584,4 +641,32 @@ enum ShopType {
   Fundraiser
   Digital
   Seasonal
+}
+
+enum ExpensePaymentMethod {
+  Cash
+  Card
+  BankTransfer
+  EWallet
+  Cheque
+  Other
+}
+
+enum ExpenseCategoryType {
+  Food
+  Transportation
+  Shopping
+  Utilities
+  Housing
+  Health
+  Education
+  Entertainment
+  Travel
+  Insurance
+  Salary
+  Tax
+  Office
+  Subscription
+  Gift
+  Other
 }
