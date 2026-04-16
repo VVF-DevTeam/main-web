@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import axios from 'axios'
 import { axiosInstance } from '@/lib/axios'
 
 // ---------------------------------------------------------------------------
@@ -328,7 +329,19 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
       })
     } catch (error) {
       console.error('Error uploading receipt image:', error)
-      toast.error('Failed to upload image', { style: { color: '#ef4444' } })
+      const isHighDemand =
+        axios.isAxiosError(error) &&
+        (error.response?.status === 503 ||
+          (error.response?.data as { error?: { status?: string } })?.error?.status ===
+            'UNAVAILABLE')
+      if (isHighDemand) {
+        toast.error('AI service is busy', {
+          description: 'Gemini is experiencing high demand. Please try again in a moment.',
+          style: { color: '#ef4444' },
+        })
+      } else {
+        toast.error('Failed to upload image', { style: { color: '#ef4444' } })
+      }
     } finally {
       setIsImageLoading(false)
       event.target.value = ''

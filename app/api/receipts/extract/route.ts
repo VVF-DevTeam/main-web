@@ -87,12 +87,14 @@ export async function POST(req: NextRequest) {
     const { imageUrl } = (await req.json()) as { imageUrl?: string }
 
     if (!imageUrl) {
+      console.error('imageUrl is required')
       return NextResponse.json({ error: 'imageUrl is required' }, { status: 400 })
     }
 
     const geminiApiKey = process.env.GEMINI_API_KEY
     const backupGeminiApiKey = process.env.GEMINI_API_KEY_BACKUP
     if (!geminiApiKey) {
+      console.error('GEMINI_API_KEY is missing')
       return NextResponse.json({ error: 'GEMINI_API_KEY is missing' }, { status: 500 })
     }
 
@@ -131,6 +133,7 @@ export async function POST(req: NextRequest) {
           imageBase64,
         })
       } else {
+        console.error('Gemini request failed', primaryErrorText)
         return NextResponse.json(
           { error: 'Gemini request failed', details: primaryErrorText },
           { status: 502 },
@@ -140,6 +143,7 @@ export async function POST(req: NextRequest) {
 
     if (!geminiResponse.ok) {
       const backupErrorText = await geminiResponse.text()
+      console.error('Gemini request failed (including backup key)', backupErrorText)
       return NextResponse.json(
         { error: 'Gemini request failed (including backup key)', details: backupErrorText },
         { status: 502 },
@@ -150,6 +154,7 @@ export async function POST(req: NextRequest) {
     const modelText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
 
     if (!modelText) {
+      console.error('Gemini returned empty content', geminiData)
       return NextResponse.json(
         { error: 'Gemini returned empty content', raw: geminiData },
         { status: 502 },
@@ -160,6 +165,7 @@ export async function POST(req: NextRequest) {
     try {
       parsed = JSON.parse(modelText)
     } catch {
+      console.error('Gemini output is not valid JSON', modelText)
       return NextResponse.json(
         { error: 'Gemini output is not valid JSON', raw: modelText },
         { status: 502 },
@@ -168,7 +174,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(parsed, { status: 200 })
   } catch (error) {
-    console.error('Receipt extraction error:', error)
+    if (error instanceof Error) {
+      console.error('Receipt extraction error:', error.stack)
+    } else {
+      console.error('Receipt extraction error:', error)
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
