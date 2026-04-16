@@ -22,6 +22,7 @@ import { getShopPayments } from '../../../../../lib/actions/payment/getShopPayme
 import { PaymentMethod, PaymentType } from '@prisma/client'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import AddShopPaymentButton from './AddShopPaymentButton'
+import ExportToExcelButton from '@/components/button/ExportToExcelButton'
 
 interface ShopStatisticsProps {
   user: UserInfoProps
@@ -244,9 +245,25 @@ export default function ShopStatistics({ user, locale }: ShopStatisticsProps) {
 
             <div className="lg:col-span-2">
               <div className="rounded-lg border bg-white shadow-sm">
-                <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                  Shop Payment Summary
-                </h3>
+                <div className="flex items-center justify-between border-b px-4 py-3">
+                  <h3 className="text-lg font-semibold">Shop Payment Summary</h3>
+                  <ExportToExcelButton
+                    data={shopPayments.map((p) => ({
+                      Shop: p.shop?.title ?? '-',
+                      Item: p.shopItem?.title ?? '-',
+                      Customer: p.guestName ?? p.user?.name ?? '-',
+                      Email: p.guestEmail ?? p.user?.email ?? '-',
+                      Phone: p.guestPhone ?? p.user?.phone ?? '-',
+                      Amount: p.pricePaid,
+                      Quantity: p.quantity,
+                      'Payment Method': p.method,
+                      'Payment Type': p.type,
+                      Date: new Date(p.createdAt).toLocaleDateString('en-US'),
+                    }))}
+                    filename={`shop-payments-${shops.find((s) => s.id === selectedShopId)?.title ?? selectedShopId ?? 'all'}`}
+                    sheetName="Shop Payments"
+                  />
+                </div>
                 <div className="space-y-4 p-4">
                   {loading ? (
                     <div className="flex items-center justify-center p-8">

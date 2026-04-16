@@ -36,8 +36,24 @@ import {
   getAllPublishedEvents,
   getEventsOfHost,
 } from '@/lib/actions/event/getEvent'
-import { getAllEventParticipants } from '@/lib/actions/event/getEventParticipant'
+import { getEventPayments } from '@/lib/actions/payment/getEventPayments'
 import EmailSuggestion from './EmailSuggestion'
+
+type OtherGuestJson = {
+  name?: string
+  email?: string
+  phone?: string
+}
+
+interface Payment {
+  id: string
+  guestEmail: string | null
+  otherGuests?: unknown
+  user: {
+    email: string
+    name: string | null
+  } | null
+}
 
 // Interfaces
 interface UserInfoProps {
@@ -51,15 +67,6 @@ interface UserInfoProps {
   phoneVerified: boolean | null
   role: string[]
 }
-interface EventParticipants {
-  userId: string | null
-  eventId: string | null
-  user: {
-    email: string
-    name: string | null
-  } | null
-}
-
 // Event Interfaces
 interface Event {
   id: string
@@ -89,14 +96,11 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
   const [events, setEvents] = useState<Event[]>([])
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [eventSearchTerm, setEventSearchTerm] = useState('')
-  const [eventParticipants, setEventParticipants] = useState<
-    EventParticipants[]
-  >([])
+  const [payments, setPayments] = useState<Payment[]>([])
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchEvents = async () => {
       try {
-        // get list of events for user
         if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
           const publishedEvents = await getAllPublishedEvents()
           setEvents(publishedEvents)
@@ -106,31 +110,11 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
           setEvents(eventsOfHost)
           setFilteredEvents(eventsOfHost)
         }
-
-        //get list of participants in events
-        const participants = await getAllEventParticipants().then(
-          (results: EventParticipants[]) =>
-            results.filter(
-              (
-                item
-              ): item is {
-                userId: string
-                eventId: string
-                user: { name: string | null; email: string }
-              } =>
-                item.userId !== null &&
-                item.eventId !== null &&
-                item.user !== null
-            )
-        )
-        setEventParticipants(participants)
-        
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error fetching events:', error)
       }
     }
-
-    fetchData()
+    fetchEvents()
   }, [user.id, user.role])
 
   //// end of filter events to show based on user role
@@ -165,6 +149,22 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
       setSelectedEvent(prefilledEventId)
     }
   }, [prefilledEventId, form])
+
+  useEffect(() => {
+    if (!selectedEvent) {
+      setPayments([])
+      return
+    }
+    const fetchPayments = async () => {
+      try {
+        const eventPayments = await getEventPayments(selectedEvent)
+        setPayments(eventPayments)
+      } catch (error) {
+        console.error('Error fetching payments:', error)
+      }
+    }
+    fetchPayments()
+  }, [selectedEvent])
 
   // Handle event search
   const handleEventSearch = async (searchTerm: string) => {
@@ -304,13 +304,19 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                         variant="outline"
                         size="sm"
                         onClick={async () => {
-                          const participantEmails = eventParticipants
-                            .filter(
-                              (p: EventParticipants) =>
-                                p.eventId === selectedEvent && p.user?.email
+                          const participantEmails = Array.from(
+                            new Set(
+                              payments
+                                .map((p) => (p.user?.email || p.guestEmail)?.trim())
+                                .filter((email): email is string => !!email && email.length > 0)
+                                .concat(
+                                  payments
+                                    .map((p) => (p.otherGuests as OtherGuestJson[]).map((g) => g.email))
+                                    .flat()
+                                    .filter((email): email is string => !!email && email.length > 0)
+                                )
                             )
-                            .map((p: EventParticipants) => p.user!.email)
-                            .filter((email): email is string => !!email)
+                          )
 
                           if (participantEmails.length === 0) {
                             toast.error('No participants found for this event')
@@ -318,14 +324,13 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
                           }
 
                           const emailString = participantEmails.join(', ')
-                          
+
                           try {
                             await navigator.clipboard.writeText(emailString)
                             toast.success('Emails copied to clipboard', {
                               description: `${participantEmails.length} email(s) copied`,
                               style: { color: '#22c55e' },
                             })
-                            // Optionally auto-fill the recipients field
                             form.setValue('recipients', participantEmails)
                           } catch (error) {
                             toast.error('Failed to copy emails to clipboard')
@@ -381,15 +386,23 @@ const EmailComposition = ({ user }: { user: UserInfoProps }) => {
               render={({ field }) => (
                 <EmailSuggestion
                   field={field}
-                  emails={eventParticipants
-                    .filter(
-                      (p: EventParticipants) =>
-                        p.eventId === selectedEvent && p.user?.email
-                    )
-                    .map((p: EventParticipants) => ({
-                      email: p.user!.email,
-                      name: p.user?.name ?? null,
-                    }))}
+                  emails={Array.from(
+                    new Map(
+                      payments
+                        .flatMap((p) => {
+                          const entries: { email: string; name: string | null }[] = []
+                          const primaryEmail = (p.user?.email || p.guestEmail)?.trim()
+                          if (primaryEmail) {
+                            entries.push({ email: primaryEmail, name: p.user?.name ?? null })
+                          }
+                          ;(p.otherGuests as OtherGuestJson[]).forEach((g) => {
+                            if (g.email) entries.push({ email: g.email, name: g.name ?? null })
+                          })
+                          return entries
+                        })
+                        .map((entry) => [entry.email, entry])
+                    ).values()
+                  )}
                 />
               )}
             />
