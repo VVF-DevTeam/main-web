@@ -24,6 +24,7 @@ import { getEventPayments } from '../../../../../lib/actions/payment/getEventPay
 import { getEventShopPayments } from '../../../../../lib/actions/payment/getEventShopPayments'
 import { PaymentMethod, PaymentType } from '@prisma/client'
 import AddPaymentButton from './AddEventPaymentButton'
+import ExportToExcelButton from '@/components/button/ExportToExcelButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { JsonValue } from '@prisma/client/runtime/library'
 
@@ -415,8 +416,8 @@ export default function EventStatistics({
                   <button
                     onClick={() => setActiveTab('tickets')}
                     className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'tickets'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                       }`}
                   >
                     Tickets
@@ -424,8 +425,8 @@ export default function EventStatistics({
                   <button
                     onClick={() => setActiveTab('answers')}
                     className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'answers'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                       }`}
                   >
                     Answers
@@ -433,8 +434,8 @@ export default function EventStatistics({
                   <button
                     onClick={() => setActiveTab('shopPayments')}
                     className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'shopPayments'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                       }`}
                   >
                     Shop
@@ -570,9 +571,38 @@ export default function EventStatistics({
                       </div>
                     ) : payments.length > 0 ? (
                       <div className="rounded-lg border bg-white shadow-sm">
-                        <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                          Sold Tickets Table
-                        </h3>
+                        <div className="flex items-center justify-between border-b px-4 py-3">
+                          <h3 className="text-lg font-semibold">Sold Tickets Table</h3>
+                          <ExportToExcelButton
+                            data={sortedPayments.map((p) => {
+                              const otherGuestsList = Array.isArray(p.otherGuests)
+                                ? (p.otherGuests as OtherGuestJson[])
+                                : []
+                              return {
+                                'Ticket Name': p.eventTicket?.type ?? '-',
+                                Email: p.guestEmail ?? p.user?.email ?? '-',
+                                Phone: p.guestPhone ?? p.user?.phone ?? '-',
+                                Customer: p.guestName ?? p.user?.name ?? '-',
+                                Amount:
+                                  typeof p.pricePaid === 'number'
+                                    ? p.pricePaid
+                                    : Number(p.pricePaid.toString()),
+                                Quantity: p.quantity,
+                                'Seat Number': p.seatNumber ?? '-',
+                                Capacity: p.eventTicket?.capacityPerTicket ?? '-',
+                                'Payment Method': p.method,
+                                'Payment Type': p.type,
+                                'Stripe ID': p.stripePaymentId ?? '-',
+                                'Other Guests':
+                                  otherGuestsList.length > 0
+                                    ? JSON.stringify(otherGuestsList)
+                                    : '-',
+                              }
+                            })}
+                            filename={`sold-tickets-${events.find((e) => e.id === selectedEventId)?.title ?? selectedEventId ?? 'all'}`}
+                            sheetName="Sold Tickets"
+                          />
+                        </div>
                         <div className="overflow-x-auto">
                           <table className="w-full border-collapse">
                             <thead>
@@ -745,9 +775,25 @@ export default function EventStatistics({
                   </>
                 ) : activeTab === 'shopPayments' ? (
                   <div className="rounded-lg border bg-white shadow-sm">
-                    <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                      Shop Payment Summary
-                    </h3>
+                    <div className="flex items-center justify-between border-b px-4 py-3">
+                      <h3 className="text-lg font-semibold">Shop Payment Summary</h3>
+                      <ExportToExcelButton
+                        data={shopPayments.map((p) => ({
+                          Shop: p.shop?.title ?? '-',
+                          Item: p.shopItem?.title ?? '-',
+                          Customer: p.guestName ?? p.user?.name ?? '-',
+                          Email: p.guestEmail ?? p.user?.email ?? '-',
+                          Phone: p.guestPhone ?? p.user?.phone ?? '-',
+                          Amount: p.pricePaid,
+                          Quantity: p.quantity,
+                          'Payment Method': p.method,
+                          'Payment Type': p.type,
+                          Date: new Date(p.createdAt).toLocaleDateString('en-US'),
+                        }))}
+                        filename={`shop-payments-${events.find((e) => e.id === selectedEventId)?.title ?? selectedEventId ?? 'all'}`}
+                        sheetName="Shop Payments"
+                      />
+                    </div>
                     <div className="space-y-4 p-4">
                       {loading ? (
                         <div className="flex items-center justify-center p-8">

@@ -7,15 +7,41 @@ import { ImageIcon } from 'lucide-react'
 import { FiChevronDown, FiChevronUp, FiEdit2 } from 'react-icons/fi'
 import { ExpenseCategoryType, ExpensePaymentMethod } from '@prisma/client'
 import { toast } from 'sonner'
+import { z } from 'zod'
+import { useForm, useFieldArray } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import Loader from '@/components/loader/Loader'
+import ExportToExcelButton from '@/components/button/ExportToExcelButton'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { axiosInstance } from '@/lib/axios'
+
+// ---------------------------------------------------------------------------
+// Types for table display rows (from the database, Decimal fields arrive as
+// objects that have a toString() method)
+// ---------------------------------------------------------------------------
 
 type ReceiptItemRow = {
   id: string
@@ -49,37 +75,47 @@ type ReceiptRow = {
   items: ReceiptItemRow[]
 }
 
-type ReceiptItemForm = {
-  description: string
-  quantity: number
-  unitPrice: number
-  taxAmount: number
-  discount: number
-  lineTotal: number
-}
+// ---------------------------------------------------------------------------
+// Zod schema
+// ---------------------------------------------------------------------------
 
-type ReceiptFormState = {
-  receiptNumber: string
-  receiptDate: string
-  merchantName: string
-  merchantAddress: string
-  currency: string
-  subtotal: number
-  taxAmount: number
-  tipAmount: number
-  discountAmount: number
-  totalAmount: number
-  note: string
-  paymentMethod: ExpensePaymentMethod
-  paymentReference: string
-  hasReimbursed: boolean
-  category: ExpenseCategoryType
-  receiptImageUrl: string
-  rawText: string
-  items: ReceiptItemForm[]
-}
+const receiptItemSchema = z.object({
+  description: z.string().min(1, 'Description is required'),
+  quantity: z.coerce.number().min(0),
+  unitPrice: z.coerce.number().min(0),
+  taxAmount: z.coerce.number().min(0),
+  discount: z.coerce.number().min(0),
+  lineTotal: z.coerce.number().min(0),
+})
 
-const createEmptyItem = (): ReceiptItemForm => ({
+const receiptSchema = z.object({
+  receiptNumber: z.string().optional(),
+  receiptDate: z.string().optional(),
+  merchantName: z.string().min(1, 'Merchant name is required'),
+  merchantAddress: z.string().optional(),
+  currency: z.string().min(1, 'Currency is required'),
+  subtotal: z.coerce.number().min(0),
+  taxAmount: z.coerce.number().min(0),
+  tipAmount: z.coerce.number().min(0),
+  discountAmount: z.coerce.number().min(0),
+  totalAmount: z.coerce.number().min(0, 'Total amount must be ≥ 0'),
+  note: z.string().optional(),
+  paymentMethod: z.nativeEnum(ExpensePaymentMethod),
+  paymentReference: z.string().optional(),
+  hasReimbursed: z.boolean(),
+  category: z.nativeEnum(ExpenseCategoryType),
+  receiptImageUrl: z.string().optional(),
+  rawText: z.string().optional(),
+  items: z.array(receiptItemSchema).min(1, 'At least one item is required'),
+})
+
+type ReceiptFormValues = z.infer<typeof receiptSchema>
+
+// ---------------------------------------------------------------------------
+// Default values
+// ---------------------------------------------------------------------------
+
+const defaultItemValues = (): z.infer<typeof receiptItemSchema> => ({
   description: '',
   quantity: 1,
   unitPrice: 0,
@@ -88,7 +124,7 @@ const createEmptyItem = (): ReceiptItemForm => ({
   lineTotal: 0,
 })
 
-const createInitialReceiptForm = (): ReceiptFormState => ({
+const defaultReceiptValues = (): ReceiptFormValues => ({
   receiptNumber: '',
   receiptDate: '',
   merchantName: '',
@@ -106,8 +142,12 @@ const createInitialReceiptForm = (): ReceiptFormState => ({
   category: ExpenseCategoryType.Other,
   receiptImageUrl: '',
   rawText: '',
-  items: [createEmptyItem()],
+  items: [defaultItemValues()],
 })
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function toNumber(value: number | { toString(): string } | null | undefined) {
   if (typeof value === 'number') return value
@@ -115,15 +155,37 @@ function toNumber(value: number | { toString(): string } | null | undefined) {
   return Number(value.toString())
 }
 
+function formatDateForInput(dateValue?: string | Date | null) {
+  if (!dateValue) return ''
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) return ''
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+  return local.toISOString().slice(0, 16)
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
   const router = useRouter()
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
   const [imagePreview, setImagePreview] = useState('')
   const [isImageLoading, setIsImageLoading] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingReceiptId, setEditingReceiptId] = useState<string | null>(null)
-  const [receiptForm, setReceiptForm] = useState<ReceiptFormState>(createInitialReceiptForm())
+
+  const form = useForm<ReceiptFormValues>({
+    resolver: zodResolver(receiptSchema),
+    defaultValues: defaultReceiptValues(),
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'items',
+  })
+
+  const isSubmitting = form.formState.isSubmitting
 
   const totalSpent = useMemo(
     () => receipts.reduce((sum, receipt) => sum + toNumber(receipt.totalAmount), 0),
@@ -131,90 +193,49 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
   )
 
   const toggleRow = (receiptId: string) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [receiptId]: !prev[receiptId],
-    }))
-  }
-
-  const formatDateForInput = (dateValue?: string | Date | null) => {
-    if (!dateValue) return ''
-    const date = new Date(dateValue)
-    if (Number.isNaN(date.getTime())) return ''
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    return local.toISOString().slice(0, 16)
-  }
-
-  const updateReceiptField = <K extends keyof ReceiptFormState>(
-    key: K,
-    value: ReceiptFormState[K],
-  ) => {
-    setReceiptForm((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const updateReceiptItem = <K extends keyof ReceiptItemForm>(
-    index: number,
-    key: K,
-    value: ReceiptItemForm[K],
-  ) => {
-    setReceiptForm((prev) => {
-      const nextItems = [...prev.items]
-      nextItems[index] = { ...nextItems[index], [key]: value }
-      return { ...prev, items: nextItems }
-    })
-  }
-
-  const addReceiptItem = () => {
-    setReceiptForm((prev) => ({ ...prev, items: [...prev.items, createEmptyItem()] }))
-  }
-
-  const removeReceiptItem = (index: number) => {
-    setReceiptForm((prev) => ({
-      ...prev,
-      items: prev.items.filter((_, itemIndex) => itemIndex !== index),
-    }))
+    setExpandedRows((prev) => ({ ...prev, [receiptId]: !prev[receiptId] }))
   }
 
   const openAddReceiptDialog = () => {
     setEditingReceiptId(null)
-    setReceiptForm(createInitialReceiptForm())
     setImagePreview('')
+    form.reset(defaultReceiptValues())
     setIsDialogOpen(true)
   }
 
   const handleEditReceipt = (receipt: ReceiptRow) => {
     setEditingReceiptId(receipt.id)
-    setReceiptForm({
-      receiptNumber: receipt.receiptNumber || '',
+    setImagePreview(receipt.receiptImageUrl || '')
+    form.reset({
+      receiptNumber: receipt.receiptNumber ?? '',
       receiptDate: formatDateForInput(receipt.receiptDate),
-      merchantName: receipt.merchantName || '',
-      merchantAddress: receipt.merchantAddress || '',
-      currency: receipt.currency || 'CAD',
+      merchantName: receipt.merchantName ?? '',
+      merchantAddress: receipt.merchantAddress ?? '',
+      currency: receipt.currency ?? 'CAD',
       subtotal: toNumber(receipt.subtotal),
       taxAmount: toNumber(receipt.taxAmount),
       tipAmount: toNumber(receipt.tipAmount),
       discountAmount: toNumber(receipt.discountAmount),
       totalAmount: toNumber(receipt.totalAmount),
-      note: receipt.note || '',
-      paymentMethod: receipt.paymentMethod || ExpensePaymentMethod.Other,
-      paymentReference: receipt.paymentReference || '',
+      note: receipt.note ?? '',
+      paymentMethod: receipt.paymentMethod ?? ExpensePaymentMethod.Other,
+      paymentReference: receipt.paymentReference ?? '',
       hasReimbursed: Boolean(receipt.hasReimbursed),
-      category: receipt.category || ExpenseCategoryType.Other,
-      receiptImageUrl: receipt.receiptImageUrl || '',
-      rawText: receipt.rawText || '',
+      category: receipt.category ?? ExpenseCategoryType.Other,
+      receiptImageUrl: receipt.receiptImageUrl ?? '',
+      rawText: receipt.rawText ?? '',
       items:
         receipt.items.length > 0
           ? receipt.items.map((item) => ({
-            description: item.description || '',
-            quantity: toNumber(item.quantity),
-            unitPrice: toNumber(item.unitPrice),
-            taxAmount: toNumber(item.taxAmount),
-            discount: toNumber(item.discount),
-            lineTotal: toNumber(item.lineTotal),
-          }))
-          : [createEmptyItem()],
+              description: item.description ?? '',
+              quantity: toNumber(item.quantity),
+              unitPrice: toNumber(item.unitPrice),
+              taxAmount: toNumber(item.taxAmount),
+              discount: toNumber(item.discount),
+              lineTotal: toNumber(item.lineTotal),
+            }))
+          : [defaultItemValues()],
     })
-    setImagePreview(receipt.receiptImageUrl || '')
     setIsDialogOpen(true)
   }
 
@@ -231,114 +252,98 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
-      if (response.status !== 200) {
-        throw new Error('Failed to upload image')
-      }
+      if (response.status !== 200) throw new Error('Failed to upload image')
 
       const data = response.data as { url?: string }
-      if (!data.url) {
-        throw new Error('Upload response missing url')
-      }
-      const uploadedUrl = data.url
+      if (!data.url) throw new Error('Upload response missing url')
 
+      const uploadedUrl = data.url
       setImagePreview(uploadedUrl)
-      updateReceiptField('receiptImageUrl', uploadedUrl)
+      form.setValue('receiptImageUrl', uploadedUrl)
 
       const extractResponse = await axiosInstance.post('/api/receipts/extract', {
         imageUrl: uploadedUrl,
       })
       const extracted = extractResponse.data as {
-        receipt?: Partial<ReceiptFormState> & {
-          items?: Array<Partial<ReceiptItemForm>>
+        receipt?: Partial<ReceiptFormValues> & {
+          items?: Array<Partial<z.infer<typeof receiptItemSchema>>>
         }
       }
       const extractedReceipt = extracted.receipt
 
       if (extractedReceipt) {
-        setReceiptForm((prev) => ({
-          ...prev,
-          receiptNumber: extractedReceipt.receiptNumber ?? prev.receiptNumber,
-          receiptDate: formatDateForInput(extractedReceipt.receiptDate) || prev.receiptDate,
-          merchantName: extractedReceipt.merchantName ?? prev.merchantName,
-          merchantAddress: extractedReceipt.merchantAddress ?? prev.merchantAddress,
-          currency: extractedReceipt.currency ?? prev.currency,
-          subtotal: Number(extractedReceipt.subtotal ?? prev.subtotal),
-          taxAmount: Number(extractedReceipt.taxAmount ?? prev.taxAmount),
-          tipAmount: Number(extractedReceipt.tipAmount ?? prev.tipAmount),
-          discountAmount: Number(extractedReceipt.discountAmount ?? prev.discountAmount),
-          totalAmount: Number(extractedReceipt.totalAmount ?? prev.totalAmount),
-          note: extractedReceipt.note ?? prev.note,
+        const current = form.getValues()
+        form.reset({
+          ...current,
+          receiptNumber: extractedReceipt.receiptNumber ?? current.receiptNumber,
+          receiptDate:
+            formatDateForInput(extractedReceipt.receiptDate) || current.receiptDate,
+          merchantName: extractedReceipt.merchantName ?? current.merchantName,
+          merchantAddress: extractedReceipt.merchantAddress ?? current.merchantAddress,
+          currency: extractedReceipt.currency ?? current.currency,
+          subtotal: Number(extractedReceipt.subtotal ?? current.subtotal),
+          taxAmount: Number(extractedReceipt.taxAmount ?? current.taxAmount),
+          tipAmount: Number(extractedReceipt.tipAmount ?? current.tipAmount),
+          discountAmount: Number(extractedReceipt.discountAmount ?? current.discountAmount),
+          totalAmount: Number(extractedReceipt.totalAmount ?? current.totalAmount),
+          note: extractedReceipt.note ?? current.note,
           paymentMethod:
             extractedReceipt.paymentMethod &&
-              Object.values(ExpensePaymentMethod).includes(
-                extractedReceipt.paymentMethod as ExpensePaymentMethod,
-              )
+            Object.values(ExpensePaymentMethod).includes(
+              extractedReceipt.paymentMethod as ExpensePaymentMethod,
+            )
               ? (extractedReceipt.paymentMethod as ExpensePaymentMethod)
-              : prev.paymentMethod,
-          paymentReference: extractedReceipt.paymentReference ?? prev.paymentReference,
+              : current.paymentMethod,
+          paymentReference: extractedReceipt.paymentReference ?? current.paymentReference,
           hasReimbursed:
             typeof extractedReceipt.hasReimbursed === 'boolean'
               ? extractedReceipt.hasReimbursed
-              : prev.hasReimbursed,
+              : current.hasReimbursed,
           category:
             extractedReceipt.category &&
-              Object.values(ExpenseCategoryType).includes(
-                extractedReceipt.category as ExpenseCategoryType,
-              )
+            Object.values(ExpenseCategoryType).includes(
+              extractedReceipt.category as ExpenseCategoryType,
+            )
               ? (extractedReceipt.category as ExpenseCategoryType)
-              : prev.category,
+              : current.category,
           receiptImageUrl: extractedReceipt.receiptImageUrl ?? uploadedUrl,
-          rawText: extractedReceipt.rawText ?? prev.rawText,
+          rawText: extractedReceipt.rawText ?? current.rawText,
           items:
             extractedReceipt.items && extractedReceipt.items.length > 0
               ? extractedReceipt.items.map((item) => ({
-                description: item.description ?? '',
-                quantity: Number(item.quantity ?? 1),
-                unitPrice: Number(item.unitPrice ?? 0),
-                taxAmount: Number(item.taxAmount ?? 0),
-                discount: Number(item.discount ?? 0),
-                lineTotal: Number(item.lineTotal ?? 0),
-              }))
-              : prev.items,
-        }))
+                  description: item.description ?? '',
+                  quantity: Number(item.quantity ?? 1),
+                  unitPrice: Number(item.unitPrice ?? 0),
+                  taxAmount: Number(item.taxAmount ?? 0),
+                  discount: Number(item.discount ?? 0),
+                  lineTotal: Number(item.lineTotal ?? 0),
+                }))
+              : current.items,
+        })
       }
 
-      toast.success('Receipt image uploaded',
-        {
-          description: 'Receipt image uploaded and fields auto-filled',
-          style: { color: '#22c55e' },
-        }
-      )
+      toast.success('Receipt image uploaded', {
+        description: 'Fields auto-filled from Gemini AI',
+        style: { color: '#22c55e' },
+      })
     } catch (error) {
       console.error('Error uploading receipt image:', error)
-      toast.error('Failed to upload image',
-        {
-          description: 'Failed to upload image',
-          style: { color: '#ef4444' },
-        }
-      )
+      toast.error('Failed to upload image', { style: { color: '#ef4444' } })
     } finally {
       setIsImageLoading(false)
       event.target.value = ''
     }
   }
 
-  const handleSubmitReceipt = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!receiptForm.merchantName.trim()) {
-      toast.error('Merchant name is required')
-      return
-    }
-
-    setIsSubmitting(true)
+  const onSubmit = async (values: ReceiptFormValues) => {
     try {
       const method = editingReceiptId ? 'put' : 'post'
       const response = await axiosInstance[method]('/api/receipts/edit', {
         receipt: {
           id: editingReceiptId ?? undefined,
-          ...receiptForm,
-          receiptDate: receiptForm.receiptDate
-            ? new Date(receiptForm.receiptDate).toISOString()
+          ...values,
+          receiptDate: values.receiptDate
+            ? new Date(values.receiptDate).toISOString()
             : undefined,
         },
       })
@@ -347,36 +352,25 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
         throw new Error(`Failed to ${editingReceiptId ? 'update' : 'save'} receipt`)
       }
 
-      toast.success(`Receipt ${editingReceiptId ? 'updated' : 'saved'} successfully`,
-        {
-          description: `Receipt ${editingReceiptId ? 'updated' : 'saved'} successfully`,
-          style: { color: '#22c55e' },
-        }
-      )
+      toast.success(`Receipt ${editingReceiptId ? 'updated' : 'saved'} successfully`, {
+        style: { color: '#22c55e' },
+      })
       setEditingReceiptId(null)
-      setReceiptForm(createInitialReceiptForm())
       setImagePreview('')
       setIsDialogOpen(false)
       router.refresh()
     } catch (error) {
       console.error(`Error ${editingReceiptId ? 'updating' : 'saving'} receipt:`, error)
-      toast.error(`Failed to ${editingReceiptId ? 'update' : 'save'} receipt`,
-        {
-          description: `Failed to ${editingReceiptId ? 'update' : 'save'} receipt`,
-          style: { color: '#ef4444' },
-        }
-      )
-    } finally {
-      setIsSubmitting(false)
+      toast.error(`Failed to ${editingReceiptId ? 'update' : 'save'} receipt`, {
+        style: { color: '#ef4444' },
+      })
     }
   }
 
   const handleToggleReimbursed = async (receiptId: string) => {
     try {
       const response = await axiosInstance.patch('/api/receipts/edit', { id: receiptId })
-      if (response.status !== 200) {
-        throw new Error('Failed to toggle reimbursed')
-      }
+      if (response.status !== 200) throw new Error('Failed to toggle reimbursed')
       toast.success('Reimbursed status updated')
       router.refresh()
     } catch (error) {
@@ -388,355 +382,495 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
   return (
     <div className="min-h-screen p-4">
       <div className="mx-auto w-full max-w-7xl">
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between gap-4">
           <h1 className="text-3xl font-bold">VVF Finance</h1>
           <Dialog
             open={isDialogOpen}
             onOpenChange={(open) => {
               setIsDialogOpen(open)
-              if (!open) {
-                setEditingReceiptId(null)
-              }
+              if (!open) setEditingReceiptId(null)
             }}
           >
-            <Button type="button" onClick={openAddReceiptDialog}>Add Receipt</Button>
+            <Button type="button" onClick={openAddReceiptDialog}>
+              Add Receipt
+            </Button>
             <DialogContent className="max-h-[85vh] bg-bgColor-white">
               <DialogHeader>
-                <DialogTitle>{editingReceiptId ? 'Edit Receipt' : 'Add Receipt'}</DialogTitle>
+                <DialogTitle>
+                  {editingReceiptId ? 'Edit Receipt' : 'Add Receipt'}
+                </DialogTitle>
               </DialogHeader>
 
-              <form
-                className="max-h-[70vh] space-y-3 overflow-y-auto pr-1"
-                onSubmit={handleSubmitReceipt}
-              >
-                <span className="text-xs text-muted-foreground italic">NOTE: Upload receipt image to auto-fill fields using Gemini API (will take around 15 - 30 seconds). Do not close the dialog before the process is complete.</span>
-                <div className="flex flex-col items-center">
-                  <label className="relative flex h-32 w-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 hover:bg-gray-50">
-                    {imagePreview ? (
-                      <div className="relative h-full w-full">
-                        <Image
-                          src={imagePreview}
-                          alt="Receipt"
-                          fill
-                          className="rounded-lg object-cover"
-                        />
-                        <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
-                          <FiEdit2 className="h-3 w-3 text-white" />
-                          <input
-                            type="file"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                            accept="image/*"
-                            disabled={isImageLoading}
+              <Form {...form}>
+                <form
+                  className="max-h-[70vh] space-y-3 overflow-y-auto pr-1"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                >
+                  <span className="text-xs italic text-muted-foreground">
+                    NOTE: Upload receipt image to auto-fill fields using Gemini AI (≈15–30 s).
+                    Do not close the dialog before the process is complete.
+                  </span>
+
+                  {/* Image upload */}
+                  <div className="flex flex-col items-center">
+                    <label className="relative flex h-32 w-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 hover:bg-gray-50">
+                      {imagePreview ? (
+                        <div className="relative h-full w-full">
+                          <Image
+                            src={imagePreview}
+                            alt="Receipt"
+                            fill
+                            className="rounded-lg object-cover"
                           />
-                        </label>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center space-y-1 text-center">
-                        <ImageIcon className="h-8 w-8 text-gray-400" />
-                        <p className="text-sm font-medium text-gray-600">Add Photo</p>
-                        <p className="text-xs text-gray-500">Optional</p>
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isImageLoading}
-                    />
-                  </label>
-                  {isImageLoading && <Loader />}
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Receipt Number</label>
-                    <input
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.receiptNumber}
-                      onChange={(e) => updateReceiptField('receiptNumber', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Receipt Date</label>
-                    <input
-                      type="datetime-local"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.receiptDate}
-                      onChange={(e) => updateReceiptField('receiptDate', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Merchant Name</label>
-                    <input
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.merchantName}
-                      onChange={(e) => updateReceiptField('merchantName', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Merchant Address</label>
-                    <input
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.merchantAddress}
-                      onChange={(e) => updateReceiptField('merchantAddress', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Currency</label>
-                    <input
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.currency}
-                      onChange={(e) => updateReceiptField('currency', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Subtotal</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.subtotal}
-                      onChange={(e) => updateReceiptField('subtotal', Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Tax Amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.taxAmount}
-                      onChange={(e) => updateReceiptField('taxAmount', Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Tip Amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.tipAmount}
-                      onChange={(e) => updateReceiptField('tipAmount', Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Discount Amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.discountAmount}
-                      onChange={(e) =>
-                        updateReceiptField('discountAmount', Number(e.target.value))
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Total Amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.totalAmount}
-                      onChange={(e) => updateReceiptField('totalAmount', Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Payment Method</label>
-                    <select
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.paymentMethod}
-                      onChange={(e) =>
-                        updateReceiptField(
-                          'paymentMethod',
-                          e.target.value as ExpensePaymentMethod,
-                        )
-                      }
-                    >
-                      {Object.values(ExpensePaymentMethod).map((method) => (
-                        <option key={method} value={method}>
-                          {method}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Category</label>
-                    <select
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.category}
-                      onChange={(e) =>
-                        updateReceiptField('category', e.target.value as ExpenseCategoryType)
-                      }
-                    >
-                      {Object.values(ExpenseCategoryType).map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Payment Reference</label>
-                    <input
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      value={receiptForm.paymentReference}
-                      onChange={(e) => updateReceiptField('paymentReference', e.target.value)}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 pt-7">
-                    <input
-                      id="hasReimbursed"
-                      type="checkbox"
-                      checked={receiptForm.hasReimbursed}
-                      onChange={(e) => updateReceiptField('hasReimbursed', e.target.checked)}
-                    />
-                    <label htmlFor="hasReimbursed" className="text-sm font-medium">
-                      Has Reimbursed
+                          <label className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-blue-500 p-2 transition-colors hover:bg-blue-600">
+                            <FiEdit2 className="h-3 w-3 text-white" />
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={handleImageUpload}
+                              accept="image/*"
+                              disabled={isImageLoading}
+                            />
+                          </label>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center space-y-1 text-center">
+                          <ImageIcon className="h-8 w-8 text-gray-400" />
+                          <p className="text-sm font-medium text-gray-600">Add Photo</p>
+                          <p className="text-xs text-gray-500">Optional</p>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isImageLoading}
+                      />
                     </label>
+                    {isImageLoading && <Loader />}
                   </div>
-                </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Note</label>
-                  <textarea
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                    rows={3}
-                    value={receiptForm.note}
-                    onChange={(e) => updateReceiptField('note', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Raw Text</label>
-                  <textarea
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                    rows={5}
-                    value={receiptForm.rawText}
-                    onChange={(e) => updateReceiptField('rawText', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Receipt Image URL (All images are stored <span className="font-bold"><a href="https://drive.google.com/drive/u/0/folders/1CC7OXATHsBxvmuFMq5wMlqs8_4kV1VUg" target="_blank" rel="noreferrer" className="text-blue-500 underline">here</a></span> in VVF Google Drive, login with your VVF account to view)</label>
-                  <input
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                    value={receiptForm.receiptImageUrl}
-                    onChange={(e) => updateReceiptField('receiptImageUrl', e.target.value)}
-                  />
-                </div>
+                  {/* Receipt header fields */}
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="receiptNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Receipt Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <div className="space-y-3 rounded-md border p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold">Receipt Items</p>
-                    <Button type="button" variant="outline" size="sm" onClick={addReceiptItem}>
-                      Add Item
+                    <FormField
+                      control={form.control}
+                      name="receiptDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Receipt Date</FormLabel>
+                          <FormControl>
+                            <Input type="datetime-local" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="merchantName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Merchant Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="merchantAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Merchant Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Currency</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="subtotal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Subtotal</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="taxAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tax Amount</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tipAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tip Amount</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="discountAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Discount Amount</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="totalAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Total Amount</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Payment Method</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select method" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Object.values(ExpensePaymentMethod).map((method) => (
+                                <SelectItem key={method} value={method}>
+                                  {method}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Object.values(ExpenseCategoryType).map((cat) => (
+                                <SelectItem key={cat} value={cat}>
+                                  {cat}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="paymentReference"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Payment Reference</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="hasReimbursed"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-2 pt-7">
+                          <FormControl>
+                            <input
+                              id="hasReimbursed"
+                              type="checkbox"
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                            />
+                          </FormControl>
+                          <FormLabel htmlFor="hasReimbursed" className="!mt-0">
+                            Has Reimbursed
+                          </FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Note</FormLabel>
+                        <FormControl>
+                          <Textarea rows={3} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="rawText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Raw Text</FormLabel>
+                        <FormControl>
+                          <Textarea rows={5} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="receiptImageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Receipt Image URL (All images stored{' '}
+                          <a
+                            href="https://drive.google.com/drive/u/0/folders/1CC7OXATHsBxvmuFMq5wMlqs8_4kV1VUg"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-bold text-blue-500 underline"
+                          >
+                            here
+                          </a>{' '}
+                          in VVF Google Drive)
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Receipt items */}
+                  <div className="space-y-3 rounded-md border p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold">Receipt Items</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => append(defaultItemValues())}
+                      >
+                        Add Item
+                      </Button>
+                    </div>
+
+                    {fields.map((fieldItem, index) => (
+                      <div
+                        key={fieldItem.id}
+                        className="grid grid-cols-1 gap-2 rounded-md border p-3 md:grid-cols-6"
+                      >
+                        <div className="md:col-span-2">
+                          <FormField
+                            control={form.control}
+                            name={`items.${index}.description`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs">Description</FormLabel>
+                                <FormControl>
+                                  <Input className="text-sm" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.quantity`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Qty</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" className="text-sm" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.unitPrice`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Unit Price</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" className="text-sm" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.taxAmount`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Tax</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" className="text-sm" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.discount`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Discount</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" className="text-sm" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.lineTotal`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">Line Total</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" className="text-sm" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="md:col-span-6">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => remove(index)}
+                            disabled={fields.length === 1}
+                          >
+                            Remove Item
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex pt-2">
+                    <Button type="submit" disabled={isSubmitting || isImageLoading}>
+                      {isSubmitting
+                        ? editingReceiptId
+                          ? 'Updating...'
+                          : 'Saving...'
+                        : editingReceiptId
+                          ? 'Update Receipt'
+                          : 'Submit Receipt'}
                     </Button>
                   </div>
-
-                  {receiptForm.items.map((item, index) => (
-                    <div key={`receipt-item-${index}`} className="grid grid-cols-1 gap-2 rounded-md border p-3 md:grid-cols-6">
-                      <div className="md:col-span-2">
-                        <label className="mb-1 block text-xs font-medium">Description</label>
-                        <input
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.description}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'description', e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium">Qty</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'quantity', Number(e.target.value))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium">Unit Price</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.unitPrice}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'unitPrice', Number(e.target.value))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium">Tax</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.taxAmount}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'taxAmount', Number(e.target.value))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium">Discount</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.discount}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'discount', Number(e.target.value))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium">Line Total</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="w-full rounded-md border px-2 py-1 text-sm"
-                          value={item.lineTotal}
-                          onChange={(e) =>
-                            updateReceiptItem(index, 'lineTotal', Number(e.target.value))
-                          }
-                        />
-                      </div>
-                      <div className="md:col-span-6">
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => removeReceiptItem(index)}
-                          disabled={receiptForm.items.length === 1}
-                        >
-                          Remove Item
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex pt-2">
-                  <Button type="submit" disabled={isSubmitting || isImageLoading}>
-                    {isSubmitting
-                      ? editingReceiptId
-                        ? 'Updating...'
-                        : 'Saving...'
-                      : editingReceiptId
-                        ? 'Update Receipt'
-                        : 'Submit Receipt'}
-                  </Button>
-                </div>
-              </form>
+                </form>
+              </Form>
             </DialogContent>
           </Dialog>
         </div>
 
+        {/* Summary cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-lg border bg-white p-5 shadow-sm">
             <p className="text-sm text-muted-foreground">Total Receipts</p>
@@ -748,8 +882,29 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
           </div>
         </div>
 
+        {/* Receipt table */}
         <div className="rounded-lg border bg-white shadow-sm">
-          <h3 className="border-b px-4 py-3 text-lg font-semibold">Receipt Table</h3>
+          <div className="flex items-center justify-between border-b px-4 py-3">
+            <h3 className="text-lg font-semibold">Receipt Table</h3>
+            <ExportToExcelButton
+              data={receipts.map((r) => ({
+                Receipt: r.receiptNumber || r.id.slice(0, 8),
+                Date: new Date(r.receiptDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                }),
+                Merchant: r.merchantName,
+                Category: r.category,
+                Method: r.paymentMethod,
+                Currency: r.currency,
+                Total: toNumber(r.totalAmount).toFixed(2),
+                'Receipt Image URL': r.receiptImageUrl ?? '',
+              }))}
+              filename="VVF-finance-receipts"
+              sheetName="Receipts"
+            />
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
@@ -761,21 +916,18 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                   <th className="px-4 py-3 text-left">Method</th>
                   <th className="px-4 py-3 text-left">Total</th>
                   <th className="px-4 py-3 text-left">Receipt Image URL</th>
-                  <th className="px-4 py-3 text-left">Action</th>
+                  <th className="min-w-[200px] px-4 py-3 text-left">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {receipts.map((receipt) => {
                   const hasItems = receipt.items.length > 0
                   const isExpanded = expandedRows[receipt.id] ?? true
-                  const formattedDate = new Date(receipt.receiptDate).toLocaleDateString(
-                    'en-US',
-                    {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    },
-                  )
+                  const formattedDate = new Date(receipt.receiptDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })
 
                   return (
                     <Fragment key={receipt.id}>
@@ -817,7 +969,7 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="grid grid-cols-2 gap-1.5">
                             <Button
                               type="button"
                               size="sm"
@@ -840,6 +992,21 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                             >
                               {receipt.hasReimbursed ? 'Reimbursed' : 'Mark Reimbursed'}
                             </Button>
+                            <div className="col-span-2" onClick={(e) => e.stopPropagation()}>
+                              <ExportToExcelButton
+                                data={receipt.items.map((item) => ({
+                                  Item: item.description,
+                                  Quantity: toNumber(item.quantity),
+                                  [`Unit Price (${receipt.currency})`]: toNumber(item.unitPrice).toFixed(2),
+                                  [`Tax (${receipt.currency})`]: toNumber(item.taxAmount).toFixed(2),
+                                  [`Discount (${receipt.currency})`]: toNumber(item.discount).toFixed(2),
+                                  [`Line Total (${receipt.currency})`]: toNumber(item.lineTotal).toFixed(2),
+                                }))}
+                                filename={`receipt-items-${receipt.receiptNumber || receipt.id.slice(0, 8)}-${formattedDate}`}
+                                sheetName="Items"
+                                className="w-full"
+                              />
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -847,7 +1014,7 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                       {hasItems && isExpanded && (
                         <tr className="bg-gray-50">
                           <td colSpan={8} className="px-4 py-2">
-                            <div className="ml-8">
+                            <div className="ml-8 overflow-x-auto">
                               <table className="w-full text-sm">
                                 <thead>
                                   <tr className="border-b border-gray-200">
@@ -861,11 +1028,16 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                                 </thead>
                                 <tbody>
                                   {receipt.items.map((item) => (
-                                    <tr key={item.id} className="border-b border-gray-200 last:border-0">
+                                    <tr
+                                      key={item.id}
+                                      className="border-b border-gray-200 last:border-0"
+                                    >
                                       <td className="px-4 py-2 font-medium text-gray-700">
                                         {item.description}
                                       </td>
-                                      <td className="px-4 py-2 text-gray-700">{toNumber(item.quantity)}</td>
+                                      <td className="px-4 py-2 text-gray-700">
+                                        {toNumber(item.quantity)}
+                                      </td>
                                       <td className="px-4 py-2 text-gray-700">
                                         {receipt.currency} {toNumber(item.unitPrice).toFixed(2)}
                                       </td>

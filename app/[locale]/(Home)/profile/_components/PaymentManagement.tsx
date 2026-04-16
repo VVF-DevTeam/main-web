@@ -8,6 +8,7 @@ import AddPaymentButton from './AddEventPaymentButton'
 import AddShopPaymentButton from './AddShopPaymentButton'
 import PaymentPagination from './PaymentPagination'
 import PaymentPageSizeSelect from './PaymentPageSizeSelect'
+import ExportToExcelButton from '@/components/button/ExportToExcelButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
 
 const paymentTypeMap = {
@@ -61,8 +62,39 @@ export default async function PaymentManagement({
         {/* Controls */}
         <div className="flex items-center justify-between">
           <PaymentPageSizeSelect value={pageSize} />
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>Total: {totalCount}</span>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-muted-foreground">Total: {totalCount}</span>
+            <ExportToExcelButton
+              data={payments.map((payment) => {
+                const isGuestCheckout = !payment.user && (payment.guestEmail || payment.guestName)
+                const startDate = new Date(
+                  payment.type === 'Membership'
+                    ? payment.createdAt
+                    : payment.event?.startDate || payment.createdAt
+                )
+                const endDate = new Date(
+                  payment.type === 'Membership'
+                    ? payment.expiresAt!
+                    : payment.event?.endDate || payment.createdAt
+                )
+                return {
+                  Event: payment.event?.title || '-',
+                  Email: payment.user?.email || payment.guestEmail || '-',
+                  Customer: payment.user?.name || payment.guestName || '-',
+                  'Start Date': startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                  'End Date': endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                  Location: payment.type === 'Membership' ? '-' : (payment.event?.location || '-'),
+                  Amount: Number(payment.pricePaid).toFixed(2),
+                  'Quantity/Seat': `${payment.quantity}/${payment.seatNumber || '-'}`,
+                  Type: isGuestCheckout
+                    ? `${paymentTypeMap[payment.type]} (Guest Checkout)`
+                    : paymentTypeMap[payment.type],
+                  Status: getPaymentStatus(payment),
+                }
+              })}
+              filename={`VVF-client-payments-${pageSize} entries`}
+              sheetName="All Client Payments"
+            />
           </div>
         </div>
 
