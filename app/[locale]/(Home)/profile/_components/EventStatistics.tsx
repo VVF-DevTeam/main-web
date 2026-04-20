@@ -869,9 +869,14 @@ export default function EventStatistics({
                 ) : (
                   // Answers Tab
                   <div className="rounded-lg border bg-white shadow-sm">
-                    <h3 className="border-b px-4 py-3 text-lg font-semibold">
-                      Form Responses
-                    </h3>
+                    <div className="flex items-center justify-between border-b px-4 py-3">
+                      <h3 className="text-lg font-semibold">Form Responses</h3>
+                      <ExportToExcelButton
+                        data={buildFormResponsesExcelData(payments)}
+                        filename={`form-responses-${events.find((e) => e.id === selectedEventId)?.title ?? selectedEventId ?? 'all'}`}
+                        sheetName="Form Responses"
+                      />
+                    </div>
                     <div className="p-4">
                       {loading ? (
                         <div className="flex items-center justify-center p-8">
@@ -919,6 +924,48 @@ type QuestionAggregate = {
   }>
 }
 
+function buildFormResponsesExcelData(
+  payments: Payment[]
+): Record<string, unknown>[] {
+  const rows: Record<string, unknown>[] = []
+
+  payments.forEach((payment) => {
+    if (!payment.formResponses) return
+    const formData = payment.formResponses as FormResponsesData
+    if (!formData.responses || !Array.isArray(formData.responses)) return
+
+    const customerName = payment.guestName || payment.user?.name || 'Unknown'
+    const customerEmail = payment.guestEmail || payment.user?.email || 'Unknown'
+
+    formData.responses.forEach((response: FormResponse) => {
+      const formNumber =
+        typeof response.formNumber === 'number' && response.formNumber > 0
+          ? response.formNumber
+          : 1
+
+      rows.push({
+        Form: formNumber,
+        Question: response.question,
+        'Question Type': response.questionType.replace('_', ' '),
+        Required: response.required ? 'Yes' : 'No',
+        'Customer Name': customerName,
+        Email: customerEmail,
+        Answer: Array.isArray(response.answer)
+          ? response.answer.join(', ')
+          : response.answer,
+      })
+    })
+  })
+
+  rows.sort((a, b) => {
+    const formDiff = (a['Form'] as number) - (b['Form'] as number)
+    if (formDiff !== 0) return formDiff
+    return String(a['Question']).localeCompare(String(b['Question']))
+  })
+
+  return rows
+}
+
 // Component to display form responses grouped by form number, then by question
 function FormResponsesView({ payments }: { payments: Payment[] }) {
   const byFormNumber = new Map<number, Map<string, QuestionAggregate>>()
@@ -928,7 +975,7 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
 
     const formData = payment.formResponses as FormResponsesData
     if (!formData.responses || !Array.isArray(formData.responses)) return
-    console.log(formData)
+
     const customerName =
       payment.guestName || payment.user?.name || 'Unknown'
     const customerEmail =
@@ -983,7 +1030,7 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
         return (
           <section key={formNumber} className="space-y-6">
             <div className="border-b border-gray-200 pb-3">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 italic">
                 Form {formNumber}
               </h3>
             </div>
