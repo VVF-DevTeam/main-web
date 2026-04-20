@@ -310,7 +310,7 @@ export default function EventCartCheckout({
     let effectivePercent = 0
     let effectiveAmount = 0
 
-    if (discountList.length > 0) {
+    if (discountList.length > 0 || appliedCodeDiscount) {
       // First, for each non‑code discount type, pick the single "best" qualifying discount
       // separately for percentage‑based and amount‑based discounts:
       // - Bulk Discount: highest minQuantity (stricter condition)
