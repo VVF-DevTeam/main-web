@@ -166,7 +166,7 @@ model User {
   name                 String?
   email                String        @unique
   age                  String?
-  phone                String?       @unique
+  phone                String?
   address              String?
   password             String?
   createdAt            DateTime      @default(now())
