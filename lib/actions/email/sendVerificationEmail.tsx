@@ -281,6 +281,95 @@ const EmailTemplateForgotPassword = ({
   )
 }
 
+const EmailTemplateStudentVerification = ({
+  firstName,
+  token,
+  email,
+}: EmailTemplateProps) => {
+  const prodLink = `https://www.vietvibe.org/students/verify?token=${token}&email=${email}`
+  const currentDateTime = new Date().toLocaleString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  })
+
+  return (
+    <div
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        padding: '20px',
+        backgroundColor: 'rgb(236,236,236)',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          padding: '20px',
+        }}
+      >
+        <h1
+          style={{ fontSize: '24px', marginBottom: '10px', color: '#111827' }}
+        >
+          Student Verification
+        </h1>
+        <p
+          style={{
+            fontSize: '12px',
+            color: '#6b7280',
+            marginBottom: '20px',
+          }}
+        >
+          Sent on {currentDateTime}
+        </p>
+        <h2
+          style={{
+            fontSize: '20px',
+            marginBottom: '20px',
+            color: '#111827',
+          }}
+        >
+          Hi, {firstName}!
+        </h2>
+        <p style={{ fontSize: '16px', color: '#374151', marginBottom: '20px' }}>
+          Please verify your student status to receive student pricing for VVF
+          events.
+        </p>
+        <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+          <a
+            href={prodLink}
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              backgroundColor: '#C11233',
+              color: '#ffffff',
+              textDecoration: 'none',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              fontSize: '16px',
+            }}
+          >
+            Verify Student Status
+          </a>
+        </div>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
+          Or copy and paste this link into your browser:
+          <br />
+          <span style={{ wordBreak: 'break-all', color: '#2563eb' }}>
+            {prodLink}
+          </span>
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export async function sendVerificationEmail({
   firstName,
   to,
@@ -305,6 +394,17 @@ export async function sendVerificationEmail({
       to: to,
       subject: 'Forgot Password',
       react: EmailTemplateForgotPassword({
+        firstName: firstName,
+        token: token,
+        email: to,
+      }),
+    })
+  } else if (type === 'studentVerification') {
+    error = await resend.emails.send({
+      from: 'VVF Admin <admin.tech@vietvibe.org>',
+      to: to,
+      subject: 'Student Verification',
+      react: EmailTemplateStudentVerification({
         firstName: firstName,
         token: token,
         email: to,

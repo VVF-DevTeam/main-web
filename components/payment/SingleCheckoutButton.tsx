@@ -30,6 +30,7 @@ interface SingleCheckoutButtonProps {
   email: string
   seatNumber?: string
   eventTicketId?: string
+  capacityPerTicket?: number
   mainUserPhone?: string
   mainUserName?: string
   isMembership?: boolean
@@ -47,6 +48,7 @@ export default function SingleCheckoutButton({
   email,
   seatNumber,
   eventTicketId,
+  capacityPerTicket = 1,
   mainUserPhone = '',
   mainUserName = '',
   isMembership = false,
@@ -235,7 +237,7 @@ export default function SingleCheckoutButton({
         onOpenChange={setShowCheckoutDialog}
         onGuestFormSubmit={handleGuestFormSubmit}
         onEventFormSubmit={handleEventFormSubmit}
-        totalGuestRequired={1}
+        totalGuestRequired={capacityPerTicket}
         userId={userId || null}
         userInfo={{
           email: email || null,

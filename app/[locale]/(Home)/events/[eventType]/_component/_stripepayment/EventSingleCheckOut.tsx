@@ -515,6 +515,7 @@ export default function EventSingleCheckOut({
                           email={userInfo?.email || ''}
                           seatNumber={seatNumber}
                           eventTicketId={ticket.id}
+                          capacityPerTicket={ticket.capacityPerTicket ?? 1}
                           mainUserPhone={userInfo?.phone || ''}
                           mainUserName={userInfo?.name || ''}
                         />

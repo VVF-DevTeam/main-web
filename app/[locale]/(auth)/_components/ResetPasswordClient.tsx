@@ -178,7 +178,7 @@ const ResetPasswordClient = () => {
   }
 
   return (
-    <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
+    <div className="flex-center relative min-h-screen bg-bgColor-white">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>

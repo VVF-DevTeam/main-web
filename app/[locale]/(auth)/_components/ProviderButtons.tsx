@@ -108,7 +108,7 @@ const ProviderButtons = () => {
         } catch {
           setIsVerifying(false)
           toast.error(
-            'Could not connect to the provider, please refresh the page and try again.',
+            'Could not connect to the provider because of time out, please refresh the page and try again.',
             {
               style: {
                 color: '#ef4444', // red-500 color

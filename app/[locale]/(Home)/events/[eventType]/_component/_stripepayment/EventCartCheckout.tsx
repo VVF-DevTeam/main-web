@@ -107,7 +107,10 @@ export default function EventCartCheckout({
   // Sum of the number of selected seats and tickets
   const totalItemCount =
     selectedSeatsWithTickets.length +
-    selectedTickets.reduce((sum, item) => sum + item.quantity, 0)
+    selectedTickets.reduce(
+      (sum, item) => sum + item.quantity * (item.ticket.capacityPerTicket ?? 1),
+      0
+    )
 
   // Normalize discounts JSON into a typed array for easier rendering
   const discountList: EventDiscountJson[] = useMemo(() => {
@@ -1039,7 +1042,15 @@ export default function EventCartCheckout({
           {/* Cart Header */}
           <div className="mb-4 flex items-center justify-between">
             <h3 className="web_h3 font-semibold text-gray-900">
-              {t('cart', { count: selectedSeatsWithTickets.length + selectedTickets.reduce((sum, item) => sum + item.quantity, 0) })}
+              {t('cart', {
+                count:
+                  selectedSeatsWithTickets.length +
+                  selectedTickets.reduce(
+                    (sum, item) =>
+                      sum + item.quantity * (item.ticket.capacityPerTicket ?? 1),
+                    0
+                  ),
+              })}
             </h3>
             <Button
               variant="ghost"

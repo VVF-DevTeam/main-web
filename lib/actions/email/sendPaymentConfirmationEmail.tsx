@@ -222,6 +222,8 @@ const EmailTemplatePaymentConfirmation = ({
                 )}
                 {eventStartDate &&
                   eventEndDate &&
+                  eventStartTime &&
+                  eventEndTime &&
                   (() => {
                     const startDate = new Date(eventStartDate)
                     const endDate = new Date(eventEndDate)
@@ -235,11 +237,6 @@ const EmailTemplatePaymentConfirmation = ({
                       month: 'short',
                       day: 'numeric',
                     })
-                    const isSameDate =
-                      startDate.toDateString() === endDate.toDateString()
-                    const dateDisplay = isSameDate
-                      ? startDateStr
-                      : `${startDateStr} - ${endDateStr}`
 
                     return (
                       <div
@@ -249,7 +246,8 @@ const EmailTemplatePaymentConfirmation = ({
                           marginBottom: '8px',
                         }}
                       >
-                        Event Date: {dateDisplay}
+                        Event Time: {startDateStr} at {eventStartTime} - {endDateStr} at{' '}
+                        {eventEndTime}
                       </div>
                     )
                   })()}
@@ -264,18 +262,6 @@ const EmailTemplatePaymentConfirmation = ({
                     Event Location: {eventLocation}
                   </div>
                 )}
-                {eventStartTime && eventEndTime && (
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      color: '#111827',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    Event Time: {eventStartTime} - {eventEndTime}
-                  </div>
-                )}
-
                 <p
                   style={{
                     fontSize: '11px',

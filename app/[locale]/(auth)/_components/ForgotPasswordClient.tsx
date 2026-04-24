@@ -135,7 +135,7 @@ const ForgotPasswordClient = () => {
         } catch {
           setLoading(false)
           toast.error(
-            'Could not connect to the server, please refresh the page and try again.',
+            'Could not connect to the server because of time out, please refresh the page and try again.',
             {
               description: (
                 <span style={{ color: 'var(--muted-foreground)' }}>
@@ -244,7 +244,7 @@ const ForgotPasswordClient = () => {
     <>
       {/* Forgot-password request or brief captcha-not-ready overlay (see onSubmitEmail) */}
       {loading && <Loader />}
-      <div className="flex-center relative min-h-screen bg-bgColor-secondary400">
+      <div className="flex-center relative min-h-screen bg-bgColor-white">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="animate-blob animation-delay-4000 absolute left-40 top-40 h-80 w-80 rounded-full bg-bgColor-secondary900 opacity-20 mix-blend-multiply blur-xl filter"></div>

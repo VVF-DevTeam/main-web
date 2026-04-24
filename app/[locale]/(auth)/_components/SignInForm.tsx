@@ -159,7 +159,7 @@ const SignInForm = () => {
           await waitForTurnstileToken(10000)
         } catch {
           toast.error(
-            'Could not connect to the server, please refresh the page and try again.',
+            'Could not connect to the server because of time out, please refresh the page and try again.',
             {
               description: (
                 <span style={{ color: 'var(--muted-foreground)' }}>
