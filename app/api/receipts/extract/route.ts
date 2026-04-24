@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-type GeminiGenerateResponse = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{
-        text?: string
-      }>
+type RouterChatCompletionResponse = {
+  choices?: Array<{
+    message?: {
+      content?:
+        | string
+        | Array<{
+            type?: string
+            text?: string
+          }>
     }
   }>
 }
 
-const GEMINI_MODEL = 'gemini-2.5-flash'
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
+const ROUTER_MODEL = 'codex-gemini'
+const ROUTER_ENDPOINT = 'https://9router.k-aithelittlelion.com/v1/chat/completions'
 
 function buildPrompt(imageUrl: string) {
   const currentYear = new Date().getFullYear()
@@ -33,51 +36,38 @@ Rules:
 - Do not include explanation.`
 }
 
-function shouldRetryWithBackup(status: number, errorText: string) {
-  const normalized = errorText.toLowerCase()
-  return (
-    status === 429 ||
-    status === 503 ||
-    normalized.includes('spike') ||
-    normalized.includes('high demand') ||
-    normalized.includes('rate limit') ||
-    normalized.includes('resource has been exhausted')
-  )
-}
-
-async function callGeminiWithKey({
+async function call9Router({
   apiKey,
   prompt,
-  imageContentType,
-  imageBase64,
+  imageUrl,
 }: {
   apiKey: string
   prompt: string
-  imageContentType: string
-  imageBase64: string
+  imageUrl: string
 }) {
-  return fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+  return fetch(ROUTER_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      contents: [
+      model: ROUTER_MODEL,
+      messages: [
         {
-          parts: [
-            { text: prompt },
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
             {
-              inline_data: {
-                mime_type: imageContentType,
-                data: imageBase64,
+              type: 'image_url',
+              image_url: {
+                url: imageUrl,
               },
             },
           ],
         },
       ],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
+      temperature: 0,
     }),
   })
 }
@@ -91,11 +81,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'imageUrl is required' }, { status: 400 })
     }
 
-    const geminiApiKey = process.env.GEMINI_API_KEY
-    const backupGeminiApiKey = process.env.GEMINI_API_KEY_BACKUP
-    if (!geminiApiKey) {
-      console.error('GEMINI_API_KEY is missing')
-      return NextResponse.json({ error: 'GEMINI_API_KEY is missing' }, { status: 500 })
+    const routerApiKey = process.env['9ROUTER_API_KEY']
+    if (!routerApiKey) {
+      console.error('9ROUTER_API_KEY is missing')
+      return NextResponse.json({ error: '9ROUTER_API_KEY is missing' }, { status: 500 })
     }
 
     const imageResponse = await fetch(imageUrl)
@@ -106,57 +95,34 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const imageContentType = imageResponse.headers.get('content-type') || 'image/jpeg'
-    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer())
-    const imageBase64 = imageBuffer.toString('base64')
-
     const prompt = buildPrompt(imageUrl)
 
-    let geminiResponse = await callGeminiWithKey({
-      apiKey: geminiApiKey,
+    const routerResponse = await call9Router({
+      apiKey: routerApiKey,
       prompt,
-      imageContentType,
-      imageBase64,
+      imageUrl,
     })
 
-    if (!geminiResponse.ok) {
-      const primaryErrorText = await geminiResponse.text()
-
-      if (
-        backupGeminiApiKey &&
-        shouldRetryWithBackup(geminiResponse.status, primaryErrorText)
-      ) {
-        geminiResponse = await callGeminiWithKey({
-          apiKey: backupGeminiApiKey,
-          prompt,
-          imageContentType,
-          imageBase64,
-        })
-      } else {
-        console.error('Gemini request failed', primaryErrorText)
-        return NextResponse.json(
-          { error: 'Gemini request failed', details: primaryErrorText },
-          { status: 502 },
-        )
-      }
-    }
-
-    if (!geminiResponse.ok) {
-      const backupErrorText = await geminiResponse.text()
-      console.error('Gemini request failed (including backup key)', backupErrorText)
+    if (!routerResponse.ok) {
+      const errorText = await routerResponse.text()
+      console.error('9router request failed', errorText)
       return NextResponse.json(
-        { error: 'Gemini request failed (including backup key)', details: backupErrorText },
+        { error: '9router request failed', details: errorText },
         { status: 502 },
       )
     }
 
-    const geminiData = (await geminiResponse.json()) as GeminiGenerateResponse
-    const modelText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
+    const routerData = (await routerResponse.json()) as RouterChatCompletionResponse
+    const rawContent = routerData.choices?.[0]?.message?.content
+    const modelText =
+      typeof rawContent === 'string'
+        ? rawContent
+        : rawContent?.find((part) => part.type === 'text')?.text
 
     if (!modelText) {
-      console.error('Gemini returned empty content', geminiData)
+      console.error('9router returned empty content', routerData)
       return NextResponse.json(
-        { error: 'Gemini returned empty content', raw: geminiData },
+        { error: '9router returned empty content', raw: routerData },
         { status: 502 },
       )
     }
@@ -165,9 +131,9 @@ export async function POST(req: NextRequest) {
     try {
       parsed = JSON.parse(modelText)
     } catch {
-      console.error('Gemini output is not valid JSON', modelText)
+      console.error('9router output is not valid JSON', modelText)
       return NextResponse.json(
-        { error: 'Gemini output is not valid JSON', raw: modelText },
+        { error: '9router output is not valid JSON', raw: modelText },
         { status: 502 },
       )
     }

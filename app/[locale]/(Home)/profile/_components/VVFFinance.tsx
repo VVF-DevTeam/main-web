@@ -324,7 +324,7 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
       }
 
       toast.success('Receipt image uploaded', {
-        description: 'Fields auto-filled from Gemini AI',
+        description: 'Fields auto-filled by The Little Lion API',
         style: { color: '#22c55e' },
       })
     } catch (error) {
@@ -336,7 +336,7 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
             'UNAVAILABLE')
       if (isHighDemand) {
         toast.error('AI service is busy', {
-          description: 'Gemini is experiencing high demand. Please try again in a moment.',
+          description: 'The Little Lion AI is experiencing high demand. Please try again in a moment.',
           style: { color: '#ef4444' },
         })
       } else {
@@ -421,7 +421,7 @@ export default function VVFFinance({ receipts }: { receipts: ReceiptRow[] }) {
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <span className="text-xs italic text-muted-foreground">
-                    NOTE: Upload receipt image to auto-fill fields using Gemini AI (≈15–30 s).
+                    NOTE: Upload receipt image to auto-fill fields using The Little Lion API - GPT (≈15–30 s).
                     Do not close the dialog before the process is complete.
                   </span>
 
