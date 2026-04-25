@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'imageUrl is required' }, { status: 400 })
     }
 
-    const routerApiKey = process.env['9ROUTER_API_KEY']
+    const routerApiKey = process.env.NINE_ROUTER_API_KEY
     if (!routerApiKey) {
       console.error('9ROUTER_API_KEY is missing')
       return NextResponse.json({ error: '9ROUTER_API_KEY is missing' }, { status: 500 })
