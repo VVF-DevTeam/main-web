@@ -13,7 +13,7 @@ type RouterChatCompletionResponse = {
   }>
 }
 
-const ROUTER_MODEL = 'codex-gemini'
+const ROUTER_MODEL = 'codex-gemini-VVF'
 const ROUTER_ENDPOINT = 'https://9router.k-aithelittlelion.com/v1/chat/completions'
 
 function buildPrompt(imageUrl: string) {
