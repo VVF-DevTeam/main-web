@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { revalidateTag } from 'next/cache'
 
 export const PATCH = async (
   request: Request,
@@ -29,12 +30,14 @@ export const PATCH = async (
           userId: userId,
         },
       })
+      revalidateTag('posts')
     } else {
       updatedLikes = await prisma.postLikes.delete({
         where: {
           postId_userId: { postId: post.id, userId: userId },
         },
       })
+      revalidateTag('posts')
     }
     return NextResponse.json(updatedLikes)
   } catch (error) {

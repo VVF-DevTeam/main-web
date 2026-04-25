@@ -1,7 +1,7 @@
 'use client'
 
 // Libraries
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -20,6 +20,7 @@ interface PostStatsProps {
   hasViewed: boolean
   postId: string
   userId: string | null
+  triggerLikeOnContainerClick?: boolean
 }
 
 // Main Component
@@ -30,10 +31,12 @@ const PostStats = ({
   userId,
   hasViewed,
   postViews,
+  triggerLikeOnContainerClick = false,
 }: PostStatsProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
   const [isLoading, setIsLoading] = useState(false)
+  const likeButtonRef = useRef<HTMLButtonElement>(null)
 
   // Local state for immediate UI updates (optimistic updates)
   const [localHasLiked, setLocalHasLiked] = useState(hasLiked)
@@ -121,12 +124,25 @@ const PostStats = ({
       setIsLoading(false)
     }
   }
+
+  const handleContainerClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!triggerLikeOnContainerClick || isLoading) return
+
+    const target = event.target as HTMLElement
+    if (target.closest('button')) return
+
+    likeButtonRef.current?.click()
+  }
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex items-center gap-x-6 text-sm text-muted-foreground">
+      <div
+        className="flex w-full items-center justify-center gap-x-6 text-sm text-muted-foreground"
+        onClick={handleContainerClick}
+      >
         <div className="flex items-center gap-x-1">
           <button
+            ref={likeButtonRef}
             onClick={() => updateLikes(localHasLiked ? 'unlike' : 'like')}
             disabled={isLoading}
             className={cn(

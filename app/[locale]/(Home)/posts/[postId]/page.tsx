@@ -46,6 +46,7 @@ const PostPage = async ({ params }: PostPageProps) => {
   if (!post) return null
 
   const isLoggedIn = session?.user?.id
+  const currentUserId = session?.user?.id ?? null
   let isVisited = null
 
   if (isLoggedIn) {
@@ -76,6 +77,13 @@ const PostPage = async ({ params }: PostPageProps) => {
     }
   }
 
+  const hasLiked = currentUserId
+    ? post.postLikes.some((like) => like.userId === currentUserId)
+    : false
+  const hasViewed = currentUserId
+    ? post.postVisits.some((visit) => visit.userId === currentUserId)
+    : false
+
   //   todo create a not found page
   return (
     <div className="mx-auto my-20 flex max-w-7xl flex-col gap-y-7">
@@ -87,6 +95,12 @@ const PostPage = async ({ params }: PostPageProps) => {
         content={post.content!}
         imageUrl={post.imgUrl!}
         author={post.user.name!}
+        postLikes={post._count.postLikes}
+        postViews={post._count.postVisits}
+        hasLiked={hasLiked}
+        hasViewed={hasViewed}
+        postId={post.id}
+        userId={currentUserId}
       />
     </div>
   )

@@ -252,6 +252,22 @@ export const getPostById = unstable_cache(
               name: true,
             },
           },
+          postLikes: {
+            select: {
+              userId: true,
+            },
+          },
+          postVisits: {
+            select: {
+              userId: true,
+            },
+          },
+          _count: {
+            select: {
+              postLikes: true,
+              postVisits: true,
+            },
+          },
         },
       })
     } catch (error) {
@@ -259,7 +275,7 @@ export const getPostById = unstable_cache(
       return null
     }
   },
-  ['post-by-id'],
+  ['post-by-id-v2'],
   {
     revalidate: 604800,
     tags: ['posts'],
