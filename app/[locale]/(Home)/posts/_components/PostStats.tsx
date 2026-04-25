@@ -21,6 +21,7 @@ interface PostStatsProps {
   postId: string
   userId: string | null
   triggerLikeOnContainerClick?: boolean
+  alignCenter?: boolean
 }
 
 // Main Component
@@ -32,6 +33,7 @@ const PostStats = ({
   hasViewed,
   postViews,
   triggerLikeOnContainerClick = false,
+  alignCenter = false,
 }: PostStatsProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
@@ -137,10 +139,13 @@ const PostStats = ({
     <>
       {isLoading && <Loader />}
       <div
-        className="flex w-full items-center justify-center gap-x-6 text-sm text-muted-foreground"
+        className={cn(
+          'flex items-center justify-center gap-x-6 text-sm text-muted-foreground',
+          alignCenter && 'w-full h-full justify-center'
+        )}
         onClick={handleContainerClick}
       >
-        <div className="flex items-center gap-x-1">
+        <div className={cn('flex items-center gap-x-1', alignCenter && 'justify-center')}>
           <button
             ref={likeButtonRef}
             onClick={() => updateLikes(localHasLiked ? 'unlike' : 'like')}

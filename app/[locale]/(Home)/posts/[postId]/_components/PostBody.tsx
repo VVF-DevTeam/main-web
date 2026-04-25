@@ -71,9 +71,9 @@ const PostBody = ({
       <Button
         asChild
         variant="outline"
-        className={`flex group h-auto max-w-[60px] justify-center items-center bg-bgColor-gray100 hover:bg-bgColor-gray300`}
+        className={`flex group h-[45px] max-w-[60px] justify-center items-center bg-bgColor-gray100 hover:bg-bgColor-gray300 p-0`}
       >
-        <div className="w-full">
+        <div className="w-full h-full">
           <PostStats
             postLikes={postLikes}
             postViews={postViews}
@@ -82,6 +82,7 @@ const PostBody = ({
             postId={postId}
             userId={userId}
             triggerLikeOnContainerClick
+            alignCenter={true}
           />
         </div>
       </Button>
