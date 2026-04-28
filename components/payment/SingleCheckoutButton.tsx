@@ -100,20 +100,20 @@ export default function SingleCheckoutButton({
       // Prepare form responses for API
       const formattedFormResponses = formResponses && Object.keys(formResponses).length > 0
         ? {
-            responses: Object.entries(formResponses).map(([questionId, answer]) => {
-              const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
-              const formNumber = answer?.formNumber
-              return {
-                questionId,
-                question: question?.question || '',
-                answer: answer?.answer,
-                questionType: question?.type || '',
-                required: question?.required || false,
-                options: question?.options || [],
-                formNumber,
-              }
-            }),
-          }
+          responses: Object.entries(formResponses).map(([questionId, answer]) => {
+            const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
+            const formNumber = answer?.formNumber
+            return {
+              questionId,
+              question: question?.question || '',
+              answer: answer?.answer,
+              questionType: question?.type || '',
+              required: question?.required || false,
+              options: question?.options || [],
+              formNumber,
+            }
+          }),
+        }
         : null
 
       const { data } = await axiosInstance.post(
@@ -132,6 +132,14 @@ export default function SingleCheckoutButton({
           // Guest information
           guestName: guestInfo.guestName,
           guestPhone: guestInfo.guestPhone,
+          // Other guests information
+          ...(guestInfo.otherGuests && guestInfo.otherGuests.length > 0 && {
+            otherGuestsInfo: guestInfo.otherGuests.map(guest => ({
+              name: guest.name,
+              email: guest.email,
+              phone: guest.phone || '',
+            })),
+          }),
           // Event form responses
           ...(formattedFormResponses && { formResponses: formattedFormResponses }),
         }
@@ -203,6 +211,7 @@ export default function SingleCheckoutButton({
     otherGuests: Array<{ name: string; email: string; phone: string }>
   }) => {
     // Save guest info
+    console.log('guestInfo', guestInfo)
     setGuestInfo(guestInfo)
 
     // If there's no event form, proceed directly to checkout

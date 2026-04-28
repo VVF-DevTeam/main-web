@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       // Guest information (for payments without login)
       guestName,
       guestPhone,
+      otherGuestsInfo, // Array of other guests' information
       // Event form responses
       formResponses,
     } = await req.json()
@@ -38,12 +39,21 @@ export async function POST(req: Request) {
     // Store checkout data in database if we have guest info or form responses
     // This is needed because Stripe metadata has a 500-character limit per value
     let checkoutDataId: string | undefined = undefined
-    if (guestName || guestPhone || formResponses) {
+    if (
+      guestName ||
+      guestPhone ||
+      (Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0) ||
+      formResponses
+    ) {
       const checkoutData = await prisma.checkoutSessionData.create({
         data: {
           guestName: guestName || null,
           guestEmail: email || null,
           guestPhone: guestPhone || null,
+          otherGuestsInfo:
+            Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0
+              ? otherGuestsInfo
+              : undefined,
           seatNumbers: seatNumber ? [seatNumber] : undefined,
           ticketMetadata: [{
             ticketId: eventTicketId,
