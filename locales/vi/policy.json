@@ -143,5 +143,30 @@
     "header": "14. Liên hệ với chúng tôi",
     "description": "Nếu bạn có câu hỏi, lo ngại hoặc yêu cầu dữ liệu, hãy liên hệ với chúng tôi tại:"
   },
-  "stripe-policy": "Chính sách bảo mật của Stripe"
+  "stripe-policy": "Chính sách bảo mật của Stripe",
+  "refundPolicy": {
+    "header": "Chính sách hoàn tiền",
+    "lastUpdated": "Cập nhật lần cuối: 2 tháng 5 năm 2026",
+    "introduction": "Chính sách hoàn tiền này quy định cách xử lý hoàn tiền cho vé sự kiện và đơn hàng mua sắm trên nền tảng Viet Vibe Foundation.",
+    "eventTickets": {
+      "header": "1. Hoàn tiền vé sự kiện",
+      "description": "Mức hoàn tiền vé sự kiện có thể từ 50% đến 100%, tùy theo chính sách do từng sự kiện quy định.",
+      "item1": "Mỗi sự kiện có thể có quy định riêng về điều kiện, thời hạn và mức hoàn tiền.",
+      "item2": "Vé được mua trong vòng 1-2 tuần trước ngày bắt đầu sự kiện có thể không đủ điều kiện hoàn tiền.",
+      "item3": "Vui lòng kiểm tra chính sách hoàn tiền của từng sự kiện trước khi mua vé.",
+      "item4": "Ưu đãi sinh viên và ưu đãi thành viên không phải lúc nào cũng được áp dụng cho giá vé sự kiện, trừ khi ban tổ chức sự kiện phê duyệt rõ ràng."
+    },
+    "shop": {
+      "header": "2. Chính sách hoàn tiền của cửa hàng",
+      "description": "Đối với đơn hàng shop, Viet Vibe Foundation không can thiệp vào chính sách hoàn tiền của các shop đối tác, ngoại trừ shop chính thức của VVF.",
+      "item1": "Mỗi shop bắt buộc phải công khai chính sách của mình, bao gồm chính sách hoàn tiền.",
+      "item2": "Khách hàng nên đọc kỹ chính sách của từng shop trước khi đặt hàng.",
+      "item3": "VVF sẽ luôn hỗ trợ người dùng trong các vấn đề liên quan đến hoàn tiền bất kể nguyên nhân, đồng thời vẫn tôn trọng chính sách đã công bố của từng shop."
+    },
+    "contact": {
+      "header": "3. Liên hệ chúng mình",
+      "description": "Nếu bạn cần hỗ trợ hoặc có câu hỏi về hoàn tiền, đội ngũ của chúng mình luôn sẵn sàng hỗ trợ.",
+      "button": "Liên hệ chúng mình"
+    }
+  }
 }

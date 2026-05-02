@@ -23,6 +23,7 @@ import DeleteForm from './_components/DeleteForm'
 import SubscriptionInfo from './_components/SubscriptionInfo'
 import PaymentManagement from './_components/PaymentManagement'
 import PrivacyPolicy from '../_components/_policy/PrivacyPolicy'
+import RefundPolicy from '../_components/_policy/RefundPolicy'
 import EmailComposition from './_components/EmailComposition'
 import EventManagement from '../events/(Admin)/allEvents/_components/EventManagement'
 import CreateEventForm from './_components/CreateEventForm'
@@ -176,7 +177,18 @@ export default async function ProfilePage({
       )
 
     case 'privacy-policy':
-      return <PrivacyPolicy locale={locale} />
+      return (
+        <div>
+          <PrivacyPolicy locale={locale} />
+        </div>
+      )
+
+    case 'refund-policy':
+      return (
+        <div>
+          <RefundPolicy locale={locale} />
+        </div>
+      )
 
     case 'admin-all-events':
       if (

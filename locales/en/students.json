@@ -1,0 +1,90 @@
+{
+  "studentsPage": {
+    "heroTitle": "Students get discounted prices for all VVF events",
+    "heroDescription": "Enjoy many fun activities and events such as classes, concerts, and campings. Create unforgettable memories and connections when you are still young!",
+    "verifyButton": "Verify Student",
+    "loginPromptPrefix": "Please login",
+    "loginPromptLink": "here",
+    "loginPromptSuffix": "first",
+    "termsPrefix": "Student discount available at accredited colleges and universities.",
+    "termsLinkText": "Terms and conditions",
+    "termsSuffix": "apply.",
+    "aboutTitle": "About us",
+    "benefits": {
+      "sports": {
+        "title": "Sports classes and tournaments",
+        "description": "From exciting competitions to practical skill-building sessions, everyone is welcome to join regardless of age or experience."
+      },
+      "music": {
+        "title": "Music classes and workshops",
+        "description": "Learn and grow with professional performers across instruments and skills such as guitar, piano, drums, and dance."
+      },
+      "volunteer": {
+        "title": "Volunteer activities and events",
+        "description": "Join meaningful community activities, build strong connections, and contribute to Vietnamese and international friends in Vancouver."
+      },
+      "community": {
+        "title": "Community connection",
+        "description": "We bring people together through shared languages of sports, music, and collective activities."
+      }
+    }
+  },
+  "verifyPage": {
+    "title": "Verify Student",
+    "description": "Verify your student status to get discounted prices for all our events.",
+    "status": {
+      "verifying": "Verifying your student status...",
+      "verificationFailedTitle": "Verification failed",
+      "verificationSuccessTitle": "Student status verified successfully",
+      "verificationSuccessDescription": "Your verification is complete. You can now use student pricing where available."
+    },
+    "form": {
+      "eduEmailLabel": "Student email",
+      "eduEmailPlaceholder": "Enter your school email address",
+      "schoolNameLabel": "School name",
+      "schoolNamePlaceholder": "Enter your college or university",
+      "sendingButton": "Sending...",
+      "sendVerificationButton": "Send verification email",
+      "validation": {
+        "invalidEmail": "Invalid email format",
+        "schoolNameMin": "School name must be at least 2 characters"
+      }
+    },
+    "notes": {
+      "title": "Verification notes",
+      "item1": "• Student discounts apply to accredited colleges and universities.",
+      "item2": "• We will send you an email for verification.",
+      "item3": "• You may be asked to confirm your active enrollment status."
+    },
+    "toasts": {
+      "verificationEmailSentTitle": "Verification email sent successfully",
+      "verificationEmailNotSentTitle": "Verification email not sent",
+      "genericErrorTitle": "Something went wrong",
+      "tryAgainLater": "Please try again later",
+      "confirmationSuccessTitle": "Student verification completed successfully",
+      "errorWithStatus": "{{message}} (Status: {{statusCode}})"
+    },
+    "errors": {
+      "invalidEduEmail": "We cannot verify that your edu email is valid, please contact VVF technical team at tech@vietvibe.org, we will reply to you in 24hrs.",
+      "failedToSendVerificationEmail": "Failed to send verification email",
+      "verificationFailed": "Student verification failed.",
+      "unexpectedVerificationError": "An unexpected error occurred while verifying student status."
+    }
+  },
+  "termsPage": {
+    "title": "Student Discount Terms and Conditions",
+    "lastUpdated": "Last updated: May 2026",
+    "intro": "These terms apply to all student discount benefits offered by Viet Vibe Foundation.",
+    "eligibility": "You must be an actively enrolled student at an accredited college or university to qualify for student pricing.",
+    "verification": "Student verification may require a valid school email and additional confirmation of enrollment status.",
+    "usage": "Discounts are non-transferable, may not be combined with other promotions unless stated, and can be changed or removed at any time.",
+    "contact": "If you have questions about your eligibility or verification status, please contact us at tech@vietvibe.org.",
+    "contactButton": "Contact Us",
+    "sections": {
+      "eligibilityTitle": "Eligibility",
+      "verificationTitle": "Verification",
+      "usageTitle": "Usage of Student Discounts",
+      "contactTitle": "Contact"
+    }
+  }
+}

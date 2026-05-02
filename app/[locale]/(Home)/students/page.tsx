@@ -3,41 +3,35 @@ import { Users, Volleyball, Guitar, Handshake, type LucideIcon } from 'lucide-re
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { auth } from '@/auth'
+import initTranslation from '@/app/i18n'
 
 type Benefit = {
-  title: string
-  description: string
+  key: string
   icon: LucideIcon
 }
 
 const benefits: Benefit[] = [
   {
-    title: 'Sports classes and tournaments',
-    description:
-      'From exciting competitions to practical skill-building sessions, everyone is welcome to join regardless of age or experience.',
+    key: 'sports',
     icon: Volleyball,
   },
   {
-    title: 'Music classes and workshops',
-    description:
-      'Learn and grow with professional performers across instruments and skills such as guitar, piano, drums, and dance.',
+    key: 'music',
     icon: Guitar,
   },
   {
-    title: 'Volunteer activities and events',
-    description:
-      'Join meaningful community activities, build strong connections, and contribute to Vietnamese and international friends in Vancouver.',
+    key: 'volunteer',
     icon: Users,
   },
   {
-    title: 'Community connection',
-    description:
-      'We bring people together through shared languages of sports, music, and collective activities.',
+    key: 'community',
     icon: Handshake,
   },
 ]
 
-const StudentsPage = async () => {
+const StudentsPage = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params
+  const { t } = await initTranslation(locale, ['students', 'common'])
   const session = await auth()
   const isLoggedIn = Boolean(session?.user?.id)
 
@@ -46,11 +40,11 @@ const StudentsPage = async () => {
       <section className='bg-bgColor-secondary200 px-6 py-20 md:py-24'>
         <div className='mx-auto flex w-full max-w-5xl flex-col items-center text-center'>
           <h1 className='max-w-4xl text-3xl font-bold leading-tight md:text-5xl'>
-            Students get discounted prices for all our events
+            {t('studentsPage.heroTitle')}
           </h1>
 
           <p className='mt-6 max-w-3xl text-base leading-relaxed'>
-            Enjoy many fun activities and events such as classes, concerts, and campings. Create unforgettable memories and connections when you are still young!
+            {t('studentsPage.heroDescription')}
           </p>
 
           {isLoggedIn ? (
@@ -61,21 +55,27 @@ const StudentsPage = async () => {
               size='lg'
               asChild
             >
-              <Link href='/students/verify'>Verify Student</Link>
+              <Link href='/students/verify'>{t('studentsPage.verifyButton')}</Link>
             </Button>
           ) : (
             <p className='mt-10 text-base font-semibold text-textColor-brandDark900'>
-              Please login{' '}
+              {t('studentsPage.loginPromptPrefix')}{' '}
               <Link href='/signIn' className='underline underline-offset-4'>
-                here
+                {t('studentsPage.loginPromptLink')}
               </Link>{' '}
-              first
+              {t('studentsPage.loginPromptSuffix')}
             </p>
           )}
 
           <p className='mt-8 text-xs leading-relaxed text-textColor-brandDark600'>
-            Student discount available at accredited colleges and universities.
-            Terms and conditions apply.
+            {t('studentsPage.termsPrefix')}{' '}
+            <Link
+              href='/students/termsAndConditions'
+              className='underline underline-offset-4'
+            >
+              {t('studentsPage.termsLinkText')}
+            </Link>{' '}
+            {t('studentsPage.termsSuffix')}
           </p>
         </div>
       </section>
@@ -83,23 +83,23 @@ const StudentsPage = async () => {
       <section className='bg-bgColor-white px-6 py-20 md:py-24'>
         <div className='mx-auto w-full max-w-6xl'>
           <h2 className='mx-auto max-w-3xl text-center text-3xl font-extrabold leading-tight md:text-5xl'>
-            About us
+            {t('studentsPage.aboutTitle')}
           </h2>
 
           <div className='mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4'>
             {benefits.map((benefit) => (
               <article
-                key={benefit.title}
+                key={benefit.key}
                 className='flex flex-col items-center text-center'
               >
                 <div className='flex h-24 w-24 items-center justify-center rounded-full bg-bgColor-secondary200 text-4xl font-bold text-textColor-brandDark900'>
                   <benefit.icon className='h-10 w-10' />
                 </div>
                 <h3 className='mt-6 text-2xl font-semibold leading-snug'>
-                  {benefit.title}
+                  {t(`studentsPage.benefits.${benefit.key}.title`)}
                 </h3>
                 <p className='mt-3 text-lg leading-relaxed'>
-                  {benefit.description}
+                  {t(`studentsPage.benefits.${benefit.key}.description`)}
                 </p>
               </article>
             ))}

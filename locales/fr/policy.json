@@ -143,5 +143,30 @@
     "header": "14. Contactez-nous",
     "description": "Si vous avez des questions, des préoccupations ou des demandes de données, contactez-nous à :"
   },
-  "stripe-policy": "Politique de confidentialité de Stripe"
+  "stripe-policy": "Politique de confidentialité de Stripe",
+  "refundPolicy": {
+    "header": "Politique de remboursement",
+    "lastUpdated": "Dernière mise à jour : 2 mai 2026",
+    "introduction": "Cette politique de remboursement explique comment les remboursements sont traités pour les billets d'événements et les achats en boutique sur la plateforme Viet Vibe Foundation.",
+    "eventTickets": {
+      "header": "1. Remboursement des billets d'événements",
+      "description": "Le remboursement des billets d'événements peut varier de 50 % à 100 %, selon la politique définie pour chaque événement.",
+      "item1": "Chaque événement peut définir ses propres règles de remboursement, délais et conditions d'éligibilité.",
+      "item2": "Les billets achetés 1 à 2 semaines avant la date de début de l'événement peuvent ne pas être éligibles au remboursement.",
+      "item3": "Veuillez consulter la politique de remboursement de chaque événement avant d'acheter un billet.",
+      "item4": "Les réductions étudiantes et les réductions d'abonnement ne sont pas systématiquement incluses dans le prix des billets, sauf approbation explicite de l'organisateur de l'événement."
+    },
+    "shop": {
+      "header": "2. Politique de remboursement des boutiques",
+      "description": "Pour les achats en boutique, Viet Vibe Foundation n'intervient pas dans les décisions de remboursement des boutiques partenaires, sauf pour la boutique principale officielle de VVF.",
+      "item1": "Chaque boutique doit fournir sa propre politique, y compris les conditions de remboursement.",
+      "item2": "Les clients doivent consulter la politique spécifique de la boutique avant de passer une commande.",
+      "item3": "VVF apportera toujours son soutien aux utilisateurs pour les demandes liées au remboursement, quelle qu'en soit la cause, tout en respectant la politique publiée de chaque boutique."
+    },
+    "contact": {
+      "header": "3. Contactez-nous",
+      "description": "Pour toute question ou assistance concernant les remboursements, notre équipe est là pour vous aider.",
+      "button": "Contactez-nous"
+    }
+  }
 }

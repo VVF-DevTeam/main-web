@@ -1,0 +1,90 @@
+{
+  "studentsPage": {
+    "heroTitle": "Les étudiants bénéficient de tarifs réduits pour tous nos événements",
+    "heroDescription": "Profitez de nombreuses activités et événements amusants comme des cours, des concerts et des camps. Créez des souvenirs inoubliables et de belles connexions pendant votre jeunesse !",
+    "verifyButton": "Vérifier le statut étudiant",
+    "loginPromptPrefix": "Veuillez vous connecter",
+    "loginPromptLink": "ici",
+    "loginPromptSuffix": "d'abord",
+    "termsPrefix": "La réduction étudiante est disponible pour les collèges et universités accrédités.",
+    "termsLinkText": "Conditions générales",
+    "termsSuffix": "s'appliquent.",
+    "aboutTitle": "À propos de nous",
+    "benefits": {
+      "sports": {
+        "title": "Cours et tournois sportifs",
+        "description": "Des compétitions passionnantes aux séances pratiques de développement des compétences, tout le monde est le bienvenu quel que soit l'âge ou l'expérience."
+      },
+      "music": {
+        "title": "Cours et ateliers de musique",
+        "description": "Apprenez et progressez avec des artistes professionnels sur différents instruments et compétences comme la guitare, le piano, la batterie et la danse."
+      },
+      "volunteer": {
+        "title": "Activités bénévoles et événements",
+        "description": "Participez à des activités communautaires utiles, créez des liens solides et contribuez à la communauté vietnamienne et internationale de Vancouver."
+      },
+      "community": {
+        "title": "Connexion communautaire",
+        "description": "Nous rassemblons les gens à travers les langages communs du sport, de la musique et des activités collectives."
+      }
+    }
+  },
+  "verifyPage": {
+    "title": "Vérifier le statut étudiant",
+    "description": "Vérifiez votre statut étudiant pour obtenir des tarifs réduits sur tous nos événements.",
+    "status": {
+      "verifying": "Vérification de votre statut étudiant en cours...",
+      "verificationFailedTitle": "Vérification échouée",
+      "verificationSuccessTitle": "Statut étudiant vérifié avec succès",
+      "verificationSuccessDescription": "Votre vérification est terminée. Vous pouvez maintenant utiliser les tarifs étudiants là où ils sont disponibles."
+    },
+    "form": {
+      "eduEmailLabel": "Email étudiant",
+      "eduEmailPlaceholder": "Saisissez votre adresse email scolaire",
+      "schoolNameLabel": "Nom de l'établissement",
+      "schoolNamePlaceholder": "Saisissez le nom de votre collège ou université",
+      "sendingButton": "Envoi...",
+      "sendVerificationButton": "Envoyer l'email de vérification",
+      "validation": {
+        "invalidEmail": "Format d'email invalide",
+        "schoolNameMin": "Le nom de l'établissement doit contenir au moins 2 caractères"
+      }
+    },
+    "notes": {
+      "title": "Notes de vérification",
+      "item1": "• Les réductions étudiantes s'appliquent aux collèges et universités accrédités.",
+      "item2": "• Nous vous enverrons un email pour la vérification.",
+      "item3": "• Il se peut que vous deviez confirmer votre statut d'inscription active."
+    },
+    "toasts": {
+      "verificationEmailSentTitle": "Email de vérification envoyé avec succès",
+      "verificationEmailNotSentTitle": "Email de vérification non envoyé",
+      "genericErrorTitle": "Une erreur s'est produite",
+      "tryAgainLater": "Veuillez réessayer plus tard",
+      "confirmationSuccessTitle": "Vérification étudiante terminée avec succès",
+      "errorWithStatus": "{{message}} (Statut: {{statusCode}})"
+    },
+    "errors": {
+      "invalidEduEmail": "Nous ne pouvons pas vérifier que votre email edu est valide. Veuillez contacter l'équipe technique VVF à tech@vietvibe.org, nous vous répondrons sous 24h.",
+      "failedToSendVerificationEmail": "Échec de l'envoi de l'email de vérification",
+      "verificationFailed": "La vérification étudiante a échoué.",
+      "unexpectedVerificationError": "Une erreur inattendue est survenue pendant la vérification du statut étudiant."
+    }
+  },
+  "termsPage": {
+    "title": "Conditions Générales de Réduction Étudiante",
+    "lastUpdated": "Dernière mise à jour : Mai 2026",
+    "intro": "Ces conditions s'appliquent à tous les avantages de réduction étudiante proposés par Viet Vibe Foundation.",
+    "eligibility": "Vous devez être étudiant activement inscrit dans un collège ou une université accrédité(e) pour bénéficier du tarif étudiant.",
+    "verification": "La vérification étudiante peut nécessiter une adresse email scolaire valide et une confirmation complémentaire du statut d'inscription.",
+    "usage": "Les réductions ne sont pas transférables, ne peuvent pas être combinées avec d'autres promotions sauf mention contraire, et peuvent être modifiées ou supprimées à tout moment.",
+    "contact": "Si vous avez des questions sur votre éligibilité ou votre statut de vérification, veuillez nous contacter à tech@vietvibe.org.",
+    "contactButton": "Contactez-nous",
+    "sections": {
+      "eligibilityTitle": "Éligibilité",
+      "verificationTitle": "Vérification",
+      "usageTitle": "Utilisation des réductions étudiantes",
+      "contactTitle": "Contact"
+    }
+  }
+}

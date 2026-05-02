@@ -22,24 +22,34 @@ import {
 } from '@/components/ui/form'
 import { BadgeCheck, GraduationCap, Info, TriangleAlert, CircleCheck } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-
-const studentVerificationSchema = z.object({
-  eduEmail: z.string().email({ message: 'Invalid email format' }),
-  schoolName: z
-    .string()
-    .min(2, { message: 'School name must be at least 2 characters' }),
-})
-
-type StudentVerificationFormValues = z.infer<typeof studentVerificationSchema>
+import { useTranslation } from 'react-i18next'
 
 const INVALID_EDU_EMAIL_MESSAGE =
   'We cannot verify that your edu email is valid, please contact VVF technical team at tech@vietvibe.org, we will reply to you in 24hrs.'
 
+type StudentVerificationFormValues = {
+  eduEmail: string
+  schoolName: string
+}
+
 const StudentVerifyPage = () => {
+  const useTranslationAny = useTranslation as any
+  const { t } = useTranslationAny('students')
+  const ts = (key: string, options?: Record<string, string | number>) =>
+    String((t as any)(key, options))
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const isConfirmationMode = Boolean(token)
   const { update: updateSession } = useSession()
+  const invalidEduEmailDisplayMessage = ts('verifyPage.errors.invalidEduEmail')
+  const studentVerificationSchema: z.ZodType<StudentVerificationFormValues> = React.useMemo(
+    () =>
+      z.object({
+        eduEmail: z.string().email({ message: ts('verifyPage.form.validation.invalidEmail') }),
+        schoolName: z.string().min(2, { message: ts('verifyPage.form.validation.schoolNameMin') }),
+      }),
+    [ts]
+  )
 
   const currentDateTime = getCurrentDateTime()
   const [countDown, setCountDown] = React.useState(0)
@@ -76,7 +86,7 @@ const StudentVerifyPage = () => {
       })
 
       if (response.status === 200) {
-        toast.success('Verification email sent successfully', {
+        toast.success(t('verifyPage.toasts.verificationEmailSentTitle'), {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
               {currentDateTime}
@@ -110,7 +120,7 @@ const StudentVerifyPage = () => {
       if (isAxiosError(error)) {
         const backendErrorMessage = error.response?.data?.message
         if (backendErrorMessage === INVALID_EDU_EMAIL_MESSAGE) {
-          toast.error(INVALID_EDU_EMAIL_MESSAGE, {
+          toast.error(invalidEduEmailDisplayMessage, {
             style: {
               color: '#ef4444',
             },
@@ -119,12 +129,15 @@ const StudentVerifyPage = () => {
         }
 
         const errorMessage =
-          error.response?.data?.message || 'Failed to send verification email'
+          error.response?.data?.message || ts('verifyPage.errors.failedToSendVerificationEmail')
         const statusCode = error.response?.status || 500
-        toast.error('Verification email not sent', {
+        toast.error(t('verifyPage.toasts.verificationEmailNotSentTitle'), {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
-              {errorMessage} (Status: {statusCode})
+              {ts('verifyPage.toasts.errorWithStatus', {
+                message: errorMessage,
+                statusCode,
+              })}
             </span>
           ),
           style: {
@@ -132,10 +145,10 @@ const StudentVerifyPage = () => {
           },
         })
       } else {
-        toast.error('Something went wrong', {
+        toast.error(t('verifyPage.toasts.genericErrorTitle'), {
           description: (
             <span style={{ color: 'var(--muted-foreground)' }}>
-              Please try again later
+              {t('verifyPage.toasts.tryAgainLater')}
             </span>
           ),
           style: {
@@ -162,7 +175,7 @@ const StudentVerifyPage = () => {
         if (response.status === 200) {
           await updateSession()
           setConfirmSuccess(true)
-          toast.success('Student verification completed successfully', {
+          toast.success(t('verifyPage.toasts.confirmationSuccessTitle'), {
             description: (
               <span style={{ color: 'var(--muted-foreground)' }}>
                 {currentDateTime}
@@ -176,11 +189,11 @@ const StudentVerifyPage = () => {
       } catch (error) {
         if (isAxiosError(error)) {
           setConfirmationError(
-            error.response?.data?.message || 'Student verification failed.'
+            error.response?.data?.message || ts('verifyPage.errors.verificationFailed')
           )
         } else {
           setConfirmationError(
-            'An unexpected error occurred while verifying student status.'
+            ts('verifyPage.errors.unexpectedVerificationError')
           )
         }
       } finally {
@@ -206,11 +219,10 @@ const StudentVerifyPage = () => {
                 <GraduationCap className='mx-auto h-8 w-8 text-textColor-brandDark900' />
               </div>
               <h1 className='mb-2 text-2xl font-bold text-textColor-brandDark900'>
-                Verify Student
+                {t('verifyPage.title')}
               </h1>
               <p className='text-textColor-brand900'>
-                Verify your student status to get discounted prices for all our
-                events.
+                {t('verifyPage.description')}
               </p>
             </div>
 
@@ -218,7 +230,7 @@ const StudentVerifyPage = () => {
               <div className='space-y-4'>
                 {confirmLoading ? (
                   <div className='rounded-lg border border-bgColor-brand900 bg-bgColor-secondary200 p-4 text-center text-sm font-medium text-textColor-brandDark900'>
-                    Verifying your student status...
+                    {t('verifyPage.status.verifying')}
                   </div>
                 ) : confirmationError ? (
                   <div className='rounded-lg border border-red-300 bg-red-50 p-4 text-center'>
@@ -226,7 +238,7 @@ const StudentVerifyPage = () => {
                       <TriangleAlert className='h-5 w-5 text-red-600' />
                     </div>
                     <p className='text-sm font-medium text-red-700'>
-                      Verification failed
+                      {t('verifyPage.status.verificationFailedTitle')}
                     </p>
                     <p className='mt-1 text-xs text-red-700'>{confirmationError}</p>
                   </div>
@@ -236,11 +248,10 @@ const StudentVerifyPage = () => {
                       <CircleCheck className='h-5 w-5 text-green-600' />
                     </div>
                     <p className='text-sm font-medium text-green-700'>
-                      Student status verified successfully
+                      {t('verifyPage.status.verificationSuccessTitle')}
                     </p>
                     <p className='mt-1 text-xs text-green-700'>
-                      Your verification is complete. You can now use student
-                      pricing where available.
+                      {t('verifyPage.status.verificationSuccessDescription')}
                     </p>
                   </div>
                 ) : null}
@@ -257,12 +268,12 @@ const StudentVerifyPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className='flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900'>
-                          Student email
+                          {t('verifyPage.form.eduEmailLabel')}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type='email'
-                            placeholder='Enter your school email address'
+                            placeholder={ts('verifyPage.form.eduEmailPlaceholder')}
                             className='h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900'
                             {...field}
                             disabled={loading}
@@ -279,12 +290,12 @@ const StudentVerifyPage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className='flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900'>
-                          School name
+                          {t('verifyPage.form.schoolNameLabel')}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type='text'
-                            placeholder='Enter your college or university'
+                            placeholder={ts('verifyPage.form.schoolNamePlaceholder')}
                             className='h-12 border-gray-300 transition-colors focus:border-bgColor-brand900 focus:ring-bgColor-brand900'
                             {...field}
                             disabled={loading}
@@ -303,7 +314,9 @@ const StudentVerifyPage = () => {
                   >
                     <span className='flex items-center justify-center gap-2'>
                       <BadgeCheck className='h-4 w-4' />
-                      {loading ? 'Sending...' : 'Send verification email'}
+                      {loading
+                        ? t('verifyPage.form.sendingButton')
+                        : t('verifyPage.form.sendVerificationButton')}
                       {countDown > 0 && !loading && <span>({countDown})</span>}
                     </span>
                   </Button>
@@ -316,18 +329,16 @@ const StudentVerifyPage = () => {
                 <Info className='mt-0.5 h-5 w-5 flex-shrink-0 text-textColor-brandDark900' />
                 <div>
                   <p className='mb-1 text-sm font-medium text-textColor-brandDark900'>
-                    Verification notes
+                    {t('verifyPage.notes.title')}
                   </p>
                   <ul className='space-y-1 text-xs text-textColor-brandDark900'>
                     <li>
-                      • Student discounts apply to accredited colleges and
-                      universities.
+                      {t('verifyPage.notes.item1')}
                     </li>
                     <li>
-                      • We will send you an email for verification.
+                      {t('verifyPage.notes.item2')}
                     </li>
-                    <li>• You may be asked to confirm your active enrollment
-                      status.</li>
+                    <li>{t('verifyPage.notes.item3')}</li>
                   </ul>
                 </div>
               </div>

@@ -80,6 +80,7 @@ const i18nNamespaces = [
   'post',
   'host',
   'shop',
+  'students',
 ]
 
 // Generate static params for all supported locales

@@ -33,6 +33,7 @@ export default function Sidebar({ locale, userId, user }: SidebarProps) {
     'admin-shop-statistics': 'Shop Manager',
     'admin-vvf-finance': 'VVF Finance',
     'privacy-policy': t('privacy-policy'),
+    'refund-policy': t('refund-policy'),
   }
 
   const isAdmin = user.role.includes('ADMIN')

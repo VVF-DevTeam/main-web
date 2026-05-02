@@ -70,6 +70,14 @@ const Footer = async ({ locale }: { locale: string }) => {
             >
               {t('footer-privacyPolicy')}
             </Link>
+
+            <Link
+              href="/policy/refund"
+              className="hover:text-textColor-brand900 hover:underline"
+            >
+              {t('footer-refundPolicy')}
+            </Link>
+
             <Link
               href="/policy"
               className="hover:text-textColor-brand900 hover:underline"

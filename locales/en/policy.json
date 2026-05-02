@@ -143,5 +143,30 @@
     "header": "14. Contact Us",
     "description": "If you have questions, concerns, or data requests, contact us at:"
   },
-  "stripe-policy": "Stripe Privacy Policy"
+  "stripe-policy": "Stripe Privacy Policy",
+  "refundPolicy": {
+    "header": "Refund Policy",
+    "lastUpdated": "Last updated: May 2, 2026",
+    "introduction": "This Refund Policy outlines how refunds are handled for event tickets and shop purchases across the Viet Vibe Foundation platform.",
+    "eventTickets": {
+      "header": "1. Event Ticket Refunds",
+      "description": "Event ticket refunds can range from 50% to 100%, depending on the refund policy defined by each event organizer.",
+      "item1": "Each event may define its own refund rules, deadlines, and eligibility conditions.",
+      "item2": "Tickets purchased within 1-2 weeks before the event start date may not be eligible for a refund.",
+      "item3": "Please review the refund policy on each event page before purchasing your ticket.",
+      "item4": "Student discounts and subscription discounts are not always included in event pricing unless the event organizer explicitly approves them."
+    },
+    "shop": {
+      "header": "2. Shop Refund Policy",
+      "description": "For shop purchases, Viet Vibe Foundation does not interfere with refund decisions for partner shops, except for the official main VVF shop.",
+      "item1": "Every shop is required to provide its own policy, including refund terms.",
+      "item2": "Customers should review the specific shop's policy before placing an order.",
+      "item3": "VVF will always support users with refund-related concerns regardless of the cause, while still respecting each shop's published policy."
+    },
+    "contact": {
+      "header": "3. Contact Us",
+      "description": "For refund support or questions, our team is here to help.",
+      "button": "Contact Us"
+    }
+  }
 }

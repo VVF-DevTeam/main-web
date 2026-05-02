@@ -1,0 +1,90 @@
+{
+  "studentsPage": {
+    "heroTitle": "Sinh viên được giảm giá cho tất cả sự kiện của VVF",
+    "heroDescription": "Thưởng thức nhiều hoạt động và sự kiện thú vị như lớp học, buổi biểu diễn và cắm trại. Tạo nên kỷ niệm đáng nhớ và kết nối ý nghĩa khi bạn còn trẻ!",
+    "verifyButton": "Xác minh sinh viên",
+    "loginPromptPrefix": "Vui lòng đăng nhập",
+    "loginPromptLink": "tại đây",
+    "loginPromptSuffix": "trước",
+    "termsPrefix": "Ưu đãi sinh viên áp dụng cho các trường cao đẳng và đại học được công nhận.",
+    "termsLinkText": "Điều khoản và điều kiện",
+    "termsSuffix": "được áp dụng.",
+    "aboutTitle": "Về chúng mình",
+    "benefits": {
+      "sports": {
+        "title": "Lớp học và giải đấu thể thao",
+        "description": "Từ các cuộc thi sôi động đến các buổi rèn luyện kỹ năng thực tế, mọi người đều có thể tham gia bất kể độ tuổi hay kinh nghiệm."
+      },
+      "music": {
+        "title": "Lớp học và workshop âm nhạc",
+        "description": "Học hỏi và phát triển cùng các nghệ sĩ chuyên nghiệp với nhiều nhạc cụ và kỹ năng như guitar, piano, trống và nhảy."
+      },
+      "volunteer": {
+        "title": "Hoạt động tình nguyện và sự kiện",
+        "description": "Tham gia các hoạt động cộng đồng ý nghĩa, xây dựng kết nối bền vững và đóng góp cho bạn bè Việt Nam và quốc tế tại Vancouver."
+      },
+      "community": {
+        "title": "Kết nối cộng đồng",
+        "description": "Chúng mình kết nối mọi người thông qua ngôn ngữ chung của thể thao, âm nhạc và các hoạt động tập thể."
+      }
+    }
+  },
+  "verifyPage": {
+    "title": "Xác minh sinh viên",
+    "description": "Xác minh tình trạng sinh viên để nhận mức giá ưu đãi cho tất cả sự kiện của chúng mình.",
+    "status": {
+      "verifying": "Đang xác minh tình trạng sinh viên của bạn...",
+      "verificationFailedTitle": "Xác minh thất bại",
+      "verificationSuccessTitle": "Đã xác minh sinh viên thành công",
+      "verificationSuccessDescription": "Quá trình xác minh đã hoàn tất. Bây giờ bạn có thể sử dụng mức giá sinh viên ở những nơi có áp dụng."
+    },
+    "form": {
+      "eduEmailLabel": "Email sinh viên",
+      "eduEmailPlaceholder": "Nhập địa chỉ email trường của bạn",
+      "schoolNameLabel": "Tên trường",
+      "schoolNamePlaceholder": "Nhập tên trường cao đẳng hoặc đại học của bạn",
+      "sendingButton": "Đang gửi...",
+      "sendVerificationButton": "Gửi email xác minh",
+      "validation": {
+        "invalidEmail": "Định dạng email không hợp lệ",
+        "schoolNameMin": "Tên trường phải có ít nhất 2 ký tự"
+      }
+    },
+    "notes": {
+      "title": "Lưu ý xác minh",
+      "item1": "• Ưu đãi sinh viên áp dụng cho các trường cao đẳng và đại học được công nhận.",
+      "item2": "• Chúng mình sẽ gửi email để bạn xác minh.",
+      "item3": "• Bạn có thể được yêu cầu xác nhận tình trạng đang theo học."
+    },
+    "toasts": {
+      "verificationEmailSentTitle": "Đã gửi email xác minh thành công",
+      "verificationEmailNotSentTitle": "Gửi email xác minh không thành công",
+      "genericErrorTitle": "Đã có lỗi xảy ra",
+      "tryAgainLater": "Vui lòng thử lại sau",
+      "confirmationSuccessTitle": "Hoàn tất xác minh sinh viên thành công",
+      "errorWithStatus": "{{message}} (Mã: {{statusCode}})"
+    },
+    "errors": {
+      "invalidEduEmail": "Chúng mình không thể xác minh email edu của bạn hợp lệ, vui lòng liên hệ đội kỹ thuật VVF tại tech@vietvibe.org, chúng mình sẽ phản hồi trong 24 giờ.",
+      "failedToSendVerificationEmail": "Không thể gửi email xác minh",
+      "verificationFailed": "Xác minh sinh viên thất bại.",
+      "unexpectedVerificationError": "Đã xảy ra lỗi không mong đợi trong quá trình xác minh sinh viên."
+    }
+  },
+  "termsPage": {
+    "title": "Điều Khoản và Điều Kiện Ưu Đãi Sinh Viên",
+    "lastUpdated": "Cập nhật lần cuối: Tháng 5 năm 2026",
+    "intro": "Các điều khoản này áp dụng cho tất cả ưu đãi giảm giá sinh viên do Viet Vibe Foundation cung cấp.",
+    "eligibility": "Bạn phải là sinh viên đang theo học tại trường cao đẳng hoặc đại học được công nhận để đủ điều kiện áp dụng mức giá sinh viên.",
+    "verification": "Việc xác minh sinh viên có thể yêu cầu email trường hợp lệ và thông tin xác nhận tình trạng theo học.",
+    "usage": "Ưu đãi không thể chuyển nhượng, không được kết hợp với chương trình khuyến mãi khác trừ khi có thông báo, và có thể được thay đổi hoặc dừng áp dụng bất kỳ lúc nào.",
+    "contact": "Nếu bạn có câu hỏi về điều kiện hoặc trạng thái xác minh, vui lòng liên hệ chúng mình qua email tech@vietvibe.org.",
+    "contactButton": "Liên hệ chúng mình",
+    "sections": {
+      "eligibilityTitle": "Điều kiện áp dụng",
+      "verificationTitle": "Xác minh sinh viên",
+      "usageTitle": "Cách áp dụng ưu đãi sinh viên",
+      "contactTitle": "Liên hệ"
+    }
+  }
+}

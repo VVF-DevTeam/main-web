@@ -11,6 +11,8 @@ import EventListVertical from '@/app/[locale]/(Home)/events/_components/EventLis
 import PostListHorizontal from '@/app/[locale]/(Home)/posts/_components/PostListHorizontal'
 import MembershipBenefits from '@/app/[locale]/(Home)/_components/membershipBenefits'
 import RegisterDoubleSection from '@/app/[locale]/(Home)/_components/registerDoubleSection'
+import StudentBenefits from '@/app/[locale]/(Home)/_components/studentBenefits'
+import ExploreMore from '@/app/[locale]/(Home)/_components/exploreMore'
 
 // Libraries
 import { Metadata } from 'next'
@@ -111,6 +113,11 @@ export default async function Home({
       <MembershipBenefits locale={locale} />
 
       <RegisterDoubleSection locale={locale} />
+
+      <StudentBenefits locale={locale} />
+
+      <ExploreMore locale={locale} />
+
       {/* <ImageCarousel autoSlide={true} locale={locale} /> */}
       {/* <SocialMediaPosts locale={locale} /> */}
       {/* <TopRatedEvents locale={locale} /> */}
