@@ -6,6 +6,7 @@ import initTranslation from '@/app/i18n'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
 import i18nConfig from '@/i18nConfig'
+import { auth } from '@/auth'
 
 // Components
 import { Toaster as SonnerToaster } from 'sonner'
@@ -95,7 +96,9 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>
 }>) {
   const { locale } = await params
-  
+    // Get the current user's id
+  const session = await auth()
+
   // Validate locale - if invalid, use default locale to prevent errors
   const validLocale = i18nConfig.locales.includes(locale)
     ? locale

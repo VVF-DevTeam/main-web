@@ -21,9 +21,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { BadgeCheck, GraduationCap, Info, TriangleAlert, CircleCheck } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 const studentVerificationSchema = z.object({
-  email: z.string().email({ message: 'Invalid email format' }),
+  eduEmail: z.string().email({ message: 'Invalid email format' }),
   schoolName: z
     .string()
     .min(2, { message: 'School name must be at least 2 characters' }),
@@ -31,11 +32,14 @@ const studentVerificationSchema = z.object({
 
 type StudentVerificationFormValues = z.infer<typeof studentVerificationSchema>
 
+const INVALID_EDU_EMAIL_MESSAGE =
+  'We cannot verify that your edu email is valid, please contact VVF technical team at tech@vietvibe.org, we will reply to you in 24hrs.'
+
 const StudentVerifyPage = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-  const email = searchParams.get('email')
-  const isConfirmationMode = Boolean(token && email)
+  const isConfirmationMode = Boolean(token)
+  const { update: updateSession } = useSession()
 
   const currentDateTime = getCurrentDateTime()
   const [countDown, setCountDown] = React.useState(0)
@@ -50,7 +54,7 @@ const StudentVerifyPage = () => {
   const form = useForm<StudentVerificationFormValues>({
     resolver: zodResolver(studentVerificationSchema),
     defaultValues: {
-      email: '',
+      eduEmail: '',
       schoolName: '',
     },
   })
@@ -66,7 +70,10 @@ const StudentVerifyPage = () => {
   const onSubmitVerification = async (data: StudentVerificationFormValues) => {
     try {
       setLoading(true)
-      const response = await axiosInstance.post('/api/student/verify', data)
+      const response = await axiosInstance.post('/api/student/verify', {
+        eduEmail: data.eduEmail,
+        schoolName: data.schoolName,
+      })
 
       if (response.status === 200) {
         toast.success('Verification email sent successfully', {
@@ -101,6 +108,16 @@ const StudentVerifyPage = () => {
     } catch (error) {
       console.error('Error:', error)
       if (isAxiosError(error)) {
+        const backendErrorMessage = error.response?.data?.message
+        if (backendErrorMessage === INVALID_EDU_EMAIL_MESSAGE) {
+          toast.error(INVALID_EDU_EMAIL_MESSAGE, {
+            style: {
+              color: '#ef4444',
+            },
+          })
+          return
+        }
+
         const errorMessage =
           error.response?.data?.message || 'Failed to send verification email'
         const statusCode = error.response?.status || 500
@@ -141,9 +158,9 @@ const StudentVerifyPage = () => {
       try {
         const response = await axiosInstance.post('/api/student/verify/confirm', {
           token,
-          email,
         })
         if (response.status === 200) {
+          await updateSession()
           setConfirmSuccess(true)
           toast.success('Student verification completed successfully', {
             description: (
@@ -172,7 +189,7 @@ const StudentVerifyPage = () => {
     }
 
     void confirmStudentVerification()
-  }, [currentDateTime, email, isConfirmationMode, token])
+  }, [currentDateTime, isConfirmationMode, token])
 
   return (
     <div className='flex-center relative min-h-[calc(100vh+120px)] content-center bg-bgColor-white'>
@@ -236,7 +253,7 @@ const StudentVerifyPage = () => {
                 >
                   <FormField
                     control={form.control}
-                    name='email'
+                    name='eduEmail'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className='flex items-center gap-2 text-sm font-semibold text-textColor-brandDark900'>
@@ -310,7 +327,7 @@ const StudentVerifyPage = () => {
                       • We will send you an email for verification.
                     </li>
                     <li>• You may be asked to confirm your active enrollment
-                    status.</li>
+                      status.</li>
                   </ul>
                 </div>
               </div>

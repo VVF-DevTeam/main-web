@@ -1,11 +1,15 @@
 import { prisma } from '../../db'
 import {v4 as uuid} from "uuid";
 
+type CreateTokenOptions = {
+  pendingEduEmail?: string
+}
+
 // create verification token
-export const createToken = async (email: string) => {
+export const createToken = async (email: string, options?: CreateTokenOptions) => {
   try {
     // check if token already exists and delete it
-   const existingToken = await getTokenByEmail(email)
+    const existingToken = await getTokenByEmail(email)
     if (existingToken) {
       await prisma.verificationToken.delete({
         where: {
@@ -19,6 +23,7 @@ export const createToken = async (email: string) => {
     const userToken = await prisma.verificationToken.create({
       data: {
         email: email,
+        pendingEduEmail: options?.pendingEduEmail?.trim().toLowerCase(),
         token: token,
         expires: expires,
       },

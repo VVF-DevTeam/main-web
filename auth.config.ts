@@ -92,12 +92,20 @@ export default {
         token.image = user.image as string
         token.role =
           user.role && user.role.length > 0 ? (user.role as Role[]) : ['USER']
+        token.eduEmailExpiredDate = user.eduEmailExpiredDate as Date
       }
 
       // In UpdateProfileForm.tsx, we use update trigger to update the user profile
       if (trigger === 'update' && session) {
         if (session.name) token.name = session.name
         if (session.image) token.image = session.image
+        const eduEmailExpiredDate =
+          (session as { eduEmailExpiredDate?: Date | null })?.eduEmailExpiredDate ??
+          (session as { user?: { eduEmailExpiredDate?: Date | null } })?.user
+            ?.eduEmailExpiredDate
+        if (eduEmailExpiredDate !== undefined) {
+          token.eduEmailExpiredDate = eduEmailExpiredDate
+        }
       }
       return token
     },
@@ -107,6 +115,7 @@ export default {
       session.user.name = token.name as string
       session.user.image = token.image as string
       session.user.role = token.role as Role[]
+      session.user.eduEmailExpiredDate = token.eduEmailExpiredDate as Date
       return session
     },
     async signIn({ account }) {
@@ -400,7 +409,7 @@ export default {
           await prisma.user.update({
             where: { id: user.id },
             data: {
-              emailVerified: new Date(),
+              emailVerifiedDate: new Date(),
             },
           })
 
@@ -430,7 +439,7 @@ export default {
         } catch (error) {
           lastError = error
           console.error(
-            `Failed to update emailVerified for user ${user.id} (attempt ${attempt + 1
+            `Failed to update emailVerifiedDate for user ${user.id} (attempt ${attempt + 1
             }/${maxRetries + 1}):`,
             error
           )

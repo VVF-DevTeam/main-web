@@ -24,7 +24,7 @@ export const verifyToken = async (token: string) => {
         email: tokenExists.email,
       },
       data: {
-        emailVerified: new Date(),
+        emailVerifiedDate: new Date(),
       },
     })
     await prisma.verificationToken.delete({

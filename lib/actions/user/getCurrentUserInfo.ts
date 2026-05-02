@@ -32,7 +32,7 @@ export async function getCurrentUserInfo(): Promise<UserInfoProps | null> {
       stripeSubscriptionId: user.stripeSubscriptionId ?? null,
       role: user.role ?? [],
       phoneVerified: user.phoneVerified ?? null,
-      emailVerified: user.emailVerified ?? null,
+      emailVerifiedDate: user.emailVerifiedDate ?? null,
     }
   } catch (error) {
     console.error('Error getting current user info:', error)

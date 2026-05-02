@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const session = await auth()
 
     // Check if user is authenticated and is an admin
-    if (!session?.user || !(session.user.role?.includes('ADMIN') || session.user.role?.includes('HOST'))) {
+    if (!session?.user || !(session.user.role?.includes('ADMIN') || session.user.role?.includes('SUPERADMIN'))) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

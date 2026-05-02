@@ -9,6 +9,7 @@ declare module "next-auth" {
       name?: string
       image?: string
       role?: string[]
+      eduEmailExpiredDate?: Date | null
     }
   }
 
@@ -18,6 +19,7 @@ declare module "next-auth" {
     name?: string
     image?: string
     role?: string[]
+    eduEmailExpiredDate?: Date | null
   }
 }
 
@@ -28,5 +30,6 @@ declare module "next-auth/jwt" {
     name?: string
     image?: string
     role?: string[]
+    eduEmailExpiredDate?: Date | null
   }
 }

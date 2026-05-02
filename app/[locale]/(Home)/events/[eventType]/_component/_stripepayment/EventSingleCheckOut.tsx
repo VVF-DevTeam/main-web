@@ -10,6 +10,13 @@ import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { EventTicket, PaymentType } from '@prisma/client'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { useSession } from 'next-auth/react'
+import {
+  getFinalTicketPrice,
+  getMemberDiscountPercent,
+  getTicketUnitPrice,
+  STUDENT_DISCOUNT_PERCENT,
+} from '@/lib/price/getPrices'
 
 export interface SelectedTicketWithQuantity {
   ticket: EventTicket
@@ -31,33 +38,6 @@ interface EventSingleCheckOutProps {
   selectedTickets?: SelectedTicketWithQuantity[]
   setSelectedTickets?: (selectedTickets: SelectedTicketWithQuantity[]) => void // Callback to pass selected tickets to parent
   userInfo?: UserInfoProps | null
-}
-
-const calculateTicketTotalPrice = (ticket: EventTicket): number => {
-  const basePrice = Number(ticket.price) || 0
-  const capacity = ticket.capacityPerTicket || 1
-
-  // If payTotalNumber exists, this is a full course/event ticket
-  if (ticket.payTotalNumber && ticket.payTotalNumber > 0) {
-    return basePrice * capacity * ticket.payTotalNumber
-  }
-
-  // Otherwise, it's a single-session/drop-in ticket
-  return basePrice * capacity
-}
-
-const calculateMemberPrice = (
-  ticket: EventTicket,
-  totalPrice: number
-): number | null => {
-  if (ticket.discountMemberPercent == null) {
-    return null
-  }
-
-  const discount = Math.max(0, Math.min(100, ticket.discountMemberPercent))
-  const discounted = totalPrice * ((100 - discount) / 100)
-
-  return Number.isFinite(discounted) ? discounted : null
 }
 
 const resolvePaymentType = (
@@ -98,10 +78,11 @@ export default function EventSingleCheckOut({
 }: EventSingleCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
+  const { data: session } = useSession()
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [emailVerified, setEmailVerified] = useState<Date | null | undefined>(
+  const [emailVerifiedDate, setEmailVerifiedDate] = useState<Date | null | undefined>(
     undefined
   )
   const containerRef = useRef<HTMLDivElement>(null)
@@ -116,11 +97,11 @@ export default function EventSingleCheckOut({
           const subscribed = await checkSubscription(userId)
           if (isMounted) {
             setIsSubscribed(Boolean(subscribed))
-            setEmailVerified(userInfo?.emailVerified ?? null)
+            setEmailVerifiedDate(userInfo?.emailVerifiedDate ?? null)
           }
         } else {
           if (isMounted) {
-            setEmailVerified(null)
+            setEmailVerifiedDate(null)
           }
         }
       } catch (error) {
@@ -263,6 +244,13 @@ export default function EventSingleCheckOut({
   )
 
   const hasTickets = checkoutTickets.length > 0
+  const eduEmailExpiredDate = session?.user?.eduEmailExpiredDate
+    ? new Date(session.user.eduEmailExpiredDate)
+    : null
+  const hasActiveStudentDiscount =
+    !!eduEmailExpiredDate &&
+    !Number.isNaN(eduEmailExpiredDate.getTime()) &&
+    eduEmailExpiredDate > new Date()
 
   if (formLink) {
     return (
@@ -313,7 +301,7 @@ export default function EventSingleCheckOut({
             </p>
           )}
 
-          {userId && userInfo?.email && !emailVerified && (
+          {userId && userInfo?.email && !emailVerifiedDate && (
             <p className="text-sm text-bgColor-brand900">
               *{t('email-not-verified-warning-prefix')} <strong>{userInfo.email}</strong>{' '}
               {t('email-not-verified-warning-suffix')}{' '}
@@ -329,8 +317,10 @@ export default function EventSingleCheckOut({
 
           <div className="flex flex-col gap-4">
             {checkoutTickets.map((ticket) => {
-              const totalPrice = calculateTicketTotalPrice(ticket)
-              const memberPrice = calculateMemberPrice(ticket, totalPrice)
+              const totalPrice = getTicketUnitPrice(ticket)
+              const memberDiscountPercent = getMemberDiscountPercent(ticket)
+              const hasMemberDiscount = memberDiscountPercent > 0
+
               const stripePriceIdForUser =
                 isSubscribed && ticket.subscribedStripePriceId
                   ? ticket.subscribedStripePriceId
@@ -343,6 +333,12 @@ export default function EventSingleCheckOut({
               const paymentTypeValue = resolvePaymentType(type, ticket)
               const perSessionPrice = Number(ticket.price) || 0
               // const currencyLabel = (ticket.currency || 'CAD').toUpperCase()
+              const discountedPrice = getFinalTicketPrice(ticket, {
+                isSubscribed,
+                hasActiveStudentDiscount,
+              })
+              const hasAnyDiscount =
+                (isSubscribed && hasMemberDiscount) || hasActiveStudentDiscount
 
               // Check if ticket has expired (date only, ignoring time)
               const currentDate = new Date()
@@ -385,15 +381,13 @@ export default function EventSingleCheckOut({
                         {ticket.type}
                       </span>
                       <div className="flex flex-col items-end gap-0.5">
-                        {isSubscribed && memberPrice !== null && (
+                        {hasAnyDiscount && (
                           <span className="text-xs text-gray-400 line-through drop-shadow-sm">
                             ${totalPrice.toFixed(2)}
                           </span>
                         )}
-                        <span className={`text-lg font-bold drop-shadow-sm ${isSubscribed && memberPrice !== null ? 'text-green-600' : 'text-gray-900'}`}>
-                          ${isSubscribed && memberPrice !== null
-                            ? memberPrice.toFixed(2)
-                            : totalPrice.toFixed(2)}
+                        <span className={`text-lg font-bold drop-shadow-sm ${hasAnyDiscount ? 'text-green-600' : 'text-gray-900'}`}>
+                          ${discountedPrice.toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -423,18 +417,27 @@ export default function EventSingleCheckOut({
                       </>
                     )}
 
-                    {/* Member price */}
-                    {memberPrice !== null ? (
-                      isSubscribed ? (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {/* Member price */}
+                      {hasMemberDiscount ? (
+                        isSubscribed ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-600 w-fit">
+                            ✦ Member discount: {memberDiscountPercent ?? 0}%
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 drop-shadow-sm w-fit">
+                            ✦ Member discount: {memberDiscountPercent ?? 0}%
+                          </span>
+                        )
+                      ) : null}
+
+                      {/* Student discounts applied */}
+                      {hasActiveStudentDiscount && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-600 w-fit">
-                          ✦ {t('member-price-applied', { price: memberPrice.toFixed(2) })}
+                          ✦ Student discount: {STUDENT_DISCOUNT_PERCENT}%
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 drop-shadow-sm w-fit">
-                          ✦ {t('member-price', { price: memberPrice.toFixed(2) })}
-                        </span>
-                      )
-                    ) : null}
+                      )}
+                    </div>
 
                     {ticket.limit && (
                       <span className="text-xs text-gray-500 drop-shadow-sm">
@@ -518,6 +521,8 @@ export default function EventSingleCheckOut({
                           capacityPerTicket={ticket.capacityPerTicket ?? 1}
                           mainUserPhone={userInfo?.phone || ''}
                           mainUserName={userInfo?.name || ''}
+                          pricingIsSubscribed={isSubscribed}
+                          pricingHasStudentDiscount={hasActiveStudentDiscount}
                         />
                       </div>
                     )}

@@ -1,17 +1,20 @@
 import { getTokenByToken } from '@/lib/actions/token/tokenFunctions'
+import { auth, unstable_update } from '@/auth'
 import { prisma } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { token, email } = await req.json()
+    const session = await auth()
+    const sessionEmail = session?.user?.email
+    if (!sessionEmail) {
+      return NextResponse.json({ message: 'Unauthorized.' }, { status: 401 })
+    }
+
+    const { token } = await req.json()
 
     if (!token || typeof token !== 'string') {
       return NextResponse.json({ message: 'Invalid token.' }, { status: 400 })
-    }
-
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({ message: 'Invalid email.' }, { status: 400 })
     }
 
     const tokenRecord = await getTokenByToken(token)
@@ -22,9 +25,16 @@ export const POST = async (req: NextRequest) => {
       )
     }
 
-    if (tokenRecord.email.toLowerCase() !== email.toLowerCase()) {
+    if (tokenRecord.email.toLowerCase() !== sessionEmail.toLowerCase()) {
       return NextResponse.json(
-        { message: 'Token and email do not match.' },
+        { message: 'Token and current account do not match.' },
+        { status: 403 }
+      )
+    }
+
+    if (!tokenRecord.pendingEduEmail) {
+      return NextResponse.json(
+        { message: 'Token is invalid for student verification.' },
         { status: 400 }
       )
     }
@@ -36,16 +46,27 @@ export const POST = async (req: NextRequest) => {
       )
     }
 
-    await prisma.user.update({
-      where: { email: tokenRecord.email },
-      data: {
-        // Persist verification completion in an existing stable field.
-        emailVerified: new Date(),
-      },
-    })
+    const verifiedDate = new Date()
+    const expireDate = new Date(verifiedDate.getTime() + 365 * 24 * 3600 * 1000)
 
-    await prisma.verificationToken.delete({
-      where: { id: tokenRecord.id },
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { email: tokenRecord.email },
+        data: {
+          eduEmailVerifiedDate: verifiedDate,
+          eduEmailExpiredDate: expireDate,
+          eduEmail: tokenRecord.pendingEduEmail,
+        },
+      }),
+      prisma.verificationToken.delete({
+        where: { id: tokenRecord.id },
+      }),
+    ])
+
+    await unstable_update({
+      user: {
+        eduEmailExpiredDate: expireDate,
+      },
     })
 
     return NextResponse.json(

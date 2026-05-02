@@ -3,7 +3,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './lib/db'
 import authConfig from './auth.config'
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
   pages: {
     signIn: '/app/signIn',
   },

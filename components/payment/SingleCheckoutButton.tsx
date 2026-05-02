@@ -34,6 +34,8 @@ interface SingleCheckoutButtonProps {
   mainUserPhone?: string
   mainUserName?: string
   isMembership?: boolean
+  pricingIsSubscribed?: boolean
+  pricingHasStudentDiscount?: boolean
 }
 
 export default function SingleCheckoutButton({
@@ -52,6 +54,8 @@ export default function SingleCheckoutButton({
   mainUserPhone = '',
   mainUserName = '',
   isMembership = false,
+  pricingIsSubscribed = false,
+  pricingHasStudentDiscount = false,
 }: SingleCheckoutButtonProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation(['event', 'membership'])
@@ -129,6 +133,8 @@ export default function SingleCheckoutButton({
           email: guestInfo.guestEmail || email,
           seatNumber: seatNumber,
           eventTicketId: eventTicketId,
+          pricingIsSubscribed,
+          pricingHasStudentDiscount,
           // Guest information
           guestName: guestInfo.guestName,
           guestPhone: guestInfo.guestPhone,

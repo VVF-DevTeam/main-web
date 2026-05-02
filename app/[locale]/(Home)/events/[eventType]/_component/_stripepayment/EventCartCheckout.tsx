@@ -20,6 +20,14 @@ import { SelectedTicketWithQuantity } from './EventSingleCheckOut'
 import { JsonValue } from '@prisma/client/runtime/library'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { CheckoutItems } from '@/lib/types/payment'
+import { useSession } from 'next-auth/react'
+import {
+  getCombinedMemberStudentPercentOff,
+  getFinalTicketPrice,
+  getMemberDiscountPercent,
+  getTicketUnitPrice,
+  STUDENT_DISCOUNT_PERCENT,
+} from '@/lib/price/getPrices'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -83,6 +91,7 @@ export default function EventCartCheckout({
 }: EventCartCheckoutProps) {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
+  const { data: session } = useSession()
 
   // Check subscription status for member pricing
   const [isSubscribed, setIsSubscribed] = useState(false)
@@ -103,6 +112,13 @@ export default function EventCartCheckout({
   const [guestInfo, setGuestInfo] = useState<{ representativeGuest?: GuestInfo; otherGuests?: GuestInfo[] }>({})
 
   const isGuestCheckout = !userId || userId.trim() === ''
+  const eduEmailExpiredDate = session?.user?.eduEmailExpiredDate
+    ? new Date(session.user.eduEmailExpiredDate)
+    : null
+  const hasActiveStudentDiscount =
+    !!eduEmailExpiredDate &&
+    !Number.isNaN(eduEmailExpiredDate.getTime()) &&
+    eduEmailExpiredDate > new Date()
 
   // Sum of the number of selected seats and tickets
   const totalItemCount =
@@ -259,16 +275,7 @@ export default function EventCartCheckout({
 
     // Calculate total for selected tickets (non-seated)
     const ticketsTotal = selectedTickets.reduce((sum, item) => {
-      const basePrice = Number(item.ticket.price) || 0
-      const capacity = item.ticket.capacityPerTicket || 1
-      let ticketPrice = basePrice * capacity
-
-      // If payTotalNumber exists, this is a full course/event ticket
-      if (item.ticket.payTotalNumber && item.ticket.payTotalNumber > 0) {
-        ticketPrice = basePrice * capacity * item.ticket.payTotalNumber
-      }
-
-      return sum + (ticketPrice * item.quantity)
+      return sum + getFinalTicketPrice(item.ticket, { quantity: item.quantity })
     }, 0)
 
     const baseTotal = seatsTotal + ticketsTotal
@@ -280,7 +287,7 @@ export default function EventCartCheckout({
     if (isSubscribed) {
       // Discount for seats
       selectedSeatsWithTickets.forEach((item) => {
-        const discountPercent = item.ticket.discountMemberPercent || 0
+        const discountPercent = getMemberDiscountPercent(item.ticket)
         if (discountPercent > 0) {
           const discountAmount = item.price * (discountPercent / 100)
           membershipDiscountAmount += discountAmount
@@ -290,25 +297,38 @@ export default function EventCartCheckout({
 
       // Discount for tickets
       selectedTickets.forEach((item) => {
-        const discountPercent = item.ticket.discountMemberPercent || 0
+        const discountPercent = getMemberDiscountPercent(item.ticket)
         if (discountPercent > 0) {
-          const basePrice = Number(item.ticket.price) || 0
-          const capacity = item.ticket.capacityPerTicket || 1
-          let ticketPrice = basePrice * capacity
-
-          if (item.ticket.payTotalNumber && item.ticket.payTotalNumber > 0) {
-            ticketPrice = basePrice * capacity * item.ticket.payTotalNumber
-          }
-
-          const discountAmount = (ticketPrice * item.quantity) * (discountPercent / 100)
+          const totalTicketPrice = getFinalTicketPrice(item.ticket, {
+            quantity: item.quantity,
+          })
+          const discountAmount = totalTicketPrice * (discountPercent / 100)
           membershipDiscountAmount += discountAmount
           totalAfterMembership -= discountAmount
         }
       })
     }
 
+    // Student % off list price (additive with member %; same as getFinalTicketPrice)
+    let totalAfterStudent = totalAfterMembership
+    let studentDiscountAmount = 0
+    if (hasActiveStudentDiscount) {
+      selectedSeatsWithTickets.forEach((item) => {
+        const d = item.price * (STUDENT_DISCOUNT_PERCENT / 100)
+        studentDiscountAmount += d
+        totalAfterStudent -= d
+      })
+      selectedTickets.forEach((item) => {
+        const lineBase =
+          getTicketUnitPrice(item.ticket) * Math.max(0, item.quantity)
+        const d = lineBase * (STUDENT_DISCOUNT_PERCENT / 100)
+        studentDiscountAmount += d
+        totalAfterStudent -= d
+      })
+    }
+
     // Apply event discounts with stacking rules
-    let totalAfterBulk = totalAfterMembership
+    let totalAfterBulk = totalAfterStudent
     let bulkDiscountAmount = 0
     let effectivePercent = 0
     let effectiveAmount = 0
@@ -345,7 +365,7 @@ export default function EventCartCheckout({
           }
         } else if (discount.type === 'Minimum Total Discount') {
           const minTotal = discount.minTotal ?? 0
-          const qualifies = totalAfterMembership >= minTotal
+          const qualifies = totalAfterStudent >= minTotal
           if (!qualifies) return
 
           if (unit === 'amount') {
@@ -440,7 +460,7 @@ export default function EventCartCheckout({
               : bestNonStackablePercent
         effectivePercent = nonCodePercent
         // Approximate total discount value from non‑code percentage discounts
-        approxNonCodePercentDiscount = totalAfterMembership * (effectivePercent / 100)
+        approxNonCodePercentDiscount = totalAfterStudent * (effectivePercent / 100)
 
         isNonStackableWinning =
           bestNonStackablePercent > 0 &&
@@ -681,7 +701,7 @@ export default function EventCartCheckout({
       }> = []
 
       // First apply percentage-based discounts (if any)
-      let totalAfterPercentDiscounts = totalAfterMembership
+      let totalAfterPercentDiscounts = totalAfterStudent
 
       if (effectivePercent > 0) {
         let sumOfRoundedPrices = 0
@@ -730,23 +750,10 @@ export default function EventCartCheckout({
 
         // Apply discount to each ticket unit individually and round
         selectedTickets.forEach((item) => {
-          const basePrice = Number(item.ticket.price) || 0
-          const capacity = item.ticket.capacityPerTicket || 1
-          let ticketPrice = basePrice * capacity
-
-          if (item.ticket.payTotalNumber && item.ticket.payTotalNumber > 0) {
-            ticketPrice = basePrice * capacity * item.ticket.payTotalNumber
-          }
-
-          // Apply member discount if subscribed
-          let memberDiscountedPrice = ticketPrice
-          if (isSubscribed) {
-            const discountPercent = item.ticket.discountMemberPercent || 0
-            if (discountPercent > 0) {
-              memberDiscountedPrice =
-                ticketPrice * (1 - discountPercent / 100)
-            }
-          }
+          const memberDiscountedPrice = getFinalTicketPrice(item.ticket, {
+            isSubscribed,
+            hasActiveStudentDiscount,
+          })
 
           // Calculate discount for this ticket type
           const originalTotalPrice = memberDiscountedPrice * item.quantity
@@ -784,13 +791,15 @@ export default function EventCartCheckout({
       )
 
       totalAfterBulk = totalAfterAllEventDiscounts
-      bulkDiscountAmount = totalAfterMembership - totalAfterBulk
+      bulkDiscountAmount = totalAfterStudent - totalAfterBulk
 
       return {
         baseTotal,
         totalAfterMembership,
+        totalAfterStudent,
         totalAfterBulk,
         membershipDiscountAmount,
+        studentDiscountAmount,
         bulkDiscountAmount,
         finalTotal: totalAfterBulk,
         effectivePercent,
@@ -807,8 +816,10 @@ export default function EventCartCheckout({
     return {
       baseTotal,
       totalAfterMembership,
+      totalAfterStudent,
       totalAfterBulk,
       membershipDiscountAmount,
+      studentDiscountAmount,
       bulkDiscountAmount,
       finalTotal: totalAfterBulk,
       effectivePercent,
@@ -823,7 +834,9 @@ export default function EventCartCheckout({
   }, [
     selectedSeatsWithTickets,
     selectedTickets,
+    totalItemCount,
     isSubscribed,
+    hasActiveStudentDiscount,
     type,
     discounts,
     appliedCodeDiscount,
@@ -928,6 +941,8 @@ export default function EventCartCheckout({
           eventId,
           type,
           mainEmail: representativeGuest?.email || userInfo?.email || '',
+          pricingIsSubscribed: isSubscribed,
+          pricingHasStudentDiscount: hasActiveStudentDiscount,
           checkoutItems,
           // Only send the code - server will re-verify to prevent tampering
           ...(appliedCodeDiscount && {
@@ -984,6 +999,7 @@ export default function EventCartCheckout({
     seatsByTicketType,
     selectedTickets,
     isSubscribed,
+    hasActiveStudentDiscount,
     eventKeyName,
     userId,
     eventId,
@@ -1065,44 +1081,54 @@ export default function EventCartCheckout({
 
           {/* Selected Seats List */}
           <div className="space-y-2">
-            {selectedSeatsWithTickets.map((item) => {
-              const basePrice = item.price
-              const discountPercent = item.ticket.discountMemberPercent || 0
+            {selectedSeatsWithTickets.map((seat) => {
+              const basePrice = seat.price
+              const discountPercent = getMemberDiscountPercent(seat.ticket)
               const hasMemberDiscount =
                 isSubscribed &&
                 discountPercent > 0 &&
-                item.ticket.discountMemberPercent != null
+                seat.ticket.discountMemberPercent != null
 
               // Calculate member price for this seat
-              const memberPrice = hasMemberDiscount
-                ? basePrice * ((100 - discountPercent) / 100)
-                : basePrice
-
-              const displayPrice = hasMemberDiscount ? memberPrice : basePrice
-              const currency = item.ticket.currency || 'CAD'
+              const memberPrice = getFinalTicketPrice(seat.ticket, {
+                isSubscribed: hasMemberDiscount,
+                hasActiveStudentDiscount,
+              })
+              const hasAnyDiscount = hasMemberDiscount || hasActiveStudentDiscount
+              const displayPrice = hasAnyDiscount ? memberPrice : basePrice
+              const currency = seat.ticket.currency || 'CAD'
+              const totalPercentOff = hasAnyDiscount
+                ? Number(
+                    getCombinedMemberStudentPercentOff(
+                      hasMemberDiscount,
+                      discountPercent,
+                      hasActiveStudentDiscount
+                    ).toFixed(1)
+                  )
+                : 0
 
               return (
                 <div
-                  key={`${item.rowIndex}-${item.seatIndex}`}
+                  key={`${seat.rowIndex}-${seat.seatIndex}`}
                   className="flex items-center justify-between rounded border bg-gray-50 p-3"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-900">
-                      {item.seatName}
+                      {seat.seatName}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {item.ticket.type}
+                      {seat.ticket.type}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end gap-0.5">
-                      {hasMemberDiscount && (
+                      {hasAnyDiscount && (
                         <>
                           <span className="text-xs text-gray-400 line-through">
                             {currency} ${basePrice.toFixed(2)}
                           </span>
                           <span className="text-xs font-medium text-green-600">
-                            {discountPercent}% off
+                            {totalPercentOff}% off
                           </span>
                         </>
                       )}
@@ -1113,9 +1139,9 @@ export default function EventCartCheckout({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onRemoveSeat(item.rowIndex, item.seatIndex)}
+                      onClick={() => onRemoveSeat(seat.rowIndex, seat.seatIndex)}
                       className="h-6 w-6 rounded p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
-                      aria-label={`Remove ${item.seatName}`}
+                      aria-label={`Remove ${seat.seatName}`}
                       disabled={isLoading}
                     >
                       ×
@@ -1127,29 +1153,32 @@ export default function EventCartCheckout({
 
             {/* Selected Tickets List (non-seated) */}
             {selectedTickets.map((item) => {
-              const basePrice = Number(item.ticket.price) || 0
-              const capacity = item.ticket.capacityPerTicket || 1
-              let ticketPrice = basePrice * capacity
-
-              // If payTotalNumber exists, this is a full course/event ticket
-              if (item.ticket.payTotalNumber && item.ticket.payTotalNumber > 0) {
-                ticketPrice = basePrice * capacity * item.ticket.payTotalNumber
-              }
-
-              const totalPrice = ticketPrice * item.quantity
-              const discountPercent = item.ticket.discountMemberPercent || 0
+              const basePrice =
+                getTicketUnitPrice(item.ticket) * Math.max(0, item.quantity)
+              const discountPercent = getMemberDiscountPercent(item.ticket)
               const hasMemberDiscount =
                 isSubscribed &&
                 discountPercent > 0 &&
                 item.ticket.discountMemberPercent != null
 
-              // Calculate member price
-              const memberPrice = hasMemberDiscount
-                ? totalPrice * ((100 - discountPercent) / 100)
-                : totalPrice
-
-              const displayPrice = hasMemberDiscount ? memberPrice : totalPrice
+              // Final line price: member % + student % off list (additive), same as getFinalTicketPrice
+              const memberPrice = getFinalTicketPrice(item.ticket, {
+                isSubscribed: hasMemberDiscount,
+                hasActiveStudentDiscount,
+                quantity: item.quantity,
+              })
+              const hasAnyDiscount = hasMemberDiscount || hasActiveStudentDiscount
+              const displayPrice = hasAnyDiscount ? memberPrice : basePrice
               const currency = item.ticket.currency || 'CAD'
+              const totalPercentOff = hasAnyDiscount
+                ? Number(
+                    getCombinedMemberStudentPercentOff(
+                      hasMemberDiscount,
+                      discountPercent,
+                      hasActiveStudentDiscount
+                    ).toFixed(1)
+                  )
+                : 0
 
               return (
                 <div
@@ -1163,13 +1192,13 @@ export default function EventCartCheckout({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end gap-0.5">
-                      {hasMemberDiscount && (
+                      {hasAnyDiscount && (
                         <>
                           <span className="text-xs text-gray-400 line-through">
-                            {currency} ${totalPrice.toFixed(2)}
+                            {currency} ${basePrice.toFixed(2)}
                           </span>
                           <span className="text-xs font-medium text-green-600">
-                            {discountPercent}% off
+                            {totalPercentOff}% off
                           </span>
                         </>
                       )}
@@ -1364,7 +1393,7 @@ export default function EventCartCheckout({
                             const amount = discount.discountAmount ?? 0
                             const unit = discount.discountUnit ?? 'percentage'
                             const minTotal = discount.minTotal ?? 0
-                            const cartTotal = priceBreakdown.totalAfterMembership
+                            const cartTotal = priceBreakdown.totalAfterStudent
                             const technicallyQualifies = cartTotal >= minTotal
 
                             // Determine if this discount is actually applied:
@@ -1549,7 +1578,7 @@ export default function EventCartCheckout({
                 <span>{t('checkout-subtotal')}</span>
                 <span>
                   {selectedSeatsWithTickets[0]?.ticket.currency || 'CAD'} $
-                  {priceBreakdown.totalAfterMembership.toFixed(2)}
+                  {priceBreakdown.totalAfterStudent.toFixed(2)}
                 </span>
               </div>
 
@@ -1592,14 +1621,14 @@ export default function EventCartCheckout({
                       if (priceBreakdown.effectivePercent > 0 && flatAmount > 0) {
                         return (
                           <span className="whitespace-nowrap">
-                            - (${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
+                            - (${priceBreakdown.totalAfterStudent.toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
                           </span>
                         )
                       }
                       if (priceBreakdown.effectivePercent > 0) {
                         return (
                           <span className="whitespace-nowrap">
-                            - ${priceBreakdown.totalAfterMembership.toFixed(2)} × {priceBreakdown.effectivePercent}%
+                            - ${priceBreakdown.totalAfterStudent.toFixed(2)} × {priceBreakdown.effectivePercent}%
                           </span>
                         )
                       }

@@ -6,6 +6,7 @@ import { revalidateTag } from 'next/cache'
 import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
 import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail'
 import { sendShopOrderConfirmationEmail, ShopOrderItem } from '@/lib/actions/email/sendShopOrderConfirmationEmail'
+import { getFinalTicketPrice } from '@/lib/price/getPrices'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -701,23 +702,25 @@ export async function POST(req: NextRequest) {
         // Create a map of ticketId to ticket for quick lookup
         const ticketMap = new Map(tickets.map((t) => [t.id, t]))
 
+        const pricingIsSubscribed = metadata.pricingIsSubscribed === 'true'
+        const pricingHasStudentDiscount =
+          metadata.pricingHasStudentDiscount === 'true'
+
         // Calculate total expected price based on ticket prices
         let totalExpectedPrice = 0
         for (const ticketInfo of ticketMetadata) {
           const ticket = ticketMap.get(ticketInfo.ticketId)
           if (ticket) {
-            const ticketPrice = Number(ticket.price) || 0
-            const totalTicketPrice =
-              ticket.payTotalNumber && ticket.payTotalNumber > 0
-                ? ticketPrice * ticket.payTotalNumber
-                : ticketPrice
-            
             // For non-seated tickets, use quantity; for seated tickets, use seatNumbers.length
             const count = ticketInfo.seatNumbers.length > 0 
               ? ticketInfo.seatNumbers.length 
               : (ticketInfo.quantity || 1)
-            
-            totalExpectedPrice += totalTicketPrice * count
+
+            totalExpectedPrice += getFinalTicketPrice(ticket, {
+              quantity: count,
+              isSubscribed: pricingIsSubscribed,
+              hasActiveStudentDiscount: pricingHasStudentDiscount,
+            })
           }
         }
 
@@ -742,14 +745,14 @@ export async function POST(req: NextRequest) {
           const seatCount = ticketInfo.seatNumbers.length > 0 
             ? ticketInfo.seatNumbers.length 
             : (ticketInfo.quantity || 1)
-          const ticketPrice = Number(ticket.price) || 0
-          const totalTicketPrice =
-            ticket.payTotalNumber && ticket.payTotalNumber > 0
-              ? ticketPrice * ticket.payTotalNumber
-              : ticketPrice
 
           // Calculate price for this ticket type, adjusted by ratio
-          const ticketPricePaid = totalTicketPrice * seatCount * priceRatio
+          const ticketPricePaid =
+            getFinalTicketPrice(ticket, {
+              quantity: seatCount,
+              isSubscribed: pricingIsSubscribed,
+              hasActiveStudentDiscount: pricingHasStudentDiscount,
+            }) * priceRatio
 
           await prisma.payment.create({
             data: {
