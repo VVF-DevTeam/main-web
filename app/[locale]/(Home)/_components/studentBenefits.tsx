@@ -12,13 +12,13 @@ const StudentBenefits = async ({ locale }: StudentBenefitsProps) => {
   const { t } = await initTranslation(locale, ['homePage', 'common'])
 
   return (
-    <div className="flex flex-col gap-y-5 bg-bgColor-secondary100 p-4 pb-10 pt-10 text-base md:pb-[80px] md:pt-[60px] md:text-lg lg:pb-[120px]">
+    <div className="flex flex-col gap-y-5 bg-bgColor-secondary100 p-4 pb-10 pt-10 text-base md:pb-[80px] md:pt-[40px] md:text-lg lg:pb-[80px]">
       <h1 className="web_h1 text-center">{t('studentBenefitsSection-title')}</h1>
       <h2 className="web-body-regular text-center">
         {t('studentBenefitsSection-description')}
       </h2>
 
-      <div className="flex flex-col items-center justify-center gap-y-6 pt-5 md:grid md:grid-cols-2">
+      <div className="flex flex-col items-center justify-center gap-y-6 md:grid md:grid-cols-2">
         <div className="flex w-full max-w-[540px] flex-col justify-end gap-y-6 text-left md:ml-auto">
           <div className="flex flex-col">
             <div className="flex items-center justify-center gap-2">
@@ -60,7 +60,7 @@ const StudentBenefits = async ({ locale }: StudentBenefitsProps) => {
         </div>
         <div className="flex items-center justify-start md:pl-16">
           <Image
-            src="https://drive.google.com/thumbnail?id=1QlxKyscd4i38AN9QOXcGudXyJI9RvN0Q"
+            src="https://drive.google.com/thumbnail?id=1lhrvYLWjC3rE3kvrKB_fE_49jyBNRDRe"
             alt="Student Benefits"
             width={500}
             height={500}
