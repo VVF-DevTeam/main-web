@@ -27,6 +27,19 @@ const AuthButtons = ({ mode }: { mode: string }) => {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const userExists = status === 'authenticated'
+  const eduEmailExpiredDate = session?.user?.eduEmailExpiredDate
+    ? new Date(session.user.eduEmailExpiredDate)
+    : null
+  const hasActiveStudentStatus =
+    !!eduEmailExpiredDate &&
+    !Number.isNaN(eduEmailExpiredDate.getTime()) &&
+    eduEmailExpiredDate > new Date()
+  const displayRoles = Array.from(
+    new Set([
+      ...((session?.user?.role || []).filter((role) => role !== 'USER')),
+      ...(hasActiveStudentStatus ? ['STUDENT'] : []),
+    ])
+  )
 
 
   const handleAuth = (type: 'login' | 'logout') => {
@@ -192,12 +205,10 @@ const AuthButtons = ({ mode }: { mode: string }) => {
                   <p className="truncate text-xs text-gray-500">
                     {session?.user?.email}
                   </p>
-                  {session?.user?.role &&
-                    session?.user?.role.length > 0 &&
-                    !session?.user?.role.includes('USER') && (
-                      <div className="flex flex-wrap gap-2">
-                        {session?.user?.role.map((role) => (
-                          <span key={role} className="inline-flex items-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-3 py-1 text-xs font-medium text-bgColor-brand900 shadow-sm">
+                  {displayRoles.length > 0 && (
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {displayRoles.map((role) => (
+                          <span key={role} className="inline-center items-center text-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-2 py-0.5 text-[11px] font-medium text-bgColor-brand900 shadow-sm">
                             {role}
                           </span>
                         ))}

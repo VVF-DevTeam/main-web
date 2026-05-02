@@ -4,6 +4,57 @@ import { verifyEventDiscountCode } from '@/lib/actions/event/verifyEventDiscount
 import { getEventDiscountsAndTickets } from '@/lib/actions/event/getEventDiscountsAndTickets'
 import { prisma } from '@/lib/db'
 import { CheckoutItems } from '@/lib/types/payment'
+import { getFinalTicketPrice } from '@/lib/price/getPrices'
+
+// ##################### FLOW OF PRICES ######################
+// Discount price creation (event_discount)
+// │
+// ├─ Gate: shouldApplyDiscount
+// │   ├─ false → no discounted prices created (skip entire block)
+// │   │         conditions: type === 'Membership' OR (effectivePercent ≤ 0 AND effectiveAmount ≤ 0)
+// │   └─ true → continue
+// │             (needs: type !== 'Membership' AND (effectivePercent > 0 OR effectiveAmount > 0))
+// │
+// ├─ Compute totalDiscountAmount (only when shouldApplyDiscount)
+// │   ├─ If effectivePercent > 0
+// │   │   └─ For each unit: round(unitPrice × (1 − effectivePercent/100)), sum → totalAfterPercentDiscounts
+// │   ├─ Else totalAfterPercentDiscounts = totalAfterMembership
+// │   ├─ totalAfterAllEventDiscounts = max(0, totalAfterPercentDiscounts − effectiveAmount)
+// │   └─ totalDiscountAmount = round(totalAfterMembership − totalAfterAllEventDiscounts, 2)
+// │
+// ├─ Group checkout lines by resolved price id (key = resolveStripePriceId(item))
+// │   │
+// │   └─ resolveStripePriceId (base for “subscribed” / student)
+// │       ├─ If NOT useStudentPricing (no student flag OR type === 'Membership')
+// │       │   └─ use item.stripePriceId  ← member vs public is whatever the client sent on that id
+// │       └─ If useStudentPricing
+// │           └─ key = ticketId + ':' + (pricingIsSubscribed ? '1' : '0')
+// │               ├─ if cache has student-adjusted id → use it (member tier baked in via getFinalTicketPrice)
+// │               └─ else fallback → item.stripePriceId
+// │
+// └─ For each price group (priceId → list of {item, unitCount, unitPrice from Stripe retrieve})
+//     │
+//     ├─ If NOT shouldApplyDiscount OR totalDiscountAmount === 0
+//     │   └─ skip this group (no create)
+//     │
+//     ├─ Else compute proportional discount for group
+//     │   ├─ groupTotal = Σ(unitPrice × unitCount)
+//     │   ├─ groupDiscount = (groupTotal / totalAfterMembership) × totalDiscountAmount
+//     │   ├─ groupFinalTotal = groupTotal − groupDiscount
+//     │   ├─ totalUnits = Σ unitCount
+//     │   └─ discountedAmountInCents = round((groupFinalTotal / totalUnits) × 100)
+//     │
+//     └─ If discountedPriceCache already has this priceId
+//         └─ skip create (reuse)
+//         Else
+//             └─ stripe.prices.create
+//                 ├─ unit_amount = discountedAmountInCents
+//                 ├─ currency from original Stripe price
+//                 ├─ product = firstItem.stripeProductId
+//                 └─ metadata: originalPriceId, discountType event_discount, effective %/$ strings, optional code fields
+//                 ├─ on success → cache price id under original resolved priceId
+//                 └─ on failure → log only (no throw)
+// #######################################################################
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -38,6 +89,8 @@ export async function POST(req: Request) {
       guestPhone,
       otherGuestsInfo, // Array of other guests' information
       formResponses, // Event form responses
+      pricingIsSubscribed,
+      pricingHasStudentDiscount,
     }: {
       eventKeyName: string
       userId?: string
@@ -50,6 +103,9 @@ export async function POST(req: Request) {
       guestPhone?: string
       otherGuestsInfo?: Array<{ name: string; email: string; phone: string }>
       formResponses?: any
+      /** Matches client member pricing (additive with student in getFinalTicketPrice). */
+      pricingIsSubscribed?: boolean
+      pricingHasStudentDiscount?: boolean
     } = await req.json()
 
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
@@ -139,24 +195,98 @@ export async function POST(req: Request) {
       }
     }
 
-    // Calculate total from actual Stripe prices being used (not DB prices)
-    // This ensures we use member prices if applicable, matching the frontend calculation
-    let totalAfterMembership = 0
+    const useStudentPricing =
+      Boolean(pricingHasStudentDiscount) && type !== 'Membership'
+    const pricingSubscribed = Boolean(pricingIsSubscribed)
+
+    const studentAdjustedStripePriceIdCache = new Map<string, string>()
     const stripePriceCache = new Map<string, Stripe.Price>()
 
-    for (const item of checkoutItems) {
-      // Retrieve the actual Stripe price being used (could be member price)
-      if (!stripePriceCache.has(item.stripePriceId)) {
+    if (useStudentPricing) {
+      const studentKeysSeen = new Set<string>()
+      for (const item of checkoutItems) {
+        const cacheKey = `${item.ticketId}:${pricingSubscribed ? '1' : '0'}`
+        if (studentKeysSeen.has(cacheKey)) continue
+        studentKeysSeen.add(cacheKey)
+
+        const dbTicket = ticketById.get(item.ticketId)
+        if (!dbTicket || !item.stripeProductId) {
+          return NextResponse.json(
+            {
+              message: `Ticket ${item.ticketId} is missing Stripe product configuration`,
+            },
+            { status: 400 }
+          )
+        }
+
+        let refPrice: Stripe.Price
         try {
-          const stripePrice = await stripe.prices.retrieve(item.stripePriceId)
-          stripePriceCache.set(item.stripePriceId, stripePrice)
+          refPrice = await stripe.prices.retrieve(item.stripePriceId)
+        } catch {
+          return NextResponse.json(
+            { message: 'Failed to validate Stripe price for checkout' },
+            { status: 400 }
+          )
+        }
+
+        const unitDollars = getFinalTicketPrice(dbTicket, {
+          isSubscribed: pricingSubscribed,
+          hasActiveStudentDiscount: true,
+          quantity: 1,
+        })
+        const unitCents = Math.round(unitDollars * 100)
+        if (!Number.isFinite(unitCents) || unitCents < 1) {
+          return NextResponse.json(
+            { message: 'Invalid ticket unit price for student checkout' },
+            { status: 400 }
+          )
+        }
+
+        try {
+          const created = await stripe.prices.create({
+            unit_amount: unitCents,
+            currency: refPrice.currency,
+            product: item.stripeProductId,
+            metadata: {
+              pricingStudentAdjusted: 'true',
+              ticketId: item.ticketId,
+              referenceStripePriceId: item.stripePriceId,
+            },
+          })
+          studentAdjustedStripePriceIdCache.set(cacheKey, created.id)
+          stripePriceCache.set(created.id, created)
+        } catch (error) {
+          console.error('Failed to create Stripe price for student checkout:', error)
+          return NextResponse.json(
+            { message: 'Failed to create Stripe price for student checkout' },
+            { status: 500 }
+          )
+        }
+      }
+    }
+
+    const resolveStripePriceId = (item: (typeof checkoutItems)[number]) => {
+      if (!useStudentPricing) return item.stripePriceId
+      const key = `${item.ticketId}:${pricingSubscribed ? '1' : '0'}`
+      return studentAdjustedStripePriceIdCache.get(key) ?? item.stripePriceId
+    }
+
+    // Calculate total from Stripe line prices (member tier via price id; student via DB-aligned prices)
+    let totalAfterMembership = 0
+
+    for (const item of checkoutItems) {
+      const priceId = resolveStripePriceId(item)
+      if (!stripePriceCache.has(priceId)) {
+        try {
+          const stripePrice = await stripe.prices.retrieve(priceId)
+          stripePriceCache.set(priceId, stripePrice)
         } catch (error) {
           console.error('Failed to retrieve Stripe price:', error)
           continue
         }
       }
 
-      const stripePrice = stripePriceCache.get(item.stripePriceId)!
+      const stripePrice = stripePriceCache.get(priceId)!
       const unitAmount = stripePrice.unit_amount || 0
       const priceInDollars = unitAmount / 100 // Convert cents to dollars
 
@@ -486,17 +616,18 @@ export async function POST(req: Request) {
         let sumOfRoundedPrices = 0
 
         for (const item of checkoutItems) {
-          if (!stripePriceCache.has(item.stripePriceId)) {
+          const priceId = resolveStripePriceId(item)
+          if (!stripePriceCache.has(priceId)) {
             try {
-              const stripePrice = await stripe.prices.retrieve(item.stripePriceId)
-              stripePriceCache.set(item.stripePriceId, stripePrice)
+              const stripePrice = await stripe.prices.retrieve(priceId)
+              stripePriceCache.set(priceId, stripePrice)
             } catch (error) {
               console.error('Failed to retrieve Stripe price:', error)
               continue
             }
           }
 
-          const stripePrice = stripePriceCache.get(item.stripePriceId)!
+          const stripePrice = stripePriceCache.get(priceId)!
           const unitPrice = (stripePrice.unit_amount || 0) / 100
 
           const unitCount = item.seatNumbers.length > 0
@@ -526,7 +657,7 @@ export async function POST(req: Request) {
     const priceGroups = new Map<string, Array<{ item: typeof checkoutItems[0]; unitCount: number; unitPrice: number }>>()
 
     for (const item of checkoutItems) {
-      const key = item.stripePriceId
+      const key = resolveStripePriceId(item)
       if (!priceGroups.has(key)) {
         priceGroups.set(key, [])
       }
@@ -537,17 +668,17 @@ export async function POST(req: Request) {
         : ((item as any).quantity || 1)
 
       // Retrieve price to get unit amount
-      if (!stripePriceCache.has(item.stripePriceId)) {
+      if (!stripePriceCache.has(key)) {
         try {
-          const stripePrice = await stripe.prices.retrieve(item.stripePriceId)
-          stripePriceCache.set(item.stripePriceId, stripePrice)
+          const stripePrice = await stripe.prices.retrieve(key)
+          stripePriceCache.set(key, stripePrice)
         } catch (error) {
           console.error('Failed to retrieve Stripe price:', error)
           continue
         }
       }
 
-      const stripePrice = stripePriceCache.get(item.stripePriceId)!
+      const stripePrice = stripePriceCache.get(key)!
       const unitPrice = (stripePrice.unit_amount || 0) / 100
 
       priceGroups.get(key)!.push({ item, unitCount, unitPrice })
@@ -604,11 +735,12 @@ export async function POST(req: Request) {
     }
 
     for (const item of checkoutItems) {
-      let priceIdToUse = item.stripePriceId
+      const resolvedPriceId = resolveStripePriceId(item)
+      let priceIdToUse = resolvedPriceId
 
       // If discount applies, use the discounted price
-      if (shouldApplyDiscount && discountedPriceCache.has(item.stripePriceId)) {
-        priceIdToUse = discountedPriceCache.get(item.stripePriceId)!
+      if (shouldApplyDiscount && discountedPriceCache.has(resolvedPriceId)) {
+        priceIdToUse = discountedPriceCache.get(resolvedPriceId)!
       }
 
       // Create line items: one per seat for seated tickets, or use quantity for non-seated tickets
@@ -696,6 +828,8 @@ export async function POST(req: Request) {
         eventId: eventId,
         type: type,
         checkoutDataId: checkoutSessionData.id, // Store reference ID - all data is in CheckoutSessionData
+        pricingIsSubscribed: pricingIsSubscribed ? 'true' : 'false',
+        pricingHasStudentDiscount: pricingHasStudentDiscount ? 'true' : 'false',
         description:
           type === 'Membership'
             ? 'Monthly Membership'

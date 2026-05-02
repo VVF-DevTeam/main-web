@@ -14,6 +14,7 @@ import {
 import SmsOtpVerificationPopover from './SmsOtpVerificationPopover'
 import ResendVerificationEmailButton from './ResendVerificationEmailButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { auth } from '@/auth'
 
 type PaymentHistoryItem = {
   id: string
@@ -65,6 +66,18 @@ const MyProfile = async ({
   paymentHistory: PaymentHistoryItem[]
 }) => {
   const { t } = await initTranslation(locale, ['profile'])
+  const session = await auth()
+  const eduEmailExpiredDate = session?.user?.eduEmailExpiredDate
+    ? new Date(session.user.eduEmailExpiredDate)
+    : null
+  const hasActiveStudentStatus =
+    !!eduEmailExpiredDate && !Number.isNaN(eduEmailExpiredDate.getTime()) && eduEmailExpiredDate > new Date()
+  const displayRoles = Array.from(
+    new Set([
+      ...(user.role || []).filter((role) => role !== 'USER'),
+      ...(hasActiveStudentStatus ? ['STUDENT'] : []),
+    ])
+  )
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -107,7 +120,7 @@ const MyProfile = async ({
                   <FiMail className="flex-shrink-0 text-xl text-textColor-gray500" />
                   <span className="flex-1 break-words lg:w-0">{user.email}</span>
                 </div>
-                {user && !user.emailVerified && (
+                {user && !user.emailVerifiedDate && (
                   <div className="ml-8">
                     <ResendVerificationEmailButton email={user.email} />
                   </div>
@@ -136,9 +149,7 @@ const MyProfile = async ({
                 </span>
               </div>
 
-              {user.role &&
-                user.role.length > 0 &&
-                !user.role.includes('USER') && (
+              {displayRoles.length > 0 && (
                   <div
                     className="rounded-lg border border-bgColor-brand900/15 bg-bgColor-brand100/40 p-3 shadow-sm"
                     role="region"
@@ -152,11 +163,11 @@ const MyProfile = async ({
                         {t('roles-section')}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {user.role.map((role) => (
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {displayRoles.map((role) => (
                         <span
                           key={role}
-                          className="inline-flex items-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-3 py-1 text-xs font-medium text-bgColor-brand900 shadow-sm"
+                          className="inline-flex w-full items-center justify-center rounded-full border border-bgColor-brand900/20 bg-bgColor-white px-1 py-0.5 text-[11px] font-medium text-bgColor-brand900 shadow-sm"
                         >
                           {role}
                         </span>

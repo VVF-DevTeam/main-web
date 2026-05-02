@@ -2,6 +2,7 @@ import React from 'react'
 import { Users, Volleyball, Guitar, Handshake, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { auth } from '@/auth'
 
 type Benefit = {
   title: string
@@ -36,7 +37,10 @@ const benefits: Benefit[] = [
   },
 ]
 
-const StudentsPage = () => {
+const StudentsPage = async () => {
+  const session = await auth()
+  const isLoggedIn = Boolean(session?.user?.id)
+
   return (
     <main className='w-full bg-bgColor-white'>
       <section className='bg-bgColor-secondary200 px-6 py-20 md:py-24'>
@@ -49,16 +53,25 @@ const StudentsPage = () => {
             Enjoy many fun activities and events such as classes, concerts, and campings. Create unforgettable memories and connections when you are still young!
           </p>
 
-          <Button
-            type='button'
-            className='mt-10 rounded-full bg-bgColor-brandDark900 px-10 py-6 text-base font-semibold text-textColor-white transition-colors hover:bg-bgColor-brandDark600'
-            variant='default'
-            size='lg'
-          >
-            <Link href='/students/verify'>
-              Verify Student
-            </Link>
-          </Button>
+          {isLoggedIn ? (
+            <Button
+              type='button'
+              className='mt-10 rounded-full bg-bgColor-brandDark900 px-10 py-6 text-base font-semibold text-textColor-white transition-colors hover:bg-bgColor-brandDark600'
+              variant='default'
+              size='lg'
+              asChild
+            >
+              <Link href='/students/verify'>Verify Student</Link>
+            </Button>
+          ) : (
+            <p className='mt-10 text-base font-semibold text-textColor-brandDark900'>
+              Please login{' '}
+              <Link href='/signIn' className='underline underline-offset-4'>
+                here
+              </Link>{' '}
+              first
+            </p>
+          )}
 
           <p className='mt-8 text-xs leading-relaxed text-textColor-brandDark600'>
             Student discount available at accredited colleges and universities.

@@ -58,7 +58,7 @@ export const POST = async (req: NextRequest) => {
         { status: 401 }
       )
 
-    if (!userExists.emailVerified) {
+    if (!userExists.emailVerifiedDate) {
       const newToken = await createToken(userExists.email)
       sendVerificationEmail({
         firstName: userExists.name!,

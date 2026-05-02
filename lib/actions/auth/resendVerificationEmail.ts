@@ -26,7 +26,7 @@ export async function resendVerificationEmailAction(email: string) {
     }
 
     // Check if email is already verified
-    if (user.emailVerified) {
+    if (user.emailVerifiedDate) {
       return {
         message: 'Your email is already verified',
         success: false,

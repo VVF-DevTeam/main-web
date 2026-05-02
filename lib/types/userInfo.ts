@@ -7,7 +7,7 @@ export interface UserInfoProps {
   age?: string
   image?: string
   phoneVerified: boolean | null
-  emailVerified: Date | null
+  emailVerifiedDate: Date | null
   role: string[]
   password: string | null
   subscribedAt: Date | null

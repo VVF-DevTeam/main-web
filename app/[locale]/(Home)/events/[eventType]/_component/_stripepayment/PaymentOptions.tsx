@@ -28,6 +28,7 @@ import { EventTicket } from '@prisma/client'
 import { JsonValue } from '@prisma/client/runtime/library'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { getTicketUnitPrice } from '@/lib/price/getPrices'
 
 interface PaymentOptionsProps {
   formLink: string
@@ -41,26 +42,6 @@ interface PaymentOptionsProps {
   tickets?: EventTicket[]
   isCapacityExceeded?: boolean
   discounts: JsonValue
-}
-
-const calculateTicketDisplayPrice = (
-  ticket: EventTicket | null
-): number | null => {
-  if (!ticket) {
-    return null
-  }
-
-  const basePrice = Number(ticket.price)
-
-  if (Number.isNaN(basePrice)) {
-    return null
-  }
-
-  if (ticket.payTotalNumber && ticket.payTotalNumber > 0) {
-    return basePrice * ticket.payTotalNumber
-  }
-
-  return basePrice
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -269,7 +250,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   }, [selectedSeat?.seat.ticketId, tickets])
 
   const selectedTicketDisplayPrice = useMemo(
-    () => calculateTicketDisplayPrice(selectedTicket),
+    () => (selectedTicket ? getTicketUnitPrice(selectedTicket) : null),
     [selectedTicket]
   )
   const selectedTicketCurrency = selectedTicket?.currency || 'CAD'
@@ -280,11 +261,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
       .map((seatData) => {
         const ticket = tickets.find((t) => t.id === seatData.seat.ticketId)
         if (!ticket) return null
-        const price = calculateTicketDisplayPrice(ticket)
         return {
           ...seatData,
           ticket,
-          price: price ?? 0,
+          price: getTicketUnitPrice(ticket),
           seatName: getSeatName(
             seatData.seat,
             seatData.rowIndex,

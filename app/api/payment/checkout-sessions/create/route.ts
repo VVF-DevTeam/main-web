@@ -1,6 +1,7 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getFinalTicketPrice } from '@/lib/price/getPrices'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -26,12 +27,89 @@ export async function POST(req: Request) {
       otherGuestsInfo, // Array of other guests' information
       // Event form responses
       formResponses,
+      pricingIsSubscribed,
+      pricingHasStudentDiscount,
     } = await req.json()
+
+    let priceIdToUse = stripePriceId
+    const useStudentPricing =
+      Boolean(pricingHasStudentDiscount) && type !== 'Membership'
+    const pricingSubscribed = Boolean(pricingIsSubscribed)
+
+    if (useStudentPricing) {
+      if (!eventTicketId || !stripeProductId) {
+        return NextResponse.json(
+          { message: 'Missing ticket/product for student pricing checkout' },
+          { status: 400 }
+        )
+      }
+
+      const dbTicket = await prisma.eventTicket.findUnique({
+        where: { id: eventTicketId },
+        select: {
+          id: true,
+          price: true,
+          discountMemberPercent: true,
+          payTotalNumber: true,
+          capacityPerTicket: true,
+        },
+      })
+
+      if (!dbTicket) {
+        return NextResponse.json(
+          { message: 'Event ticket not found for student pricing checkout' },
+          { status: 404 }
+        )
+      }
+
+      let refPrice: Stripe.Price
+      try {
+        refPrice = await stripe.prices.retrieve(stripePriceId)
+      } catch {
+        return NextResponse.json(
+          { message: 'Failed to validate Stripe price for checkout' },
+          { status: 400 }
+        )
+      }
+
+      const unitDollars = getFinalTicketPrice(dbTicket, {
+        isSubscribed: pricingSubscribed,
+        hasActiveStudentDiscount: true,
+        quantity: 1,
+      })
+      const unitCents = Math.round(unitDollars * 100)
+      if (!Number.isFinite(unitCents) || unitCents < 1) {
+        return NextResponse.json(
+          { message: 'Invalid ticket unit price for student checkout' },
+          { status: 400 }
+        )
+      }
+
+      try {
+        const created = await stripe.prices.create({
+          unit_amount: unitCents,
+          currency: refPrice.currency,
+          product: stripeProductId,
+          metadata: {
+            pricingStudentAdjusted: 'true',
+            ticketId: eventTicketId,
+            referenceStripePriceId: stripePriceId,
+          },
+        })
+        priceIdToUse = created.id
+      } catch (error) {
+        console.error('Failed to create Stripe price for student checkout:', error)
+        return NextResponse.json(
+          { message: 'Failed to create Stripe price for student checkout' },
+          { status: 500 }
+        )
+      }
+    }
 
     // Create single line item for one ticket
     const lineItems = [
       {
-        price: stripePriceId,
+        price: priceIdToUse,
         quantity: 1,
       },
     ]
@@ -87,10 +165,12 @@ export async function POST(req: Request) {
       metadata: {
         userId: userId || '',
         eventId: eventId,
-        stripePriceId: stripePriceId,
+        stripePriceId: priceIdToUse,
         stripeProductId: stripeProductId,
         eventTicketId: eventTicketId || '',
         type: type,
+        pricingIsSubscribed: pricingSubscribed ? 'true' : 'false',
+        pricingHasStudentDiscount: useStudentPricing ? 'true' : 'false',
         ...(seatNumber && { seatNumber: seatNumber }),
         // If we stored data in CheckoutSessionData, use that
         // Otherwise, fallback to inline metadata (backward compatibility)

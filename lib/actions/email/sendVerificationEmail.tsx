@@ -284,9 +284,9 @@ const EmailTemplateForgotPassword = ({
 const EmailTemplateStudentVerification = ({
   firstName,
   token,
-  email,
+  email: _email,
 }: EmailTemplateProps) => {
-  const prodLink = `https://www.vietvibe.org/students/verify?token=${token}&email=${email}`
+  const prodLink = `https://www.vietvibe.org/students/verify?token=${token}`
   const currentDateTime = new Date().toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -377,9 +377,9 @@ export async function sendVerificationEmail({
   type,
 }: SendEmailTemplateProps) {
   const resend = new Resend(process.env.RESEND_API_KEY_PRODUCTION)
-  let error: CreateEmailResponse | null = null
+  let emailResponse: CreateEmailResponse | null = null
   if (type === 'accountVerification') {
-    error = await resend.emails.send({
+    emailResponse = await resend.emails.send({
       from: 'VVF Admin <admin.tech@vietvibe.org>',
       to: to,
       subject: 'Account verification',
@@ -389,7 +389,7 @@ export async function sendVerificationEmail({
       }),
     })
   } else if (type === 'forgotPassword') {
-    error = await resend.emails.send({
+    emailResponse = await resend.emails.send({
       from: 'VVF Admin <admin.tech@vietvibe.org>',
       to: to,
       subject: 'Forgot Password',
@@ -400,7 +400,7 @@ export async function sendVerificationEmail({
       }),
     })
   } else if (type === 'studentVerification') {
-    error = await resend.emails.send({
+    emailResponse = await resend.emails.send({
       from: 'VVF Admin <admin.tech@vietvibe.org>',
       to: to,
       subject: 'Student Verification',
@@ -410,7 +410,13 @@ export async function sendVerificationEmail({
         email: to,
       }),
     })
+  } else {
+    throw new Error(`Unsupported verification email type: ${type}`)
   }
 
-  console.log(error)
+  if (emailResponse?.error) {
+    throw new Error(
+      `Failed to send ${type} email: ${emailResponse.error.message || 'unknown error'}`
+    )
+  }
 }

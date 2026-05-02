@@ -85,7 +85,7 @@ const EventsPage = async ({
         currentPage={upcomingPageNum}
         totalPages={totalPagesUpcoming}
         totalItems={upcomingEvents.length}
-      />z
+      />
       {/* <EventAdminButtons /> */}
       <EventCalendar events={allEvents} locale={locale} />
       {finishedEvents.length > 0 && (
