@@ -136,7 +136,6 @@ export async function POST(req: Request) {
       type,
     })
 
-    console.log('discountApplied', discountApplied)
     // Create single line item for one ticket
     const lineItems = [
       {

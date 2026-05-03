@@ -24,6 +24,7 @@ async function fetchEventPaymentsData(eventId: string) {
         guestPhone: true,
         otherGuests: true,
         formResponses: true,
+        discountApplied: true,
         user: {
           select: {
             name: true,
@@ -79,7 +80,7 @@ async function fetchEventPaymentsData(eventId: string) {
 export async function getEventPayments(eventId: string) {
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
-    [`event-payments-v7-${eventId}`], // Cache key per event (v6 after adding formResponses field)
+    [`event-payments-v8-${eventId}`], // Cache key per event (v8 after adding discountApplied field)
     {
       revalidate: 86400, // Cache for 1 day (revalidateTag handles on-demand invalidation)
       tags: ['payments'], // Tag for revalidation - automatically invalidated when payments change

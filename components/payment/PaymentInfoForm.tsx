@@ -46,6 +46,7 @@ export default function PaymentInfoForm({
 
     const [formResponses, setFormResponses] = useState<FormResponses>(initialResponses)
     const [customInputDrafts, setCustomInputDrafts] = useState<Record<string, string>>({})
+    const [invalidQuestionIds, setInvalidQuestionIds] = useState<string[]>([])
     const debounceTimersRef = useRef<Record<string, ReturnType<typeof setTimeout> | undefined>>(
         {}
     )
@@ -81,6 +82,23 @@ export default function PaymentInfoForm({
         }
     }, [])
 
+    useEffect(() => {
+        if (invalidQuestionIds.length === 0) return
+        const nextInvalids = invalidQuestionIds.filter((questionId) => {
+            const question = questions.find((q) => q.id === questionId)
+            if (!question?.required) return false
+
+            const value = formResponses[question.id]?.answer
+            if (question.type === 'multi_choice') {
+                return !Array.isArray(value) || value.length === 0
+            }
+            return typeof value !== 'string' || value.trim() === ''
+        })
+        if (nextInvalids.length !== invalidQuestionIds.length) {
+            setInvalidQuestionIds(nextInvalids)
+        }
+    }, [formResponses, invalidQuestionIds, questions])
+
     const getStringValue = (questionId: string) => {
         const entry = formResponses[questionId]
         return typeof entry?.answer === 'string' ? entry.answer : ''
@@ -110,6 +128,8 @@ export default function PaymentInfoForm({
         })
 
         if (missingResponses.length > 0) {
+            const missingIds = missingResponses.map((q) => q.id)
+            setInvalidQuestionIds(missingIds)
             toast.error(t('form-validation-error'), {
                 description: t('form-validation-description', { count: missingResponses.length }),
                 style: { color: '#ef4444' },
@@ -117,6 +137,7 @@ export default function PaymentInfoForm({
             return
         }
 
+        setInvalidQuestionIds([])
         onSubmit(formResponses)
     }
 
@@ -128,7 +149,14 @@ export default function PaymentInfoForm({
         <div className="space-y-6">
             <div className="space-y-6 py-4">
                 {questions.map((question, index) => (
-                    <div key={question.id} className="space-y-2">
+                    <div
+                        key={question.id}
+                        className={`space-y-2 rounded-md border p-3 transition-colors ${
+                            invalidQuestionIds.includes(question.id)
+                                ? 'border-red-500'
+                                : 'border-transparent'
+                        }`}
+                    >
                         <Label htmlFor={question.id} className="text-sm font-medium">
                             {index + 1}. {question.question}
                             {question.required && <span className="text-red-500 ml-1">*</span>}

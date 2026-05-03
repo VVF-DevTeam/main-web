@@ -5,7 +5,12 @@ import {
 
 /** One row per pricing or promo adjustment applied on checkout (stored in CheckoutSessionData.discountApplied). */
 export type CheckoutAppliedDiscountRecord = {
-  kind: 'membership' | 'student' | 'event_combined' | 'discount_code'
+  kind:
+    | 'membership'
+    | 'student'
+    | 'event_percent'
+    | 'event_amount'
+    | 'discount_code'
   ticketId?: string
   /** Member tier percent from EventTicket.discountMemberPercent */
   percentOff?: number
@@ -13,7 +18,7 @@ export type CheckoutAppliedDiscountRecord = {
   fixedAmountOff?: number
   /** Event-level percent off subtotal (0–100) */
   eventPercentOff?: number
-  /** Total dollars removed by event_combined (after % then fixed, matching checkout math) */
+  /** Total dollars removed by event discounts (when tracked at this row level). */
   totalDiscountDollars?: number
   /** Cart subtotal in dollars after member/student unit prices, before event discounts */
   preEventDiscountSubtotal?: number
@@ -55,6 +60,7 @@ export function buildAppliedDiscountsMulti(params: {
     discountUnit: 'percentage' | 'amount'
     cannotBeStacked: boolean
   } | null
+  codeDiscountApplied: boolean
 }): CheckoutAppliedDiscountRecord[] {
   const {
     checkoutItems,
@@ -68,6 +74,7 @@ export function buildAppliedDiscountsMulti(params: {
     totalDiscountAmount,
     totalAfterMembership,
     verifiedCodeDiscount,
+    codeDiscountApplied,
   } = params
 
   const out: CheckoutAppliedDiscountRecord[] = []
@@ -113,16 +120,30 @@ export function buildAppliedDiscountsMulti(params: {
     (effectivePercent > 0 || effectiveAmount > 0) &&
     totalDiscountAmount > 0
   ) {
-    out.push({
-      kind: 'event_combined',
-      eventPercentOff: effectivePercent > 0 ? effectivePercent : undefined,
-      fixedAmountOff: effectiveAmount > 0 ? effectiveAmount : undefined,
-      totalDiscountDollars: totalDiscountAmount,
-      preEventDiscountSubtotal: totalAfterMembership,
-    })
+    const appliedCodeUnit =
+      codeDiscountApplied && verifiedCodeDiscount
+        ? verifiedCodeDiscount.discountUnit
+        : null
+
+    // Avoid overlap: if code discount is applied for a unit type,
+    // represent that unit with `discount_code` only.
+    if (effectivePercent > 0 && appliedCodeUnit !== 'percentage') {
+      out.push({
+        kind: 'event_percent',
+        eventPercentOff: effectivePercent,
+        preEventDiscountSubtotal: totalAfterMembership,
+      })
+    }
+    if (effectiveAmount > 0 && appliedCodeUnit !== 'amount') {
+      out.push({
+        kind: 'event_amount',
+        fixedAmountOff: effectiveAmount,
+        preEventDiscountSubtotal: totalAfterMembership,
+      })
+    }
   }
 
-  if (verifiedCodeDiscount) {
+  if (verifiedCodeDiscount && codeDiscountApplied) {
     out.push({
       kind: 'discount_code',
       code: verifiedCodeDiscount.code,

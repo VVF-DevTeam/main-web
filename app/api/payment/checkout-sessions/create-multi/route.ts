@@ -332,6 +332,7 @@ export async function POST(req: Request) {
     // Calculate effective discount using the same logic as EventCartCheckout.tsx
     let effectivePercent = 0
     let effectiveAmount = 0
+    let codeDiscountApplied = false
 
     if (discountList.length > 0 || verifiedCodeDiscount) {
       // First, for each non-code discount type, pick the single "best" qualifying discount
@@ -541,6 +542,7 @@ export async function POST(req: Request) {
             // Non-stackable: pick the better of code vs non-code percentage
             if (codePercent > effectivePercent) {
               effectivePercent = codePercent
+              codeDiscountApplied = true
             }
           } else {
             // Stackable code discount: if there's a non-stackable bulk discount,
@@ -552,10 +554,12 @@ export async function POST(req: Request) {
                 effectivePercent = codePercent
                 effectiveAmount = 0
                 amountNonStackableChosen = false
+                codeDiscountApplied = true
               }
             } else {
               // No non-stackable bulk discount: add stackable code discount on top
               effectivePercent += codePercent
+              codeDiscountApplied = true
             }
           }
         } else {
@@ -574,6 +578,7 @@ export async function POST(req: Request) {
               // Code amount wins: drop other event discounts
               effectivePercent = 0
               effectiveAmount = codeAmount
+              codeDiscountApplied = true
             }
           } else {
             // Stackable amount code: if there's a non-stackable percentage discount,
@@ -586,10 +591,12 @@ export async function POST(req: Request) {
                 effectivePercent = 0
                 effectiveAmount = codeAmount
                 amountNonStackableChosen = false
+                codeDiscountApplied = true
               }
             } else {
               // No non-stackable percentage discount: add stackable amount code to existing amount discounts
               effectiveAmount += codeAmount
+              codeDiscountApplied = true
             }
           }
         }
@@ -801,9 +808,9 @@ export async function POST(req: Request) {
       totalDiscountAmount,
       totalAfterMembership,
       verifiedCodeDiscount,
+      codeDiscountApplied,
     })
 
-    console.log('discountApplied', discountApplied)
     // Save all checkout data to CheckoutSessionData before creating Stripe session
     const checkoutSessionData = await prisma.checkoutSessionData.create({
       data: {

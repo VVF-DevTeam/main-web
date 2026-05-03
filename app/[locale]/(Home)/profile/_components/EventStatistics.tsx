@@ -57,6 +57,7 @@ interface Payment {
   guestPhone: string | null
   otherGuests?: JsonValue
   formResponses?: JsonValue
+  discountApplied?: JsonValue
   user: {
     name: string | null
     email: string
@@ -113,6 +114,131 @@ type FormResponse = {
 
 type FormResponsesData = {
   responses: FormResponse[]
+}
+
+type DiscountAppliedRecord = {
+  kind?:
+    | 'membership'
+    | 'student'
+    | 'event_percent'
+    | 'event_amount'
+    | 'discount_code'
+  ticketId?: string
+  percentOff?: number
+  fixedAmountOff?: number
+  eventPercentOff?: number
+  totalDiscountDollars?: number
+  preEventDiscountSubtotal?: number
+  code?: string
+  discountUnit?: 'percentage' | 'amount'
+  configuredValue?: number
+  cannotBeStacked?: boolean
+  originalPrice?: number
+  finalPrice?: number
+}
+
+function formatMoney(value: unknown): string {
+  const n = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(n)) return '-'
+  return `$${n.toFixed(2)}`
+}
+
+function formatDiscountApplied(discountApplied?: JsonValue): string {
+  if (!Array.isArray(discountApplied) || discountApplied.length === 0) {
+    return '-'
+  }
+
+  const lines = discountApplied
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') return null
+      const d = entry as DiscountAppliedRecord
+      switch (d.kind) {
+        case 'membership':
+          return `Membership ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (from ${formatMoney(d.originalPrice)})` : ''}`
+        case 'student':
+          return `Student ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (from ${formatMoney(d.originalPrice)})` : ''}`
+        case 'event_percent':
+          return `Event % ${d.eventPercentOff ?? 0}%`
+        case 'event_amount':
+          return `Event amount ${formatMoney(d.fixedAmountOff)}`
+        case 'discount_code':
+          if (!d.code) return 'Code discount'
+          if (d.discountUnit === 'percentage') {
+            return `Code ${d.code} (${d.configuredValue ?? 0}% off)`
+          }
+          if (d.discountUnit === 'amount') {
+            return `Code ${d.code} (${formatMoney(d.configuredValue)} off)`
+          }
+          return `Code ${d.code}`
+        default:
+          return null
+      }
+    })
+    .filter((v): v is string => Boolean(v))
+
+  return lines.length > 0 ? lines.join(' | ') : '-'
+}
+
+function renderDiscountApplied(discountApplied?: JsonValue): React.ReactNode {
+  if (!Array.isArray(discountApplied) || discountApplied.length === 0) {
+    return <span className="text-gray-400">-</span>
+  }
+
+  const entries = discountApplied.filter(
+    (entry): entry is DiscountAppliedRecord =>
+      Boolean(entry) && typeof entry === 'object'
+  )
+
+  if (entries.length === 0) {
+    return <span className="text-gray-400">-</span>
+  }
+
+  return (
+    <div className="flex max-w-[260px] flex-wrap gap-1">
+      {entries.map((d, idx) => {
+        let label = ''
+        let detail: string | null = null
+        switch (d.kind) {
+          case 'membership':
+            label = 'Membership'
+            detail = `${d.percentOff ?? 0}% off`
+            break
+          case 'student':
+            label = 'Student'
+            detail = `${d.percentOff ?? 0}% off`
+            break
+          case 'event_percent':
+            label = 'Event %'
+            detail = `${d.eventPercentOff ?? 0}% off`
+            break
+          case 'event_amount':
+            label = 'Event amount'
+            detail = `${formatMoney(d.fixedAmountOff)} off`
+            break
+          case 'discount_code':
+            label = d.code ? `Code: ${d.code}` : 'Code'
+            if (d.discountUnit === 'percentage') {
+              detail = `${d.configuredValue ?? 0}% off`
+            } else if (d.discountUnit === 'amount') {
+              detail = `${formatMoney(d.configuredValue)} off`
+            }
+            break
+          default:
+            label = 'Discount'
+        }
+        return (
+          <span
+            key={`${d.kind ?? 'discount'}-${idx}`}
+            className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
+            title={detail ?? undefined}
+          >
+            {label}
+            {detail ? ` - ${detail}` : ''}
+          </span>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function EventStatistics({
@@ -593,6 +719,7 @@ export default function EventStatistics({
                                 'Payment Method': p.method,
                                 'Payment Type': p.type,
                                 'Stripe ID': p.stripePaymentId ?? '-',
+                                Discounts: formatDiscountApplied(p.discountApplied),
                                 'Other Guests':
                                   otherGuestsList.length > 0
                                     ? JSON.stringify(otherGuestsList)
@@ -665,6 +792,7 @@ export default function EventStatistics({
                                     {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
                                   </div>
                                 </th>
+                                <th className="px-4 py-3 text-left">Discounts Applied</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -732,10 +860,13 @@ export default function EventStatistics({
                                       <td className="px-4 py-3">
                                         {payment.method}
                                       </td>
+                                      <td className="px-4 py-3">
+                                        {renderDiscountApplied(payment.discountApplied)}
+                                      </td>
                                     </tr>
                                     {hasOtherGuests && isExpanded && (
                                       <tr className="bg-gray-50">
-                                        <td colSpan={9} className="px-4">
+                                        <td colSpan={10} className="px-4">
                                           <div className="ml-8">
                                             <table className="w-full text-sm">
                                               <tbody>
