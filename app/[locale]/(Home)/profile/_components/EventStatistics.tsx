@@ -143,6 +143,11 @@ function formatMoney(value: unknown): string {
   return `$${n.toFixed(2)}`
 }
 
+function shortTicketId(ticketId?: string): string | undefined {
+  if (!ticketId || ticketId.length < 8) return ticketId
+  return `…${ticketId.slice(-6)}`
+}
+
 function formatDiscountApplied(discountApplied?: JsonValue): string {
   if (!Array.isArray(discountApplied) || discountApplied.length === 0) {
     return '-'
@@ -152,22 +157,23 @@ function formatDiscountApplied(discountApplied?: JsonValue): string {
     .map((entry) => {
       if (!entry || typeof entry !== 'object') return null
       const d = entry as DiscountAppliedRecord
+      const tid = shortTicketId(d.ticketId)
       switch (d.kind) {
         case 'membership':
-          return `Membership ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (from ${formatMoney(d.originalPrice)})` : ''}`
+          return `Member ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (list ${formatMoney(d.originalPrice)})` : ''}${tid ? ` · ${tid}` : ''}`
         case 'student':
-          return `Student ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (from ${formatMoney(d.originalPrice)})` : ''}`
+          return `Student ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (list ${formatMoney(d.originalPrice)})` : ''}${tid ? ` · ${tid}` : ''}`
         case 'event_percent':
-          return `Event % ${d.eventPercentOff ?? 0}%`
+          return `Event ${d.eventPercentOff ?? 0}% off subtotal${d.preEventDiscountSubtotal != null ? ` (subtotal ${formatMoney(d.preEventDiscountSubtotal)})` : ''}`
         case 'event_amount':
-          return `Event amount ${formatMoney(d.fixedAmountOff)}`
+          return `Event ${formatMoney(d.fixedAmountOff)} off subtotal${d.preEventDiscountSubtotal != null ? ` (subtotal ${formatMoney(d.preEventDiscountSubtotal)})` : ''}`
         case 'discount_code':
-          if (!d.code) return 'Code discount'
+          if (!d.code) return 'Promo code'
           if (d.discountUnit === 'percentage') {
-            return `Code ${d.code} (${d.configuredValue ?? 0}% off)`
+            return `Code ${d.code}: ${d.configuredValue ?? 0}%${d.cannotBeStacked ? ' (exclusive)' : ''}`
           }
           if (d.discountUnit === 'amount') {
-            return `Code ${d.code} (${formatMoney(d.configuredValue)} off)`
+            return `Code ${d.code}: ${formatMoney(d.configuredValue)}${d.cannotBeStacked ? ' (exclusive)' : ''}`
           }
           return `Code ${d.code}`
         default:
@@ -176,12 +182,114 @@ function formatDiscountApplied(discountApplied?: JsonValue): string {
     })
     .filter((v): v is string => Boolean(v))
 
-  return lines.length > 0 ? lines.join(' | ') : '-'
+  return lines.length > 0 ? lines.join('; ') : '-'
+}
+
+type DiscountRowVisual = {
+  key: string
+  badge: string
+  title: string
+  subtitle?: string
+  boxClass: string
+}
+
+function buildDiscountRows(entries: DiscountAppliedRecord[]): DiscountRowVisual[] {
+  return entries.map((d, idx) => {
+    const tid = shortTicketId(d.ticketId)
+    const baseKey = `${d.kind ?? 'x'}-${idx}`
+
+    switch (d.kind) {
+      case 'membership':
+        return {
+          key: baseKey,
+          badge: 'Member',
+          title: `${d.percentOff ?? 0}% off list price`,
+          subtitle:
+            d.originalPrice != null
+              ? `List ${formatMoney(d.originalPrice)} / ticket${tid ? ` · ${tid}` : ''}`
+              : tid
+                ? `Ticket ${tid}`
+                : undefined,
+          boxClass: 'border-blue-200 bg-blue-50/90',
+        }
+      case 'student':
+        return {
+          key: baseKey,
+          badge: 'Student',
+          title: `${d.percentOff ?? 0}% off list price`,
+          subtitle:
+            d.originalPrice != null
+              ? `List ${formatMoney(d.originalPrice)} / ticket${tid ? ` · ${tid}` : ''}`
+              : tid
+                ? `Ticket ${tid}`
+                : undefined,
+          boxClass: 'border-violet-200 bg-violet-50/90',
+        }
+      case 'event_percent':
+        return {
+          key: baseKey,
+          badge: 'Event',
+          title: `${d.eventPercentOff ?? 0}% off cart subtotal`,
+          subtitle:
+            d.preEventDiscountSubtotal != null
+              ? `Subtotal (after member/student pricing): ${formatMoney(d.preEventDiscountSubtotal)}`
+              : undefined,
+          boxClass: 'border-amber-200 bg-amber-50/90',
+        }
+      case 'event_amount':
+        return {
+          key: baseKey,
+          badge: 'Event',
+          title: `${formatMoney(d.fixedAmountOff)} off cart subtotal`,
+          subtitle:
+            d.preEventDiscountSubtotal != null
+              ? `Subtotal (after member/student pricing): ${formatMoney(d.preEventDiscountSubtotal)}`
+              : undefined,
+          boxClass: 'border-amber-200 bg-amber-50/90',
+        }
+      case 'discount_code': {
+        const exclusive = d.cannotBeStacked ? 'Exclusive rule (cannot stack with some other promos).' : undefined
+        if (d.discountUnit === 'percentage') {
+          return {
+            key: baseKey,
+            badge: 'Code',
+            title: d.code ? `${d.code} · ${d.configuredValue ?? 0}% off` : 'Promo code',
+            subtitle: exclusive,
+            boxClass: 'border-rose-200 bg-rose-50/90',
+          }
+        }
+        if (d.discountUnit === 'amount') {
+          return {
+            key: baseKey,
+            badge: 'Code',
+            title: d.code ? `${d.code} · ${formatMoney(d.configuredValue)} off` : 'Promo code',
+            subtitle: exclusive,
+            boxClass: 'border-rose-200 bg-rose-50/90',
+          }
+        }
+        return {
+          key: baseKey,
+          badge: 'Code',
+          title: d.code ?? 'Promo code',
+          subtitle: exclusive,
+          boxClass: 'border-rose-200 bg-rose-50/90',
+        }
+      }
+      default:
+        return {
+          key: baseKey,
+          badge: 'Other',
+          title: 'Discount',
+          subtitle: undefined,
+          boxClass: 'border-slate-200 bg-slate-50/90',
+        }
+    }
+  })
 }
 
 function renderDiscountApplied(discountApplied?: JsonValue): React.ReactNode {
   if (!Array.isArray(discountApplied) || discountApplied.length === 0) {
-    return <span className="text-gray-400">-</span>
+    return <span className="text-sm text-muted-foreground">None</span>
   }
 
   const entries = discountApplied.filter(
@@ -190,53 +298,29 @@ function renderDiscountApplied(discountApplied?: JsonValue): React.ReactNode {
   )
 
   if (entries.length === 0) {
-    return <span className="text-gray-400">-</span>
+    return <span className="text-sm text-muted-foreground">None</span>
   }
 
+  const rows = buildDiscountRows(entries)
+
   return (
-    <div className="flex max-w-[260px] flex-wrap gap-1">
-      {entries.map((d, idx) => {
-        let label = ''
-        let detail: string | null = null
-        switch (d.kind) {
-          case 'membership':
-            label = 'Membership'
-            detail = `${d.percentOff ?? 0}% off`
-            break
-          case 'student':
-            label = 'Student'
-            detail = `${d.percentOff ?? 0}% off`
-            break
-          case 'event_percent':
-            label = 'Event %'
-            detail = `${d.eventPercentOff ?? 0}% off`
-            break
-          case 'event_amount':
-            label = 'Event amount'
-            detail = `${formatMoney(d.fixedAmountOff)} off`
-            break
-          case 'discount_code':
-            label = d.code ? `Code: ${d.code}` : 'Code'
-            if (d.discountUnit === 'percentage') {
-              detail = `${d.configuredValue ?? 0}% off`
-            } else if (d.discountUnit === 'amount') {
-              detail = `${formatMoney(d.configuredValue)} off`
-            }
-            break
-          default:
-            label = 'Discount'
-        }
-        return (
-          <span
-            key={`${d.kind ?? 'discount'}-${idx}`}
-            className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
-            title={detail ?? undefined}
-          >
-            {label}
-            {detail ? ` - ${detail}` : ''}
-          </span>
-        )
-      })}
+    <div className="flex min-w-0 flex-col gap-2 py-0.5">
+      {rows.map((row) => (
+        <div
+          key={row.key}
+          className={`rounded-md border px-2.5 py-2 text-left shadow-sm ${row.boxClass}`}
+        >
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="rounded bg-white/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              {row.badge}
+            </span>
+          </div>
+          <p className="mt-1 text-xs font-medium leading-snug text-slate-900">{row.title}</p>
+          {row.subtitle ? (
+            <p className="mt-0.5 text-[11px] leading-snug text-slate-600">{row.subtitle}</p>
+          ) : null}
+        </div>
+      ))}
     </div>
   )
 }
@@ -719,7 +803,7 @@ export default function EventStatistics({
                                 'Payment Method': p.method,
                                 'Payment Type': p.type,
                                 'Stripe ID': p.stripePaymentId ?? '-',
-                                Discounts: formatDiscountApplied(p.discountApplied),
+                                'Discounts Applied': formatDiscountApplied(p.discountApplied),
                                 'Other Guests':
                                   otherGuestsList.length > 0
                                     ? JSON.stringify(otherGuestsList)
@@ -792,7 +876,14 @@ export default function EventStatistics({
                                     {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
                                   </div>
                                 </th>
-                                <th className="px-4 py-3 text-left">Discounts Applied</th>
+                                <th className="min-w-[220px] max-w-[300px] px-4 py-3 text-left align-top">
+                                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                    Discounts applied
+                                  </span>
+                                  <span className="mt-0.5 block text-[11px] font-normal normal-case text-muted-foreground/85">
+                                    Member, student, event rules, and codes
+                                  </span>
+                                </th>
                               </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -860,7 +951,7 @@ export default function EventStatistics({
                                       <td className="px-4 py-3">
                                         {payment.method}
                                       </td>
-                                      <td className="px-4 py-3">
+                                      <td className="min-w-[220px] max-w-[320px] align-top px-4 py-3">
                                         {renderDiscountApplied(payment.discountApplied)}
                                       </td>
                                     </tr>
