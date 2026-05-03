@@ -5,6 +5,7 @@ import { getEventDiscountsAndTickets } from '@/lib/actions/event/getEventDiscoun
 import { prisma } from '@/lib/db'
 import { CheckoutItems } from '@/lib/types/payment'
 import { getFinalTicketPrice } from '@/lib/price/getPrices'
+import { buildAppliedDiscountsMulti } from '@/lib/payment/checkoutDiscountApplied'
 
 // ##################### FLOW OF PRICES ######################
 // Discount price creation (event_discount)
@@ -788,6 +789,21 @@ export async function POST(req: Request) {
       })
     }
 
+    const discountApplied = buildAppliedDiscountsMulti({
+      checkoutItems,
+      ticketById,
+      pricingSubscribed: pricingSubscribed,
+      useStudentPricing,
+      type,
+      shouldApplyDiscount,
+      effectivePercent,
+      effectiveAmount,
+      totalDiscountAmount,
+      totalAfterMembership,
+      verifiedCodeDiscount,
+    })
+
+    console.log('discountApplied', discountApplied)
     // Save all checkout data to CheckoutSessionData before creating Stripe session
     const checkoutSessionData = await prisma.checkoutSessionData.create({
       data: {
@@ -803,6 +819,7 @@ export async function POST(req: Request) {
           : undefined,
         // Event form responses
         formResponses: formResponses || undefined,
+        discountApplied: discountApplied.length > 0 ? discountApplied : undefined,
       },
     })
 

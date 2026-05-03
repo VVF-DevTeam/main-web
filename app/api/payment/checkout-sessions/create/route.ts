@@ -2,6 +2,10 @@ import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getFinalTicketPrice } from '@/lib/price/getPrices'
+import {
+  buildAppliedDiscountsSingle,
+  type TicketDiscountFields,
+} from '@/lib/payment/checkoutDiscountApplied'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -36,6 +40,8 @@ export async function POST(req: Request) {
       Boolean(pricingHasStudentDiscount) && type !== 'Membership'
     const pricingSubscribed = Boolean(pricingIsSubscribed)
 
+    let dbTicketForDiscounts: TicketDiscountFields | null = null
+
     if (useStudentPricing) {
       if (!eventTicketId || !stripeProductId) {
         return NextResponse.json(
@@ -61,6 +67,8 @@ export async function POST(req: Request) {
           { status: 404 }
         )
       }
+
+      dbTicketForDiscounts = dbTicket
 
       let refPrice: Stripe.Price
       try {
@@ -104,8 +112,31 @@ export async function POST(req: Request) {
           { status: 500 }
         )
       }
+    } else if (
+      pricingSubscribed &&
+      eventTicketId &&
+      type !== 'Membership'
+    ) {
+      dbTicketForDiscounts = await prisma.eventTicket.findUnique({
+        where: { id: eventTicketId },
+        select: {
+          id: true,
+          discountMemberPercent: true,
+          price: true,
+          capacityPerTicket: true,
+          payTotalNumber: true,
+        },
+      })
     }
 
+    const discountApplied = buildAppliedDiscountsSingle({
+      dbTicket: dbTicketForDiscounts,
+      pricingSubscribed,
+      useStudentPricing,
+      type,
+    })
+
+    console.log('discountApplied', discountApplied)
     // Create single line item for one ticket
     const lineItems = [
       {
@@ -121,7 +152,8 @@ export async function POST(req: Request) {
       guestName ||
       guestPhone ||
       (Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0) ||
-      formResponses
+      formResponses ||
+      discountApplied.length > 0
     ) {
       const checkoutData = await prisma.checkoutSessionData.create({
         data: {
@@ -140,6 +172,7 @@ export async function POST(req: Request) {
             type: type,
           }],
           formResponses: formResponses || undefined,
+          discountApplied: discountApplied.length > 0 ? discountApplied : undefined,
           status: 'PENDING',
         },
       })

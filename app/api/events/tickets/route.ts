@@ -247,7 +247,7 @@ export const PUT = async (request: Request) => {
 export const DELETE = async (request: Request) => {
   try {
     const session = await auth()
-    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST') && !session?.user?.role?.includes('SUPERADMIN')) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

@@ -424,6 +424,7 @@ export async function POST(req: NextRequest) {
       }> | null
       otherGuestsInfo: Array<{ name: string; email: string; phone: string }> | null
       formResponses: any | null
+      discountApplied: any | null
     } | null = null
 
     if (metadata?.checkoutDataId) {
@@ -439,6 +440,7 @@ export async function POST(req: NextRequest) {
             shopItemMetadata: true,
             otherGuestsInfo: true,
             formResponses: true,
+            discountApplied: true,
           },
         })
         if (data) {
@@ -458,6 +460,7 @@ export async function POST(req: NextRequest) {
             }> | null,
             otherGuestsInfo: data.otherGuestsInfo as Array<{ name: string; email: string; phone: string }> | null,
             formResponses: data.formResponses,
+            discountApplied: data.discountApplied,
           }
         }
       } catch (e) {
@@ -608,6 +611,7 @@ export async function POST(req: NextRequest) {
                 guestEmail: guestEmail,
                 guestPhone: guestPhone,
                 otherGuests: otherGuestsInfo || undefined,
+                discountApplied: checkoutSessionData?.discountApplied || undefined,
               },
             })
 
@@ -661,6 +665,7 @@ export async function POST(req: NextRequest) {
               guestEmail: guestEmail,
               guestPhone: guestPhone,
               otherGuests: otherGuestsInfo || undefined,
+              discountApplied: checkoutSessionData?.discountApplied || undefined,
             },
           })
 
@@ -774,6 +779,7 @@ export async function POST(req: NextRequest) {
               otherGuests: otherGuestsInfo || undefined,
               // Event form responses
               formResponses: checkoutSessionData?.formResponses || undefined,
+              discountApplied: checkoutSessionData?.discountApplied || undefined,
             },
           })
         }
@@ -820,6 +826,7 @@ export async function POST(req: NextRequest) {
             otherGuests: otherGuestsInfo || undefined,
             // Event form responses
             formResponses: checkoutSessionData?.formResponses || undefined,
+            discountApplied: checkoutSessionData?.discountApplied || undefined,
           },
         })
       }

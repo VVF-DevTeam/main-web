@@ -293,6 +293,9 @@ model Payment {
 
   // Custom form responses
   formResponses   Json?       // Answers to EventForm questions
+  
+  // Discounts captured from CheckoutSessionData at payment creation time
+  discountApplied Json?
 
   // Relations
   userId          String?
@@ -330,6 +333,9 @@ model CheckoutSessionData {
   // form responses
   formResponses   Json?            // Custom event registration form answers
   
+  // Discount applied
+  discountApplied Json?            // List of all applied discounts
+
   stripeSessionId String? @unique // Optional initially, set after session creation
 
   @@index([stripeSessionId]) // Fast lookup in webhook
