@@ -80,14 +80,61 @@ export default function PortalCodingRulePage() {
 
       <section className="space-y-2">
         <h3 className="text-lg font-semibold text-textColor-secondary600">
-          5) Next.js route convention
+          5) Next.js route & pathname naming
         </h3>
         <p className="text-sm text-textColor-gray100">
-          In App Router, folders define URL paths. For example:
+          In the App Router, <strong>folder names</strong> are URL segments unless the folder is
+          special-cased. Follow these naming rules for pathnames:
         </p>
+        <ul className="list-disc space-y-1 pl-5 text-sm text-textColor-gray100">
+          <li>
+            <strong>URL segments (folders):</strong> use <strong>kebab-case</strong> — lowercase
+            words with hyphens (e.g. <code>portal-home</code>, <code>coding-rule</code>,
+            <code>create-event</code>). Avoid camelCase or spaces in segment names.
+          </li>
+          <li>
+            <strong>Dynamic segments:</strong> bracket folder names — <code>[locale]</code>,{' '}
+            <code>[eventKeyName]</code>. Param names are camelCase by convention; they appear in{' '}
+            <code>params</code> on <code>page.tsx</code> / <code>layout.tsx</code>.
+          </li>
+          <li>
+            <strong>Route groups:</strong> parentheses — <code>(Home)</code>, <code>(auth)</code>.
+            The group name is <strong>not</strong> part of the URL; it only groups layouts.
+          </li>
+          <li>
+            <strong>Private folders (underscore):</strong> a segment whose name starts with{' '}
+            <code>_</code> — for example <code>_components</code>, <code>_lib</code> — is{' '}
+            <strong>not</strong> part of the URL. Use these to colocate components, hooks, or tests
+            next to a route without adding another pathname segment. (Same idea as route groups, but
+            marked explicitly as implementation-only.)
+          </li>
+          <li>
+            <strong>Reserved file names:</strong> <code>page.tsx</code> (route UI),{' '}
+            <code>layout.tsx</code> (nested layout), <code>loading.tsx</code>,{' '}
+            <code>error.tsx</code>, <code>route.ts</code> (Route Handler). File name is fixed;
+            only the folder path becomes the pathname.
+          </li>
+          <li>
+            <strong>Catch-all / optional catch-all:</strong> <code>[...slug]</code>,{' '}
+            <code>[[...slug]]</code> — use when one segment must capture multiple path parts.
+          </li>
+        </ul>
         <pre className="overflow-x-auto rounded-md bg-black/30 p-3 text-xs text-textColor-gray100">
-{`app/[locale]/portal-home/page.tsx       -> filesystem: /{locale}/portal-home
-On portal.vietvibe.org, middleware shows short URLs: /{locale} and /{locale}/coding-rule`}
+{`app/[locale]/portal-home/page.tsx
+  -> URL path: /{locale}/portal-home
+
+app/[locale]/portal-home/coding-rule/page.tsx
+  -> URL path: /{locale}/portal-home/coding-rule
+
+app/[locale]/(Home)/events/page.tsx
+  -> URL path: /{locale}/events   // (Home) is omitted from the pathname
+
+app/[locale]/(Home)/profile/_components/Foo.tsx
+  -> _components does not appear in the URL; still /{locale}/profile/...
+
+On portal.vietvibe.org, middleware rewrites short URLs to portal-home internally:
+  /{locale}  ->  /{locale}/portal-home
+  /{locale}/coding-rule  ->  /{locale}/portal-home/coding-rule`}
         </pre>
       </section>
 

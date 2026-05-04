@@ -28,6 +28,9 @@ export default async function PortalPage({
           Portal coding rules
         </Link>
       </p>
+      <p className="text-sm text-slate-300">
+        Start coding by adding file into app/[locale]/portal-home/
+      </p>
     </section>
   )
 }
