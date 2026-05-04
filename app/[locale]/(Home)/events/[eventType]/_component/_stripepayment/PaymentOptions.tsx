@@ -28,7 +28,7 @@ import { EventTicket } from '@prisma/client'
 import { JsonValue } from '@prisma/client/runtime/library'
 import { getCurrentUserInfo } from '@/lib/actions/user/getCurrentUserInfo'
 import { UserInfoProps } from '@/lib/types/userInfo'
-import { getTicketUnitPrice } from '@/lib/price/getPrices'
+import { getTicketUnitPrice } from '@/lib/actions/price/getPrices'
 
 interface PaymentOptionsProps {
   formLink: string

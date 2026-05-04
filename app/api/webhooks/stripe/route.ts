@@ -6,7 +6,7 @@ import { revalidateTag } from 'next/cache'
 import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentConfirmationEmail'
 import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail'
 import { sendShopOrderConfirmationEmail, ShopOrderItem } from '@/lib/actions/email/sendShopOrderConfirmationEmail'
-import { getFinalTicketPrice } from '@/lib/price/getPrices'
+import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',

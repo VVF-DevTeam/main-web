@@ -1,7 +1,7 @@
 import {
   getTicketUnitPrice,
   STUDENT_DISCOUNT_PERCENT,
-} from '@/lib/price/getPrices'
+} from '@/lib/actions/price/getPrices'
 
 /** One row per pricing or promo adjustment applied on checkout (stored in CheckoutSessionData.discountApplied). */
 export type CheckoutAppliedDiscountRecord = {

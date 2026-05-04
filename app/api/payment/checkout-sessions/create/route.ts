@@ -1,11 +1,11 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getFinalTicketPrice } from '@/lib/price/getPrices'
+import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
 import {
   buildAppliedDiscountsSingle,
   type TicketDiscountFields,
-} from '@/lib/payment/checkoutDiscountApplied'
+} from '@/lib/actions/payment/checkoutDiscountApplied'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
