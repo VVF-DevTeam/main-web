@@ -5,6 +5,9 @@ import NextAuth from 'next-auth'
 import authConfig from './auth.config'
 import { checkRateLimit, getClientIp } from '@/lib/security/rateLimit'
 
+/** App Router segment for staff portal (app/[locale]/portal-home/...) */
+const PORTAL_APP_SEGMENT = 'portal-home'
+
 // app/[locale]/(Home)/posts/page.tsx — listing only (not /posts/[postId] or admin)
 const POSTS_LISTING_PATH =
   /^\/(?:[a-z]{2}|[a-z]{2}-[A-Z]{2})\/posts\/?$/i
@@ -36,6 +39,14 @@ function isProtectedRoute(pathname: string): boolean {
   return PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(pathname))
 }
 
+/** True when this locale path already targets portal-home — skip portal-host rewrite. */
+function isLocalePathUnderPortalApp(localePathRemainder: string): boolean {
+  return (
+    localePathRemainder === `/${PORTAL_APP_SEGMENT}` ||
+    localePathRemainder.startsWith(`/${PORTAL_APP_SEGMENT}/`)
+  )
+}
+
 // Type for NextAuth middleware function
 type NextAuthMiddleware = (
   request: NextRequest,
@@ -54,12 +65,12 @@ export default async function middleware(
   const hostHeader = request.headers.get('host') ?? ''
   const host = hostHeader.split(':')[0].toLowerCase()
   const isMainHost = host === 'vietvibe.org' || host === 'www.vietvibe.org'
-  const isPortalHost = host === 'portal.vietvibe.org'
+  const isPortalHost = host === 'portal.vietvibe.org' || host === 'www.portal.vietvibe.org'
   const isLocalHost = host === 'localhost' || host === '127.0.0.1'
 
   // Domain-based path rules:
-  // - Main domain uses /{locale}/...
-  // - Portal domain uses /{locale}/portal...
+  // - Main domain: /{locale}/...
+  // - Portal domain: browser shows /{locale} and /{locale}/...; rewrites to /{locale}/portal-home/...
   // Keep API/auth/static paths untouched.
   const localePrefixMatch = pathname.match(/^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})(\/.*)?$/)
   const locale = localePrefixMatch?.[1]
@@ -78,20 +89,17 @@ export default async function middleware(
       return NextResponse.redirect(url, 308)
     }
 
-    if (isPortalHost && pathname === '/') {
-      const url = request.nextUrl.clone()
-      url.pathname = `/${i18nConfig.defaultLocale}/portal`
-      return NextResponse.redirect(url, 308)
-    }
-
     if (isMainHost) {
-      // Block portal area on main domain.
-      if (pathname === '/portal' || pathname.startsWith('/portal/')) {
+      // Block staff portal routes on main domain (only portal-home segment)
+      if (
+        pathname === `/${PORTAL_APP_SEGMENT}` ||
+        pathname.startsWith(`/${PORTAL_APP_SEGMENT}/`)
+      ) {
         const url = request.nextUrl.clone()
         url.pathname = '/'
         return NextResponse.redirect(url, 308)
       }
-      if (locale && localePathRemainder.startsWith('/portal')) {
+      if (locale && isLocalePathUnderPortalApp(localePathRemainder)) {
         const url = request.nextUrl.clone()
         url.pathname = `/${locale}`
         return NextResponse.redirect(url, 308)
@@ -99,29 +107,30 @@ export default async function middleware(
     }
 
     if (isPortalHost) {
-      // Root on portal host goes to localized portal home.
+      // https://portal.../  -> internally /{defaultLocale}/portal-home
       if (pathname === '/') {
         const url = request.nextUrl.clone()
-        url.pathname = `/${i18nConfig.defaultLocale}/portal`
-        return NextResponse.redirect(url, 308)
+        url.pathname = `/${i18nConfig.defaultLocale}/${PORTAL_APP_SEGMENT}`
+        return NextResponse.rewrite(url)
       }
 
-      // Locale root on portal host goes to that locale's portal home.
+      // https://portal.../en  -> internally /en/portal-home
       if (locale && (localePathRemainder === '' || localePathRemainder === '/')) {
         const url = request.nextUrl.clone()
-        url.pathname = `/${locale}/portal`
-        return NextResponse.redirect(url, 308)
+        url.pathname = `/${locale}/${PORTAL_APP_SEGMENT}`
+        return NextResponse.rewrite(url)
       }
 
-      // Only allow /{locale}/portal... on portal host.
-      if (locale) {
-        const isPortalArea =
-          localePathRemainder === '/portal' || localePathRemainder.startsWith('/portal/')
-        if (!isPortalArea) {
-          const url = request.nextUrl.clone()
-          url.pathname = `/${locale}/portal`
-          return NextResponse.redirect(url, 308)
-        }
+      // https://portal.../en/coding-rule -> internally /en/portal-home/coding-rule
+      if (
+        locale &&
+        localePathRemainder &&
+        localePathRemainder !== '/' &&
+        !isLocalePathUnderPortalApp(localePathRemainder)
+      ) {
+        const url = request.nextUrl.clone()
+        url.pathname = `/${locale}/${PORTAL_APP_SEGMENT}${localePathRemainder}`
+        return NextResponse.rewrite(url)
       }
     }
   }
@@ -160,12 +169,12 @@ export default async function middleware(
 
   // Public routes: just i18n routing (no auth overhead, bfcache-friendly)
   const response = i18nRouter(request, i18nConfig)
-  
+
   // Set current-path header for public routes too (needed for BackButton component)
   if (response instanceof NextResponse) {
     response.headers.set('current-path', pathname)
   }
-  
+
   return response
 }
 

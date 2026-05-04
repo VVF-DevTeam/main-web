@@ -86,8 +86,8 @@ export default function PortalCodingRulePage() {
           In App Router, folders define URL paths. For example:
         </p>
         <pre className="overflow-x-auto rounded-md bg-black/30 p-3 text-xs text-textColor-gray100">
-{`app/[locale]/portal/page.tsx       -> /{locale}/portal
-app/[locale]/portal/users/page.tsx -> /{locale}/portal/users`}
+{`app/[locale]/portal-home/page.tsx       -> filesystem: /{locale}/portal-home
+On portal.vietvibe.org, middleware shows short URLs: /{locale} and /{locale}/coding-rule`}
         </pre>
       </section>
 

@@ -22,7 +22,7 @@ export default async function PortalPage({
       <p className="text-sm text-slate-400">Current locale: {locale}</p>
       <p className="text-sm">
         <Link
-          href={`/${locale}/portal/coding-rule`}
+          href={`/${locale}/portal-home/coding-rule`}
           className="font-medium text-textColor-blue underline decoration-textColor-blue/60 underline-offset-4 hover:text-textColor-secondary600"
         >
           Portal coding rules
