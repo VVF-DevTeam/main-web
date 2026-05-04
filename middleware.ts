@@ -58,7 +58,7 @@ export default async function middleware(
   const isLocalHost = host === 'localhost' || host === '127.0.0.1'
 
   // Domain-based path rules:
-  // - Main domain uses /{locale}/app...
+  // - Main domain uses /{locale}/...
   // - Portal domain uses /{locale}/portal...
   // Keep API/auth/static paths untouched.
   const localePrefixMatch = pathname.match(/^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})(\/.*)?$/)
@@ -74,7 +74,7 @@ export default async function middleware(
   if (!isLocalHost && !isApiOrStaticPath) {
     if (isMainHost && pathname === '/') {
       const url = request.nextUrl.clone()
-      url.pathname = `/${i18nConfig.defaultLocale}/app`
+      url.pathname = `/${i18nConfig.defaultLocale}`
       return NextResponse.redirect(url, 308)
     }
 
@@ -88,27 +88,40 @@ export default async function middleware(
       // Block portal area on main domain.
       if (pathname === '/portal' || pathname.startsWith('/portal/')) {
         const url = request.nextUrl.clone()
-        url.pathname = '/app'
+        url.pathname = '/'
         return NextResponse.redirect(url, 308)
       }
       if (locale && localePathRemainder.startsWith('/portal')) {
         const url = request.nextUrl.clone()
-        url.pathname = `/${locale}/app`
+        url.pathname = `/${locale}`
         return NextResponse.redirect(url, 308)
       }
     }
 
     if (isPortalHost) {
-      // Block app area on portal domain.
-      if (pathname === '/app' || pathname.startsWith('/app/')) {
+      // Root on portal host goes to localized portal home.
+      if (pathname === '/') {
         const url = request.nextUrl.clone()
-        url.pathname = '/portal'
+        url.pathname = `/${i18nConfig.defaultLocale}/portal`
         return NextResponse.redirect(url, 308)
       }
-      if (locale && localePathRemainder.startsWith('/app')) {
+
+      // Locale root on portal host goes to that locale's portal home.
+      if (locale && (localePathRemainder === '' || localePathRemainder === '/')) {
         const url = request.nextUrl.clone()
         url.pathname = `/${locale}/portal`
         return NextResponse.redirect(url, 308)
+      }
+
+      // Only allow /{locale}/portal... on portal host.
+      if (locale) {
+        const isPortalArea =
+          localePathRemainder === '/portal' || localePathRemainder.startsWith('/portal/')
+        if (!isPortalArea) {
+          const url = request.nextUrl.clone()
+          url.pathname = `/${locale}/portal`
+          return NextResponse.redirect(url, 308)
+        }
       }
     }
   }
