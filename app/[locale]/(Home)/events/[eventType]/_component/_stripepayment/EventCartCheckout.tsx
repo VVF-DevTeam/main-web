@@ -27,7 +27,7 @@ import {
   getMemberDiscountPercent,
   getTicketUnitPrice,
   STUDENT_DISCOUNT_PERCENT,
-} from '@/lib/price/getPrices'
+} from '@/lib/actions/price/getPrices'
 
 interface SelectedSeatWithTicket {
   seat: {

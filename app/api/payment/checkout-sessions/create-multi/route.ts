@@ -4,8 +4,8 @@ import { verifyEventDiscountCode } from '@/lib/actions/event/verifyEventDiscount
 import { getEventDiscountsAndTickets } from '@/lib/actions/event/getEventDiscountsAndTickets'
 import { prisma } from '@/lib/db'
 import { CheckoutItems } from '@/lib/types/payment'
-import { getFinalTicketPrice } from '@/lib/price/getPrices'
-import { buildAppliedDiscountsMulti } from '@/lib/payment/checkoutDiscountApplied'
+import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
+import { buildAppliedDiscountsMulti } from '@/lib/actions/payment/checkoutDiscountApplied'
 
 // ##################### FLOW OF PRICES ######################
 // Discount price creation (event_discount)
