@@ -51,6 +51,67 @@ export default async function middleware(
   event: NextFetchEvent
 ): Promise<NextResponse | Response> {
   const { pathname } = request.nextUrl
+  const hostHeader = request.headers.get('host') ?? ''
+  const host = hostHeader.split(':')[0].toLowerCase()
+  const isMainHost = host === 'vietvibe.org' || host === 'www.vietvibe.org'
+  const isPortalHost = host === 'portal.vietvibe.org'
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1'
+
+  // Domain-based path rules:
+  // - Main domain uses /{locale}/app...
+  // - Portal domain uses /{locale}/portal...
+  // Keep API/auth/static paths untouched.
+  const localePrefixMatch = pathname.match(/^\/([a-z]{2}|[a-z]{2}-[A-Z]{2})(\/.*)?$/)
+  const locale = localePrefixMatch?.[1]
+  const localePathRemainder = localePrefixMatch?.[2] || ''
+  const isApiOrStaticPath =
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname.startsWith('/sitemap')
+
+  if (!isLocalHost && !isApiOrStaticPath) {
+    if (isMainHost && pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${i18nConfig.defaultLocale}/app`
+      return NextResponse.redirect(url, 308)
+    }
+
+    if (isPortalHost && pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${i18nConfig.defaultLocale}/portal`
+      return NextResponse.redirect(url, 308)
+    }
+
+    if (isMainHost) {
+      // Block portal area on main domain.
+      if (pathname === '/portal' || pathname.startsWith('/portal/')) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/app'
+        return NextResponse.redirect(url, 308)
+      }
+      if (locale && localePathRemainder.startsWith('/portal')) {
+        const url = request.nextUrl.clone()
+        url.pathname = `/${locale}/app`
+        return NextResponse.redirect(url, 308)
+      }
+    }
+
+    if (isPortalHost) {
+      // Block app area on portal domain.
+      if (pathname === '/app' || pathname.startsWith('/app/')) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/portal'
+        return NextResponse.redirect(url, 308)
+      }
+      if (locale && localePathRemainder.startsWith('/app')) {
+        const url = request.nextUrl.clone()
+        url.pathname = `/${locale}/portal`
+        return NextResponse.redirect(url, 308)
+      }
+    }
+  }
 
   // Exclude common static files from i18n routing
   // These should be handled as static files, not as locale routes
