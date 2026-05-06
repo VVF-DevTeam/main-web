@@ -247,6 +247,12 @@ export default function PartialRefundButton({ user }: { user: UserInfoProps }) {
               </button>
             </div>
 
+            <div className="mb-6">
+              <p className="text-muted-foreground text-sm">
+                NOTE: Refund takes up to 3 days to process. Please notice the client accordingly.
+              </p>
+            </div>
+
             <Form {...form}>
               <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
