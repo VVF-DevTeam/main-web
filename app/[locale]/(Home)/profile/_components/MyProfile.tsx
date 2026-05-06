@@ -50,6 +50,7 @@ const paymentTypeMap = {
   Camping: 'Camping',
   Event: 'Event',
   Shop: 'Shop',
+  Refund: 'Refund',
 }
 
 const MyProfile = async ({
@@ -206,10 +207,10 @@ const MyProfile = async ({
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {paymentHistory.some((p) => p.type !== 'Shop') ? (
+                    {paymentHistory.some((p) => p.type !== 'Shop' && p.type !== 'Refund') ? (
                       paymentHistory.map(
                         (payment: PaymentHistoryItem, index: number) => {
-                          if (payment.type !== 'Shop') {
+                          if (payment.type !== 'Shop' && payment.type !== 'Refund') {
                             // payment details
                             const event = payment.event
                             const startDate = new Date(

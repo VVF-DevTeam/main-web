@@ -14,6 +14,8 @@ async function fetchEventPaymentsData(eventId: string) {
       select: {
         id: true,
         pricePaid: true,
+        totalRefundAmount: true,
+        createdAt: true,
         quantity: true,
         seatNumber: true,
         type: true,
@@ -56,6 +58,10 @@ async function fetchEventPaymentsData(eventId: string) {
     return payments.map((payment) => ({
       ...payment,
       pricePaid: Number(payment.pricePaid.toString()),
+      totalRefundAmount:
+        payment.totalRefundAmount == null
+          ? null
+          : Number(payment.totalRefundAmount.toString()),
       otherGuests: Array.isArray(payment.otherGuests)
         ? payment.otherGuests
         : [],
@@ -80,7 +86,7 @@ async function fetchEventPaymentsData(eventId: string) {
 export async function getEventPayments(eventId: string) {
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
-    [`event-payments-v8-${eventId}`], // Cache key per event (v8 after adding discountApplied field)
+    [`event-payments-v10-${eventId}`], // Cache key per event (v10 after adding createdAt)
     {
       revalidate: 86400, // Cache for 1 day (revalidateTag handles on-demand invalidation)
       tags: ['payments'], // Tag for revalidation - automatically invalidated when payments change

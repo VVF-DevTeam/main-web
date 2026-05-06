@@ -18,6 +18,9 @@ export type PaymentWithRelations = {
     name: string | null
     email: string
   } | null
+  monitorUser: {
+    name: string | null
+  } | null
   event: {
     title: string
     keyName: string

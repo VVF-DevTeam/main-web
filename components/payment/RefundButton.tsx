@@ -13,6 +13,8 @@ interface RefundButtonProps {
   disabled?: boolean
   stripeProductId: string | null
   method: PaymentMethod
+  /** Logged-in admin/superadmin who performs the refund (stored as Payment.monitorUserId). */
+  monitorUserId: string
 }
 
 export default function RefundButton({
@@ -21,6 +23,7 @@ export default function RefundButton({
   disabled = false,
   stripeProductId,
   method,
+  monitorUserId,
 }: RefundButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -31,6 +34,7 @@ export default function RefundButton({
         paymentId,
         amount,
         stripeProductId,
+        monitorUserId,
       })
       toast.success('Refund processed successfully', {
         description: `$${amount.toFixed(2)} will be refunded to user account in 5-7 business days`,
@@ -68,7 +72,7 @@ export default function RefundButton({
           }
         `}
       >
-        {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Refund'}
+        {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Full Refund'}
       </button>
     </>
   )

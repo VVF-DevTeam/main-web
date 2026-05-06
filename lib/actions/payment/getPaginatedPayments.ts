@@ -4,12 +4,14 @@ import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { PaymentWithRelations } from '@/lib/types/payment'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { Prisma } from '@prisma/client'
 
 // Base function to fetch payments (without caching)
 async function fetchPaymentsData(
   user: UserInfoProps,
   currentPage: number,
-  pageSize: number
+  pageSize: number,
+  searchTerm: string = ''
 ) {
   const skip = Math.max(0, (currentPage - 1) * pageSize)
   const requiredCount = currentPage * pageSize + pageSize // Extra page as buffer
@@ -18,11 +20,26 @@ async function fetchPaymentsData(
   let payments: PaymentWithRelations[]
   let totalCount: number
 
+  const normalizedSearch = searchTerm.trim()
+  const searchWhere: Prisma.PaymentWhereInput | undefined = normalizedSearch
+    ? {
+        OR: [
+          { event: { is: { title: { contains: normalizedSearch, mode: 'insensitive' } } } },
+          { user: { is: { email: { contains: normalizedSearch, mode: 'insensitive' } } } },
+          { user: { is: { name: { contains: normalizedSearch, mode: 'insensitive' } } } },
+          { guestEmail: { contains: normalizedSearch, mode: 'insensitive' } },
+          { guestName: { contains: normalizedSearch, mode: 'insensitive' } },
+        ],
+      }
+    : undefined
+
   if (user.role.includes('ADMIN') || user.role.includes('SUPERADMIN')) {
     // Admin: get all payments
+    const where: Prisma.PaymentWhereInput = searchWhere ?? {}
     const [adminTotalCount, adminPayments] = await Promise.all([
-      prisma.payment.count(),
+      prisma.payment.count({ where }),
       prisma.payment.findMany({
+        where,
         select: {
           id: true,
           pricePaid: true,
@@ -40,6 +57,11 @@ async function fetchPaymentsData(
             select: {
               name: true,
               email: true,
+            },
+          },
+          monitorUser: {
+            select: {
+              name: true,
             },
           },
           event: {
@@ -81,11 +103,16 @@ async function fetchPaymentsData(
     })
 
     const hostedEventIds = hostedEvents.map((event) => event.id)
-    const where = {
-      eventId: {
-        in: hostedEventIds,
-      },
-    } as const
+    const where: Prisma.PaymentWhereInput = {
+      AND: [
+        {
+          eventId: {
+            in: hostedEventIds,
+          },
+        },
+        ...(searchWhere ? [searchWhere] : []),
+      ],
+    }
 
     const [hostTotalCount, hostPayments] = await Promise.all([
       prisma.payment.count({ where }),
@@ -105,6 +132,11 @@ async function fetchPaymentsData(
             select: {
               name: true,
               email: true,
+            },
+          },
+          monitorUser: {
+            select: {
+              name: true,
             },
           },
           event: {
@@ -158,7 +190,8 @@ async function fetchPaymentsData(
 export const getPaginatedPayments = async (
   user: UserInfoProps,
   currentPage: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
+  searchTerm: string = ''
 ): Promise<{
   payments: PaymentWithRelations[]
   totalCount: number
@@ -172,11 +205,11 @@ export const getPaginatedPayments = async (
     // Create stable cache key from user properties
     const userRole = user.role[0] || 'USER'
     const userId = user.role.includes('HOST') ? user.id : 'all'
-    const cacheKey = `payments-${userRole}-${userId}-${currentPage}-${pageSize}`
+    const cacheKey = `payments-${userRole}-${userId}-${currentPage}-${pageSize}-${searchTerm.trim().toLowerCase()}`
     
     // Use unstable_cache with stable key
     const getCachedPaymentsData = unstable_cache(
-      async () => fetchPaymentsData(user, currentPage, pageSize),
+      async () => fetchPaymentsData(user, currentPage, pageSize, searchTerm),
       [cacheKey], // stable cache key
       {
         tags: ['payments'], // tag for revalidation

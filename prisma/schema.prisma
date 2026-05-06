@@ -184,7 +184,8 @@ model User {
   accounts             Account[]
   applications         Application[]
   jobs                 Job[]
-  payments             Payment[]
+  payments             Payment[]     @relation("PaymentUser")
+  monitoredPayments    Payment[]     @relation("PaymentMonitorUser")
   posts                Post[]
   likedPosts           PostLikes[]
   visitedPosts         PostVisits[]
@@ -283,6 +284,7 @@ model Payment {
   // info
   pricePaid       Decimal
   refunded        Boolean     @default(false)
+  totalRefundAmount Decimal?  
   seatNumber      String?
   
   // Guests information
@@ -299,12 +301,14 @@ model Payment {
 
   // Relations
   userId          String?
+  monitorUserId   String?    
   eventId         String?
   eventTicketId   String?
   shopId          String?
   shopItemId      String?
   event           Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
-  user            User?        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user            User?        @relation("PaymentUser", fields: [userId], references: [id], onDelete: Restrict)
+  monitorUser     User?        @relation("PaymentMonitorUser", fields: [monitorUserId], references: [id], onDelete: Restrict)
   eventTicket     EventTicket? @relation(fields: [eventTicketId], references: [id], onDelete: Restrict)
   shop            Shop?        @relation(fields: [shopId], references: [id], onDelete: Restrict)
   shopItem        ShopItem?    @relation(fields: [shopItemId], references: [id], onDelete: Restrict)
@@ -599,6 +603,7 @@ enum PaymentType {
   Event
   Class
   Shop
+  Refund
 }
 
 enum PaymentMethod {

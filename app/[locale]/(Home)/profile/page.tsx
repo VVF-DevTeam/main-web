@@ -108,6 +108,8 @@ export default async function ProfilePage({
     section?: string
     page?: string
     pageSize?: string
+    paymentSearch?: string
+    paymentTypeTab?: 'all' | 'incoming' | 'refund'
     eventKeyName?: string
     jobId?: string
     postId?: string
@@ -115,7 +117,7 @@ export default async function ProfilePage({
   }>
 }) {
   const [
-    { section, page: pageStr, pageSize: pageSizeStr, eventKeyName, jobId, postId, shopId },
+    { section, page: pageStr, pageSize: pageSizeStr, paymentSearch, paymentTypeTab, eventKeyName, jobId, postId, shopId },
     { locale },
     user,
   ] = await Promise.all([searchParams, params, getCurrentUserInfo()])
@@ -156,7 +158,15 @@ export default async function ProfilePage({
         const pageSize = [5, 10, 20, 50].includes(Number(pageSizeStr))
           ? Number(pageSizeStr)
           : 5
-        return <PaymentManagement user={user} page={page} pageSize={pageSize} />
+        return (
+          <PaymentManagement
+            user={user}
+            page={page}
+            pageSize={pageSize}
+            dbSearch={paymentSearch || ''}
+            paymentTypeTab={paymentTypeTab || 'all'}
+          />
+        )
       }
       return (
         <p className="mt-10 text-center">
