@@ -1,6 +1,7 @@
 import Footer from '@/app/[locale]/(Home)/_components/footer'
 import Navbar from '@/app/[locale]/(Home)/_components/navbar'
 import Header from '@/app/[locale]/(Home)/_components/header'
+import ChatWidget from '@/app/[locale]/(Home)/_components/chatWidget'
 // import Copyright from './_components/copyright'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +24,7 @@ const Layout = async ({
       <div className="mt-auto">
         <Footer locale={locale} />
       </div>
+      <ChatWidget />
     </div>
   )
 }

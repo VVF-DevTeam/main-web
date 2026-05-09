@@ -202,5 +202,12 @@
   "back-button": "Back",
   "processing": "Processing...",
   "form-validation-error": "Please answer all required questions",
-  "form-validation-description": "{{count}} required question(s) need to be answered."
+  "form-validation-description": "{{count}} required question(s) need to be answered.",
+  "chat-clear-conversation": "Clear conversation",
+  "chat-input-placeholder": "Ask a question",
+  "chat-suggested-questions": "Suggested questions",
+  "chat-suggested-question-upcoming-events": "What are the upcoming events?",
+  "chat-suggested-question-upcoming-event-detail": "Tell me about {{eventTitle}}",
+  "chat-suggested-question-vvf-mission": "What is VVF and its missions?",
+  "chat-suggested-question-default-upcoming-event-name": "the upcoming event"
 }

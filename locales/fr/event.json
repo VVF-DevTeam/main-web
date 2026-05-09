@@ -205,5 +205,12 @@
   "back-button": "Retour",
   "processing": "Traitement en cours...",
   "form-validation-error": "Veuillez répondre à toutes les questions obligatoires",
-  "form-validation-description": "{{count}} question(s) obligatoire(s) doit/doivent être répondue(s)."
+  "form-validation-description": "{{count}} question(s) obligatoire(s) doit/doivent être répondue(s).",
+  "chat-clear-conversation": "Effacer la conversation",
+  "chat-input-placeholder": "Posez une question",
+  "chat-suggested-questions": "Questions suggérées",
+  "chat-suggested-question-upcoming-events": "Quels sont les prochains événements ?",
+  "chat-suggested-question-upcoming-event-detail": "Parlez-moi de {{eventTitle}}",
+  "chat-suggested-question-vvf-mission": "Qu'est-ce que VVF et quelles sont ses missions ?",
+  "chat-suggested-question-default-upcoming-event-name": "le prochain événement"
 }

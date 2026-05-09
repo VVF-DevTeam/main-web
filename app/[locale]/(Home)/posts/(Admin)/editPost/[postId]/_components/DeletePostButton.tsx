@@ -34,7 +34,7 @@ const DeletePostButton = ({ postId, isSuperAdmin }: DeletePostButtonProps) => {
   const router = useRouter()
   const currentDateTime = getCurrentDateTime()
   const deniedMessage =
-    'only superadmin can delete, please contact Khai or Trong'
+    'Only Super Admin have delete permission, please contact Director of IT department (Khai) or any other Director'
 
   const handleDelete = async () => {
     setIsDeleting(true)

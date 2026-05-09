@@ -400,6 +400,7 @@ export default async function ProfilePage({
         return (
           <EditJob
             job={job}
+            isSuperAdmin={Boolean(isSuperAdmin)}
           />
         )
       }
@@ -462,6 +463,7 @@ export default async function ProfilePage({
           <EditPost
             post={post}
             showBackButton={false}
+            isSuperAdmin={Boolean(isSuperAdmin)}
           />
         )
       }

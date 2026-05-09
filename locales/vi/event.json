@@ -205,5 +205,12 @@
   "back-button": "Quay lại",
   "processing": "Đang xử lý...",
   "form-validation-error": "Vui lòng trả lời tất cả các câu hỏi bắt buộc",
-  "form-validation-description": "{{count}} câu hỏi bắt buộc cần được trả lời."
+  "form-validation-description": "{{count}} câu hỏi bắt buộc cần được trả lời.",
+  "chat-clear-conversation": "Xóa cuộc trò chuyện",
+  "chat-input-placeholder": "Nhập câu hỏi",
+  "chat-suggested-questions": "Câu hỏi gợi ý",
+  "chat-suggested-question-upcoming-events": "Các sự kiện sắp tới là gì?",
+  "chat-suggested-question-upcoming-event-detail": "Cho mình biết về {{eventTitle}}",
+  "chat-suggested-question-vvf-mission": "VVF là gì và sứ mệnh của VVF là gì?",
+  "chat-suggested-question-default-upcoming-event-name": "sự kiện sắp tới"
 }
