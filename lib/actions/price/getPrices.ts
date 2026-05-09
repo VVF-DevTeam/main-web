@@ -50,7 +50,7 @@ export const applyPercentageDiscount = (price: number, discountPercent: number):
 }
 
 /** Student percent off list price when applied (additive with member %). */
-export const STUDENT_DISCOUNT_PERCENT = 10
+export const STUDENT_DISCOUNT_PERCENT = 18
 
 /**
  * Total percent off list/unit price: member % (if any) plus student % (if any),
