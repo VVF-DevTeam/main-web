@@ -69,6 +69,7 @@ const ChatWidget = () => {
   ])
   const { data: session } = useSession()
   const chatContainerRef = useRef<HTMLDivElement | null>(null)
+  const hasUserMessageRef = useRef(false)
 
   const userMeta = useMemo(
     () => ({
@@ -77,6 +78,25 @@ const ChatWidget = () => {
     }),
     [session?.user?.email, session?.user?.name]
   )
+
+  useEffect(() => {
+    hasUserMessageRef.current = messages.some((item) => item.role === 'user')
+  }, [messages])
+
+  const clearConversationOnServer = async (useKeepalive = false) => {
+    const response = await fetch('/api/chat-bot/send-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: useKeepalive,
+      body: JSON.stringify({
+        email: userMeta.email,
+        name: userMeta.name,
+        clearConversation: true,
+      }),
+    })
+
+    return response.ok
+  }
 
   useEffect(() => {
     if (!isOpen) return
@@ -123,21 +143,43 @@ const ChatWidget = () => {
     suggestedQuestionVvfMission,
   ])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const navigationEntry = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined
+    const isReloadNavigation = navigationEntry?.type === 'reload'
+
+    if (isReloadNavigation) {
+      void handleClearConversation()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const clearIfUserHasChat = () => {
+      if (!hasUserMessageRef.current) return
+      void clearConversationOnServer(true)
+    }
+
+    window.addEventListener('beforeunload', clearIfUserHasChat)
+
+    return () => {
+      window.removeEventListener('beforeunload', clearIfUserHasChat)
+      if (hasUserMessageRef.current) {
+        void clearConversationOnServer(true)
+      }
+    }
+  }, [userMeta.email, userMeta.name])
+
   const handleClearConversation = async () => {
     if (isClearing || isSending) return
     setIsClearing(true)
     try {
-      const response = await fetch('/api/chat-bot/send-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: userMeta.email,
-          name: userMeta.name,
-          clearConversation: true,
-        }),
-      })
-
-      if (!response.ok) {
+      const isCleared = await clearConversationOnServer()
+      if (!isCleared) {
         throw new Error('Failed to clear conversation')
       }
 
@@ -388,7 +430,7 @@ const ChatWidget = () => {
               {messages.map((message) =>
                 message.role === 'user' ? (
                   <div className="flex justify-end" key={message.id}>
-                    <div className="max-w-[84%] rounded-2xl bg-[#f3f3f6] px-4 py-3 text-base leading-8">
+                    <div className="max-w-[84%] rounded-2xl bg-[#f3f3f6] px-4 py-3 text-base leading-8 [overflow-wrap:anywhere]">
                       {message.text}
                     </div>
                   </div>
@@ -399,7 +441,7 @@ const ChatWidget = () => {
                       alt="VVF Penguin Helper"
                       className="mt-1 h-8 w-8 rounded-full object-cover"
                     />
-                    <div className="max-w-[84%] whitespace-pre-wrap text-base leading-8">
+                    <div className="max-w-[84%] whitespace-pre-wrap text-base leading-8 [overflow-wrap:anywhere]">
                       {renderMarkdownText(message.text)}
                     </div>
                   </div>
