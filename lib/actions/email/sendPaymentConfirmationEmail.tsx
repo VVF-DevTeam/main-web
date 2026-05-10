@@ -288,6 +288,20 @@ const EmailTemplatePaymentConfirmation = ({
                 </p>
               </td>
 
+              {/* Acoustic Camp participant document link */}
+              {eventTitle?.toLowerCase().includes('acoustic camp') && (
+                <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '16px' }}>
+                  Please check out this document for more information about the event:{' '}
+                  <a
+                    href="https://docs.google.com/document/d/197emItEXbcai1FbjJklf2FbrLFLu_OEdkCMvrQjYKh4/edit?usp=sharing"
+                    style={{ color: '#2563eb' }}
+                  >
+                    Acoustic Camp — all information (Google Doc)
+                  </a>
+                  .
+                </p>
+              )}
+
               {/* Right: image column */}
               {ticketImageUrl && (
                 <td

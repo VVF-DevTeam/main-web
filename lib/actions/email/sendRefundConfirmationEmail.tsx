@@ -96,7 +96,7 @@ const EmailTemplateRefundConfirmation = ({
         </h1>
         <p style={{ fontSize: '16px', color: '#374151', marginBottom: '20px' }}>
           Your refund for <strong>{ticketType}</strong> has been successfully
-          processed. We are sorry to see you go and hope to see you again soon!
+          processed. See you again soon!
         </p>
 
         {eventTitle && (
@@ -207,7 +207,7 @@ const EmailTemplateRefundConfirmation = ({
                     fontStyle: 'italic',
                   }}
                 >
-                  *Note: Stripe will also send you a separate email with an
+                  *Note: Stripe may send you a separate email with an
                   official refund receipt. Please check your spam folder if you
                   don't see it in your inbox.
                 </p>
