@@ -297,7 +297,11 @@ export default function EventSingleCheckOut({
               >
                 membership
               </Link>
-              !
+              {t('payment-orVerifyStudentPrefix')}
+              <Link href="/student" className="text-textColor-blue hover:underline">
+                {t('payment-student-link')}
+              </Link>
+              {t('payment-orVerifyStudentSuffix')}!
             </p>
           )}
 

@@ -786,7 +786,7 @@ const EventTickets = ({ event }: EventTicketsProps) => {
                   {/* Buttons — keep full contrast when row is disabled */}
                   <div
                     className={cn(
-                      'flex shrink-0 gap-x-2',
+                      'flex shrink-0 flex-col gap-y-2',
                       ticket.disabled && 'text-slate-900'
                     )}
                   >

@@ -808,7 +808,7 @@ const FormPanel = ({
 
   return (
     <div
-      style={{ width: panelWidth, minWidth: '240px', flexShrink: 0 }}
+      style={{ width: panelWidth, minWidth: '320px', flexShrink: 0 }}
       className="flex flex-col rounded-md border border-slate-200 bg-white shadow-sm"
     >
       {/* Panel header */}

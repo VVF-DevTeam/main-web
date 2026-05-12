@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
+import { cn } from '@/lib/utils'
 
 interface ScheduleItemProps {
   eventId: string
@@ -168,14 +169,20 @@ const ScheduleItem = ({
       <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex items-center gap-x-2 xl:gap-x-4"
+        className={cn(
+          'grid min-w-0 w-full grid-cols-1 gap-3',
+          'sm:grid-rows-[auto_auto] sm:gap-x-2 sm:gap-y-2 xl:gap-x-4',
+          isEditable
+            ? 'sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]'
+            : 'sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'
+        )}
       >
-        <>
+        <div className="flex min-w-0 w-full gap-x-2 sm:contents">
           <FormField
             name="startTime"
             control={form.control}
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="min-w-0 flex-1 sm:col-start-1 sm:row-start-1 sm:flex-none">
                 <FormControl>
                   <TimePicker
                     isEditable={!isEditable}
@@ -192,7 +199,7 @@ const ScheduleItem = ({
             name="endTime"
             control={form.control}
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="min-w-0 flex-1 sm:col-start-2 sm:row-start-1 sm:flex-none">
                 <FormControl>
                   <TimePicker
                     isEditable={!isEditable}
@@ -204,20 +211,20 @@ const ScheduleItem = ({
               </FormItem>
             )}
           />
-        </>
+        </div>
 
         <FormField
           name="description"
           control={form.control}
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="min-w-0 w-full sm:col-span-2 sm:row-start-2 sm:min-w-0">
               <FormControl>
                 <Input
                   placeholder="add..."
                   type="text"
                   required
                   disabled={!isEditable || isLoading}
-                  className="h-[43px] w-full"
+                  className="h-[43px] min-w-0 w-full max-w-full overflow-x-auto"
                   {...field}
                 />
               </FormControl>
@@ -226,7 +233,7 @@ const ScheduleItem = ({
           )}
         />
         {isEditable && (
-          <div className="flex gap-x-1">
+          <div className="flex w-full shrink-0 flex-col items-end gap-y-1 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:h-full sm:w-auto sm:items-center sm:justify-center">
             {/* Save button */}
             <Button
               variant={'outline'}

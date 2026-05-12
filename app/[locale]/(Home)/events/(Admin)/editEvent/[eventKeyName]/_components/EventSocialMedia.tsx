@@ -53,7 +53,7 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
       setIsLoading(true)
       // Filter out incomplete social links
       const completeLinks = socialLinks.filter(link => link.platform && link.url)
-      
+
       await axiosInstance.put(`/api/events/edit/${event.id}`, { socialLinks: completeLinks })
       toast.success('Social media links updated successfully', {
         description: (
@@ -68,7 +68,7 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
       router.refresh()
     } catch (error) {
       console.log(error)
-      toast.error('Failed to update social media links', { 
+      toast.error('Failed to update social media links', {
         description: (
           <div className="flex flex-col gap-1">
             <span>{error instanceof Error ? error.message : 'Please try again later'}</span>
@@ -87,55 +87,59 @@ const EventSocialMedia = ({ event }: EventSocialMediaProps) => {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
-      <div className="flex flex-col gap-y-4">
-        {socialLinks.map((link, index) => (
-          <div key={index} className="flex items-end gap-x-4">
-            <div className="flex-1">
-              <Label>Platform</Label>
-              <Select
-                value={link.platform}
-                onValueChange={(value) => handleLinkChange(index, 'platform', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  {socialMediaOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex-1">
-              <Label>URL</Label>
-              <Input
-                type="url"
-                value={link.url}
-                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                placeholder="Enter social media URL"
-              />
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => handleRemoveLink(index)}
-              disabled={isLoading}
-              className="mb-[2px]"
+      <div className="flex min-w-0 flex-col gap-y-4 rounded-md bg-slate-50 px-4 py-6">
+        <div className="flex flex-col gap-y-4">
+          {socialLinks.map((link, index) => (
+            <div
+              key={index}
+              className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-x-4 sm:overflow-x-auto"
             >
-              Remove
-            </Button>
-          </div>
-        ))}
+              <div className="w-full min-w-0 sm:min-w-[9rem] sm:max-w-[12rem] sm:grow-0 sm:shrink">
+                <Label>Platform</Label>
+                <Select
+                  value={link.platform}
+                  onValueChange={(value) => handleLinkChange(index, 'platform', value)}
+                >
+                  <SelectTrigger className="min-w-0 w-full max-w-full">
+                    <SelectValue placeholder="Select platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {socialMediaOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full min-w-0 sm:min-w-[240px] sm:flex-1">
+                <Label>URL</Label>
+                <Input
+                  type="url"
+                  value={link.url}
+                  onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                  placeholder="Enter social media URL"
+                  className="h-9 min-w-0 w-full max-w-full overflow-x-auto"
+                />
+              </div>
+              <Button
+                variant="destructive"
+                onClick={() => handleRemoveLink(index)}
+                disabled={isLoading}
+                className="mb-[2px] w-full shrink-0 sm:w-auto"
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-4">
+          <Button onClick={handleAddLink} variant="outline" disabled={isLoading}>
+            Add Social Media Link
+          </Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
+        </div>
       </div>
-      <div className="flex gap-x-4">
-        <Button onClick={handleAddLink} variant="outline" disabled={isLoading}>
-          Add Social Media Link
-        </Button>
-        <Button onClick={handleSubmit} disabled={isLoading}>Save Changes</Button>
-      </div>
-    </div>
     </>
   )
 }

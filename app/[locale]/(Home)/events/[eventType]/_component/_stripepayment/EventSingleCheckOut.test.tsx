@@ -42,6 +42,9 @@ vi.mock('react-i18next', () => ({
       const translations: Record<string, string> = {
         'reserve-button': 'Reserve',
         'payment-membershipIntro': 'Get discounted prices with',
+        'payment-orVerifyStudentPrefix': ', or verify if you are a ',
+        'payment-student-link': 'student',
+        'payment-orVerifyStudentSuffix': '',
         sessions: 'sessions',
       }
       return translations[key] || key
@@ -145,6 +148,7 @@ describe('EventSingleCheckOut', () => {
       screen.getByText('Get discounted prices with', { exact: false })
     ).toBeInTheDocument()
     expect(screen.getByText('membership')).toBeInTheDocument()
+    expect(screen.getByText('student')).toBeInTheDocument()
 
     // Renders every ticket with a checkout button
     const checkoutButtons = screen.getAllByTestId('normal-checkout-button')
@@ -268,7 +272,7 @@ describe('EventSingleCheckOut', () => {
     consoleSpy.mockRestore()
   })
 
-  test('membership link points to registration page', async () => {
+  test('membership and student links point to registration and student pages', async () => {
     render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
@@ -278,5 +282,9 @@ describe('EventSingleCheckOut', () => {
     const membershipLink = screen.getByText('membership')
     expect(membershipLink).toHaveAttribute('href', '/registration/membership')
     expect(membershipLink).toHaveClass('text-textColor-blue', 'hover:underline')
+
+    const studentLink = screen.getByText('student')
+    expect(studentLink).toHaveAttribute('href', '/student')
+    expect(studentLink).toHaveClass('text-textColor-blue', 'hover:underline')
   })
 })
