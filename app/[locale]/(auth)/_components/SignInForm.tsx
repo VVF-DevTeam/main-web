@@ -22,11 +22,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@radix-ui/react-separator'
 import { signInSchema } from '@/lib/zodSchema/signinSchema'
-import ProviderButtons from './ProviderButtons'
+import ProviderButtons, {
+  type ProviderButtonsTurnstileHandle,
+} from './ProviderButtons'
 import { useSession } from 'next-auth/react'
 import { ServerActionResponse } from '@/lib/types/serverAction'
 import { useTranslation } from 'react-i18next'
-import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 import Loader from '@/components/loader/Loader'
 
 const SignInForm = () => {
@@ -37,20 +38,10 @@ const SignInForm = () => {
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   const [showPassword, setShowPassword] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState('')
   const [loading, setLoading] = useState(false)
-  const turnstileRef = useRef<BoundTurnstileObject | null>(null)
-  const turnstileTokenRef = useRef('')
-  const tokenRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const providerTurnstileRef = useRef<ProviderButtonsTurnstileHandle | null>(null)
   const retryAfterCaptchaFailRef = useRef(false)
   const pendingSubmissionRef = useRef<z.infer<typeof signInSchema> | null>(null)
-  /**
-   * Turnstile is invisible: `onVerify(token)` can run after the user clicks submit.
-   * This Promise lets us deterministically wait for a verified token (or timeout)
-   * before calling `signinAction`.
-   */
-  const tokenWaitResolveRef = useRef<((token: string) => void) | null>(null)
-  const tokenWaitRejectRef = useRef<((err: unknown) => void) | null>(null)
   // If token is resolved by retry flow, prevent the original waiting submit
   // from continuing so we avoid duplicate submissions.
   const tokenResolvedViaRetryRef = useRef(false)
@@ -80,17 +71,6 @@ const SignInForm = () => {
     }
   }, [searchParams])
 
-  // Cleanup Turnstile refresh interval and captcha-wait timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (tokenRefreshIntervalRef.current) {
-        clearInterval(tokenRefreshIntervalRef.current)
-      }
-      tokenWaitResolveRef.current = null
-      tokenWaitRejectRef.current = null
-    }
-  }, [])
-
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -99,50 +79,8 @@ const SignInForm = () => {
     },
   })
 
-  const isCaptchaFailure = (message: string) =>
-    message.toLowerCase().includes('captcha verification')
-
   const refreshTurnstileToken = () => {
-    if (!turnstileRef.current) return
-    // Clear token immediately so the next submit waits for a fresh `onVerify`.
-    turnstileTokenRef.current = ''
-    setTurnstileToken('')
-    turnstileRef.current.reset()
-    turnstileRef.current.execute()
-  }
-
-  const waitForTurnstileToken = (ms = 10000) => {
-    // Fast path if token is already present.
-    if (turnstileTokenRef.current) {
-      return Promise.resolve(turnstileTokenRef.current)
-    }
-
-    // Avoid hanging if a second submit starts a new wait: reject the previous one.
-    if (tokenWaitRejectRef.current) {
-      tokenWaitRejectRef.current(new Error('Superseded by a newer token wait'))
-    }
-
-    return new Promise<string>((resolve, reject) => {
-      const timeoutId = window.setTimeout(() => {
-        tokenWaitResolveRef.current = null
-        tokenWaitRejectRef.current = null
-        reject(new Error('Turnstile token timeout'))
-      }, ms)
-
-      tokenWaitResolveRef.current = (token) => {
-        window.clearTimeout(timeoutId)
-        tokenWaitResolveRef.current = null
-        tokenWaitRejectRef.current = null
-        resolve(token)
-      }
-
-      tokenWaitRejectRef.current = (err) => {
-        window.clearTimeout(timeoutId)
-        tokenWaitResolveRef.current = null
-        tokenWaitRejectRef.current = null
-        reject(err)
-      }
-    })
+    providerTurnstileRef.current?.refresh()
   }
 
   const onSubmit = async (
@@ -152,11 +90,29 @@ const SignInForm = () => {
     try {
       setLoading(true)
 
-      // If token isn't ready yet, wait for Turnstile verification (max 2s).
+      const turnstile = providerTurnstileRef.current
+      if (!turnstile) {
+        toast.error(
+          'Could not connect to the server because of time out, please refresh the page and try again.',
+          {
+            description: (
+              <span style={{ color: 'var(--muted-foreground)' }}>
+                {currentDateTime}
+              </span>
+            ),
+            style: {
+              color: '#ef4444', // red-500 color
+            },
+          }
+        )
+        return
+      }
+
+      // If token isn't ready yet, wait for Turnstile verification.
       // No toast: UX is "show Loader briefly, then stop if timeout".
-      if (!turnstileTokenRef.current) {
+      if (!turnstile.getToken()) {
         try {
-          await waitForTurnstileToken(10000)
+          await turnstile.waitForToken(10000)
         } catch {
           toast.error(
             'Could not connect to the server because of time out, please refresh the page and try again.',
@@ -185,7 +141,7 @@ const SignInForm = () => {
       const response: ServerActionResponse = await signinAction({
         ...data,
         locale: locale,
-        turnstileToken: turnstileTokenRef.current,
+        turnstileToken: turnstile.getToken(),
       })
 
       if (response.success) {
@@ -350,52 +306,6 @@ const SignInForm = () => {
                 >
                   {t('forgotPassword')}
                 </Link>
-                <Turnstile
-                  sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                  size="invisible"
-                  execution="execute"
-                  onLoad={(_, boundTurnstile) => {
-                    turnstileRef.current = boundTurnstile
-                    // Run once on load
-                    boundTurnstile.execute()
-                    // Refresh token every 5 minutes
-                    if (tokenRefreshIntervalRef.current) {
-                      clearInterval(tokenRefreshIntervalRef.current)
-                    }
-                    tokenRefreshIntervalRef.current = setInterval(() => {
-                      boundTurnstile.reset()
-                      boundTurnstile.execute()
-                    }, 5 * 60 * 1000)
-                  }}
-                  onVerify={(token) => {
-                    turnstileTokenRef.current = token
-                    setTurnstileToken(token)
-                    const isRetryFlow =
-                      retryAfterCaptchaFailRef.current &&
-                      pendingSubmissionRef.current
-                    tokenResolvedViaRetryRef.current = Boolean(isRetryFlow)
-                    // Resolve any `waitForTurnstileToken()` created by a pre-token submit.
-                    if (tokenWaitResolveRef.current) {
-                      tokenWaitResolveRef.current(token)
-                    }
-                    if (
-                      retryAfterCaptchaFailRef.current &&
-                      pendingSubmissionRef.current
-                    ) {
-                      const pendingData = pendingSubmissionRef.current
-                      retryAfterCaptchaFailRef.current = false
-                      pendingSubmissionRef.current = null
-                      void onSubmit(pendingData, true)
-                    }
-                  }}
-                  onExpire={() => {
-                    turnstileTokenRef.current = ''
-                    setTurnstileToken('')
-                    if (tokenWaitRejectRef.current) {
-                      tokenWaitRejectRef.current(new Error('Turnstile expired'))
-                    }
-                  }}
-                />
                 <Button
                   type="submit"
                   disabled={loading}
@@ -404,7 +314,19 @@ const SignInForm = () => {
                   {t('login')}
                 </Button>
                 {/* <p className="text-center text-sm font-bold">OR</p> */}
-                <ProviderButtons />
+                <ProviderButtons
+                  ref={providerTurnstileRef}
+                  credentialTurnstileBridge={{
+                    retryAfterCaptchaFailRef,
+                    pendingSubmissionRef,
+                    tokenResolvedViaRetryRef,
+                    onRetrySubmit: (data, hasRetried) =>
+                      void onSubmit(
+                        data as z.infer<typeof signInSchema>,
+                        hasRetried
+                      ),
+                  }}
+                />
                 <p className="text-sm font-bold">OR</p>
                 <p className="text-sm">
                   {t('noAccount')}{' '}

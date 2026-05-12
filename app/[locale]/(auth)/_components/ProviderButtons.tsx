@@ -1,5 +1,12 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 import { authAction } from '@/lib/actions/auth/authAction'
 import { authType } from '@/lib/types/authTpes'
 import { FaGithub } from 'react-icons/fa'
@@ -8,6 +15,24 @@ import Image from 'next/image'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 import { toast } from 'sonner'
 import Loader from '@/components/loader/Loader'
+
+/** Lets a parent (e.g. email/password sign-in) share the same Turnstile widget. */
+export type CredentialTurnstileBridge = {
+  retryAfterCaptchaFailRef: React.MutableRefObject<boolean>
+  pendingSubmissionRef: React.MutableRefObject<unknown | null>
+  tokenResolvedViaRetryRef: React.MutableRefObject<boolean>
+  onRetrySubmit: (data: unknown, hasRetried: boolean) => void | Promise<void>
+}
+
+export type ProviderButtonsTurnstileHandle = {
+  getToken: () => string
+  refresh: () => void
+  waitForToken: (ms?: number) => Promise<string>
+}
+
+type ProviderButtonsProps = {
+  credentialTurnstileBridge?: CredentialTurnstileBridge
+}
 
 const providers: { id: authType; icon: React.ReactNode }[] = [
   { id: 'google', icon: <FcGoogle className="h-6 w-6" /> },
@@ -26,7 +51,10 @@ const providers: { id: authType; icon: React.ReactNode }[] = [
   { id: 'github', icon: <FaGithub className="h-6 w-6" /> },
 ]
 
-const ProviderButtons = () => {
+const ProviderButtons = forwardRef<
+  ProviderButtonsTurnstileHandle,
+  ProviderButtonsProps
+>(function ProviderButtons({ credentialTurnstileBridge }, ref) {
   const [isVerifying, setIsVerifying] = useState(false)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
   const turnstileTokenRef = useRef('')
@@ -36,7 +64,6 @@ const ProviderButtons = () => {
   /**
    * Promise-based waiting for Turnstile verification.
    *
-   * Turnstile is "invisible" and may verify after the user clicks a provider.
    * To guarantee we only call `authAction` after `handleVerified` ran, we wait
    * for the next `onVerify(token)` via a Promise.
    */
@@ -59,19 +86,24 @@ const ProviderButtons = () => {
   const isCaptchaFailure = (message: string) =>
     message.toLowerCase().includes('captcha verification failed')
 
-  const refreshTurnstileToken = () => {
+  const refreshTurnstileToken = useCallback(() => {
     if (!turnstileRef.current) return
     // Clear any existing token immediately so we can't accidentally reuse it
     // while the new `execute()` is still in flight.
     turnstileTokenRef.current = ''
     turnstileRef.current.reset()
     turnstileRef.current.execute()
-  }
+  }, [])
 
-  const waitForTurnstileToken = (ms = 10000) => {
+  const waitForTurnstileToken = useCallback((ms = 10000) => {
     // If we already have a token, no need to wait.
     if (turnstileTokenRef.current) {
       return Promise.resolve(turnstileTokenRef.current)
+    }
+
+    // Avoid hanging if a second wait starts: reject the previous one.
+    if (tokenWaitRejectRef.current) {
+      tokenWaitRejectRef.current(new Error('Superseded by a newer token wait'))
     }
 
     return new Promise<string>((resolve, reject) => {
@@ -95,7 +127,17 @@ const ProviderButtons = () => {
         reject(err)
       }
     })
-  }
+  }, [])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getToken: () => turnstileTokenRef.current,
+      refresh: refreshTurnstileToken,
+      waitForToken: waitForTurnstileToken,
+    }),
+    [refreshTurnstileToken, waitForTurnstileToken]
+  )
 
   const onSubmit = async (provider: authType, hasRetried = false) => {
     try {
@@ -155,16 +197,26 @@ const ProviderButtons = () => {
 
   const handleVerified = (token: string) => {
     turnstileTokenRef.current = token
-    const isRetryFlow =
+    const isProviderRetryFlow =
       retryAfterCaptchaFailRef.current && pendingProviderRef.current
-    tokenResolvedViaRetryRef.current = Boolean(isRetryFlow)
+    const isCredentialRetryFlow = Boolean(
+      credentialTurnstileBridge &&
+        credentialTurnstileBridge.retryAfterCaptchaFailRef.current &&
+        credentialTurnstileBridge.pendingSubmissionRef.current
+    )
+
+    tokenResolvedViaRetryRef.current = Boolean(isProviderRetryFlow)
+    if (credentialTurnstileBridge) {
+      credentialTurnstileBridge.tokenResolvedViaRetryRef.current =
+        isCredentialRetryFlow
+    }
 
     // Resolve any pending `waitForTurnstileToken()` promise.
     if (tokenWaitResolveRef.current) {
       tokenWaitResolveRef.current(token)
     }
 
-    // Because retry needs a fresh Turnstile token, 
+    // Because retry needs a fresh Turnstile token,
     // and handleVerified is the first reliable point where that new token is guaranteed to exist.
     // So we can call `onSubmit` with `hasRetried = true` to handle the retry.
     if (retryAfterCaptchaFailRef.current && pendingProviderRef.current) {
@@ -172,6 +224,17 @@ const ProviderButtons = () => {
       retryAfterCaptchaFailRef.current = false
       pendingProviderRef.current = null
       void onSubmit(provider, true)
+    }
+
+    if (
+      credentialTurnstileBridge &&
+      credentialTurnstileBridge.retryAfterCaptchaFailRef.current &&
+      credentialTurnstileBridge.pendingSubmissionRef.current
+    ) {
+      const pendingData = credentialTurnstileBridge.pendingSubmissionRef.current
+      credentialTurnstileBridge.retryAfterCaptchaFailRef.current = false
+      credentialTurnstileBridge.pendingSubmissionRef.current = null
+      void credentialTurnstileBridge.onRetrySubmit(pendingData, true)
     }
   }
 
@@ -225,6 +288,6 @@ const ProviderButtons = () => {
       </div>
     </>
   )
-}
+})
 
 export default ProviderButtons
