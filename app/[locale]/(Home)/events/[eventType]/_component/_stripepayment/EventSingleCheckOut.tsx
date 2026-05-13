@@ -87,7 +87,6 @@ export default function EventSingleCheckOut({
   )
   const containerRef = useRef<HTMLDivElement>(null)
   const prevShowFormRef = useRef(false)
-
   useEffect(() => {
     let isMounted = true
 
@@ -97,6 +96,7 @@ export default function EventSingleCheckOut({
           const subscribed = await checkSubscription(userId)
           if (isMounted) {
             setIsSubscribed(Boolean(subscribed))
+            console.log('subscribed', subscribed)
             setEmailVerifiedDate(userInfo?.emailVerifiedDate ?? null)
           }
         } else {
@@ -288,21 +288,33 @@ export default function EventSingleCheckOut({
         <p className="text-sm text-red-600">{t('no-ticket-selected')}</p>
       ) : (
         <>
-          {!isSubscribed && (
+          {!isSubscribed ? (
             <p className="text-sm text-gray-500">
-              {t('payment-membershipIntro')}{' '}
-              <Link
-                href="/registration/membership"
-                className="text-textColor-blue hover:underline"
-              >
-                membership
-              </Link>
-              {t('payment-orVerifyStudentPrefix')}
+              {!hasActiveStudentDiscount && (
+                <>
+                  {t('payment-membershipIntro')}{' '}
+                  <Link
+                    href="/registration/membership"
+                    className="text-textColor-blue hover:underline"
+                  >
+                    membership
+                  </Link>
+                  {t('payment-orVerifyStudentPrefix')}
+                  <Link href="/student" className="text-textColor-blue hover:underline">
+                    {t('payment-student-link')}
+                  </Link>
+                  {t('payment-orVerifyStudentSuffix')}!
+                </>
+              )}
+            </p>
+          ) : !hasActiveStudentDiscount && (
+            <>
+              {t('payment-studentOnly-intro')}
               <Link href="/student" className="text-textColor-blue hover:underline">
                 {t('payment-student-link')}
               </Link>
               {t('payment-orVerifyStudentSuffix')}!
-            </p>
+            </>
           )}
 
           {userId && userInfo?.email && !emailVerifiedDate && (
@@ -318,6 +330,15 @@ export default function EventSingleCheckOut({
               , {t('verify-email-reason')}
             </p>
           )}
+
+          {/* Note users that if they have a discount code, they should use event cart to checkout */}
+          <p className="text-sm text-gray-600">
+            {t('discount-code-cart-note-before')}
+            <span className="italic font-bold">{t('discount-code-cart-note-code')}</span>
+            {t('discount-code-cart-note-middle')}
+            <span className="italic font-bold">{t('discount-code-cart-note-below')}</span>
+            {t('discount-code-cart-note-after')}
+          </p>
 
           <div className="flex flex-col gap-4">
             {checkoutTickets.map((ticket) => {

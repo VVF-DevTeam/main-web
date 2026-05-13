@@ -193,7 +193,7 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership`
           : `${origin}/events/class/${eventKeyName}`,
-      allow_promotion_codes: true,
+      allow_promotion_codes: false,
       metadata: {
         userId: userId || '',
         eventId: eventId,

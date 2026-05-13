@@ -115,7 +115,7 @@ export async function POST(req: Request) {
       customer_email: mainEmail,
       success_url: `${origin}/shop/payment/success`,
       cancel_url: `${origin}/shop`,
-      allow_promotion_codes: true,
+      allow_promotion_codes: false,
       metadata: {
         userId: userId || '',
         shopId: shopId,

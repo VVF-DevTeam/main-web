@@ -1,6 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useSession } from 'next-auth/react'
 import EventSingleCheckOut from './EventSingleCheckOut'
 import { checkSubscription } from '@/lib/actions/payment/checkSubscription'
 import { EventTicket } from '@prisma/client'
@@ -8,6 +9,9 @@ import { Decimal } from '@prisma/client/runtime/library'
 
 // Mock dependencies
 vi.mock('@/lib/actions/payment/checkSubscription')
+vi.mock('next-auth/react', () => ({
+  useSession: vi.fn(),
+}))
 vi.mock('@/components/payment/NormalCheckoutButton', () => ({
   __esModule: true,
   default: ({
@@ -42,9 +46,15 @@ vi.mock('react-i18next', () => ({
       const translations: Record<string, string> = {
         'reserve-button': 'Reserve',
         'payment-membershipIntro': 'Get discounted prices with',
+        'payment-studentOnly-intro': 'Verify if you are a ',
         'payment-orVerifyStudentPrefix': ', or verify if you are a ',
         'payment-student-link': 'student',
         'payment-orVerifyStudentSuffix': '',
+        'discount-code-cart-note-before': 'If you want to use a ',
+        'discount-code-cart-note-code': 'discount code',
+        'discount-code-cart-note-middle': ', please add the ticket to the cart and apply the code ',
+        'discount-code-cart-note-below': 'below',
+        'discount-code-cart-note-after': '.',
         sessions: 'sessions',
       }
       return translations[key] || key
@@ -70,6 +80,7 @@ vi.mock('next/link', () => ({
 }))
 
 const mockCheckSubscription = vi.mocked(checkSubscription)
+const mockUseSession = vi.mocked(useSession)
 
 const createTicket = (overrides: Partial<EventTicket> = {}): EventTicket =>
   ({
@@ -127,6 +138,11 @@ describe('EventSingleCheckOut', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockCheckSubscription.mockResolvedValue(false)
+    mockUseSession.mockReturnValue({
+      data: { user: {} },
+      status: 'authenticated',
+      update: vi.fn(),
+    } as unknown as ReturnType<typeof useSession>)
   })
 
   test('renders loading state initially', () => {
@@ -143,11 +159,11 @@ describe('EventSingleCheckOut', () => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
     })
 
-    // Shows membership upsell for non-subscribed users
+    // Non–verified student: student verify line only (no membership mention)
     expect(
-      screen.getByText('Get discounted prices with', { exact: false })
+      screen.getByText('Verify if you are a ', { exact: false })
     ).toBeInTheDocument()
-    expect(screen.getByText('membership')).toBeInTheDocument()
+    expect(screen.queryByText('membership')).not.toBeInTheDocument()
     expect(screen.getByText('student')).toBeInTheDocument()
 
     // Renders every ticket with a checkout button
@@ -272,7 +288,27 @@ describe('EventSingleCheckOut', () => {
     consoleSpy.mockRestore()
   })
 
-  test('membership and student links point to registration and student pages', async () => {
+  test('student verify link points to /student when user is not a verified student', async () => {
+    render(<EventSingleCheckOut {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('membership')).not.toBeInTheDocument()
+    const studentLink = screen.getByText('student')
+    expect(studentLink).toHaveAttribute('href', '/student')
+    expect(studentLink).toHaveClass('text-textColor-blue', 'hover:underline')
+  })
+
+  test('membership link only when user has active student discount (no student verify link)', async () => {
+    const future = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+    mockUseSession.mockReturnValue({
+      data: { user: { eduEmailExpiredDate: future } },
+      status: 'authenticated',
+      update: vi.fn(),
+    } as unknown as ReturnType<typeof useSession>)
+
     render(<EventSingleCheckOut {...defaultProps} />)
 
     await waitFor(() => {
@@ -283,8 +319,6 @@ describe('EventSingleCheckOut', () => {
     expect(membershipLink).toHaveAttribute('href', '/registration/membership')
     expect(membershipLink).toHaveClass('text-textColor-blue', 'hover:underline')
 
-    const studentLink = screen.getByText('student')
-    expect(studentLink).toHaveAttribute('href', '/student')
-    expect(studentLink).toHaveClass('text-textColor-blue', 'hover:underline')
+    expect(screen.queryByRole('link', { name: 'student' })).not.toBeInTheDocument()
   })
 })
