@@ -221,5 +221,21 @@
   "chat-suggested-question-upcoming-events": "Các sự kiện sắp tới là gì?",
   "chat-suggested-question-upcoming-event-detail": "Cho mình biết về {{eventTitle}}",
   "chat-suggested-question-vvf-mission": "VVF là gì và sứ mệnh của VVF là gì?",
-  "chat-suggested-question-default-upcoming-event-name": "sự kiện sắp tới"
+  "chat-suggested-question-default-upcoming-event-name": "sự kiện sắp tới",
+  "post-payment-form-description": "Vui lòng hoàn thành mẫu đăng ký cho {{eventTitle}}.",
+  "post-payment-form-guest-label": "Đăng ký với tư cách",
+  "post-payment-form-submit": "Gửi mẫu",
+  "post-payment-form-success": "Mẫu đăng ký của bạn đã được gửi thành công.",
+  "post-payment-form-back-to-event": "Quay lại sự kiện",
+  "post-payment-form-invalid-link-description": "Liên kết này thiếu thông tin bắt buộc. Vui lòng sử dụng liên kết từ email xác nhận của bạn.",
+  "post-payment-form-already-submitted-description": "Bạn đã gửi mẫu đăng ký cho sự kiện này rồi.",
+  "post-payment-form-error-missing_params": "Liên kết không hợp lệ",
+  "post-payment-form-error-event_not_found": "Không tìm thấy sự kiện",
+  "post-payment-form-error-payment_not_found": "Không tìm thấy thanh toán phù hợp cho sự kiện này",
+  "post-payment-form-error-guest_not_found": "Email của bạn không có trong hồ sơ thanh toán này",
+  "post-payment-form-error-form_not_configured": "Sự kiện này chưa có mẫu đăng ký",
+  "post-payment-form-error-already_submitted": "Đã gửi mẫu rồi",
+  "post-payment-form-error-empty_form": "Vui lòng điền mẫu trước khi gửi",
+  "post-payment-form-error-invalid_payment": "Tham chiếu thanh toán không hợp lệ",
+  "post-payment-form-error-server_error": "Đã xảy ra lỗi. Vui lòng thử lại sau."
 }

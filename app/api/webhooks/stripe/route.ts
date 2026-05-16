@@ -7,6 +7,7 @@ import { sendPaymentConfirmationEmail } from '@/lib/actions/email/sendPaymentCon
 import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubscriptionConfirmationEmail'
 import { sendShopOrderConfirmationEmail, ShopOrderItem } from '@/lib/actions/email/sendShopOrderConfirmationEmail'
 import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
+import { buildPostPaymentFormLink } from '@/lib/utils/buildPostPaymentFormLink'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -856,6 +857,8 @@ export async function POST(req: NextRequest) {
                   event: {
                     select: {
                       title: true,
+                      keyName: true,
+                      eventType: true,
                       startDate: true,
                       endDate: true,
                       location: true,
@@ -886,10 +889,8 @@ export async function POST(req: NextRequest) {
                   }
                 }, 0)
 
-                // Send email with combined information
-                await sendPaymentConfirmationEmail({
-                  firstName,
-                  to: user.email,
+                // Send email with combined information (purchaser + other guests, deduped)
+                const paymentConfirmationPayload = {
                   ticketType: tickets.map((t) => t.type).join(', '), // Combined ticket types
                   pricePaid,
                   quantity: quantity || totalQuantity,
@@ -904,7 +905,72 @@ export async function POST(req: NextRequest) {
                   eventLocation: firstTicket.event.location,
                   eventStartTime: firstTicket.event.startTime,
                   eventEndTime: firstTicket.event.endTime,
+                }
+                const primaryEmail = user.email.trim()
+                const payerUserId =
+                  metadata.userId && metadata.userId.trim() !== ''
+                    ? metadata.userId.trim()
+                    : null
+                const eventFormExists = metadata.eventId
+                  ? !!(await prisma.eventForm.findFirst({
+                      where: { eventId: metadata.eventId },
+                      select: { id: true },
+                    }))
+                  : false
+
+                // Initialize with primary email
+                const recipients: {
+                  to: string
+                  firstName: string
+                  formLink?: string
+                }[] = [
+                  {
+                    to: primaryEmail,
+                    firstName,
+                  },
+                ]
+                
+                // Add other guests to recipients
+                if (otherGuestsInfo?.length) {
+                  for (const g of otherGuestsInfo) {
+                    const email = g.email?.trim()
+                    if (!email) continue
+                    if (email.toLowerCase() === primaryEmail.toLowerCase()) continue
+                    const formLink =
+                      eventFormExists &&
+                      payerUserId &&
+                      firstTicket.event.keyName
+                        ? buildPostPaymentFormLink({
+                            userId: payerUserId,
+                            eventKeyName: firstTicket.event.keyName,
+                            eventType: firstTicket.event.eventType,
+                            guestEmail: email,
+                          })
+                        : undefined
+                    recipients.push({
+                      to: email,
+                      firstName: g.name?.split(' ')[0] || 'Valued Customer',
+                      formLink,
+                    })
+                  }
+                }
+                const seenEmails = new Set<string>()
+                const uniqueRecipients = recipients.filter((r) => {
+                  const key = r.to.toLowerCase()
+                  if (seenEmails.has(key)) return false
+                  seenEmails.add(key)
+                  return true
                 })
+                await Promise.all(
+                  uniqueRecipients.map((r) =>
+                    sendPaymentConfirmationEmail({
+                      ...paymentConfirmationPayload,
+                      firstName: r.firstName,
+                      to: r.to,
+                      formLink: r.formLink,
+                    })
+                  )
+                )
               }
             }
 
@@ -1027,6 +1093,8 @@ export async function POST(req: NextRequest) {
                   event: {
                     select: {
                       title: true,
+                      keyName: true,
+                      eventType: true,
                       startDate: true,
                       endDate: true,
                       location: true,
@@ -1038,18 +1106,28 @@ export async function POST(req: NextRequest) {
                 },
               })
 
-              console.log('user', user)
-              console.log('ticket', ticket)
               // send email confirmation for single ticket
               if (user && user.email && ticket) {
                 const pricePaid = chargedAmount / 100
                 const perSessionPrice = Number(ticket.price) || 0
                 const firstName = user.name?.split(' ')[0] || 'Valued Customer'
 
-                console.log('sending email confirmation')
-                await sendPaymentConfirmationEmail({
-                  firstName,
-                  to: user.email,
+                console.log('sending email confirmation for customer:', firstName)
+                const singleTicketSeatNumber = (() => {
+                  if (metadata.seatNumbers) {
+                    try {
+                      const parsed = JSON.parse(metadata.seatNumbers as string)
+                      return Array.isArray(parsed)
+                        ? parsed.join(', ')
+                        : metadata.seatNumber
+                    } catch (e) {
+                      console.error('Error parsing seatNumbers in email:', e)
+                      return metadata.seatNumber
+                    }
+                  }
+                  return metadata.seatNumber
+                })()
+                const singleTicketPayload = {
                   ticketType: ticket.type,
                   pricePaid,
                   quantity: quantity || 1,
@@ -1058,28 +1136,77 @@ export async function POST(req: NextRequest) {
                   perSessionPrice,
                   payTotalNumber: ticket.payTotalNumber,
                   eventTitle: ticket.event.title,
-                  seatNumber: (() => {
-                    if (metadata.seatNumbers) {
-                      try {
-                        const parsed = JSON.parse(
-                          metadata.seatNumbers as string
-                        )
-                        return Array.isArray(parsed)
-                          ? parsed.join(', ')
-                          : metadata.seatNumber
-                      } catch (e) {
-                        console.error('Error parsing seatNumbers in email:', e)
-                        return metadata.seatNumber
-                      }
-                    }
-                    return metadata.seatNumber
-                  })(),
+                  seatNumber: singleTicketSeatNumber,
                   eventStartDate: ticket.event.startDate,
                   eventEndDate: ticket.event.endDate,
                   eventLocation: ticket.event.location,
                   eventStartTime: ticket.event.startTime,
                   eventEndTime: ticket.event.endTime,
-                })
+                }
+                const primaryEmailSingle = user.email.trim()
+                const payerUserIdSingle =
+                  metadata.userId && metadata.userId.trim() !== ''
+                    ? metadata.userId.trim()
+                    : null
+                const eventFormExistsSingle = metadata.eventId
+                  ? !!(await prisma.eventForm.findFirst({
+                      where: { eventId: metadata.eventId },
+                      select: { id: true },
+                    }))
+                  : false
+                const singleTicketRecipients: {
+                  to: string
+                  firstName: string
+                  formLink?: string
+                }[] = [
+                  {
+                    to: primaryEmailSingle,
+                    firstName,
+                  },
+                ]
+                if (otherGuestsInfo?.length) {
+                  for (const g of otherGuestsInfo) {
+                    const email = g.email?.trim()
+                    if (!email) continue
+                    if (email.toLowerCase() === primaryEmailSingle.toLowerCase())
+                      continue
+                    const formLink =
+                      eventFormExistsSingle &&
+                      payerUserIdSingle &&
+                      ticket.event.keyName
+                        ? buildPostPaymentFormLink({
+                            userId: payerUserIdSingle,
+                            eventKeyName: ticket.event.keyName,
+                            eventType: ticket.event.eventType,
+                            guestEmail: email,
+                          })
+                        : undefined
+                    singleTicketRecipients.push({
+                      to: email,
+                      firstName: g.name?.split(' ')[0] || 'Valued Customer',
+                      formLink,
+                    })
+                  }
+                }
+                const seenSingleEmails = new Set<string>()
+                const uniqueSingleRecipients = singleTicketRecipients.filter(
+                  (r) => {
+                    const key = r.to.toLowerCase()
+                    if (seenSingleEmails.has(key)) return false
+                    seenSingleEmails.add(key)
+                    return true
+                  }
+                )
+                await Promise.all(
+                  uniqueSingleRecipients.map((r) =>
+                    sendPaymentConfirmationEmail({
+                      ...singleTicketPayload,
+                      firstName: r.firstName,
+                      to: r.to,
+                      formLink: r.formLink,
+                    })
+                  )
+                )
               }
             }
           }

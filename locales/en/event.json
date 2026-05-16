@@ -218,5 +218,21 @@
   "chat-suggested-question-upcoming-events": "What are the upcoming events?",
   "chat-suggested-question-upcoming-event-detail": "Tell me about {{eventTitle}}",
   "chat-suggested-question-vvf-mission": "What is VVF and its missions?",
-  "chat-suggested-question-default-upcoming-event-name": "the upcoming event"
+  "chat-suggested-question-default-upcoming-event-name": "the upcoming event",
+  "post-payment-form-description": "Please complete the registration form for {{eventTitle}}.",
+  "post-payment-form-guest-label": "Registering as",
+  "post-payment-form-submit": "Submit form",
+  "post-payment-form-success": "Your registration form has been submitted successfully.",
+  "post-payment-form-back-to-event": "Back to event",
+  "post-payment-form-invalid-link-description": "This link is missing required information. Please use the link from your confirmation email.",
+  "post-payment-form-already-submitted-description": "You have already submitted the registration form for this event.",
+  "post-payment-form-error-missing_params": "Invalid link",
+  "post-payment-form-error-event_not_found": "Event not found",
+  "post-payment-form-error-payment_not_found": "No matching payment was found for this event",
+  "post-payment-form-error-guest_not_found": "Your email was not found on this payment record",
+  "post-payment-form-error-form_not_configured": "No registration form has been set up for this event yet",
+  "post-payment-form-error-already_submitted": "Form already submitted",
+  "post-payment-form-error-empty_form": "Please fill out the form before submitting",
+  "post-payment-form-error-invalid_payment": "Invalid payment reference",
+  "post-payment-form-error-server_error": "Something went wrong. Please try again later."
 }

@@ -101,24 +101,39 @@ export default function SingleCheckoutButton({
     try {
       setIsLoading(true)
 
-      // Prepare form responses for API
-      const formattedFormResponses = formResponses && Object.keys(formResponses).length > 0
-        ? {
-          responses: Object.entries(formResponses).map(([questionId, answer]) => {
-            const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
-            const formNumber = answer?.formNumber
-            return {
-              questionId,
-              question: question?.question || '',
-              answer: answer?.answer,
-              questionType: question?.type || '',
-              required: question?.required || false,
-              options: question?.options || [],
-              formNumber,
-            }
-          }),
-        }
-        : null
+      // Stored shape matches Payment.formResponses: [{ email, responses: [...] }]
+      const formResponderEmail = (guestInfo.guestEmail || email || '')
+        .trim()
+        .toLowerCase()
+      const formattedFormResponses =
+        formResponses &&
+        Object.keys(formResponses).length > 0 &&
+        formResponderEmail
+          ? [
+              {
+                email: formResponderEmail,
+                responses: Object.entries(formResponses).map(
+                  ([questionId, answer]) => {
+                    const question = eventFormData
+                      ?.flatMap((f) => f.questions)
+                      .find((q) => q.id === questionId)
+                    const rawFn = answer?.formNumber
+                    const formNumber =
+                      typeof rawFn === 'number' && rawFn > 0 ? rawFn : 1
+                    return {
+                      questionId,
+                      question: question?.question || '',
+                      answer: answer?.answer,
+                      questionType: question?.type || '',
+                      required: question?.required ?? false,
+                      options: question?.options || [],
+                      formNumber,
+                    }
+                  }
+                ),
+              },
+            ]
+          : null
 
       const { data } = await axiosInstance.post(
         '/api/payment/checkout-sessions/create',

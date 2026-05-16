@@ -19,6 +19,7 @@ interface EmailTemplatePaymentConfirmationProps {
   eventLocation?: string | null
   eventStartTime?: string | null
   eventEndTime?: string | null
+  formLink?: string | null
 }
 
 interface SendPaymentConfirmationEmailProps {
@@ -38,6 +39,7 @@ interface SendPaymentConfirmationEmailProps {
   eventLocation?: string | null
   eventStartTime?: string | null
   eventEndTime?: string | null
+  formLink?: string | null
 }
 
 // Email Template Component
@@ -57,6 +59,7 @@ const EmailTemplatePaymentConfirmation = ({
   eventLocation,
   eventStartTime,
   eventEndTime,
+  formLink,
 }: EmailTemplatePaymentConfirmationProps) => {
   const currencyLabel = currency.toUpperCase()
   const formattedPrice = pricePaid.toFixed(2)
@@ -286,21 +289,21 @@ const EmailTemplatePaymentConfirmation = ({
                   receipt attached for your payment. Please check your spam
                   folder if you don't see it in your inbox.
                 </p>
-              </td>
 
-              {/* Acoustic Camp participant document link */}
-              {eventTitle?.toLowerCase().includes('acoustic camp') && (
-                <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '16px' }}>
-                  Please check out this document for more information about the event:{' '}
-                  <a
-                    href="https://docs.google.com/document/d/197emItEXbcai1FbjJklf2FbrLFLu_OEdkCMvrQjYKh4/edit?usp=sharing"
-                    style={{ color: '#2563eb' }}
-                  >
-                    Acoustic Camp — all information (Google Doc)
-                  </a>
-                  .
-                </p>
-              )}
+                {/* Acoustic Camp participant document link */}
+                {eventTitle?.toLowerCase().includes('acoustic camp') && (
+                  <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '16px' }}>
+                    Please check out this document for more information about the event:{' '}
+                    <a
+                      href="https://docs.google.com/document/d/197emItEXbcai1FbjJklf2FbrLFLu_OEdkCMvrQjYKh4/edit?usp=sharing"
+                      style={{ color: '#2563eb' }}
+                    >
+                      Acoustic Camp — all information (Google Doc)
+                    </a>
+                    .
+                  </p>
+                )}
+              </td>
 
               {/* Right: image column */}
               {ticketImageUrl && (
@@ -340,6 +343,49 @@ const EmailTemplatePaymentConfirmation = ({
           </tbody>
         </table>
 
+        {formLink && (
+          <div
+            style={{
+              marginTop: '20px',
+              marginBottom: '20px',
+              padding: '16px',
+              borderRadius: '6px',
+              border: '1px solid #dbeafe',
+              backgroundColor: '#eff6ff',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '15px',
+                color: '#1e40af',
+                margin: '0 0 12px 0',
+                fontWeight: 'bold',
+              }}
+            >
+              Complete your registration form
+            </p>
+            <p style={{ fontSize: '14px', color: '#374151', margin: '0 0 12px 0' }}>
+              Please fill out the event registration form using the link below so we
+              can prepare for your arrival.
+            </p>
+            <a
+              href={formLink}
+              style={{
+                display: 'inline-block',
+                padding: '10px 20px',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+              }}
+            >
+              Fill registration form
+            </a>
+          </div>
+        )}
+
         <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '20px' }}>
           If you have any questions, please contact us at{' '}
           <a href="mailto:tech@vietvibe.org" style={{ color: '#2563eb' }}>
@@ -369,6 +415,7 @@ export async function sendPaymentConfirmationEmail({
   eventLocation,
   eventStartTime,
   eventEndTime,
+  formLink,
 }: SendPaymentConfirmationEmailProps) {
   const resend = new Resend(process.env.RESEND_API_KEY_PRODUCTION)
 
@@ -393,6 +440,7 @@ export async function sendPaymentConfirmationEmail({
         eventLocation,
         eventStartTime,
         eventEndTime,
+        formLink,
       }),
     })
     console.log('result sendPaymentConfirmationEmail', result)

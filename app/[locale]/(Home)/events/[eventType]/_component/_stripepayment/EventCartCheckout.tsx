@@ -105,7 +105,7 @@ export default function EventCartCheckout({
     useState<AppliedCodeDiscount | null>(null)
   const [cooldownEndTime, setCooldownEndTime] = useState<number | null>(null)
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0)
-  
+
   // Event form data and responses
   const [eventFormData, setEventFormData] = useState<EventFormData>(null)
   const [isLoadingEventForm, setIsLoadingEventForm] = useState(true)
@@ -571,7 +571,7 @@ export default function EventCartCheckout({
         // Compare non-stackable percentage discount value against stackable amount discounts
         const percentValue = approxNonCodePercentDiscount
         const amountValue = effectiveAmount // This is stackableAmount at this point
-        
+
         if (amountValue > percentValue) {
           // Stackable amount discounts are better: replace the non-stackable percentage
           effectivePercent = 0
@@ -913,24 +913,40 @@ export default function EventCartCheckout({
         return
       }
 
-      // Prepare form responses for API
-      const formattedFormResponses = eventFormResponses && Object.keys(eventFormResponses).length > 0
-        ? {
-            responses: Object.entries(eventFormResponses).map(([questionId, answer]) => {
-              const question = eventFormData?.flatMap(f => f.questions).find(q => q.id === questionId)
-              const formNumber = answer?.formNumber
-              return {
-                questionId,
-                question: question?.question || '',
-                answer: answer?.answer,
-                questionType: question?.type || '',
-                required: question?.required || false,
-                options: question?.options || [],
-                formNumber,
-              }
-            }),
-          }
-        : null
+      // Stored shape matches Payment.formResponses: [{ email, responses: [...] }]
+      const formResponderEmail = (
+        representativeGuest?.email ||
+        userInfo?.email ||
+        ''
+      ).trim().toLowerCase()
+      
+      const formattedFormResponses =
+        eventFormResponses &&
+          Object.keys(eventFormResponses).length > 0 &&
+          formResponderEmail
+          ? [
+            {
+              email: formResponderEmail,
+              responses: Object.entries(eventFormResponses).map(
+                ([questionId, answer]) => {
+                  const question = eventFormData?.flatMap((f) => f.questions).find((q) => q.id === questionId)
+                  const rawFn = answer?.formNumber
+                  const formNumber =
+                    typeof rawFn === 'number' && rawFn > 0 ? rawFn : 1
+                  return {
+                    questionId,
+                    question: question?.question || '',
+                    answer: answer?.answer,
+                    questionType: question?.type || '',
+                    required: question?.required ?? false,
+                    options: question?.options || [],
+                    formNumber,
+                  }
+                }
+              ),
+            },
+          ]
+          : null
 
       // Call API endpoint for multi-ticket checkout
       const { data } = await axiosInstance.post(
@@ -1030,7 +1046,7 @@ export default function EventCartCheckout({
       },
       otherGuests: guestInfo.otherGuests,
     })
-    
+
     // If there's no event form, proceed directly to checkout
     if (!eventFormData || !eventFormData.some(f => f.questions.length > 0)) {
       setShowCheckoutDialog(false)
@@ -1099,12 +1115,12 @@ export default function EventCartCheckout({
               const currency = seat.ticket.currency || 'CAD'
               const totalPercentOff = hasAnyDiscount
                 ? Number(
-                    getCombinedMemberStudentPercentOff(
-                      hasMemberDiscount,
-                      discountPercent,
-                      hasActiveStudentDiscount
-                    ).toFixed(1)
-                  )
+                  getCombinedMemberStudentPercentOff(
+                    hasMemberDiscount,
+                    discountPercent,
+                    hasActiveStudentDiscount
+                  ).toFixed(1)
+                )
                 : 0
 
               return (
@@ -1172,12 +1188,12 @@ export default function EventCartCheckout({
               const currency = item.ticket.currency || 'CAD'
               const totalPercentOff = hasAnyDiscount
                 ? Number(
-                    getCombinedMemberStudentPercentOff(
-                      hasMemberDiscount,
-                      discountPercent,
-                      hasActiveStudentDiscount
-                    ).toFixed(1)
-                  )
+                  getCombinedMemberStudentPercentOff(
+                    hasMemberDiscount,
+                    discountPercent,
+                    hasActiveStudentDiscount
+                  ).toFixed(1)
+                )
                 : 0
 
               return (

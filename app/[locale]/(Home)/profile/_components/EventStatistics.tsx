@@ -112,8 +112,34 @@ type FormResponse = {
   formNumber?: number
 }
 
-type FormResponsesData = {
+/** One guest's submitted answers (stored as an array on Payment.formResponses) */
+type FormResponsesBlock = {
+  email: string
   responses: FormResponse[]
+}
+
+function normalizeFormResponseBlocks(
+  formResponses: JsonValue | undefined
+): Array<{ email: string; customerName: string; responses: FormResponse[] }> {
+  if (!formResponses || !Array.isArray(formResponses)) return []
+
+  return (formResponses as FormResponsesBlock[])
+    .filter((block) => block.email && Array.isArray(block.responses))
+    .map((block) => {
+      const nameFromAnswer = block.responses.find((r) =>
+        r.question?.toLowerCase().includes('your name')
+      )?.answer
+      const customerName =
+        typeof nameFromAnswer === 'string' && nameFromAnswer.trim() !== ''
+          ? nameFromAnswer.trim()
+          : block.email
+
+      return {
+        email: block.email.trim(),
+        customerName,
+        responses: block.responses,
+      }
+    })
 }
 
 type DiscountAppliedRecord = {
@@ -1152,31 +1178,28 @@ function buildFormResponsesExcelData(
   const rows: Record<string, unknown>[] = []
 
   payments.forEach((payment) => {
-    if (!payment.formResponses) return
-    const formData = payment.formResponses as FormResponsesData
-    if (!formData.responses || !Array.isArray(formData.responses)) return
+    const blocks = normalizeFormResponseBlocks(payment.formResponses)
 
-    const customerName = payment.guestName || payment.user?.name || 'Unknown'
-    const customerEmail = payment.guestEmail || payment.user?.email || 'Unknown'
+    for (const block of blocks) {
+      for (const response of block.responses) {
+        const formNumber =
+          typeof response.formNumber === 'number' && response.formNumber > 0
+            ? response.formNumber
+            : 1
 
-    formData.responses.forEach((response: FormResponse) => {
-      const formNumber =
-        typeof response.formNumber === 'number' && response.formNumber > 0
-          ? response.formNumber
-          : 1
-
-      rows.push({
-        Form: formNumber,
-        Question: response.question,
-        'Question Type': response.questionType.replace('_', ' '),
-        Required: response.required ? 'Yes' : 'No',
-        'Customer Name': customerName,
-        Email: customerEmail,
-        Answer: Array.isArray(response.answer)
-          ? response.answer.join(', ')
-          : response.answer,
-      })
-    })
+        rows.push({
+          Form: formNumber,
+          Question: response.question,
+          'Question Type': response.questionType.replace('_', ' '),
+          Required: response.required ? 'Yes' : 'No',
+          'Customer Name': block.customerName,
+          Email: block.email,
+          Answer: Array.isArray(response.answer)
+            ? response.answer.join(', ')
+            : response.answer,
+        })
+      }
+    }
   })
 
   rows.sort((a, b) => {
@@ -1193,44 +1216,38 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
   const byFormNumber = new Map<number, Map<string, QuestionAggregate>>()
 
   payments.forEach((payment) => {
-    if (!payment.formResponses) return
+    const blocks = normalizeFormResponseBlocks(payment.formResponses)
 
-    const formData = payment.formResponses as FormResponsesData
-    if (!formData.responses || !Array.isArray(formData.responses)) return
+    for (const block of blocks) {
+      for (const response of block.responses) {
+        const formNumber =
+          typeof response.formNumber === 'number' && response.formNumber > 0
+            ? response.formNumber
+            : 1
 
-    const customerName =
-      payment.guestName || payment.user?.name || 'Unknown'
-    const customerEmail =
-      payment.guestEmail || payment.user?.email || 'Unknown'
+        if (!byFormNumber.has(formNumber)) {
+          byFormNumber.set(formNumber, new Map())
+        }
+        const questionMap = byFormNumber.get(formNumber)!
 
-    formData.responses.forEach((response: FormResponse) => {
-      const formNumber =
-        typeof response.formNumber === 'number' && response.formNumber > 0
-          ? response.formNumber
-          : 1
+        if (!questionMap.has(response.questionId)) {
+          questionMap.set(response.questionId, {
+            question: response.question,
+            questionType: response.questionType,
+            required: response.required,
+            options: response.options ?? [],
+            responses: [],
+          })
+        }
 
-      if (!byFormNumber.has(formNumber)) {
-        byFormNumber.set(formNumber, new Map())
-      }
-      const questionMap = byFormNumber.get(formNumber)!
-
-      if (!questionMap.has(response.questionId)) {
-        questionMap.set(response.questionId, {
-          question: response.question,
-          questionType: response.questionType,
-          required: response.required,
-          options: response.options ?? [],
-          responses: [],
+        questionMap.get(response.questionId)!.responses.push({
+          paymentId: payment.id,
+          customerName: block.customerName,
+          customerEmail: block.email,
+          answer: response.answer,
         })
       }
-
-      questionMap.get(response.questionId)!.responses.push({
-        paymentId: payment.id,
-        customerName,
-        customerEmail,
-        answer: response.answer,
-      })
-    })
+    }
   })
 
   const sortedFormNumbers = Array.from(byFormNumber.keys()).sort(

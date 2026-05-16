@@ -115,9 +115,21 @@ const PaymentSuccess = ({
         </p>
       )}
 
+
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
         {t('paymentSuccess-closing')}
       </p>
+
+      <p className="max-w-xl text-left text-sm text-neutral-600 dark:text-neutral-400 italic pt-2">
+        <strong>*Note:</strong> If you make a <strong>group purchase</strong>, a
+        copy of the ticket along with the form will be sent to{' '}
+        <strong>each person</strong>.{' '}
+        <strong>
+          Please notify other persons in your group to fill out this form
+        </strong>
+        , as this is <strong>required</strong> for us to make better preparation
+        for the event. Thank you!
+      </p>      
     </div>
   )
 }
