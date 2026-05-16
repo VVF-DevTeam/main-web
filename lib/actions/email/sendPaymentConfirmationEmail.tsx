@@ -265,6 +265,19 @@ const EmailTemplatePaymentConfirmation = ({
                     Event Location: {eventLocation}
                   </div>
                 )}
+                {/* Acoustic Camp participant document link */}
+                {eventTitle?.toLowerCase().includes('acoustic camp') && (
+                  <p style={{ fontSize: '12px', color: '#111827', marginTop: '8px' }}>
+                    Please check out this document for more information about the event:{' '}
+                    <a
+                      href="https://docs.google.com/document/d/197emItEXbcai1FbjJklf2FbrLFLu_OEdkCMvrQjYKh4/edit?usp=sharing"
+                      style={{ color: '#2563eb' }}
+                    >
+                      Acoustic Camp all information (Google Doc)
+                    </a>
+                    .
+                  </p>
+                )}
                 <p
                   style={{
                     fontSize: '11px',
@@ -289,20 +302,6 @@ const EmailTemplatePaymentConfirmation = ({
                   receipt attached for your payment. Please check your spam
                   folder if you don't see it in your inbox.
                 </p>
-
-                {/* Acoustic Camp participant document link */}
-                {eventTitle?.toLowerCase().includes('acoustic camp') && (
-                  <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '16px' }}>
-                    Please check out this document for more information about the event:{' '}
-                    <a
-                      href="https://docs.google.com/document/d/197emItEXbcai1FbjJklf2FbrLFLu_OEdkCMvrQjYKh4/edit?usp=sharing"
-                      style={{ color: '#2563eb' }}
-                    >
-                      Acoustic Camp — all information (Google Doc)
-                    </a>
-                    .
-                  </p>
-                )}
               </td>
 
               {/* Right: image column */}

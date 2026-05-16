@@ -157,8 +157,9 @@ export default function PostPaymentEventForm({
         return
       }
 
-      toast.success(t('post-payment-form-success'))
-      router.push(`/${locale}/events/${eventType}/${eventKeyName}`)
+      router.push(
+        `/${locale}/events/${eventType}/${eventKeyName}/form/success`
+      )
     } catch {
       toast.error(t('post-payment-form-error-server_error'))
     } finally {

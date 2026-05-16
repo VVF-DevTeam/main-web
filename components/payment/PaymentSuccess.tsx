@@ -87,7 +87,6 @@ const PaymentSuccess = ({
       </div>
 
       {/* Message */}
-
       <p className="max-w-xl text-lg text-neutral-700 dark:text-neutral-300">
         {t('paymentSuccess-text')} <strong>{title}</strong>
       </p>
