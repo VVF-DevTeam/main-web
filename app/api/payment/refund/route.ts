@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { paymentId, amount, monitorUserId } = await req.json()
+    const { paymentId, amount, monitorUserId, note } = await req.json()
 
     if (!paymentId) {
       return new NextResponse('Missing paymentId', { status: 400 })
@@ -178,6 +178,7 @@ export async function POST(req: Request) {
         monitorUserId,
         eventId: payment.eventId,
         eventTicketId: payment.eventTicketId,
+        note: typeof note === 'string' && note.trim() ? note.trim() : null,
       },
     })
     

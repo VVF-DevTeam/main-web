@@ -286,6 +286,7 @@ model Payment {
   refunded        Boolean     @default(false)
   totalRefundAmount Decimal?  
   seatNumber      String?
+  note            String?
   
   // Guests information
   guestName       String?

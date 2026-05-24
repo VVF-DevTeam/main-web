@@ -15,6 +15,7 @@ interface AddPaymentParams {
   paymentMethod: string
   paymentType: string
   membershipEndDate?: Date | null
+  note?: string
 }
 
 export async function addPayment({
@@ -29,6 +30,7 @@ export async function addPayment({
   paymentMethod,
   paymentType,
   membershipEndDate,
+  note,
 }: AddPaymentParams) {
   try {
     if (eventId === 'none') {
@@ -48,6 +50,7 @@ export async function addPayment({
         method: paymentMethod as PaymentMethod,
         type: paymentType as PaymentType,
         expiresAt: membershipEndDate,
+        note: note || null,
       },
     })
 

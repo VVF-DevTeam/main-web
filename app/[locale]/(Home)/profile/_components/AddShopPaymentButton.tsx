@@ -24,6 +24,7 @@ import {
 import { getUsersSimple } from '@/lib/actions/user/getAllUsersSimple'
 import { UserInfoProps, UserInfoSimpleProps } from '@/lib/types/userInfo'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
 import { addShopPayment } from '@/lib/actions/payment/addShopPayment'
 import { getAllPublishedShop, getShopsOfShopOwner, getShopById } from '@/lib/actions/shop/getShop'
@@ -39,6 +40,7 @@ const addShopPaymentSchema = z
     pricePaid: z.number().optional(),
     quantity: z.number().min(1, 'Quantity must be greater than 0'),
     paymentMethod: z.string().min(1, 'Payment method is required'),
+    note: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -331,6 +333,20 @@ const AddShopPaymentModal = ({
                   <FormMessage />
                 </FormItem>
               )} />
+
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Note (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea rows={3} {...field} placeholder="Add any notes about this payment" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <Button type="submit">Add Shop Payment</Button>
           </form>
@@ -392,6 +408,7 @@ export default function AddShopPaymentButton({
       pricePaid: 0,
       quantity: 1,
       paymentMethod: '',
+      note: '',
     },
   })
 
@@ -420,6 +437,7 @@ export default function AddShopPaymentButton({
       userId: data.userId === 'none-user' ? undefined : data.userId,
       shopItemId: data.shopItemId || undefined,
       pricePaid: data.pricePaid || 0,
+      note: data.note?.trim() || undefined,
     }
 
     const { success } = await addShopPayment(submitData)
@@ -439,6 +457,7 @@ export default function AddShopPaymentButton({
         pricePaid: 0,
         quantity: 1,
         paymentMethod: '',
+        note: '',
       })
       if (onPaymentAdded) {
         await onPaymentAdded()

@@ -14,6 +14,7 @@ interface AddShopPaymentParams {
   pricePaid: number
   quantity: number
   paymentMethod: string
+  note?: string
 }
 
 export async function addShopPayment({
@@ -26,6 +27,7 @@ export async function addShopPayment({
   pricePaid,
   quantity,
   paymentMethod,
+  note,
 }: AddShopPaymentParams) {
   try {
     const payment = await prisma.payment.create({
@@ -40,6 +42,7 @@ export async function addShopPayment({
         quantity,
         method: paymentMethod as PaymentMethod,
         type: PaymentType.Shop,
+        note: note || null,
       },
     })
 

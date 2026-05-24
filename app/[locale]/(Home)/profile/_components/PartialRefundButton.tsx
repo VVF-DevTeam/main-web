@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Form,
   FormControl,
@@ -54,6 +55,7 @@ const partialRefundSchema = z.object({
   userEmail: z.string().min(1, 'User is required'),
   paymentId: z.string().min(1, 'Payment is required'),
   refundAmount: z.coerce.number().positive('Refund amount must be greater than 0'),
+  note: z.string().optional(),
 })
 
 type PartialRefundFormValues = z.infer<typeof partialRefundSchema>
@@ -73,6 +75,7 @@ export default function PartialRefundButton({ user }: { user: UserInfoProps }) {
       userEmail: '',
       paymentId: '',
       refundAmount: 0,
+      note: '',
     },
   })
 
@@ -186,6 +189,7 @@ export default function PartialRefundButton({ user }: { user: UserInfoProps }) {
         paymentId: data.paymentId,
         amount: data.refundAmount,
         monitorUserId: user.id,
+        note: data.note?.trim() || undefined,
       })
 
       toast.success('Partial refund processed successfully', {
@@ -392,6 +396,20 @@ export default function PartialRefundButton({ user }: { user: UserInfoProps }) {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="note"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Note (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={3} {...field} placeholder="Add any notes about this refund" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <Button type="submit" disabled={isLoading}>
                   Process Partial Refund

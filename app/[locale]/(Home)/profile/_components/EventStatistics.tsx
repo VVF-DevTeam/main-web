@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { getEventPayments } from '../../../../../lib/actions/payment/getEventPayments'
 import { getEventShopPayments } from '../../../../../lib/actions/payment/getEventShopPayments'
+import { getEventRefundPayments } from '../../../../../lib/actions/payment/getEventRefundPayments'
 import { PaymentMethod, PaymentType } from '@prisma/client'
 import AddPaymentButton from './AddEventPaymentButton'
 import ExportToExcelButton from '@/components/button/ExportToExcelButton'
@@ -98,6 +99,39 @@ interface ShopPayment {
   shopItem: {
     id: string
     title: string
+  } | null
+}
+
+interface RefundPayment {
+  id: string
+  createdAt: Date
+  pricePaid: number
+  quantity: number
+  seatNumber: string | null
+  type: PaymentType
+  method: PaymentMethod
+  stripePaymentId: string | null
+  guestName: string | null
+  guestEmail: string | null
+  guestPhone: string | null
+  user: {
+    name: string | null
+    email: string
+    phone: string | null
+  } | null
+  monitorUser: {
+    name: string | null
+  } | null
+  event: {
+    title: string
+    startDate: Date | null
+    endDate: Date | null
+    location: string | null
+    keyName: string
+  } | null
+  eventTicket: {
+    type: string
+    capacityPerTicket: number
   } | null
 }
 
@@ -365,13 +399,14 @@ export default function EventStatistics({
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [payments, setPayments] = useState<Payment[]>([])
   const [shopPayments, setShopPayments] = useState<ShopPayment[]>([])
+  const [refundPayments, setRefundPayments] = useState<RefundPayment[]>([])
   const [loading, setLoading] = useState(false)
   const [sortConfig, setSortConfig] = useState<{
     column: 'ticketName' | 'email' | 'phone' | 'customer' | 'paymentMethod' | null
     order: 'asc' | 'desc' | null
   }>({ column: null, order: null })
   const [expandedPayments, setExpandedPayments] = useState<Record<string, boolean>>({})
-  const [activeTab, setActiveTab] = useState<'tickets' | 'shopPayments' | 'answers'>('tickets')
+  const [activeTab, setActiveTab] = useState<'tickets' | 'shopPayments' | 'answers' | 'refund'>('tickets')
 
   // Initialize from URL params if present
   useEffect(() => {
@@ -406,12 +441,14 @@ export default function EventStatistics({
     if (!selectedEventId) return
     setLoading(true)
     try {
-      const [eventPayments, eventShopPayments] = await Promise.all([
+      const [eventPayments, eventShopPayments, eventRefundPayments] = await Promise.all([
         getEventPayments(selectedEventId),
         getEventShopPayments(selectedEventId),
+        getEventRefundPayments(selectedEventId),
       ])
       setPayments(eventPayments)
       setShopPayments(eventShopPayments)
+      setRefundPayments(eventRefundPayments)
     } catch (error) {
       console.error('Error fetching payments:', error)
       toast.error('Failed to load event payments')
@@ -427,6 +464,7 @@ export default function EventStatistics({
     } else {
       setPayments([])
       setShopPayments([])
+      setRefundPayments([])
     }
   }, [selectedEventId, reloadPayments])
 
@@ -490,10 +528,23 @@ export default function EventStatistics({
     )
   )
 
-  const participantEmails =
-    activeTab === 'shopPayments' ? shopParticipantEmails : ticketParticipantEmails
+  const refundParticipantEmails = Array.from(
+    new Set(
+      refundPayments
+        .map((p) => (p.user?.email || p.guestEmail)?.trim())
+        .filter((email): email is string => !!email && email.length > 0)
+    )
+  )
 
-  const selectedEventKeyName = payments[0]?.event?.keyName
+  const participantEmails =
+    activeTab === 'shopPayments'
+      ? shopParticipantEmails
+      : activeTab === 'refund'
+        ? refundParticipantEmails
+        : ticketParticipantEmails
+
+  const selectedEventKeyName =
+    payments[0]?.event?.keyName || refundPayments[0]?.event?.keyName
 
   const handleCopyEmails = async () => {
     if (participantEmails.length === 0) {
@@ -561,47 +612,63 @@ export default function EventStatistics({
   }
 
   // Sort payments based on the selected column
-  const sortedPayments = [...payments].sort((a, b) => {
-    if (sortConfig.column === null || sortConfig.order === null) return 0
+  const sortPaymentsByColumn = <
+    T extends {
+      eventTicket?: { type: string } | null
+      user?: { email?: string | null; phone?: string | null; name?: string | null } | null
+      guestEmail?: string | null
+      guestPhone?: string | null
+      guestName?: string | null
+      method?: PaymentMethod
+    },
+  >(
+    items: T[]
+  ) =>
+    [...items].sort((a, b) => {
+      if (sortConfig.column === null || sortConfig.order === null) return 0
 
-    let valueA = ''
-    let valueB = ''
+      let valueA = ''
+      let valueB = ''
 
-    switch (sortConfig.column) {
-      case 'ticketName':
-        valueA = a.eventTicket?.type || ''
-        valueB = b.eventTicket?.type || ''
-        break
-      case 'email':
-        valueA = a.user?.email || a.guestEmail || ''
-        valueB = b.user?.email || b.guestEmail || ''
-        break
-      case 'phone':
-        valueA = a.user?.phone || a.guestPhone || ''
-        valueB = b.user?.phone || b.guestPhone || ''
-        break
-      case 'customer':
-        valueA = a.user?.name || a.guestName || ''
-        valueB = b.user?.name || b.guestName || ''
-        break
-      case 'paymentMethod':
-        valueA = a.method || ''
-        valueB = b.method || ''
-        break
-    }
+      switch (sortConfig.column) {
+        case 'ticketName':
+          valueA = a.eventTicket?.type || ''
+          valueB = b.eventTicket?.type || ''
+          break
+        case 'email':
+          valueA = a.user?.email || a.guestEmail || ''
+          valueB = b.user?.email || b.guestEmail || ''
+          break
+        case 'phone':
+          valueA = a.user?.phone || a.guestPhone || ''
+          valueB = b.user?.phone || b.guestPhone || ''
+          break
+        case 'customer':
+          valueA = a.user?.name || a.guestName || ''
+          valueB = b.user?.name || b.guestName || ''
+          break
+        case 'paymentMethod':
+          valueA = a.method || ''
+          valueB = b.method || ''
+          break
+      }
 
-    if (sortConfig.order === 'asc') {
-      return valueA.localeCompare(valueB)
-    } else {
+      if (sortConfig.order === 'asc') {
+        return valueA.localeCompare(valueB)
+      }
       return valueB.localeCompare(valueA)
-    }
-  })
+    })
+
+  const sortedPayments = sortPaymentsByColumn(payments)
+  const sortedRefundPayments = sortPaymentsByColumn(refundPayments)
 
   const totalShopRevenue = shopPayments.reduce(
     (sum, payment) => sum + payment.pricePaid,
     0
   )
   const totalItemsSold = shopPayments.reduce((sum, payment) => sum + payment.quantity, 0)
+  const totalRefunded = refundPayments.reduce((sum, payment) => sum + payment.pricePaid, 0)
+  const overviewEvent = payments[0]?.event || refundPayments[0]?.event
 
   return (
     <div className="min-h-screen p-4">
@@ -668,6 +735,15 @@ export default function EventStatistics({
                     Answers
                   </button>
                   <button
+                    onClick={() => setActiveTab('refund')}
+                    className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'refund'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      }`}
+                  >
+                    Refund
+                  </button>
+                  <button
                     onClick={() => setActiveTab('shopPayments')}
                     className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'shopPayments'
                       ? 'border-blue-500 text-blue-600'
@@ -685,20 +761,24 @@ export default function EventStatistics({
               <div className="lg:col-span-1">
                 <div className="rounded-lg border bg-white p-6 shadow-sm">
                   <h2 className="mb-4 text-xl font-semibold">
-                    {activeTab === 'shopPayments' ? 'Shop Overview' : 'Event Overview'}
+                    {activeTab === 'shopPayments'
+                      ? 'Shop Overview'
+                      : activeTab === 'refund'
+                        ? 'Refunds Overview'
+                        : 'Event Overview'}
                   </h2>
 
                   {/* Event Details */}
-                  {payments.length > 0 && payments[0]?.event && (
+                  {overviewEvent && (
                     <div className="mb-6 space-y-2 border-b pb-4">
-                      {payments[0].event.startDate && (
+                      {overviewEvent.startDate && (
                         <div>
                           <p className="text-xs text-muted-foreground">
                             Start Date
                           </p>
                           <p className="text-sm font-medium">
                             {new Date(
-                              payments[0].event.startDate
+                              overviewEvent.startDate
                             ).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
@@ -707,14 +787,14 @@ export default function EventStatistics({
                           </p>
                         </div>
                       )}
-                      {payments[0].event.endDate && (
+                      {overviewEvent.endDate && (
                         <div>
                           <p className="text-xs text-muted-foreground">
                             End Date
                           </p>
                           <p className="text-sm font-medium">
                             {new Date(
-                              payments[0].event.endDate
+                              overviewEvent.endDate
                             ).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
@@ -723,13 +803,13 @@ export default function EventStatistics({
                           </p>
                         </div>
                       )}
-                      {payments[0].event.location && (
+                      {overviewEvent.location && (
                         <div>
                           <p className="text-xs text-muted-foreground">
                             Location
                           </p>
                           <p className="text-sm font-medium">
-                            {payments[0].event.location}
+                            {overviewEvent.location}
                           </p>
                         </div>
                       )}
@@ -740,18 +820,32 @@ export default function EventStatistics({
                   <div className="mb-6 space-y-4">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        {activeTab === 'shopPayments' ? 'Total Item Sold' : 'Total Participants'}
+                        {activeTab === 'shopPayments'
+                          ? 'Total Item Sold'
+                          : activeTab === 'refund'
+                            ? 'Total Refunds'
+                            : 'Total Participants'}
                       </p>
                       <p className="text-2xl font-bold">
-                        {activeTab === 'shopPayments' ? totalItemsSold : totalParticipants}
+                        {activeTab === 'shopPayments'
+                          ? totalItemsSold
+                          : activeTab === 'refund'
+                            ? refundPayments.length
+                            : totalParticipants}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        Total Earned
+                        {activeTab === 'refund' ? 'Total Refunded' : 'Total Earned'}
                       </p>
                       <p className="text-2xl font-bold">
-                        ${(activeTab === 'shopPayments' ? totalShopRevenue : totalEventEarned).toFixed(2)}
+                        $
+                        {(activeTab === 'shopPayments'
+                          ? totalShopRevenue
+                          : activeTab === 'refund'
+                            ? totalRefunded
+                            : totalEventEarned
+                        ).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -763,7 +857,7 @@ export default function EventStatistics({
                       preSelectedEventId={selectedEventId}
                       onPaymentAdded={reloadPayments}
                     />
-                    {activeTab !== 'shopPayments' && (
+                    {activeTab !== 'shopPayments' && activeTab !== 'refund' && (
                       <Button
                         onClick={handleSendEmail}
                         className="w-full"
@@ -1114,6 +1208,167 @@ export default function EventStatistics({
                       )}
                     </div>
                   </div>
+                ) : activeTab === 'refund' ? (
+                  <>
+                    {loading ? (
+                      <div className="flex items-center justify-center rounded-lg border bg-white p-8">
+                        <p>Loading...</p>
+                      </div>
+                    ) : refundPayments.length > 0 ? (
+                      <div className="rounded-lg border bg-white shadow-sm">
+                        <div className="flex items-center justify-between border-b px-4 py-3">
+                          <h3 className="text-lg font-semibold">Refund Table</h3>
+                          <ExportToExcelButton
+                            data={sortedRefundPayments.map((p) => ({
+                              'Ticket Name': p.eventTicket?.type ?? '-',
+                              Email: p.guestEmail ?? p.user?.email ?? '-',
+                              Phone: p.guestPhone ?? p.user?.phone ?? '-',
+                              Customer: p.guestName ?? p.user?.name ?? '-',
+                              Amount: p.pricePaid,
+                              Quantity: p.quantity,
+                              'Seat Number': p.seatNumber ?? '-',
+                              Capacity: p.eventTicket?.capacityPerTicket ?? '-',
+                              'Payment Method': p.method,
+                              'Payment Type': p.type,
+                              'Created At': new Date(p.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              }),
+                              'Monitor Name': p.monitorUser?.name ?? '-',
+                            }))}
+                            filename={`refunds-${events.find((e) => e.id === selectedEventId)?.title ?? selectedEventId ?? 'all'}`}
+                            sheetName="Refunds"
+                          />
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th
+                                  className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('ticketName')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Ticket Name
+                                    {sortConfig.column !== 'ticketName' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'ticketName' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'ticketName' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('email')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Email
+                                    {sortConfig.column !== 'email' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'email' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'email' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('phone')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Phone Number
+                                    {sortConfig.column !== 'phone' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'phone' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'phone' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th
+                                  className="max-w-[110px] break-words cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('customer')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Customer
+                                    {sortConfig.column !== 'customer' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'customer' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'customer' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th className="px-4 py-3 text-left">Amount</th>
+                                <th className="max-w-[110px] break-words px-4 py-3 text-left">Quantity/Seat</th>
+                                <th className="px-4 py-3 text-left">Capacity</th>
+                                <th
+                                  className="cursor-pointer px-4 py-3 text-left hover:bg-gray-200"
+                                  onClick={() => handleSort('paymentMethod')}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    Payment Method
+                                    {sortConfig.column !== 'paymentMethod' && <ArrowUpDown className="h-3 w-3 text-gray-400 shrink-0" />}
+                                    {sortConfig.column === 'paymentMethod' && sortConfig.order === 'asc' && <FiChevronUp className="h-3 w-3 text-blue-600 shrink-0" />}
+                                    {sortConfig.column === 'paymentMethod' && sortConfig.order === 'desc' && <FiChevronDown className="h-3 w-3 text-orange-600 shrink-0" />}
+                                  </div>
+                                </th>
+                                <th className="px-4 py-3 text-left">Created At</th>
+                                <th className="px-4 py-3 text-left">Monitor Name</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              {sortedRefundPayments.map((payment) => {
+                                const isGuestCheckout =
+                                  !payment.user &&
+                                  (payment.guestEmail || payment.guestName)
+                                const displayEmail =
+                                  payment.guestEmail || payment.user?.email || '-'
+                                const displayPhone =
+                                  payment.guestPhone || payment.user?.phone || '-'
+                                const displayName =
+                                  payment.guestName || payment.user?.name || '-'
+                                const paymentType = payment.eventTicket?.type || '-'
+                                let displayPaymentType = paymentType
+                                if (isGuestCheckout) {
+                                  displayPaymentType += ' (Guest Checkout)'
+                                }
+
+                                return (
+                                  <tr key={payment.id} className="bg-white">
+                                    <td className="px-4 py-3">{displayPaymentType}</td>
+                                    <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
+                                      {displayEmail}
+                                    </td>
+                                    <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
+                                      {displayPhone}
+                                    </td>
+                                    <td className="max-w-[100px] whitespace-normal break-words px-4 py-3">
+                                      {displayName}
+                                    </td>
+                                    <td className="px-4 py-3">${payment.pricePaid.toFixed(2)}</td>
+                                    <td className="px-4 py-3">
+                                      {payment.quantity}/{payment.seatNumber || '-'}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      {payment.eventTicket?.capacityPerTicket ?? 1}
+                                    </td>
+                                    <td className="px-4 py-3">{payment.method}</td>
+                                    <td className="px-4 py-3">
+                                      {new Date(payment.createdAt).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      {payment.monitorUser?.name || '-'}
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center rounded-lg border bg-white p-8">
+                        <p className="text-muted-foreground">
+                          No refunds found for this event
+                        </p>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   // Answers Tab
                   <div className="rounded-lg border bg-white shadow-sm">

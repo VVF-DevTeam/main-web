@@ -30,6 +30,7 @@ import {
 import { getUsersSimple } from '@/lib/actions/user/getAllUsersSimple'
 import { UserInfoProps, UserInfoSimpleProps } from '@/lib/types/userInfo'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { addPayment } from '@/lib/actions/payment/addPayment'
 import { getEventTickets, EventTicket } from '@/lib/actions/ticket/getEventTickets'
 import { useRouter } from 'next/navigation'
@@ -49,6 +50,7 @@ const addPaymentSchema = z
     membershipEndDate: z
       .date()
       .optional(),
+    note: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -543,6 +545,20 @@ const AddClientModal = ({
                   )}
                 />
               )}
+
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Note (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea rows={3} {...field} placeholder="Add any notes about this payment" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>  
 
             {/* Submit Button */}
@@ -619,6 +635,7 @@ const AddPaymentButton = ({
       paymentMethod: '',
       paymentType: '',
       membershipEndDate: new Date(),
+      note: '',
     },
   })
 
@@ -669,6 +686,7 @@ const AddPaymentButton = ({
       eventId: data.eventId === 'none' || !data.eventId ? undefined : data.eventId,
       userId: data.userId === 'none-user' ? undefined : data.userId,
       eventTicketId: data.eventTicketId || undefined,
+      note: data.note?.trim() || undefined,
     }
     
     const { success, message } = await addPayment(submitData)
