@@ -59,6 +59,9 @@ export async function POST(req: Request) {
         eventTicketId: true,
         quantity: true,
         refunded: true, // Check if already refunded
+        guestName: true,
+        guestEmail: true,
+        guestPhone: true,
         user: {
           select: {
             stripeSubscriptionId: true,
@@ -169,6 +172,9 @@ export async function POST(req: Request) {
         method: 'Stripe',
         refunded: true,
         userId: payment.userId,
+        guestName: payment.guestName,
+        guestEmail: payment.guestEmail,
+        guestPhone: payment.guestPhone,
         monitorUserId,
         eventId: payment.eventId,
         eventTicketId: payment.eventTicketId,
@@ -178,11 +184,12 @@ export async function POST(req: Request) {
     // Revalidate payment cache after updating payment
     revalidateTag('payments')
 
-    // Send refund confirmation email to the user (best-effort, non-blocking for failure)
-    if (payment.user?.email) {
+    // Send refund confirmation email (registered user or guest checkout)
+    const refundRecipientEmail = (payment.user?.email || payment.guestEmail || '').trim()
+    if (refundRecipientEmail) {
       try {
-        const firstName =
-          payment.user.name?.split(' ')[0] || 'Valued Customer'
+        const displayName = payment.user?.name || payment.guestName
+        const firstName = displayName?.split(' ')[0] || 'Valued Customer'
 
         const refundedAmount =
           typeof refund.amount === 'number' ? refund.amount / 100 : 0
@@ -194,7 +201,7 @@ export async function POST(req: Request) {
 
         await sendRefundConfirmationEmail({
           firstName,
-          to: payment.user.email,
+          to: refundRecipientEmail,
           ticketType,
           refundedAmount,
           currency: 'CAD',
