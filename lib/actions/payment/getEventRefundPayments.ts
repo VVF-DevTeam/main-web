@@ -22,6 +22,7 @@ async function fetchEventRefundPaymentsData(eventId: string) {
         guestName: true,
         guestEmail: true,
         guestPhone: true,
+        note: true,
         user: {
           select: {
             name: true,

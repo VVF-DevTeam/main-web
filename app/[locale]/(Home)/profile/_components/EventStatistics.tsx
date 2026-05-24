@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { getEventPayments } from '../../../../../lib/actions/payment/getEventPayments'
 import { getEventShopPayments } from '../../../../../lib/actions/payment/getEventShopPayments'
 import { getEventRefundPayments } from '../../../../../lib/actions/payment/getEventRefundPayments'
+import PaymentNoteButton from '@/components/payment/PaymentNoteButton'
 import { PaymentMethod, PaymentType } from '@prisma/client'
 import AddPaymentButton from './AddEventPaymentButton'
 import ExportToExcelButton from '@/components/button/ExportToExcelButton'
@@ -114,6 +115,7 @@ interface RefundPayment {
   guestName: string | null
   guestEmail: string | null
   guestPhone: string | null
+  note: string | null
   user: {
     name: string | null
     email: string
@@ -1305,6 +1307,7 @@ export default function EventStatistics({
                                 </th>
                                 <th className="px-4 py-3 text-left">Created At</th>
                                 <th className="px-4 py-3 text-left">Monitor Name</th>
+                                <th className="px-4 py-3 text-left">Actions</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -1353,6 +1356,9 @@ export default function EventStatistics({
                                     </td>
                                     <td className="px-4 py-3">
                                       {payment.monitorUser?.name || '-'}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      <PaymentNoteButton note={payment.note} />
                                     </td>
                                   </tr>
                                 )

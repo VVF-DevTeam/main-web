@@ -14,6 +14,7 @@ export type PaymentWithRelations = {
   seatNumber: string | null
   guestName: string | null
   guestEmail: string | null
+  note: string | null
   user: {
     name: string | null
     email: string

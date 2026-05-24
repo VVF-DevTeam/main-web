@@ -3,6 +3,7 @@
 import { KeyboardEvent, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import RefundButton from '@/components/payment/RefundButton'
+import PaymentNoteButton from '@/components/payment/PaymentNoteButton'
 import { getPaymentStatus, getStatusColor } from '@/lib/actions/payment/paymentStatus'
 import { Input } from '@/components/ui/input'
 import ExportToExcelButton from '@/components/button/ExportToExcelButton'
@@ -24,6 +25,7 @@ type ClientPayment = {
   seatNumber: string | null
   guestName: string | null
   guestEmail: string | null
+  note: string | null
   user: {
     name: string | null
     email: string
@@ -217,9 +219,10 @@ export default function PaymentManagementClient({
               <th className="px-4 py-3 text-left">Quantity/Seat</th>
               <th className="px-4 py-3 text-left">Type</th>
               <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">
-                {paymentTypeTab === 'refund' ? 'Monitor Name' : 'Actions'}
-              </th>
+              {paymentTypeTab === 'refund' && (
+                <th className="px-4 py-3 text-left">Monitor Name</th>
+              )}
+              <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -266,33 +269,37 @@ export default function PaymentManagementClient({
                     </td>
                     <td className="px-4 py-3">{paymentTypeDisplay}</td>
                     <td className={`px-4 py-3 font-medium ${statusColor}`}>{status}</td>
-                    {paymentTypeTab === 'refund' ? (
+                    {paymentTypeTab === 'refund' && (
                       <td className="px-4 py-3">{payment.monitorUser?.name || '-'}</td>
-                    ) : (
-                      <td className="px-4 py-3">
-                        <RefundButton
-                          paymentId={payment.id}
-                          stripeProductId={payment.eventTicket?.stripeProductId || payment.stripePaymentId}
-                          method={payment.method}
-                          amount={Number(payment.pricePaid)}
-                          monitorUserId={refundMonitorUserId}
-                          disabled={
-                            status === 'Expired' ||
-                            status === 'Past' ||
-                            status === 'Refunded' ||
-                            payment.method === 'ETF' ||
-                            payment.method === 'Cash' ||
-                            payment.method === 'BankTransfer'
-                          }
-                        />
-                      </td>
                     )}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col items-center gap-2">
+                        <PaymentNoteButton note={payment.note} />
+                        {paymentTypeTab !== 'refund' && (
+                          <RefundButton
+                            paymentId={payment.id}
+                            stripeProductId={payment.eventTicket?.stripeProductId || payment.stripePaymentId}
+                            method={payment.method}
+                            amount={Number(payment.pricePaid)}
+                            monitorUserId={refundMonitorUserId}
+                            disabled={
+                              status === 'Expired' ||
+                              status === 'Past' ||
+                              status === 'Refunded' ||
+                              payment.method === 'ETF' ||
+                              payment.method === 'Cash' ||
+                              payment.method === 'BankTransfer'
+                            }
+                          />
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 )
               })
             ) : (
               <tr>
-                <td colSpan={11} className="px-4 py-3 text-center">
+                <td colSpan={paymentTypeTab === 'refund' ? 10 : 9} className="px-4 py-3 text-center">
                   No payments found
                 </td>
               </tr>

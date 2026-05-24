@@ -53,6 +53,7 @@ async function fetchPaymentsData(
           seatNumber: true,
           guestName: true,
           guestEmail: true,
+          note: true,
           user: {
             select: {
               name: true,
@@ -128,6 +129,7 @@ async function fetchPaymentsData(
           method: true,
           refunded: true,
           stripePaymentId: true,
+          note: true,
           user: {
             select: {
               name: true,

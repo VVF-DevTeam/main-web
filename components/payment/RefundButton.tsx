@@ -102,7 +102,11 @@ export default function RefundButton({
       <button
         onClick={() => setShowConfirmModal(true)}
         disabled={disabled || isLoading}
-        className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors
+        className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+          method === 'ETF' || method === 'Cash' || method === 'BankTransfer'
+            ? ''
+            : 'whitespace-nowrap'
+        }
           ${
             disabled
               ? 'cursor-not-allowed bg-gray-100 text-gray-400'
@@ -110,7 +114,16 @@ export default function RefundButton({
           }
         `}
       >
-        {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? `Payment by ${method} (Refund not available here)` : isLoading ? 'Processing...' : 'Full Refund'}
+        {method === 'ETF' || method === 'Cash' || method === 'BankTransfer' ? (
+          <span className="flex flex-col items-center leading-tight">
+            <span>Payment by {method}</span>
+            <span>(Refund not available)</span>
+          </span>
+        ) : isLoading ? (
+          'Processing...'
+        ) : (
+          'Full Refund'
+        )}
       </button>
     </>
   )
