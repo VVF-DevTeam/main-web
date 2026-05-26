@@ -12,19 +12,17 @@ vi.mock('@/lib/actions/payment/checkSubscription')
 vi.mock('next-auth/react', () => ({
   useSession: vi.fn(),
 }))
-vi.mock('@/components/payment/NormalCheckoutButton', () => ({
+vi.mock('@/components/payment/SingleCheckoutButton', () => ({
   __esModule: true,
   default: ({
     buttonText,
     type,
-    price,
     numberSession,
     stripePriceId,
     stripeProductId,
   }: {
     buttonText: string
     type: string
-    price?: number
     numberSession?: number
     stripePriceId: string
     stripeProductId: string
@@ -32,7 +30,6 @@ vi.mock('@/components/payment/NormalCheckoutButton', () => ({
     <div data-testid="normal-checkout-button">
       <span data-testid="button-text">{buttonText}</span>
       <span data-testid="payment-type">{type}</span>
-      <span data-testid="price">{price}</span>
       <span data-testid="sessions">{numberSession ?? ''}</span>
       <span data-testid="stripe-price-id">{stripePriceId}</span>
       <span data-testid="stripe-product-id">{stripeProductId}</span>
@@ -55,6 +52,10 @@ vi.mock('react-i18next', () => ({
         'discount-code-cart-note-middle': ', please add the ticket to the cart and apply the code ',
         'discount-code-cart-note-below': 'below',
         'discount-code-cart-note-after': '.',
+        or: 'or',
+        'purchase-ticket-directly': 'Purchase ticket directly',
+        'ticket-no-longer-available': 'Ticket no longer available',
+        'no-ticket-selected': 'Tickets are currently unavailable. Please check back later.',
         sessions: 'sessions',
       }
       return translations[key] || key
@@ -240,6 +241,37 @@ describe('EventSingleCheckOut', () => {
       .map((node) => node.textContent)
 
     expect(paymentTypes).toContain('Concert')
+  })
+
+  test('renders direct checkout button for active seated tickets', async () => {
+    const seatedTicket = [
+      createTicket({
+        id: 'seated_ticket',
+        type: 'Front Row',
+        stripeProductId: 'prod_seated',
+        stripePriceId: 'price_seated',
+      }),
+    ]
+
+    render(
+      <EventSingleCheckOut
+        {...defaultProps}
+        type="Concert"
+        tickets={seatedTicket}
+        seatNumber="A1"
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+    })
+
+    expect(screen.getByText('Seat Number: A1')).toBeInTheDocument()
+    expect(screen.getByText('or:')).toBeInTheDocument()
+    expect(screen.getAllByTestId('normal-checkout-button')).toHaveLength(1)
+    expect(screen.getByTestId('button-text')).toHaveTextContent(
+      'purchase-ticket-directly'
+    )
   })
 
   test('renders form link for legacy events', async () => {

@@ -527,31 +527,33 @@ export default function EventSingleCheckOut({
                     {isExpired && (
                       <Button disabled variant="outline" className="w-full opacity-50">
                         {t('ticket-no-longer-available')}
-                      </Button>) 
-                    //   : (
-                    //   <div className="flex items-center gap-2">
-                    //     <span className="text-sm font-medium text-gray-700 drop-shadow-sm">{t('or')}: </span>
-                    //     <SingleCheckoutButton
-                    //       stripePriceId={stripePriceIdForUser}
-                    //       stripeProductId={ticket.stripeProductId}
-                    //       eventKeyName={eventKeyName}
-                    //       userId={userId}
-                    //       eventId={eventId}
-                    //       buttonText="purchase-ticket-directly"
-                    //       type={paymentTypeValue}
-                    //       numberSession={ticket.payTotalNumber ?? undefined}
-                    //       email={userInfo?.email || ''}
-                    //       seatNumber={seatNumber}
-                    //       eventTicketId={ticket.id}
-                    //       capacityPerTicket={ticket.capacityPerTicket ?? 1}
-                    //       mainUserPhone={userInfo?.phone || ''}
-                    //       mainUserName={userInfo?.name || ''}
-                    //       pricingIsSubscribed={isSubscribed}
-                    //       pricingHasStudentDiscount={hasActiveStudentDiscount}
-                    //     />
-                    //   </div>
-                    // )
-                    }
+                      </Button>
+                    )}
+                    {!isExpired && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700 drop-shadow-sm">
+                          {t('or')}:
+                        </span>
+                        <SingleCheckoutButton
+                          stripePriceId={stripePriceIdForUser}
+                          stripeProductId={ticket.stripeProductId}
+                          eventKeyName={eventKeyName}
+                          userId={userId}
+                          eventId={eventId}
+                          buttonText="purchase-ticket-directly"
+                          type={paymentTypeValue}
+                          numberSession={ticket.payTotalNumber ?? undefined}
+                          email={userInfo?.email || ''}
+                          seatNumber={seatNumber}
+                          eventTicketId={ticket.id}
+                          capacityPerTicket={ticket.capacityPerTicket ?? 1}
+                          mainUserPhone={userInfo?.phone || ''}
+                          mainUserName={userInfo?.name || ''}
+                          pricingIsSubscribed={isSubscribed}
+                          pricingHasStudentDiscount={hasActiveStudentDiscount}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               )

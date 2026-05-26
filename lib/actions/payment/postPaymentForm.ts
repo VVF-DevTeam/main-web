@@ -10,6 +10,7 @@ import {
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
 
 type OtherGuest = { name: string; email: string; phone?: string }
+const MAX_SUBMISSION_RETRIES = 3
 
 export type FormResponseEntry = {
   questionId: string
@@ -109,14 +110,23 @@ export type VerifyPostPaymentFormResult =
 
 export async function verifyPostPaymentFormAccess({
   userId,
+  paymentReference,
   eventKeyName,
   guestEmail,
 }: {
-  userId: string
+  userId?: string | null
+  paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
 }): Promise<VerifyPostPaymentFormResult> {
-  if (!userId?.trim() || !guestEmail?.trim() || !eventKeyName?.trim()) {
+  const normalizedUserId = userId?.trim() || null
+  const normalizedPaymentReference = paymentReference?.trim() || null
+
+  if (
+    (!normalizedUserId && !normalizedPaymentReference) ||
+    !guestEmail?.trim() ||
+    !eventKeyName?.trim()
+  ) {
     return { success: false, error: 'missing_params' }
   }
 
@@ -132,9 +142,11 @@ export async function verifyPostPaymentFormAccess({
 
     const payments = await prisma.payment.findMany({
       where: {
-        userId: userId.trim(),
         eventId: event.id,
         refunded: false,
+        ...(normalizedUserId
+          ? { userId: normalizedUserId }
+          : { stripePaymentId: normalizedPaymentReference }),
       },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -202,18 +214,21 @@ export type SubmitPostPaymentFormResult =
 export async function submitPostPaymentForm({
   paymentId,
   userId,
+  paymentReference,
   eventKeyName,
   guestEmail,
   formResponses,
 }: {
   paymentId: string
-  userId: string
+  userId?: string | null
+  paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
   formResponses: FormResponses
 }): Promise<SubmitPostPaymentFormResult> {
   const verification = await verifyPostPaymentFormAccess({
     userId,
+    paymentReference,
     eventKeyName,
     guestEmail,
   })
@@ -234,39 +249,74 @@ export async function submitPostPaymentForm({
     return { success: false, error: 'empty_form' }
   }
 
-  try {
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-      select: { formResponses: true },
-    })
-
-    if (!payment) {
-      return { success: false, error: 'payment_not_found' }
-    }
-
-    const newBlock: SavedFormResponsesBlock = {
-      email: normalizeEmail(guestEmail),
-      responses: formatFormResponses(
-        formResponses,
-        verification.eventFormData
-      ),
-    }
-
-    const updatedFormResponses = appendFormResponses(
-      asFormResponseBlocks(payment.formResponses),
-      newBlock
-    )
-
-    await prisma.payment.update({
-      where: { id: paymentId },
-      data: { formResponses: updatedFormResponses },
-    })
-
-    revalidateTag('payments')
-
-    return { success: true }
-  } catch (error) {
-    console.error('submitPostPaymentForm error:', error)
-    return { success: false, error: 'server_error' }
+  const newBlock: SavedFormResponsesBlock = {
+    email: normalizeEmail(guestEmail),
+    responses: formatFormResponses(
+      formResponses,
+      verification.eventFormData
+    ),
   }
+
+  for (let attempt = 1; attempt <= MAX_SUBMISSION_RETRIES; attempt++) {
+    try {
+      const txResult = await prisma.$transaction(async (tx) => {
+        const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`
+          SELECT id
+          FROM "Payment"
+          WHERE id = ${paymentId}
+          FOR UPDATE
+        `
+
+        if (lockedRows.length === 0) {
+          return { success: false as const, error: 'payment_not_found' }
+        }
+
+        const payment = await tx.payment.findUnique({
+          where: { id: paymentId },
+          select: { formResponses: true },
+        })
+
+        if (!payment) {
+          return { success: false as const, error: 'payment_not_found' }
+        }
+
+        const existingBlocks = asFormResponseBlocks(payment.formResponses)
+
+        if (guestAlreadySubmitted(existingBlocks, guestEmail)) {
+          return { success: false as const, error: 'already_submitted' }
+        }
+
+        const updatedFormResponses = appendFormResponses(
+          existingBlocks,
+          newBlock
+        )
+
+        await tx.payment.update({
+          where: { id: paymentId },
+          data: { formResponses: updatedFormResponses },
+        })
+
+        return { success: true as const }
+      })
+
+      if (!txResult.success) {
+        return txResult
+      }
+
+      revalidateTag('payments')
+      return { success: true }
+    } catch (error: any) {
+      const isRetryableConflict =
+        error?.code === 'P2034' && attempt < MAX_SUBMISSION_RETRIES
+
+      if (isRetryableConflict) {
+        continue
+      }
+
+      console.error('submitPostPaymentForm error:', error)
+      return { success: false, error: 'server_error' }
+    }
+  }
+
+  return { success: false, error: 'server_error' }
 }
