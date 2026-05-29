@@ -50,7 +50,7 @@ export const getAllPublishedEventsWithRelations = unstable_cache(
           isPublished: true,
         },
         orderBy: {
-          createdAt: 'desc',
+          endDate: 'desc',
         },
         include: {
           categories: true,
@@ -106,7 +106,7 @@ export const getPublishedEventsWithFilters = unstable_cache(
           }),
         },
         orderBy: {
-          [orderByField || 'createdAt']: orderDirection || 'desc',
+          [orderByField || 'endDate']: orderDirection || 'desc',
         },
         take: numberOfEvents ? numberOfEvents : undefined,
       }
