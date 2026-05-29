@@ -96,6 +96,8 @@ function guestAlreadySubmitted(
   )
 }
 
+const MAX_FORM_RESPONSE_WRITE_RETRIES = 5
+
 export type VerifyPostPaymentFormResult =
   | {
       success: true
@@ -249,70 +251,58 @@ export async function submitPostPaymentForm({
     return { success: false, error: 'empty_form' }
   }
 
-  const newBlock: SavedFormResponsesBlock = {
-    email: normalizeEmail(guestEmail),
-    responses: formatFormResponses(formResponses, verification.eventFormData),
-  }
+  try {
+    const newBlock: SavedFormResponsesBlock = {
+      email: normalizeEmail(guestEmail),
+      responses: formatFormResponses(
+        formResponses,
+        verification.eventFormData
+      ),
+    }
 
-  for (let attempt = 1; attempt <= MAX_SUBMISSION_RETRIES; attempt++) {
-    try {
-      const txResult = await prisma.$transaction(async (tx) => {
-        const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`
-          SELECT id
-          FROM "Payment"
-          WHERE id = ${paymentId}
-          FOR UPDATE
-        `
-
-        if (lockedRows.length === 0) {
-          return { success: false as const, error: 'payment_not_found' }
-        }
-
-        const payment = await tx.payment.findUnique({
-          where: { id: paymentId },
-          select: { formResponses: true },
-        })
-
-        if (!payment) {
-          return { success: false as const, error: 'payment_not_found' }
-        }
-
-        const existingBlocks = asFormResponseBlocks(payment.formResponses)
-
-        if (guestAlreadySubmitted(existingBlocks, guestEmail)) {
-          return { success: false as const, error: 'already_submitted' }
-        }
-
-        const updatedFormResponses = appendFormResponses(
-          existingBlocks,
-          newBlock
-        )
-
-        await tx.payment.update({
-          where: { id: paymentId },
-          data: { formResponses: updatedFormResponses },
-        })
-
-        return { success: true as const }
+    for (
+      let attempt = 0;
+      attempt < MAX_FORM_RESPONSE_WRITE_RETRIES;
+      attempt++
+    ) {
+      const payment = await prisma.payment.findUnique({
+        where: { id: paymentId },
+        select: { formResponses: true, updatedAt: true },
       })
 
-      if (!txResult.success) {
-        return txResult
+      if (!payment) {
+        return { success: false, error: 'payment_not_found' }
       }
 
-      revalidateTag('payments')
-      return { success: true }
-    } catch (error: any) {
-      const isRetryableConflict =
-        error?.code === 'P2034' && attempt < MAX_SUBMISSION_RETRIES
+      const existingResponses = asFormResponseBlocks(payment.formResponses)
 
-      if (isRetryableConflict) {
-        continue
+      if (guestAlreadySubmitted(existingResponses, guestEmail)) {
+        return { success: false, error: 'already_submitted' }
       }
 
-      console.error('submitPostPaymentForm error:', error)
-      return { success: false, error: 'server_error' }
+      const updatedFormResponses = appendFormResponses(
+        existingResponses,
+        newBlock
+      )
+
+      const updateResult = await prisma.payment.updateMany({
+        where: {
+          id: paymentId,
+          updatedAt: payment.updatedAt,
+        },
+        data: { formResponses: updatedFormResponses },
+      })
+
+      if (updateResult.count === 1) {
+        revalidateTag('payments')
+        return { success: true }
+      }
     }
+
+    return { success: false, error: 'server_error' }
+  } catch (error) {
+    console.error('submitPostPaymentForm error:', error)
+    return { success: false, error: 'server_error' }
   }
 
   return { success: false, error: 'server_error' }
