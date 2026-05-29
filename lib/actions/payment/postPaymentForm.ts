@@ -10,6 +10,7 @@ import {
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
 
 type OtherGuest = { name: string; email: string; phone?: string }
+const MAX_SUBMISSION_RETRIES = 3
 
 export type FormResponseEntry = {
   questionId: string
@@ -111,14 +112,23 @@ export type VerifyPostPaymentFormResult =
 
 export async function verifyPostPaymentFormAccess({
   userId,
+  paymentReference,
   eventKeyName,
   guestEmail,
 }: {
-  userId: string
+  userId?: string | null
+  paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
 }): Promise<VerifyPostPaymentFormResult> {
-  if (!userId?.trim() || !guestEmail?.trim() || !eventKeyName?.trim()) {
+  const normalizedUserId = userId?.trim() || null
+  const normalizedPaymentReference = paymentReference?.trim() || null
+
+  if (
+    (!normalizedUserId && !normalizedPaymentReference) ||
+    !guestEmail?.trim() ||
+    !eventKeyName?.trim()
+  ) {
     return { success: false, error: 'missing_params' }
   }
 
@@ -134,9 +144,11 @@ export async function verifyPostPaymentFormAccess({
 
     const payments = await prisma.payment.findMany({
       where: {
-        userId: userId.trim(),
         eventId: event.id,
         refunded: false,
+        ...(normalizedUserId
+          ? { userId: normalizedUserId }
+          : { stripePaymentId: normalizedPaymentReference }),
       },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -204,18 +216,21 @@ export type SubmitPostPaymentFormResult =
 export async function submitPostPaymentForm({
   paymentId,
   userId,
+  paymentReference,
   eventKeyName,
   guestEmail,
   formResponses,
 }: {
   paymentId: string
-  userId: string
+  userId?: string | null
+  paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
   formResponses: FormResponses
 }): Promise<SubmitPostPaymentFormResult> {
   const verification = await verifyPostPaymentFormAccess({
     userId,
+    paymentReference,
     eventKeyName,
     guestEmail,
   })
@@ -289,4 +304,6 @@ export async function submitPostPaymentForm({
     console.error('submitPostPaymentForm error:', error)
     return { success: false, error: 'server_error' }
   }
+
+  return { success: false, error: 'server_error' }
 }

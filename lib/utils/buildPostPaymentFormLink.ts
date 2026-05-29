@@ -1,11 +1,13 @@
 export function buildPostPaymentFormLink({
   userId,
+  paymentReference,
   eventKeyName,
   eventType,
   guestEmail,
   locale = 'en',
 }: {
-  userId: string
+  userId?: string | null
+  paymentReference?: string | null
   eventKeyName: string
   eventType: string
   guestEmail: string
@@ -16,9 +18,16 @@ export function buildPostPaymentFormLink({
     'https://www.vietvibe.org'
 
   const params = new URLSearchParams({
-    userId,
     guestEmail: guestEmail.trim(),
   })
+
+  if (userId?.trim()) {
+    params.set('userId', userId.trim())
+  }
+
+  if (paymentReference?.trim()) {
+    params.set('paymentReference', paymentReference.trim())
+  }
 
   return `${baseUrl}/${locale}/events/${eventType.toLowerCase()}/${eventKeyName}/form?${params.toString()}`
 }
