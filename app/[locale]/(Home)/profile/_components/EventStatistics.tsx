@@ -29,6 +29,7 @@ import AddPaymentButton from './AddEventPaymentButton'
 import ExportToExcelButton from '@/components/button/ExportToExcelButton'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { JsonValue } from '@prisma/client/runtime/library'
+import { normalizeStoredFormResponses } from '@/lib/utils/paymentFormResponses'
 
 type OtherGuestJson = {
   name?: string
@@ -155,12 +156,19 @@ type FormResponsesBlock = {
 }
 
 function normalizeFormResponseBlocks(
-  formResponses: JsonValue | undefined
+  payment: Payment
 ): Array<{ email: string; customerName: string; responses: FormResponse[] }> {
-  if (!formResponses || !Array.isArray(formResponses)) return []
+  const blocks = normalizeStoredFormResponses(payment.formResponses)
+  if (!blocks) return []
 
-  return (formResponses as FormResponsesBlock[])
+  const fallbackEmail = payment.guestEmail || payment.user?.email || 'Unknown'
+  const fallbackName = payment.guestName || payment.user?.name || fallbackEmail
+
+  return blocks
     .filter((block) => block.email && Array.isArray(block.responses))
+    .concat(
+      blocks.filter((block) => !block.email && Array.isArray(block.responses))
+    )
     .map((block) => {
       const nameFromAnswer = block.responses.find((r) =>
         r.question?.toLowerCase().includes('your name')
@@ -168,10 +176,10 @@ function normalizeFormResponseBlocks(
       const customerName =
         typeof nameFromAnswer === 'string' && nameFromAnswer.trim() !== ''
           ? nameFromAnswer.trim()
-          : block.email
+          : fallbackName
 
       return {
-        email: block.email.trim(),
+        email: block.email.trim() || fallbackEmail,
         customerName,
         responses: block.responses,
       }
@@ -1439,7 +1447,7 @@ function buildFormResponsesExcelData(
   const rows: Record<string, unknown>[] = []
 
   payments.forEach((payment) => {
-    const blocks = normalizeFormResponseBlocks(payment.formResponses)
+    const blocks = normalizeFormResponseBlocks(payment)
 
     for (const block of blocks) {
       for (const response of block.responses) {
@@ -1477,7 +1485,7 @@ function FormResponsesView({ payments }: { payments: Payment[] }) {
   const byFormNumber = new Map<number, Map<string, QuestionAggregate>>()
 
   payments.forEach((payment) => {
-    const blocks = normalizeFormResponseBlocks(payment.formResponses)
+    const blocks = normalizeFormResponseBlocks(payment)
 
     for (const block of blocks) {
       for (const response of block.responses) {

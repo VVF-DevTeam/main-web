@@ -8,6 +8,7 @@ import {
   getEventForm,
 } from '@/lib/actions/event/getEventForm'
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
+import { normalizeStoredFormResponses } from '@/lib/utils/paymentFormResponses'
 
 type OtherGuest = { name: string; email: string; phone?: string }
 
@@ -33,8 +34,7 @@ function normalizeEmail(email: string): string {
 function asFormResponseBlocks(
   value: unknown
 ): SavedFormResponsesBlock[] | null {
-  if (!value || !Array.isArray(value)) return null
-  return value as SavedFormResponsesBlock[]
+  return normalizeStoredFormResponses(value) as SavedFormResponsesBlock[] | null
 }
 
 function isGuestOnPayment(
@@ -109,14 +109,23 @@ export type VerifyPostPaymentFormResult =
 
 export async function verifyPostPaymentFormAccess({
   userId,
+  paymentRef,
   eventKeyName,
   guestEmail,
 }: {
-  userId: string
+  userId?: string
+  paymentRef?: string
   eventKeyName: string
   guestEmail: string
 }): Promise<VerifyPostPaymentFormResult> {
-  if (!userId?.trim() || !guestEmail?.trim() || !eventKeyName?.trim()) {
+  const normalizedUserId = userId?.trim()
+  const normalizedPaymentRef = paymentRef?.trim()
+
+  if (
+    (!normalizedUserId && !normalizedPaymentRef) ||
+    !guestEmail?.trim() ||
+    !eventKeyName?.trim()
+  ) {
     return { success: false, error: 'missing_params' }
   }
 
@@ -132,9 +141,11 @@ export async function verifyPostPaymentFormAccess({
 
     const payments = await prisma.payment.findMany({
       where: {
-        userId: userId.trim(),
         eventId: event.id,
         refunded: false,
+        ...(normalizedPaymentRef
+          ? { stripePaymentId: normalizedPaymentRef }
+          : { userId: normalizedUserId }),
       },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -202,18 +213,21 @@ export type SubmitPostPaymentFormResult =
 export async function submitPostPaymentForm({
   paymentId,
   userId,
+  paymentRef,
   eventKeyName,
   guestEmail,
   formResponses,
 }: {
   paymentId: string
-  userId: string
+  userId?: string
+  paymentRef?: string
   eventKeyName: string
   guestEmail: string
   formResponses: FormResponses
 }): Promise<SubmitPostPaymentFormResult> {
   const verification = await verifyPostPaymentFormAccess({
     userId,
+    paymentRef,
     eventKeyName,
     guestEmail,
   })
@@ -235,15 +249,6 @@ export async function submitPostPaymentForm({
   }
 
   try {
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-      select: { formResponses: true },
-    })
-
-    if (!payment) {
-      return { success: false, error: 'payment_not_found' }
-    }
-
     const newBlock: SavedFormResponsesBlock = {
       email: normalizeEmail(guestEmail),
       responses: formatFormResponses(
@@ -252,19 +257,37 @@ export async function submitPostPaymentForm({
       ),
     }
 
-    const updatedFormResponses = appendFormResponses(
-      asFormResponseBlocks(payment.formResponses),
-      newBlock
-    )
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const payment = await prisma.payment.findUnique({
+        where: { id: paymentId },
+        select: { formResponses: true, updatedAt: true },
+      })
 
-    await prisma.payment.update({
-      where: { id: paymentId },
-      data: { formResponses: updatedFormResponses },
-    })
+      if (!payment) {
+        return { success: false, error: 'payment_not_found' }
+      }
 
-    revalidateTag('payments')
+      const existingBlocks = asFormResponseBlocks(payment.formResponses)
+      if (guestAlreadySubmitted(existingBlocks, guestEmail)) {
+        return { success: false, error: 'already_submitted' }
+      }
 
-    return { success: true }
+      const updatedFormResponses = appendFormResponses(existingBlocks, newBlock)
+
+      const updated = await prisma.payment.updateMany({
+        where: {
+          id: paymentId,
+          updatedAt: payment.updatedAt,
+        },
+        data: { formResponses: updatedFormResponses },
+      })
+
+      if (updated.count === 1) {
+        revalidateTag('payments')
+        return { success: true }
+      }
+    }
+    return { success: false, error: 'server_error' }
   } catch (error) {
     console.error('submitPostPaymentForm error:', error)
     return { success: false, error: 'server_error' }

@@ -75,7 +75,8 @@ function getVisibleQuestions(
 
 interface PostPaymentEventFormProps {
   paymentId: string
-  userId: string
+  userId?: string
+  paymentRef?: string
   eventKeyName: string
   guestEmail: string
   eventTitle: string
@@ -88,6 +89,7 @@ interface PostPaymentEventFormProps {
 export default function PostPaymentEventForm({
   paymentId,
   userId,
+  paymentRef,
   eventKeyName,
   guestEmail,
   eventTitle,
@@ -146,6 +148,7 @@ export default function PostPaymentEventForm({
       const result = await submitPostPaymentForm({
         paymentId,
         userId,
+        paymentRef,
         eventKeyName,
         guestEmail,
         formResponses: merged,

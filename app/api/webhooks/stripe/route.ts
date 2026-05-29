@@ -938,10 +938,10 @@ export async function POST(req: NextRequest) {
                     if (email.toLowerCase() === primaryEmail.toLowerCase()) continue
                     const formLink =
                       eventFormExists &&
-                      payerUserId &&
                       firstTicket.event.keyName
                         ? buildPostPaymentFormLink({
-                            userId: payerUserId,
+                            userId: payerUserId || undefined,
+                            paymentRef: payerUserId ? undefined : paymentId,
                             eventKeyName: firstTicket.event.keyName,
                             eventType: firstTicket.event.eventType,
                             guestEmail: email,
@@ -1172,10 +1172,10 @@ export async function POST(req: NextRequest) {
                       continue
                     const formLink =
                       eventFormExistsSingle &&
-                      payerUserIdSingle &&
                       ticket.event.keyName
                         ? buildPostPaymentFormLink({
-                            userId: payerUserIdSingle,
+                            userId: payerUserIdSingle || undefined,
+                            paymentRef: payerUserIdSingle ? undefined : paymentId,
                             eventKeyName: ticket.event.keyName,
                             eventType: ticket.event.eventType,
                             guestEmail: email,
