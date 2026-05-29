@@ -6,8 +6,10 @@ import {
   verifyPostPaymentFormAccess,
 } from './postPaymentForm'
 
-const revalidateTag = vi.fn()
-const getEventForm = vi.fn()
+const { revalidateTag, getEventForm } = vi.hoisted(() => ({
+  revalidateTag: vi.fn(),
+  getEventForm: vi.fn(),
+}))
 
 vi.mock('@/lib/db', () => ({
   __esModule: true,
