@@ -95,6 +95,8 @@ function guestAlreadySubmitted(
   )
 }
 
+const MAX_FORM_RESPONSE_WRITE_RETRIES = 5
+
 export type VerifyPostPaymentFormResult =
   | {
       success: true
@@ -235,15 +237,6 @@ export async function submitPostPaymentForm({
   }
 
   try {
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-      select: { formResponses: true },
-    })
-
-    if (!payment) {
-      return { success: false, error: 'payment_not_found' }
-    }
-
     const newBlock: SavedFormResponsesBlock = {
       email: normalizeEmail(guestEmail),
       responses: formatFormResponses(
@@ -252,19 +245,46 @@ export async function submitPostPaymentForm({
       ),
     }
 
-    const updatedFormResponses = appendFormResponses(
-      asFormResponseBlocks(payment.formResponses),
-      newBlock
-    )
+    for (
+      let attempt = 0;
+      attempt < MAX_FORM_RESPONSE_WRITE_RETRIES;
+      attempt++
+    ) {
+      const payment = await prisma.payment.findUnique({
+        where: { id: paymentId },
+        select: { formResponses: true, updatedAt: true },
+      })
 
-    await prisma.payment.update({
-      where: { id: paymentId },
-      data: { formResponses: updatedFormResponses },
-    })
+      if (!payment) {
+        return { success: false, error: 'payment_not_found' }
+      }
 
-    revalidateTag('payments')
+      const existingResponses = asFormResponseBlocks(payment.formResponses)
 
-    return { success: true }
+      if (guestAlreadySubmitted(existingResponses, guestEmail)) {
+        return { success: false, error: 'already_submitted' }
+      }
+
+      const updatedFormResponses = appendFormResponses(
+        existingResponses,
+        newBlock
+      )
+
+      const updateResult = await prisma.payment.updateMany({
+        where: {
+          id: paymentId,
+          updatedAt: payment.updatedAt,
+        },
+        data: { formResponses: updatedFormResponses },
+      })
+
+      if (updateResult.count === 1) {
+        revalidateTag('payments')
+        return { success: true }
+      }
+    }
+
+    return { success: false, error: 'server_error' }
   } catch (error) {
     console.error('submitPostPaymentForm error:', error)
     return { success: false, error: 'server_error' }
