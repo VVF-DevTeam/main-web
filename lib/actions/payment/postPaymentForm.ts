@@ -10,7 +10,6 @@ import {
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
 
 type OtherGuest = { name: string; email: string; phone?: string }
-const MAX_SUBMISSION_RETRIES = 3
 
 export type FormResponseEntry = {
   questionId: string
@@ -146,9 +145,9 @@ export async function verifyPostPaymentFormAccess({
       where: {
         eventId: event.id,
         refunded: false,
-        ...(normalizedUserId
-          ? { userId: normalizedUserId }
-          : { stripePaymentId: normalizedPaymentReference }),
+        ...(normalizedPaymentReference
+          ? { stripePaymentId: normalizedPaymentReference }
+          : { userId: normalizedUserId }),
       },
       orderBy: { createdAt: 'desc' },
       select: {

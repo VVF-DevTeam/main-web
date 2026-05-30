@@ -3,7 +3,10 @@ import { mockReset } from 'vitest-mock-extended'
 import { prisma } from '@/lib/__mocks__/db'
 import { getEventForm } from '@/lib/actions/event/getEventForm'
 import { revalidateTag } from 'next/cache'
-import { submitPostPaymentForm } from './postPaymentForm'
+import {
+  submitPostPaymentForm,
+  verifyPostPaymentFormAccess,
+} from './postPaymentForm'
 
 vi.mock('@/lib/db', () => ({
   __esModule: true,
@@ -61,7 +64,47 @@ beforeEach(() => {
   ] as any)
 })
 
-describe('submitPostPaymentForm', () => {
+describe('postPaymentForm actions', () => {
+  test('uses paymentReference before userId so repeat purchases do not bind to the wrong payment', async () => {
+    prisma.payment.findMany.mockResolvedValueOnce([
+      {
+        id: 'payment_old',
+        guestEmail: 'buyer@example.com',
+        guestName: 'Buyer',
+        otherGuests: [{ name: 'Guest', email: 'guest@example.com' }],
+        formResponses: null,
+      },
+    ] as any)
+
+    const result = await verifyPostPaymentFormAccess({
+      userId: 'user_1',
+      paymentReference: 'pi_old',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
+    expect(result).toMatchObject({
+      success: true,
+      paymentId: 'payment_old',
+      alreadySubmitted: false,
+    })
+    expect(prisma.payment.findMany).toHaveBeenCalledWith({
+      where: {
+        eventId: 'event_1',
+        refunded: false,
+        stripePaymentId: 'pi_old',
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        guestEmail: true,
+        guestName: true,
+        otherGuests: true,
+        formResponses: true,
+      },
+    })
+  })
+
   test('retries conflicting writes so concurrent guest submissions are preserved', async () => {
     const firstReadAt = new Date('2026-05-28T11:00:00.000Z')
     const secondReadAt = new Date('2026-05-28T11:00:01.000Z')
