@@ -3,7 +3,10 @@ import { mockReset } from 'vitest-mock-extended'
 import { prisma } from '@/lib/__mocks__/db'
 import { getEventForm } from '@/lib/actions/event/getEventForm'
 import { revalidateTag } from 'next/cache'
-import { submitPostPaymentForm } from './postPaymentForm'
+import {
+  submitPostPaymentForm,
+  verifyPostPaymentFormAccess,
+} from './postPaymentForm'
 
 vi.mock('@/lib/db', () => ({
   __esModule: true,
@@ -62,6 +65,76 @@ beforeEach(() => {
 })
 
 describe('submitPostPaymentForm', () => {
+  test('uses paymentReference to scope guest access to the linked payment', async () => {
+    const payments = [
+      {
+        id: 'payment_new',
+        userId: 'user_1',
+        stripePaymentId: 'pi_new',
+        createdAt: new Date('2026-05-29T11:00:00.000Z'),
+        guestEmail: 'buyer@example.com',
+        guestName: 'Buyer',
+        otherGuests: [{ name: 'Guest', email: 'guest@example.com' }],
+        formResponses: null,
+      },
+      {
+        id: 'payment_old',
+        userId: 'user_1',
+        stripePaymentId: 'pi_old',
+        createdAt: new Date('2026-05-28T11:00:00.000Z'),
+        guestEmail: 'buyer@example.com',
+        guestName: 'Buyer',
+        otherGuests: [{ name: 'Guest', email: 'guest@example.com' }],
+        formResponses: null,
+      },
+    ]
+
+    prisma.payment.findMany.mockImplementation(async (args: any) => {
+      const filtered = payments
+        .filter(
+          (payment) =>
+            (!args.where.userId || payment.userId === args.where.userId) &&
+            (!args.where.stripePaymentId ||
+              payment.stripePaymentId === args.where.stripePaymentId)
+        )
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+      return filtered.map(
+        ({ id, guestEmail, guestName, otherGuests, formResponses }) => ({
+          id,
+          guestEmail,
+          guestName,
+          otherGuests,
+          formResponses,
+        })
+      ) as any
+    })
+
+    const result = await verifyPostPaymentFormAccess({
+      userId: 'user_1',
+      paymentReference: 'pi_old',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
+    expect(result).toMatchObject({
+      success: true,
+      paymentId: 'payment_old',
+      guestName: 'Guest',
+      alreadySubmitted: false,
+    })
+    expect(prisma.payment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          eventId: 'event_1',
+          refunded: false,
+          userId: 'user_1',
+          stripePaymentId: 'pi_old',
+        }),
+      })
+    )
+  })
+
   test('retries conflicting writes so concurrent guest submissions are preserved', async () => {
     const firstReadAt = new Date('2026-05-28T11:00:00.000Z')
     const secondReadAt = new Date('2026-05-28T11:00:01.000Z')

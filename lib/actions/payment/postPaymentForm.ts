@@ -123,9 +123,18 @@ export async function verifyPostPaymentFormAccess({
 }): Promise<VerifyPostPaymentFormResult> {
   const normalizedUserId = userId?.trim() || null
   const normalizedPaymentReference = paymentReference?.trim() || null
+  const paymentLookup =
+    normalizedPaymentReference
+      ? {
+          stripePaymentId: normalizedPaymentReference,
+          ...(normalizedUserId ? { userId: normalizedUserId } : {}),
+        }
+      : normalizedUserId
+        ? { userId: normalizedUserId }
+        : null
 
   if (
-    (!normalizedUserId && !normalizedPaymentReference) ||
+    !paymentLookup ||
     !guestEmail?.trim() ||
     !eventKeyName?.trim()
   ) {
@@ -146,9 +155,7 @@ export async function verifyPostPaymentFormAccess({
       where: {
         eventId: event.id,
         refunded: false,
-        ...(normalizedUserId
-          ? { userId: normalizedUserId }
-          : { stripePaymentId: normalizedPaymentReference }),
+        ...paymentLookup,
       },
       orderBy: { createdAt: 'desc' },
       select: {
