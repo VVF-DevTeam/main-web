@@ -27,15 +27,39 @@ export type SavedFormResponsesBlock = {
   responses: FormResponseEntry[]
 }
 
+type LegacySavedFormResponses = {
+  responses: FormResponseEntry[]
+}
+
 function normalizeEmail(email: string): string {
   return email.toLowerCase().trim()
 }
 
 function asFormResponseBlocks(
-  value: unknown
+  value: unknown,
+  fallbackEmail?: string | null
 ): SavedFormResponsesBlock[] | null {
-  if (!value || !Array.isArray(value)) return null
-  return value as SavedFormResponsesBlock[]
+  if (!value) return null
+  if (Array.isArray(value)) return value as SavedFormResponsesBlock[]
+
+  // Payments created before the post-payment guest flow stored a single
+  // checkout responder as { responses: [...] }. Preserve that block when
+  // appending later guest submissions instead of overwriting it.
+  if (
+    fallbackEmail?.trim() &&
+    typeof value === 'object' &&
+    value !== null &&
+    Array.isArray((value as LegacySavedFormResponses).responses)
+  ) {
+    return [
+      {
+        email: normalizeEmail(fallbackEmail),
+        responses: (value as LegacySavedFormResponses).responses,
+      },
+    ]
+  }
+
+  return null
 }
 
 function isGuestOnPayment(
@@ -199,7 +223,7 @@ export async function verifyPostPaymentFormAccess({
       eventFormData,
       guestName,
       alreadySubmitted: guestAlreadySubmitted(
-        asFormResponseBlocks(payment.formResponses),
+        asFormResponseBlocks(payment.formResponses, payment.guestEmail),
         guestEmail
       ),
     }
@@ -267,14 +291,17 @@ export async function submitPostPaymentForm({
     ) {
       const payment = await prisma.payment.findUnique({
         where: { id: paymentId },
-        select: { formResponses: true, updatedAt: true },
+        select: { guestEmail: true, formResponses: true, updatedAt: true },
       })
 
       if (!payment) {
         return { success: false, error: 'payment_not_found' }
       }
 
-      const existingResponses = asFormResponseBlocks(payment.formResponses)
+      const existingResponses = asFormResponseBlocks(
+        payment.formResponses,
+        payment.guestEmail
+      )
 
       if (guestAlreadySubmitted(existingResponses, guestEmail)) {
         return { success: false, error: 'already_submitted' }
