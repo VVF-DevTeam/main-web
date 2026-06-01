@@ -32,16 +32,12 @@ This is a [Next.js](https://nextjs.org) project to create a web application temp
          ```
 4. Pull Request & Deployment:
 
-   a. This project uses Vercel to host the production and dev branches, and AWS Amplify for backup and preview:
+   a. This project uses Vercel to host the production and dev/preview branches:
       - Vercel: www.vietvibe.org
-      - Amplify: https://dev.duxsz6wwtbq9f.amplifyapp.com
-      g
   
    b. In addition, the branch is integrated with Vercel and Amplify bots to build every PR's preview automatically. Please __always verify__ your PR after the build is finished:
-      - For Vercel, you will need a Vercel account to request access to the preview:
+      - For Vercel, you may need a Vercel account to request access to the preview:
    ![image](https://github.com/user-attachments/assets/8b237405-8d22-4aaf-8ab3-9ef1ada254de)
-      - For AWS, it is open to the public:
-   ![image](https://github.com/user-attachments/assets/03c59fb7-dcf2-4608-a1ff-c9373b2a2a84)
 
    c. *__Some important tips:__* :
       - Make sure __all__ checks have passed in your PR: 
