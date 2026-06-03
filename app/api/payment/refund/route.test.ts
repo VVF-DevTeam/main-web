@@ -2,18 +2,20 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mockReset } from 'vitest-mock-extended'
 import { prisma } from '@/lib/__mocks__/db'
 
-const mockStripeClient = {
-  paymentIntents: {
-    retrieve: vi.fn(),
+const { mockStripeClient } = vi.hoisted(() => ({
+  mockStripeClient: {
+    paymentIntents: {
+      retrieve: vi.fn(),
+    },
+    refunds: {
+      list: vi.fn(),
+      create: vi.fn(),
+    },
+    subscriptions: {
+      cancel: vi.fn(),
+    },
   },
-  refunds: {
-    list: vi.fn(),
-    create: vi.fn(),
-  },
-  subscriptions: {
-    cancel: vi.fn(),
-  },
-}
+}))
 
 vi.mock('@/auth', () => ({
   __esModule: true,
