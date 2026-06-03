@@ -43,6 +43,7 @@ async function fetchPaymentsData(
         select: {
           id: true,
           pricePaid: true,
+          totalRefundAmount: true,
           createdAt: true,
           type: true,
           expiresAt: true,
@@ -122,6 +123,7 @@ async function fetchPaymentsData(
         select: {
           id: true,
           pricePaid: true,
+          totalRefundAmount: true,
           createdAt: true,
           type: true,
           expiresAt: true,

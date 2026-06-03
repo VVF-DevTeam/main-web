@@ -4,6 +4,7 @@ import { Decimal } from "@prisma/client/runtime/library"
 export type PaymentWithRelations = {
   id: string
   pricePaid: Decimal
+  totalRefundAmount: Decimal | null
   createdAt: Date
   type: PaymentType
   expiresAt: Date | null

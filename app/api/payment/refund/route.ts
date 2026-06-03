@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       select: {
         stripePaymentId: true,
         pricePaid: true,
+        totalRefundAmount: true,
         type: true,
         eventId: true,
         userId: true,
@@ -99,13 +100,24 @@ export async function POST(req: Request) {
 
     const totalPaidInCents =
       paymentIntent.amount_received || paymentIntent.amount || Math.round(Number(payment.pricePaid) * 100)
+    const rowPaidInCents = Math.round(Number(payment.pricePaid) * 100)
+    const alreadyRefundedForRowInCents = Math.round(
+      Number(payment.totalRefundAmount ?? 0) * 100
+    )
     const remainingRefundableInCents = Math.max(totalPaidInCents - alreadyRefundedInCents, 0)
+    const remainingRowRefundableInCents = Math.max(
+      rowPaidInCents - alreadyRefundedForRowInCents,
+      0
+    )
 
     if (remainingRefundableInCents === 0) {
       return new NextResponse('Payment is already fully refunded', { status: 400 })
     }
+    if (remainingRowRefundableInCents === 0) {
+      return new NextResponse('Payment is already fully refunded', { status: 400 })
+    }
 
-    let refundAmountInCents: number | undefined
+    let refundAmountInCents = remainingRowRefundableInCents
     if (amount !== undefined && amount !== null) {
       const parsedAmount = Number(amount)
       if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -118,20 +130,37 @@ export async function POST(req: Request) {
           status: 400,
         })
       }
+      if (refundAmountInCents > remainingRowRefundableInCents) {
+        return new NextResponse(
+          'Refund amount exceeds remaining refundable amount for this payment',
+          { status: 400 }
+        )
+      }
+    }
+
+    if (refundAmountInCents > remainingRefundableInCents) {
+      return new NextResponse('Refund amount exceeds remaining refundable amount', {
+        status: 400,
+      })
     }
 
     // Process refund through Stripe
-    // If amount is not specified, Stripe will refund the full amount automatically
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
-      ...(refundAmountInCents ? { amount: refundAmountInCents } : {}),
+      amount: refundAmountInCents,
     })
 
-    const totalRefundedAfterThisRefund = alreadyRefundedInCents + refund.amount
-    const isFullRefund = totalRefundedAfterThisRefund >= totalPaidInCents
+    const totalRefundedForRowAfterThisRefund =
+      alreadyRefundedForRowInCents + refund.amount
+    const isPaymentFullyRefunded =
+      totalRefundedForRowAfterThisRefund >= rowPaidInCents
 
     // If it's a full Membership refund, cancel subscription immediately
-    if (isFullRefund && payment.type === 'Membership' && payment.user?.stripeSubscriptionId) {
+    if (
+      isPaymentFullyRefunded &&
+      payment.type === 'Membership' &&
+      payment.user?.stripeSubscriptionId
+    ) {
       try {
         await stripe.subscriptions.cancel(payment.user.stripeSubscriptionId)
 
@@ -156,10 +185,11 @@ export async function POST(req: Request) {
       where: { id: paymentId },
       data: {
         updatedAt: new Date(),
-        refunded: isFullRefund,
-        totalRefundAmount: totalRefundedAfterThisRefund / 100,
+        refunded: isPaymentFullyRefunded,
+        totalRefundAmount: totalRefundedForRowAfterThisRefund / 100,
         monitorUserId,
-        ...(payment.type === 'Membership' && isFullRefund && { expiresAt: null }),
+        ...(payment.type === 'Membership' &&
+          isPaymentFullyRefunded && { expiresAt: null }),
       },
     })
 
@@ -218,7 +248,12 @@ export async function POST(req: Request) {
 
     // If it's an event payment, remove the user from the event
     // If user has deleted their account, no need to disconnect them from the event
-    if (isFullRefund && payment.type !== 'Membership' && payment.eventId && payment.userId) {
+    if (
+      isPaymentFullyRefunded &&
+      payment.type !== 'Membership' &&
+      payment.eventId &&
+      payment.userId
+    ) {
       await prisma.event.update({
         where: { id: payment.eventId },
         data: {
