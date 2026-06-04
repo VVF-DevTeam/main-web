@@ -14,6 +14,13 @@ function isAdminRole(roles: Role[]) {
   return roles.some((r) => r === Role.ADMIN || r === Role.SUPERADMIN)
 }
 
+function toCents(amount: number | string | null | undefined) {
+  if (amount == null) return 0
+  const parsed = Number(amount)
+  if (Number.isNaN(parsed)) return 0
+  return Math.round(parsed * 100)
+}
+
 export async function POST(req: Request) {
   try {
     const session = await auth()
@@ -53,6 +60,7 @@ export async function POST(req: Request) {
       select: {
         stripePaymentId: true,
         pricePaid: true,
+        totalRefundAmount: true,
         type: true,
         eventId: true,
         userId: true,
@@ -98,8 +106,21 @@ export async function POST(req: Request) {
       .reduce((total, item) => total + item.amount, 0)
 
     const totalPaidInCents =
-      paymentIntent.amount_received || paymentIntent.amount || Math.round(Number(payment.pricePaid) * 100)
-    const remainingRefundableInCents = Math.max(totalPaidInCents - alreadyRefundedInCents, 0)
+      paymentIntent.amount_received || paymentIntent.amount || toCents(payment.pricePaid)
+    const intentRemainingRefundableInCents = Math.max(
+      totalPaidInCents - alreadyRefundedInCents,
+      0
+    )
+    const paymentPaidInCents = toCents(payment.pricePaid)
+    const paymentAlreadyRefundedInCents = toCents(payment.totalRefundAmount)
+    const paymentRemainingRefundableInCents = Math.max(
+      paymentPaidInCents - paymentAlreadyRefundedInCents,
+      0
+    )
+    const remainingRefundableInCents = Math.min(
+      intentRemainingRefundableInCents,
+      paymentRemainingRefundableInCents
+    )
 
     if (remainingRefundableInCents === 0) {
       return new NextResponse('Payment is already fully refunded', { status: 400 })
@@ -118,17 +139,19 @@ export async function POST(req: Request) {
           status: 400,
         })
       }
+    } else {
+      refundAmountInCents = remainingRefundableInCents
     }
 
     // Process refund through Stripe
-    // If amount is not specified, Stripe will refund the full amount automatically
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
-      ...(refundAmountInCents ? { amount: refundAmountInCents } : {}),
+      amount: refundAmountInCents,
     })
 
-    const totalRefundedAfterThisRefund = alreadyRefundedInCents + refund.amount
-    const isFullRefund = totalRefundedAfterThisRefund >= totalPaidInCents
+    const paymentRefundedAfterThisRefund =
+      paymentAlreadyRefundedInCents + refund.amount
+    const isFullRefund = paymentRefundedAfterThisRefund >= paymentPaidInCents
 
     // If it's a full Membership refund, cancel subscription immediately
     if (isFullRefund && payment.type === 'Membership' && payment.user?.stripeSubscriptionId) {
@@ -157,7 +180,7 @@ export async function POST(req: Request) {
       data: {
         updatedAt: new Date(),
         refunded: isFullRefund,
-        totalRefundAmount: totalRefundedAfterThisRefund / 100,
+        totalRefundAmount: paymentRefundedAfterThisRefund / 100,
         monitorUserId,
         ...(payment.type === 'Membership' && isFullRefund && { expiresAt: null }),
       },
