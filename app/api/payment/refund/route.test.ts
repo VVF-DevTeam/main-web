@@ -6,18 +6,20 @@ import { auth } from '@/auth'
 import { revalidateTag } from 'next/cache'
 import { sendRefundConfirmationEmail } from '@/lib/actions/email/sendRefundConfirmationEmail'
 
-const stripeMock = {
-  paymentIntents: {
-    retrieve: vi.fn(),
+const { stripeMock } = vi.hoisted(() => ({
+  stripeMock: {
+    paymentIntents: {
+      retrieve: vi.fn(),
+    },
+    refunds: {
+      list: vi.fn(),
+      create: vi.fn(),
+    },
+    subscriptions: {
+      cancel: vi.fn(),
+    },
   },
-  refunds: {
-    list: vi.fn(),
-    create: vi.fn(),
-  },
-  subscriptions: {
-    cancel: vi.fn(),
-  },
-}
+}))
 
 vi.mock('stripe', () => ({
   __esModule: true,
