@@ -1,6 +1,7 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { canAccessEventPaymentData } from './canAccessEventPaymentData'
 
 // Base function to fetch event payments (without caching)
 async function fetchEventPaymentsData(eventId: string) {
@@ -84,6 +85,10 @@ async function fetchEventPaymentsData(eventId: string) {
 // (e.g., v2 → v3) to force a cache refresh, otherwise wait for:
 // 1. Cache expiration (1 day) or 2. Tag revalidation (when payments are created/refunded)
 export async function getEventPayments(eventId: string) {
+  if (!(await canAccessEventPaymentData(eventId))) {
+    return []
+  }
+
   const cachedFunction = unstable_cache(
     () => fetchEventPaymentsData(eventId),
     [`event-payments-v10-${eventId}`], // Cache key per event (v10 after adding createdAt)
