@@ -105,6 +105,42 @@ describe('postPaymentForm actions', () => {
     })
   })
 
+  test('treats legacy checkout form responses as already submitted for the purchaser', async () => {
+    prisma.payment.findMany.mockResolvedValueOnce([
+      {
+        id: 'payment_legacy',
+        guestEmail: 'buyer@example.com',
+        guestName: 'Buyer',
+        otherGuests: [{ name: 'Guest', email: 'guest@example.com' }],
+        formResponses: {
+          responses: [
+            {
+              questionId: 'q1',
+              question: 'Dietary restrictions',
+              answer: 'Vegetarian',
+              questionType: 'text',
+              required: true,
+              options: [],
+              formNumber: 1,
+            },
+          ],
+        },
+      },
+    ] as any)
+
+    const result = await verifyPostPaymentFormAccess({
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'buyer@example.com',
+    })
+
+    expect(result).toMatchObject({
+      success: true,
+      paymentId: 'payment_legacy',
+      alreadySubmitted: true,
+    })
+  })
+
   test('retries conflicting writes so concurrent guest submissions are preserved', async () => {
     const firstReadAt = new Date('2026-05-28T11:00:00.000Z')
     const secondReadAt = new Date('2026-05-28T11:00:01.000Z')
@@ -176,6 +212,67 @@ describe('postPaymentForm actions', () => {
       },
       data: {
         formResponses: [concurrentGuestBlock, newGuestBlock],
+      },
+    })
+    expect(mockRevalidateTag).toHaveBeenCalledWith('payments')
+  })
+
+  test('preserves legacy checkout answers when a guest submits later', async () => {
+    const updatedAt = new Date('2026-05-28T11:00:00.000Z')
+    const legacyBuyerBlock = {
+      email: 'buyer@example.com',
+      responses: [
+        {
+          questionId: 'q1',
+          question: 'Dietary restrictions',
+          answer: 'No peanuts',
+          questionType: 'text',
+          required: true,
+          options: [],
+          formNumber: 1,
+        },
+      ],
+    }
+    const newGuestBlock = {
+      email: 'guest@example.com',
+      responses: [
+        {
+          questionId: 'q1',
+          question: 'Dietary restrictions',
+          answer: 'Vegetarian',
+          questionType: 'text',
+          required: true,
+          options: [],
+          formNumber: 1,
+        },
+      ],
+    }
+
+    prisma.payment.findUnique.mockResolvedValueOnce({
+      formResponses: {
+        responses: legacyBuyerBlock.responses,
+      },
+      updatedAt,
+      guestEmail: 'buyer@example.com',
+    } as any)
+    prisma.payment.updateMany.mockResolvedValueOnce({ count: 1 } as any)
+
+    const result = await submitPostPaymentForm({
+      paymentId: 'payment_1',
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+      formResponses: submittedResponses,
+    })
+
+    expect(result).toEqual({ success: true })
+    expect(prisma.payment.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'payment_1',
+        updatedAt,
+      },
+      data: {
+        formResponses: [legacyBuyerBlock, newGuestBlock],
       },
     })
     expect(mockRevalidateTag).toHaveBeenCalledWith('payments')
