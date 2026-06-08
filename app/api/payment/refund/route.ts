@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       select: {
         stripePaymentId: true,
         pricePaid: true,
+        totalRefundAmount: true,
         type: true,
         eventId: true,
         userId: true,
@@ -100,8 +101,16 @@ export async function POST(req: Request) {
     const totalPaidInCents =
       paymentIntent.amount_received || paymentIntent.amount || Math.round(Number(payment.pricePaid) * 100)
     const remainingRefundableInCents = Math.max(totalPaidInCents - alreadyRefundedInCents, 0)
+    const rowPaidInCents = Math.round(Number(payment.pricePaid) * 100)
+    const rowAlreadyRefundedInCents =
+      payment.totalRefundAmount == null ? 0 : Math.round(Number(payment.totalRefundAmount) * 100)
+    const rowRemainingRefundableInCents = Math.max(rowPaidInCents - rowAlreadyRefundedInCents, 0)
+    const allowedRefundableInCents = Math.min(
+      rowRemainingRefundableInCents,
+      remainingRefundableInCents
+    )
 
-    if (remainingRefundableInCents === 0) {
+    if (allowedRefundableInCents === 0) {
       return new NextResponse('Payment is already fully refunded', { status: 400 })
     }
 
@@ -113,25 +122,26 @@ export async function POST(req: Request) {
       }
       refundAmountInCents = Math.round(parsedAmount * 100)
 
-      if (refundAmountInCents > remainingRefundableInCents) {
+      if (refundAmountInCents > allowedRefundableInCents) {
         return new NextResponse('Refund amount exceeds remaining refundable amount', {
           status: 400,
         })
       }
+    } else {
+      refundAmountInCents = allowedRefundableInCents
     }
 
     // Process refund through Stripe
-    // If amount is not specified, Stripe will refund the full amount automatically
     const refund = await stripe.refunds.create({
       payment_intent: payment.stripePaymentId,
-      ...(refundAmountInCents ? { amount: refundAmountInCents } : {}),
+      amount: refundAmountInCents,
     })
 
-    const totalRefundedAfterThisRefund = alreadyRefundedInCents + refund.amount
-    const isFullRefund = totalRefundedAfterThisRefund >= totalPaidInCents
+    const rowTotalRefundedAfterThisRefund = rowAlreadyRefundedInCents + refund.amount
+    const isFullRefundForRow = rowTotalRefundedAfterThisRefund >= rowPaidInCents
 
     // If it's a full Membership refund, cancel subscription immediately
-    if (isFullRefund && payment.type === 'Membership' && payment.user?.stripeSubscriptionId) {
+    if (isFullRefundForRow && payment.type === 'Membership' && payment.user?.stripeSubscriptionId) {
       try {
         await stripe.subscriptions.cancel(payment.user.stripeSubscriptionId)
 
@@ -156,10 +166,10 @@ export async function POST(req: Request) {
       where: { id: paymentId },
       data: {
         updatedAt: new Date(),
-        refunded: isFullRefund,
-        totalRefundAmount: totalRefundedAfterThisRefund / 100,
+        refunded: isFullRefundForRow,
+        totalRefundAmount: rowTotalRefundedAfterThisRefund / 100,
         monitorUserId,
-        ...(payment.type === 'Membership' && isFullRefund && { expiresAt: null }),
+        ...(payment.type === 'Membership' && isFullRefundForRow && { expiresAt: null }),
       },
     })
 
@@ -218,7 +228,7 @@ export async function POST(req: Request) {
 
     // If it's an event payment, remove the user from the event
     // If user has deleted their account, no need to disconnect them from the event
-    if (isFullRefund && payment.type !== 'Membership' && payment.eventId && payment.userId) {
+    if (isFullRefundForRow && payment.type !== 'Membership' && payment.eventId && payment.userId) {
       await prisma.event.update({
         where: { id: payment.eventId },
         data: {
