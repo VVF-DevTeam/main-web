@@ -222,4 +222,76 @@ describe('postPaymentForm actions', () => {
     expect(prisma.payment.updateMany).toHaveBeenCalledTimes(1)
     expect(mockRevalidateTag).not.toHaveBeenCalled()
   })
+
+  test('preserves legacy checkout form responses when a guest submits later', async () => {
+    const existingBuyerResponses = {
+      responses: [
+        {
+          questionId: 'q1',
+          question: 'Dietary restrictions',
+          answer: 'No peanuts',
+          questionType: 'text',
+          required: true,
+          options: [],
+          formNumber: 1,
+        },
+      ],
+    }
+    const updatedAt = new Date('2026-05-28T11:00:00.000Z')
+
+    prisma.payment.findMany.mockResolvedValueOnce([
+      {
+        id: 'payment_1',
+        guestEmail: 'buyer@example.com',
+        guestName: 'Buyer',
+        otherGuests: [{ name: 'Guest', email: 'guest@example.com' }],
+        formResponses: existingBuyerResponses,
+      },
+    ] as any)
+    prisma.payment.findUnique.mockResolvedValueOnce({
+      formResponses: existingBuyerResponses,
+      guestEmail: 'buyer@example.com',
+      updatedAt,
+    } as any)
+    prisma.payment.updateMany.mockResolvedValueOnce({ count: 1 } as any)
+
+    const result = await submitPostPaymentForm({
+      paymentId: 'payment_1',
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+      formResponses: submittedResponses,
+    })
+
+    expect(result).toEqual({ success: true })
+    expect(prisma.payment.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'payment_1',
+        updatedAt,
+      },
+      data: {
+        formResponses: [
+          {
+            email: 'buyer@example.com',
+            responses: existingBuyerResponses.responses,
+          },
+          {
+            email: 'guest@example.com',
+            responses: [
+              {
+                questionId: 'q1',
+                question: 'Dietary restrictions',
+                answer: 'Vegetarian',
+                questionType: 'text',
+                required: true,
+                options: [],
+                formNumber: 1,
+              },
+            ],
+          },
+        ],
+      },
+    })
+    expect(mockRevalidateTag).toHaveBeenCalledWith('payments')
+  })
 })

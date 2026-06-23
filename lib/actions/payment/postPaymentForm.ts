@@ -26,15 +26,45 @@ export type SavedFormResponsesBlock = {
   responses: FormResponseEntry[]
 }
 
+type LegacySavedFormResponses = {
+  responses: FormResponseEntry[]
+}
+
 function normalizeEmail(email: string): string {
   return email.toLowerCase().trim()
 }
 
 function asFormResponseBlocks(
-  value: unknown
+  value: unknown,
+  fallbackEmail?: string | null
 ): SavedFormResponsesBlock[] | null {
-  if (!value || !Array.isArray(value)) return null
-  return value as SavedFormResponsesBlock[]
+  if (!value) return null
+
+  if (Array.isArray(value)) {
+    const blocks = value.filter(
+      (entry): entry is SavedFormResponsesBlock =>
+        !!entry &&
+        typeof entry === 'object' &&
+        typeof (entry as SavedFormResponsesBlock).email === 'string' &&
+        Array.isArray((entry as SavedFormResponsesBlock).responses)
+    )
+
+    return blocks.length > 0 ? blocks : null
+  }
+
+  if (
+    typeof value === 'object' &&
+    Array.isArray((value as LegacySavedFormResponses).responses)
+  ) {
+    return [
+      {
+        email: fallbackEmail ? normalizeEmail(fallbackEmail) : '',
+        responses: (value as LegacySavedFormResponses).responses,
+      },
+    ]
+  }
+
+  return null
 }
 
 function isGuestOnPayment(
@@ -198,7 +228,7 @@ export async function verifyPostPaymentFormAccess({
       eventFormData,
       guestName,
       alreadySubmitted: guestAlreadySubmitted(
-        asFormResponseBlocks(payment.formResponses),
+        asFormResponseBlocks(payment.formResponses, payment.guestEmail),
         guestEmail
       ),
     }
@@ -266,14 +296,17 @@ export async function submitPostPaymentForm({
     ) {
       const payment = await prisma.payment.findUnique({
         where: { id: paymentId },
-        select: { formResponses: true, updatedAt: true },
+        select: { formResponses: true, guestEmail: true, updatedAt: true },
       })
 
       if (!payment) {
         return { success: false, error: 'payment_not_found' }
       }
 
-      const existingResponses = asFormResponseBlocks(payment.formResponses)
+      const existingResponses = asFormResponseBlocks(
+        payment.formResponses,
+        payment.guestEmail
+      )
 
       if (guestAlreadySubmitted(existingResponses, guestEmail)) {
         return { success: false, error: 'already_submitted' }
