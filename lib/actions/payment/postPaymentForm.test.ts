@@ -7,6 +7,8 @@ import {
   submitPostPaymentForm,
   verifyPostPaymentFormAccess,
 } from './postPaymentForm'
+import { buildPostPaymentFormLink } from '@/lib/utils/buildPostPaymentFormLink'
+import { createPostPaymentGuestAccessToken } from '@/lib/utils/postPaymentGuestAccessToken'
 
 vi.mock('@/lib/db', () => ({
   __esModule: true,
@@ -23,6 +25,17 @@ vi.mock('next/cache', () => ({
 
 const mockGetEventForm = vi.mocked(getEventForm)
 const mockRevalidateTag = vi.mocked(revalidateTag)
+
+function buildGuestAccessToken(
+  paymentReference = 'pi_old',
+  guestEmail = 'guest@example.com'
+) {
+  return createPostPaymentGuestAccessToken({
+    paymentReference,
+    eventKeyName: 'camp',
+    guestEmail,
+  })
+}
 
 const eventFormData = [
   {
@@ -46,6 +59,7 @@ const submittedResponses = {
 }
 
 beforeEach(() => {
+  process.env.AUTH_SECRET = 'test-auth-secret'
   mockReset(prisma)
   vi.clearAllMocks()
   mockGetEventForm.mockResolvedValue(eventFormData)
@@ -65,6 +79,25 @@ beforeEach(() => {
 })
 
 describe('postPaymentForm actions', () => {
+  test('buildPostPaymentFormLink signs guest email and payment reference', () => {
+    const link = buildPostPaymentFormLink({
+      userId: 'user_1',
+      paymentReference: 'pi_old',
+      eventKeyName: 'camp',
+      eventType: 'Retreat',
+      guestEmail: 'guest@example.com',
+      locale: 'en',
+    })
+
+    const url = new URL(link)
+
+    expect(url.searchParams.get('paymentReference')).toBe('pi_old')
+    expect(url.searchParams.get('guestEmail')).toBe('guest@example.com')
+    expect(url.searchParams.get('guestAccessToken')).toBe(
+      buildGuestAccessToken()
+    )
+  })
+
   test('uses paymentReference before userId so repeat purchases do not bind to the wrong payment', async () => {
     prisma.payment.findMany.mockResolvedValueOnce([
       {
@@ -79,6 +112,7 @@ describe('postPaymentForm actions', () => {
     const result = await verifyPostPaymentFormAccess({
       userId: 'user_1',
       paymentReference: 'pi_old',
+      guestAccessToken: buildGuestAccessToken(),
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
     })
@@ -103,6 +137,18 @@ describe('postPaymentForm actions', () => {
         formResponses: true,
       },
     })
+  })
+
+  test('rejects tampered guest email even when payment reference is valid', async () => {
+    const result = await verifyPostPaymentFormAccess({
+      paymentReference: 'pi_old',
+      guestAccessToken: buildGuestAccessToken(),
+      eventKeyName: 'camp',
+      guestEmail: 'other-guest@example.com',
+    })
+
+    expect(result).toEqual({ success: false, error: 'missing_params' })
+    expect(prisma.payment.findMany).not.toHaveBeenCalled()
   })
 
   test('retries conflicting writes so concurrent guest submissions are preserved', async () => {
@@ -153,6 +199,8 @@ describe('postPaymentForm actions', () => {
     const result = await submitPostPaymentForm({
       paymentId: 'payment_1',
       userId: 'user_1',
+      paymentReference: 'pi_old',
+      guestAccessToken: buildGuestAccessToken(),
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
       formResponses: submittedResponses,
@@ -213,6 +261,8 @@ describe('postPaymentForm actions', () => {
     const result = await submitPostPaymentForm({
       paymentId: 'payment_1',
       userId: 'user_1',
+      paymentReference: 'pi_old',
+      guestAccessToken: buildGuestAccessToken(),
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
       formResponses: submittedResponses,

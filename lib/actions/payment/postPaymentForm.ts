@@ -8,6 +8,7 @@ import {
   getEventForm,
 } from '@/lib/actions/event/getEventForm'
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
+import { isValidPostPaymentGuestAccessToken } from '@/lib/utils/postPaymentGuestAccessToken'
 
 type OtherGuest = { name: string; email: string; phone?: string }
 
@@ -112,21 +113,35 @@ export type VerifyPostPaymentFormResult =
 export async function verifyPostPaymentFormAccess({
   userId,
   paymentReference,
+  guestAccessToken,
   eventKeyName,
   guestEmail,
 }: {
   userId?: string | null
   paymentReference?: string | null
+  guestAccessToken?: string | null
   eventKeyName: string
   guestEmail: string
 }): Promise<VerifyPostPaymentFormResult> {
-  const normalizedUserId = userId?.trim() || null
   const normalizedPaymentReference = paymentReference?.trim() || null
+  const normalizedGuestAccessToken = guestAccessToken?.trim() || null
 
   if (
-    (!normalizedUserId && !normalizedPaymentReference) ||
+    !normalizedPaymentReference ||
+    !normalizedGuestAccessToken ||
     !guestEmail?.trim() ||
     !eventKeyName?.trim()
+  ) {
+    return { success: false, error: 'missing_params' }
+  }
+
+  if (
+    !isValidPostPaymentGuestAccessToken({
+      token: normalizedGuestAccessToken,
+      paymentReference: normalizedPaymentReference,
+      eventKeyName,
+      guestEmail,
+    })
   ) {
     return { success: false, error: 'missing_params' }
   }
@@ -145,9 +160,7 @@ export async function verifyPostPaymentFormAccess({
       where: {
         eventId: event.id,
         refunded: false,
-        ...(normalizedPaymentReference
-          ? { stripePaymentId: normalizedPaymentReference }
-          : { userId: normalizedUserId }),
+        stripePaymentId: normalizedPaymentReference,
       },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -216,6 +229,7 @@ export async function submitPostPaymentForm({
   paymentId,
   userId,
   paymentReference,
+  guestAccessToken,
   eventKeyName,
   guestEmail,
   formResponses,
@@ -223,6 +237,7 @@ export async function submitPostPaymentForm({
   paymentId: string
   userId?: string | null
   paymentReference?: string | null
+  guestAccessToken?: string | null
   eventKeyName: string
   guestEmail: string
   formResponses: FormResponses
@@ -230,6 +245,7 @@ export async function submitPostPaymentForm({
   const verification = await verifyPostPaymentFormAccess({
     userId,
     paymentReference,
+    guestAccessToken,
     eventKeyName,
     guestEmail,
   })

@@ -14,6 +14,7 @@ interface EventFormPageProps {
   searchParams: Promise<{
     userId?: string
     paymentReference?: string
+    guestAccessToken?: string
     guestEmail?: string
   }>
 }
@@ -56,13 +57,18 @@ const EventFormPage = async ({
   searchParams,
 }: EventFormPageProps) => {
   const { locale, eventType, eventKeyName } = await params
-  const { userId, paymentReference, guestEmail } = await searchParams
+  const { userId, paymentReference, guestAccessToken, guestEmail } =
+    await searchParams
 
   const { t } = await initTranslations(locale, ['event', 'common'])
 
   const backLabel = t('post-payment-form-back-to-event')
 
-  if ((!userId?.trim() && !paymentReference?.trim()) || !guestEmail?.trim()) {
+  if (
+    !paymentReference?.trim() ||
+    !guestAccessToken?.trim() ||
+    !guestEmail?.trim()
+  ) {
     return (
       <StatusCard
         title={t('post-payment-form-error-missing_params')}
@@ -78,6 +84,7 @@ const EventFormPage = async ({
   const verification = await verifyPostPaymentFormAccess({
     userId,
     paymentReference,
+    guestAccessToken,
     eventKeyName,
     guestEmail,
   })
@@ -115,6 +122,7 @@ const EventFormPage = async ({
       paymentId={verification.paymentId}
       userId={userId}
       paymentReference={paymentReference}
+      guestAccessToken={guestAccessToken}
       eventKeyName={eventKeyName}
       guestEmail={guestEmail}
       eventTitle={verification.eventTitle}
