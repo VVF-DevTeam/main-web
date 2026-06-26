@@ -1,3 +1,5 @@
+import { createPostPaymentFormAccessToken } from './postPaymentFormAccessToken'
+
 export function buildPostPaymentFormLink({
   userId,
   paymentReference,
@@ -12,13 +14,25 @@ export function buildPostPaymentFormLink({
   eventType: string
   guestEmail: string
   locale?: string
-}): string {
+}): string | null {
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, '') ??
     'https://www.vietvibe.org'
 
+  const accessToken = createPostPaymentFormAccessToken({
+    userId,
+    paymentReference,
+    eventKeyName,
+    guestEmail,
+  })
+
+  if (!accessToken) {
+    return null
+  }
+
   const params = new URLSearchParams({
     guestEmail: guestEmail.trim(),
+    accessToken,
   })
 
   if (userId?.trim()) {

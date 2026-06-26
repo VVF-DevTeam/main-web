@@ -8,6 +8,7 @@ import {
   getEventForm,
 } from '@/lib/actions/event/getEventForm'
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
+import { verifyPostPaymentFormAccessToken } from '@/lib/utils/postPaymentFormAccessToken'
 
 type OtherGuest = { name: string; email: string; phone?: string }
 
@@ -114,11 +115,13 @@ export async function verifyPostPaymentFormAccess({
   paymentReference,
   eventKeyName,
   guestEmail,
+  accessToken,
 }: {
   userId?: string | null
   paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
+  accessToken?: string | null
 }): Promise<VerifyPostPaymentFormResult> {
   const normalizedUserId = userId?.trim() || null
   const normalizedPaymentReference = paymentReference?.trim() || null
@@ -127,6 +130,18 @@ export async function verifyPostPaymentFormAccess({
     (!normalizedUserId && !normalizedPaymentReference) ||
     !guestEmail?.trim() ||
     !eventKeyName?.trim()
+  ) {
+    return { success: false, error: 'missing_params' }
+  }
+
+  if (
+    !verifyPostPaymentFormAccessToken({
+      token: accessToken,
+      userId: normalizedUserId,
+      paymentReference: normalizedPaymentReference,
+      eventKeyName,
+      guestEmail,
+    })
   ) {
     return { success: false, error: 'missing_params' }
   }
@@ -218,6 +233,7 @@ export async function submitPostPaymentForm({
   paymentReference,
   eventKeyName,
   guestEmail,
+  accessToken,
   formResponses,
 }: {
   paymentId: string
@@ -225,6 +241,7 @@ export async function submitPostPaymentForm({
   paymentReference?: string | null
   eventKeyName: string
   guestEmail: string
+  accessToken?: string | null
   formResponses: FormResponses
 }): Promise<SubmitPostPaymentFormResult> {
   const verification = await verifyPostPaymentFormAccess({
@@ -232,6 +249,7 @@ export async function submitPostPaymentForm({
     paymentReference,
     eventKeyName,
     guestEmail,
+    accessToken,
   })
 
   if (!verification.success) {

@@ -944,7 +944,7 @@ export async function POST(req: NextRequest) {
                             eventKeyName: firstTicket.event.keyName,
                             eventType: firstTicket.event.eventType,
                             guestEmail: email,
-                          })
+                          }) ?? undefined
                         : undefined
                     recipients.push({
                       to: email,
@@ -1177,7 +1177,7 @@ export async function POST(req: NextRequest) {
                             eventKeyName: ticket.event.keyName,
                             eventType: ticket.event.eventType,
                             guestEmail: email,
-                          })
+                          }) ?? undefined
                         : undefined
                     singleTicketRecipients.push({
                       to: email,

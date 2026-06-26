@@ -79,6 +79,7 @@ interface PostPaymentEventFormProps {
   paymentReference?: string
   eventKeyName: string
   guestEmail: string
+  accessToken: string
   eventTitle: string
   guestName: string | null
   eventFormData: EventFormData
@@ -92,6 +93,7 @@ export default function PostPaymentEventForm({
   paymentReference,
   eventKeyName,
   guestEmail,
+  accessToken,
   eventTitle,
   guestName,
   eventFormData,
@@ -151,6 +153,7 @@ export default function PostPaymentEventForm({
         paymentReference,
         eventKeyName,
         guestEmail,
+        accessToken,
         formResponses: merged,
       })
 
