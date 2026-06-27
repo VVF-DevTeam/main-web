@@ -526,6 +526,7 @@ export async function POST(req: NextRequest) {
           : null
 
       // Handle multi-ticket checkout with ticketMetadata
+      const createdEventPaymentIds: string[] = []
       let ticketMetadata: Array<{
         ticketId: string
         seatNumbers: string[]
@@ -760,7 +761,7 @@ export async function POST(req: NextRequest) {
               hasActiveStudentDiscount: pricingHasStudentDiscount,
             }) * priceRatio
 
-          await prisma.payment.create({
+          const createdPayment = await prisma.payment.create({
             data: {
               userId: metadata.userId && metadata.userId.trim() !== '' ? metadata.userId : null,
               eventId: metadata.eventId,
@@ -783,6 +784,7 @@ export async function POST(req: NextRequest) {
               discountApplied: checkoutSessionData?.discountApplied || undefined,
             },
           })
+          createdEventPaymentIds.push(createdPayment.id)
         }
       } else {
         ////// FOR SINGLE TICKET CHECKOUT //////
@@ -809,7 +811,7 @@ export async function POST(req: NextRequest) {
         }
 
         // For Membership or empty/invalid eventTicketId, validEventTicketId remains null
-        await prisma.payment.create({
+        const createdPayment = await prisma.payment.create({
           data: {
             userId: metadata.userId && metadata.userId.trim() !== '' ? metadata.userId : null,
             eventId: metadata.eventId,
@@ -830,6 +832,7 @@ export async function POST(req: NextRequest) {
             discountApplied: checkoutSessionData?.discountApplied || undefined,
           },
         })
+        createdEventPaymentIds.push(createdPayment.id)
       }
 
       // Send payment confirmation email
@@ -911,6 +914,8 @@ export async function POST(req: NextRequest) {
                   metadata.userId && metadata.userId.trim() !== ''
                     ? metadata.userId.trim()
                     : null
+                const formAccessReference =
+                  paymentId || createdEventPaymentIds[0] || null
                 const eventFormExists = metadata.eventId
                   ? !!(await prisma.eventForm.findFirst({
                       where: { eventId: metadata.eventId },
@@ -937,10 +942,12 @@ export async function POST(req: NextRequest) {
                     if (!email) continue
                     if (email.toLowerCase() === primaryEmail.toLowerCase()) continue
                     const formLink =
-                      eventFormExists && firstTicket.event.keyName
+                      eventFormExists &&
+                      firstTicket.event.keyName &&
+                      (payerUserId || formAccessReference)
                         ? buildPostPaymentFormLink({
                             userId: payerUserId,
-                            paymentReference: paymentId,
+                            paymentReference: formAccessReference,
                             eventKeyName: firstTicket.event.keyName,
                             eventType: firstTicket.event.eventType,
                             guestEmail: email,
@@ -1147,6 +1154,8 @@ export async function POST(req: NextRequest) {
                   metadata.userId && metadata.userId.trim() !== ''
                     ? metadata.userId.trim()
                     : null
+                const formAccessReferenceSingle =
+                  paymentId || createdEventPaymentIds[0] || null
                 const eventFormExistsSingle = metadata.eventId
                   ? !!(await prisma.eventForm.findFirst({
                       where: { eventId: metadata.eventId },
@@ -1170,10 +1179,12 @@ export async function POST(req: NextRequest) {
                     if (email.toLowerCase() === primaryEmailSingle.toLowerCase())
                       continue
                     const formLink =
-                      eventFormExistsSingle && ticket.event.keyName
+                      eventFormExistsSingle &&
+                      ticket.event.keyName &&
+                      (payerUserIdSingle || formAccessReferenceSingle)
                         ? buildPostPaymentFormLink({
                             userId: payerUserIdSingle,
-                            paymentReference: paymentId,
+                            paymentReference: formAccessReferenceSingle,
                             eventKeyName: ticket.event.keyName,
                             eventType: ticket.event.eventType,
                             guestEmail: email,
