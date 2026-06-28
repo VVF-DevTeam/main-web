@@ -150,10 +150,16 @@ export async function POST(req: Request) {
       }
     }
 
-    // Update payment in database
-    // For full membership refunds, nullify expiresAt to maintain data consistency
-    await prisma.payment.update({
-      where: { id: paymentId },
+    // Keep every purchase row for the same Stripe PaymentIntent in sync.
+    // Multi-ticket and multi-item checkouts share one stripePaymentId, so only
+    // updating the clicked row leaves sibling rows looking active after a full refund.
+    await prisma.payment.updateMany({
+      where: {
+        stripePaymentId: payment.stripePaymentId,
+        type: {
+          not: 'Refund',
+        },
+      },
       data: {
         updatedAt: new Date(),
         refunded: isFullRefund,
