@@ -6,7 +6,7 @@ import { revalidateTag } from 'next/cache'
 import { sendRefundConfirmationEmail } from '@/lib/actions/email/sendRefundConfirmationEmail'
 import { POST } from './route'
 
-const stripeMocks = {
+const stripeMocks = vi.hoisted(() => ({
   paymentIntents: {
     retrieve: vi.fn(),
   },
@@ -17,7 +17,7 @@ const stripeMocks = {
   subscriptions: {
     cancel: vi.fn(),
   },
-}
+}))
 
 vi.mock('@/auth', () => ({
   auth: vi.fn(),
