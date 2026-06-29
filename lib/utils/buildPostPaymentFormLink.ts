@@ -1,3 +1,5 @@
+import { createPostPaymentFormToken } from './postPaymentFormToken'
+
 export function buildPostPaymentFormLink({
   userId,
   paymentReference,
@@ -28,6 +30,16 @@ export function buildPostPaymentFormLink({
   if (paymentReference?.trim()) {
     params.set('paymentReference', paymentReference.trim())
   }
+
+  params.set(
+    'token',
+    createPostPaymentFormToken({
+      userId,
+      paymentReference,
+      eventKeyName,
+      guestEmail,
+    })
+  )
 
   return `${baseUrl}/${locale}/events/${eventType.toLowerCase()}/${eventKeyName}/form?${params.toString()}`
 }

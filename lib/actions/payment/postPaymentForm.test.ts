@@ -3,6 +3,7 @@ import { mockReset } from 'vitest-mock-extended'
 import { prisma } from '@/lib/__mocks__/db'
 import { getEventForm } from '@/lib/actions/event/getEventForm'
 import { revalidateTag } from 'next/cache'
+import { createPostPaymentFormToken } from '@/lib/utils/postPaymentFormToken'
 import {
   submitPostPaymentForm,
   verifyPostPaymentFormAccess,
@@ -48,6 +49,7 @@ const submittedResponses = {
 beforeEach(() => {
   mockReset(prisma)
   vi.clearAllMocks()
+  process.env.AUTH_SECRET = 'test-post-payment-secret'
   mockGetEventForm.mockResolvedValue(eventFormData)
   prisma.event.findUnique.mockResolvedValue({
     id: 'event_1',
@@ -66,6 +68,13 @@ beforeEach(() => {
 
 describe('postPaymentForm actions', () => {
   test('uses paymentReference before userId so repeat purchases do not bind to the wrong payment', async () => {
+    const token = createPostPaymentFormToken({
+      userId: 'user_1',
+      paymentReference: 'pi_old',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
     prisma.payment.findMany.mockResolvedValueOnce([
       {
         id: 'payment_old',
@@ -81,6 +90,7 @@ describe('postPaymentForm actions', () => {
       paymentReference: 'pi_old',
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
+      token,
     })
 
     expect(result).toMatchObject({
@@ -106,6 +116,11 @@ describe('postPaymentForm actions', () => {
   })
 
   test('retries conflicting writes so concurrent guest submissions are preserved', async () => {
+    const token = createPostPaymentFormToken({
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
     const firstReadAt = new Date('2026-05-28T11:00:00.000Z')
     const secondReadAt = new Date('2026-05-28T11:00:01.000Z')
     const concurrentGuestBlock = {
@@ -155,6 +170,7 @@ describe('postPaymentForm actions', () => {
       userId: 'user_1',
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
+      token,
       formResponses: submittedResponses,
     })
 
@@ -182,6 +198,11 @@ describe('postPaymentForm actions', () => {
   })
 
   test('returns already_submitted if a retry sees the same guest saved by another request', async () => {
+    const token = createPostPaymentFormToken({
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
     const firstReadAt = new Date('2026-05-28T11:00:00.000Z')
     const secondReadAt = new Date('2026-05-28T11:00:01.000Z')
     const sameGuestBlock = {
@@ -215,11 +236,31 @@ describe('postPaymentForm actions', () => {
       userId: 'user_1',
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
+      token,
       formResponses: submittedResponses,
     })
 
     expect(result).toEqual({ success: false, error: 'already_submitted' })
     expect(prisma.payment.updateMany).toHaveBeenCalledTimes(1)
     expect(mockRevalidateTag).not.toHaveBeenCalled()
+  })
+
+  test('rejects tampered guest emails even when the payment reference is valid', async () => {
+    const token = createPostPaymentFormToken({
+      paymentReference: 'pi_shared',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
+    const result = await verifyPostPaymentFormAccess({
+      paymentReference: 'pi_shared',
+      eventKeyName: 'camp',
+      guestEmail: 'other@example.com',
+      token,
+    })
+
+    expect(result).toEqual({ success: false, error: 'invalid_link' })
+    expect(prisma.event.findUnique).not.toHaveBeenCalled()
+    expect(prisma.payment.findMany).not.toHaveBeenCalled()
   })
 })

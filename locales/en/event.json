@@ -233,6 +233,7 @@
   "post-payment-form-error-event_not_found": "Event not found",
   "post-payment-form-error-payment_not_found": "No matching payment was found for this event",
   "post-payment-form-error-guest_not_found": "Your email was not found on this payment record",
+  "post-payment-form-error-invalid_link": "This post-payment form link is invalid",
   "post-payment-form-error-form_not_configured": "No registration form has been set up for this event yet",
   "post-payment-form-error-already_submitted": "Form already submitted",
   "post-payment-form-error-empty_form": "Please fill out the form before submitting",

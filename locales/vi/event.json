@@ -236,6 +236,7 @@
   "post-payment-form-error-event_not_found": "Không tìm thấy sự kiện",
   "post-payment-form-error-payment_not_found": "Không tìm thấy thanh toán phù hợp cho sự kiện này",
   "post-payment-form-error-guest_not_found": "Email của bạn không có trong hồ sơ thanh toán này",
+  "post-payment-form-error-invalid_link": "Liên kết biểu mẫu sau thanh toán này không hợp lệ",
   "post-payment-form-error-form_not_configured": "Sự kiện này chưa có mẫu đăng ký",
   "post-payment-form-error-already_submitted": "Đã gửi mẫu rồi",
   "post-payment-form-error-empty_form": "Vui lòng điền mẫu trước khi gửi",

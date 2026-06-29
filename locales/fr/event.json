@@ -236,6 +236,7 @@
   "post-payment-form-error-event_not_found": "Événement introuvable",
   "post-payment-form-error-payment_not_found": "Aucun paiement correspondant n'a été trouvé pour cet événement",
   "post-payment-form-error-guest_not_found": "Votre e-mail n'a pas été trouvé sur cet enregistrement de paiement",
+  "post-payment-form-error-invalid_link": "Ce lien de formulaire après paiement est invalide",
   "post-payment-form-error-form_not_configured": "Aucun formulaire d'inscription n'a encore été configuré pour cet événement",
   "post-payment-form-error-already_submitted": "Formulaire déjà soumis",
   "post-payment-form-error-empty_form": "Veuillez remplir le formulaire avant de soumettre",
