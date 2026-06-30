@@ -230,6 +230,7 @@
   "post-payment-form-invalid-link-description": "This link is missing required information. Please use the link from your confirmation email.",
   "post-payment-form-already-submitted-description": "You have already submitted the registration form for this event.",
   "post-payment-form-error-missing_params": "Invalid link",
+  "post-payment-form-error-invalid_link": "Invalid link",
   "post-payment-form-error-event_not_found": "Event not found",
   "post-payment-form-error-payment_not_found": "No matching payment was found for this event",
   "post-payment-form-error-guest_not_found": "Your email was not found on this payment record",

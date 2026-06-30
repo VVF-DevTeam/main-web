@@ -1,3 +1,5 @@
+import { createPostPaymentFormAccessToken } from '@/lib/utils/postPaymentFormAccessToken'
+
 export function buildPostPaymentFormLink({
   userId,
   paymentReference,
@@ -26,7 +28,17 @@ export function buildPostPaymentFormLink({
   }
 
   if (paymentReference?.trim()) {
-    params.set('paymentReference', paymentReference.trim())
+    const normalizedPaymentReference = paymentReference.trim()
+
+    params.set('paymentReference', normalizedPaymentReference)
+    params.set(
+      'formToken',
+      createPostPaymentFormAccessToken({
+        paymentReference: normalizedPaymentReference,
+        eventKeyName,
+        guestEmail,
+      })
+    )
   }
 
   return `${baseUrl}/${locale}/events/${eventType.toLowerCase()}/${eventKeyName}/form?${params.toString()}`

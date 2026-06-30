@@ -233,6 +233,7 @@
   "post-payment-form-invalid-link-description": "Ce lien ne contient pas les informations requises. Veuillez utiliser le lien de votre e-mail de confirmation.",
   "post-payment-form-already-submitted-description": "Vous avez déjà soumis le formulaire d'inscription pour cet événement.",
   "post-payment-form-error-missing_params": "Lien invalide",
+  "post-payment-form-error-invalid_link": "Lien invalide",
   "post-payment-form-error-event_not_found": "Événement introuvable",
   "post-payment-form-error-payment_not_found": "Aucun paiement correspondant n'a été trouvé pour cet événement",
   "post-payment-form-error-guest_not_found": "Votre e-mail n'a pas été trouvé sur cet enregistrement de paiement",

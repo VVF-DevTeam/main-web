@@ -14,6 +14,7 @@ interface EventFormPageProps {
   searchParams: Promise<{
     userId?: string
     paymentReference?: string
+    formToken?: string
     guestEmail?: string
   }>
 }
@@ -56,7 +57,8 @@ const EventFormPage = async ({
   searchParams,
 }: EventFormPageProps) => {
   const { locale, eventType, eventKeyName } = await params
-  const { userId, paymentReference, guestEmail } = await searchParams
+  const { userId, paymentReference, formToken, guestEmail } =
+    await searchParams
 
   const { t } = await initTranslations(locale, ['event', 'common'])
 
@@ -78,6 +80,7 @@ const EventFormPage = async ({
   const verification = await verifyPostPaymentFormAccess({
     userId,
     paymentReference,
+    formToken,
     eventKeyName,
     guestEmail,
   })
@@ -89,6 +92,12 @@ const EventFormPage = async ({
         title={t(errorKey, {
           defaultValue: t('post-payment-form-error-server_error'),
         })}
+        description={
+          verification.error === 'invalid_link' ||
+          verification.error === 'missing_params'
+            ? String(t('post-payment-form-invalid-link-description'))
+            : undefined
+        }
         locale={locale}
         eventType={eventType}
         eventKeyName={eventKeyName}
@@ -115,6 +124,7 @@ const EventFormPage = async ({
       paymentId={verification.paymentId}
       userId={userId}
       paymentReference={paymentReference}
+      formToken={formToken}
       eventKeyName={eventKeyName}
       guestEmail={guestEmail}
       eventTitle={verification.eventTitle}
