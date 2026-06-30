@@ -8,6 +8,7 @@ import {
   getEventForm,
 } from '@/lib/actions/event/getEventForm'
 import type { FormResponses } from '@/components/payment/PaymentInfoForm'
+import { verifyPostPaymentFormAccessToken } from '@/lib/utils/postPaymentFormAccessToken'
 
 type OtherGuest = { name: string; email: string; phone?: string }
 
@@ -112,16 +113,19 @@ export type VerifyPostPaymentFormResult =
 export async function verifyPostPaymentFormAccess({
   userId,
   paymentReference,
+  formToken,
   eventKeyName,
   guestEmail,
 }: {
   userId?: string | null
   paymentReference?: string | null
+  formToken?: string | null
   eventKeyName: string
   guestEmail: string
 }): Promise<VerifyPostPaymentFormResult> {
   const normalizedUserId = userId?.trim() || null
   const normalizedPaymentReference = paymentReference?.trim() || null
+  const normalizedFormToken = formToken?.trim() || null
 
   if (
     (!normalizedUserId && !normalizedPaymentReference) ||
@@ -129,6 +133,18 @@ export async function verifyPostPaymentFormAccess({
     !eventKeyName?.trim()
   ) {
     return { success: false, error: 'missing_params' }
+  }
+
+  if (
+    normalizedPaymentReference &&
+    !verifyPostPaymentFormAccessToken({
+      token: normalizedFormToken,
+      paymentReference: normalizedPaymentReference,
+      eventKeyName,
+      guestEmail,
+    })
+  ) {
+    return { success: false, error: 'invalid_link' }
   }
 
   try {
@@ -216,6 +232,7 @@ export async function submitPostPaymentForm({
   paymentId,
   userId,
   paymentReference,
+  formToken,
   eventKeyName,
   guestEmail,
   formResponses,
@@ -223,6 +240,7 @@ export async function submitPostPaymentForm({
   paymentId: string
   userId?: string | null
   paymentReference?: string | null
+  formToken?: string | null
   eventKeyName: string
   guestEmail: string
   formResponses: FormResponses
@@ -230,6 +248,7 @@ export async function submitPostPaymentForm({
   const verification = await verifyPostPaymentFormAccess({
     userId,
     paymentReference,
+    formToken,
     eventKeyName,
     guestEmail,
   })
