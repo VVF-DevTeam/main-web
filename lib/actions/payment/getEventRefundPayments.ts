@@ -1,6 +1,7 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { canAccessEventPaymentData } from './canAccessEventPaymentData'
 
 async function fetchEventRefundPaymentsData(eventId: string) {
   const { prisma } = await import('@/lib/db')
@@ -73,6 +74,10 @@ async function fetchEventRefundPaymentsData(eventId: string) {
 }
 
 export async function getEventRefundPayments(eventId: string) {
+  if (!(await canAccessEventPaymentData(eventId))) {
+    return []
+  }
+
   const cachedFunction = unstable_cache(
     () => fetchEventRefundPaymentsData(eventId),
     [`event-refund-payments-v1-${eventId}`],
