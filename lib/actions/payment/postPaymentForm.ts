@@ -162,7 +162,12 @@ export async function verifyPostPaymentFormAccess({
         eventId: event.id,
         refunded: false,
         ...(normalizedPaymentReference
-          ? { stripePaymentId: normalizedPaymentReference }
+          ? {
+              OR: [
+                { stripePaymentId: normalizedPaymentReference },
+                { id: normalizedPaymentReference },
+              ],
+            }
           : { userId: normalizedUserId }),
       },
       orderBy: { createdAt: 'desc' },

@@ -118,7 +118,36 @@ describe('postPaymentForm actions', () => {
       where: {
         eventId: 'event_1',
         refunded: false,
-        stripePaymentId: 'pi_old',
+        OR: [{ stripePaymentId: 'pi_old' }, { id: 'pi_old' }],
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        guestEmail: true,
+        guestName: true,
+        otherGuests: true,
+        formResponses: true,
+      },
+    })
+  })
+
+  test('accepts a payment row id as the post-payment reference when Stripe payment id is unavailable', async () => {
+    const result = await verifyPostPaymentFormAccess({
+      paymentReference: 'payment_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
+    expect(result).toMatchObject({
+      success: true,
+      paymentId: 'payment_1',
+      alreadySubmitted: false,
+    })
+    expect(prisma.payment.findMany).toHaveBeenCalledWith({
+      where: {
+        eventId: 'event_1',
+        refunded: false,
+        OR: [{ stripePaymentId: 'payment_1' }, { id: 'payment_1' }],
       },
       orderBy: { createdAt: 'desc' },
       select: {
