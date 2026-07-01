@@ -10,6 +10,8 @@ import Loader from '@/components/loader/Loader'
 interface RefundButtonProps {
   paymentId: string
   amount: number
+  /** Original payment amount; when `amount` differs, UI shows partial refund. */
+  originalAmount: number
   disabled?: boolean
   stripeProductId: string | null
   method: PaymentMethod
@@ -20,6 +22,7 @@ interface RefundButtonProps {
 export default function RefundButton({
   paymentId,
   amount,
+  originalAmount,
   disabled = false,
   stripeProductId,
   method,
@@ -28,6 +31,8 @@ export default function RefundButton({
   const [isLoading, setIsLoading] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const router = useRouter()
+  const isPartialRefund = amount !== originalAmount
+  const refundLabel = isPartialRefund ? 'Partial Refund' : 'Full Refund'
   const handleRefund = async () => {
     try {
       setIsLoading(true)
@@ -73,7 +78,7 @@ export default function RefundButton({
             className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold">Confirm Full Refund</h3>
+            <h3 className="text-lg font-semibold">Confirm {refundLabel}</h3>
             <p className="mt-2 text-sm text-gray-600">
               Are you sure you want to refund ${amount.toFixed(2)} for this payment?
             </p>
@@ -122,7 +127,7 @@ export default function RefundButton({
         ) : isLoading ? (
           'Processing...'
         ) : (
-          'Full Refund'
+          refundLabel
         )}
       </button>
     </>

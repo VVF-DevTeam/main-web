@@ -287,6 +287,7 @@ export default function PaymentManagementClient({
                             stripeProductId={payment.eventTicket?.stripeProductId || payment.stripePaymentId}
                             method={payment.method}
                             amount={remainingRefundAmount}
+                            originalAmount={Number(payment.pricePaid)}
                             monitorUserId={refundMonitorUserId}
                             disabled={
                               status === 'Expired' ||
