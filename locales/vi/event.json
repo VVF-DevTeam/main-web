@@ -233,6 +233,7 @@
   "post-payment-form-invalid-link-description": "Liên kết này thiếu thông tin bắt buộc. Vui lòng sử dụng liên kết từ email xác nhận của bạn.",
   "post-payment-form-already-submitted-description": "Bạn đã gửi mẫu đăng ký cho sự kiện này rồi.",
   "post-payment-form-error-missing_params": "Liên kết không hợp lệ",
+  "post-payment-form-error-invalid_link": "Liên kết không hợp lệ",
   "post-payment-form-error-event_not_found": "Không tìm thấy sự kiện",
   "post-payment-form-error-payment_not_found": "Không tìm thấy thanh toán phù hợp cho sự kiện này",
   "post-payment-form-error-guest_not_found": "Email của bạn không có trong hồ sơ thanh toán này",
