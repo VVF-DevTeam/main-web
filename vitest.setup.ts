@@ -2,6 +2,9 @@ import '@testing-library/jest-dom/vitest'
 import { vi, beforeEach } from 'vitest'
 import React from 'react'
 
+// Next.js resolves this sentinel internally; unit tests should no-op it.
+vi.mock('server-only', () => ({}))
+
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter() {
