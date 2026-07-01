@@ -15,6 +15,7 @@ import { PaymentTypeTab } from './PaymentTypeTabs'
 type ClientPayment = {
   id: string
   pricePaid: number | string
+  totalRefundAmount: number | string | null
   createdAt: string
   type: PaymentType
   expiresAt: string | null
@@ -229,6 +230,11 @@ export default function PaymentManagementClient({
             {filteredPayments.length > 0 ? (
               paginatedPayments.map((payment) => {
                 const createdAt = new Date(payment.createdAt)
+                const remainingRefundAmount = Math.max(
+                  Number(payment.pricePaid) -
+                    Number(payment.totalRefundAmount ?? 0),
+                  0
+                )
                 const status = getPaymentStatus({
                   ...payment,
                   createdAt: new Date(payment.createdAt),
@@ -280,12 +286,13 @@ export default function PaymentManagementClient({
                             paymentId={payment.id}
                             stripeProductId={payment.eventTicket?.stripeProductId || payment.stripePaymentId}
                             method={payment.method}
-                            amount={Number(payment.pricePaid)}
+                            amount={remainingRefundAmount}
                             monitorUserId={refundMonitorUserId}
                             disabled={
                               status === 'Expired' ||
                               status === 'Past' ||
                               status === 'Refunded' ||
+                              remainingRefundAmount <= 0 ||
                               payment.method === 'ETF' ||
                               payment.method === 'Cash' ||
                               payment.method === 'BankTransfer'
