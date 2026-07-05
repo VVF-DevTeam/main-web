@@ -132,8 +132,15 @@ describe('postPaymentForm actions', () => {
   })
 
   test('accepts a payment row id as the post-payment reference when Stripe payment id is unavailable', async () => {
+    const formToken = createPostPaymentFormAccessToken({
+      paymentReference: 'payment_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
     const result = await verifyPostPaymentFormAccess({
       paymentReference: 'payment_1',
+      formToken,
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
     })
@@ -252,6 +259,70 @@ describe('postPaymentForm actions', () => {
       },
       data: {
         formResponses: [concurrentGuestBlock, newGuestBlock],
+      },
+    })
+    expect(mockRevalidateTag).toHaveBeenCalledWith('payments')
+  })
+
+  test('preserves legacy checkout form responses when another guest submits post-payment', async () => {
+    const legacyCheckoutResponses = {
+      responses: [
+        {
+          questionId: 'q1',
+          question: 'Dietary restrictions',
+          answer: 'Gluten free',
+          questionType: 'text',
+          required: true,
+          options: [],
+          formNumber: 1,
+        },
+      ],
+    }
+    const newGuestBlock = {
+      email: 'guest@example.com',
+      responses: [
+        {
+          questionId: 'q1',
+          question: 'Dietary restrictions',
+          answer: 'Vegetarian',
+          questionType: 'text',
+          required: true,
+          options: [],
+          formNumber: 1,
+        },
+      ],
+    }
+    const readAt = new Date('2026-05-28T11:00:00.000Z')
+
+    prisma.payment.findUnique.mockResolvedValueOnce({
+      formResponses: legacyCheckoutResponses,
+      updatedAt: readAt,
+      guestEmail: 'buyer@example.com',
+    } as any)
+    prisma.payment.updateMany.mockResolvedValueOnce({ count: 1 } as any)
+
+    const result = await submitPostPaymentForm({
+      paymentId: 'payment_1',
+      userId: 'user_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+      formResponses: submittedResponses,
+    })
+
+    expect(result).toEqual({ success: true })
+    expect(prisma.payment.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'payment_1',
+        updatedAt: readAt,
+      },
+      data: {
+        formResponses: [
+          {
+            email: 'buyer@example.com',
+            responses: legacyCheckoutResponses.responses,
+          },
+          newGuestBlock,
+        ],
       },
     })
     expect(mockRevalidateTag).toHaveBeenCalledWith('payments')
