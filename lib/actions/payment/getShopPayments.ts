@@ -1,10 +1,11 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 async function fetchShopPaymentsData(shopId: string) {
   const { prisma } = await import('@/lib/db')
-  try {
+  return withDbRetry(async () => {
     const payments = await prisma.payment.findMany({
       where: {
         refunded: false,
@@ -49,10 +50,7 @@ async function fetchShopPaymentsData(shopId: string) {
       ...payment,
       pricePaid: Number(payment.pricePaid.toString()),
     }))
-  } catch (error) {
-    console.error('Error fetching shop payments:', error)
-    throw error
-  }
+  }, { label: 'fetchShopPaymentsData' })
 }
 
 export async function getShopPayments(shopId: string) {

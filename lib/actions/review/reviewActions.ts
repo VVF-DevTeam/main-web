@@ -7,6 +7,7 @@ import {
   convertReviewRatingToNumber,
 } from '@/lib/utilFunctions/ratingUtils'
 import { revalidateTag, unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 export interface CreateReviewData {
   userId: string
@@ -58,7 +59,7 @@ export const getCachedReviewsPaginated = unstable_cache(
     removeEmptyComments?: boolean,
     seriesId?: string
   ): Promise<ReviewsPaginationResult> => {
-    try {
+    return withDbRetry(async () => {
       const skip = (page - 1) * reviewsPerPage
 
       // Build where clause
@@ -141,15 +142,7 @@ export const getCachedReviewsPaginated = unstable_cache(
         totalPages,
         currentPage: page,
       }
-    } catch (error) {
-      console.error('Error getting reviews:', error)
-      return {
-        reviews: [],
-        totalCount: 0,
-        totalPages: 0,
-        currentPage: page,
-      }
-    }
+    }, { label: 'getCachedReviewsPaginated' })
   },
   ['reviews-paginated'], // Cache key prefix
   {
@@ -161,35 +154,29 @@ export const getCachedReviewsPaginated = unstable_cache(
 // Cached version of getPublishedEventsForReviewsWithSearch
 export const getCachedPublishedEventsForReviews = unstable_cache(
   async (searchTerm?: string, limit: number = 15) => {
-    try {
-      const events = await prisma.event.findMany({
-        where: {
-          isPublished: true,
-          ...(searchTerm && {
-            title: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          }),
-        },
-        select: {
-          id: true,
-          title: true,
-        },
-        orderBy: {
-          updatedAt: 'desc', // Latest events first
-        },
-        take: limit,
-      })
-
-      return events
-    } catch (error) {
-      console.error(
-        'Error getting published events for reviews with search:',
-        error
-      )
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.event.findMany({
+          where: {
+            isPublished: true,
+            ...(searchTerm && {
+              title: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            }),
+          },
+          select: {
+            id: true,
+            title: true,
+          },
+          orderBy: {
+            updatedAt: 'desc', // Latest events first
+          },
+          take: limit,
+        }),
+      { label: 'getCachedPublishedEventsForReviews' }
+    )
   },
   ['published-events-reviews'],
   {
@@ -201,43 +188,37 @@ export const getCachedPublishedEventsForReviews = unstable_cache(
 // Cached version of getPublishedSeriesForReviewsWithSearch
 export const getCachedPublishedSeriesForReviews = unstable_cache(
   async (searchTerm?: string, limit: number = 15) => {
-    try {
-      const series = await prisma.eventSeries.findMany({
-        where: {
-          events: {
-            some: {
-              isPublished: true,
-              Review: {
-                some: {}, // Only series that have events with reviews
+    return withDbRetry(
+      () =>
+        prisma.eventSeries.findMany({
+          where: {
+            events: {
+              some: {
+                isPublished: true,
+                Review: {
+                  some: {}, // Only series that have events with reviews
+                },
               },
             },
+            ...(searchTerm && {
+              name: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            }),
           },
-          ...(searchTerm && {
-            name: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          }),
-        },
-        select: {
-          id: true,
-          name: true,
-          keyName: true,
-        },
-        orderBy: {
-          name: 'asc',
-        },
-        take: limit,
-      })
-
-      return series
-    } catch (error) {
-      console.error(
-        'Error getting published series for reviews with search:',
-        error
-      )
-      return []
-    }
+          select: {
+            id: true,
+            name: true,
+            keyName: true,
+          },
+          orderBy: {
+            name: 'asc',
+          },
+          take: limit,
+        }),
+      { label: 'getCachedPublishedSeriesForReviews' }
+    )
   },
   ['published-series-reviews'],
   {

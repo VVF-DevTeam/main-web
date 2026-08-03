@@ -1,11 +1,12 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 import { canAccessEventPaymentData } from './canAccessEventPaymentData'
 
 async function fetchEventRefundPaymentsData(eventId: string) {
   const { prisma } = await import('@/lib/db')
-  try {
+  return withDbRetry(async () => {
     const payments = await prisma.payment.findMany({
       where: {
         eventId,
@@ -67,10 +68,7 @@ async function fetchEventRefundPaymentsData(eventId: string) {
           }
         : null,
     }))
-  } catch (error) {
-    console.error('Error fetching event refund payments:', error)
-    throw error
-  }
+  }, { label: 'fetchEventRefundPaymentsData' })
 }
 
 export async function getEventRefundPayments(eventId: string) {

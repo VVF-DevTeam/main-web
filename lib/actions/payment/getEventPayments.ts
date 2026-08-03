@@ -1,12 +1,13 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 import { canAccessEventPaymentData } from './canAccessEventPaymentData'
 
 // Base function to fetch event payments (without caching)
 async function fetchEventPaymentsData(eventId: string) {
   const { prisma } = await import('@/lib/db')
-  try {
+  return withDbRetry(async () => {
     const payments = await prisma.payment.findMany({
       where: {
         eventId: eventId,
@@ -74,10 +75,7 @@ async function fetchEventPaymentsData(eventId: string) {
           }
         : null,
     }))
-  } catch (error) {
-    console.error('Error fetching event payments:', error)
-    throw error
-  }
+  }, { label: 'fetchEventPaymentsData' })
 }
 
 // Cached version of getEventPayments - cached per event

@@ -1,7 +1,8 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
-import { EventSponsor, SponsorTier, SponsorOnEvent } from '@prisma/client'
+import { EventSponsor, SponsorTier } from '@prisma/client'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Type matching what SponsorsManager expects
 type SponsorOnEventWithEvent = {
@@ -22,35 +23,33 @@ type SponsorWithEvents = EventSponsor & {
 export const getAllEventSponsors = unstable_cache(
   async (): Promise<SponsorWithEvents[]> => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const sponsors = await prisma.eventSponsor.findMany({
-        orderBy: {
-          name: 'asc',
-        },
-        include: {
-          events: {
-            select: {
-              eventId: true,
-              tier: true,
-              order: true,
-              event: {
-                select: {
-                  id: true,
-                  title: true,
+    return withDbRetry(
+      () =>
+        prisma.eventSponsor.findMany({
+          orderBy: {
+            name: 'asc',
+          },
+          include: {
+            events: {
+              select: {
+                eventId: true,
+                tier: true,
+                order: true,
+                event: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
                 },
               },
-            },
-            orderBy: {
-              tier: 'asc',
+              orderBy: {
+                tier: 'asc',
+              },
             },
           },
-        },
-      })
-      return sponsors
-    } catch (error) {
-      console.error('Error getting event sponsors:', error)
-      return []
-    }
+        }),
+      { label: 'getAllEventSponsors' }
+    )
   },
   ['event-sponsors-all'], // Cache key prefix
   {
@@ -58,4 +57,3 @@ export const getAllEventSponsors = unstable_cache(
     tags: ['event-sponsors'], // Tag for revalidation
   }
 )
-

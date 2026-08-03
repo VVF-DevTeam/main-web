@@ -1,6 +1,7 @@
 import { prisma } from '../../db'
 import { Post, PostLikes, PostVisits } from '@prisma/client'
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Base post data
 type PostBase = Pick<Post, 'id' | 'title' | 'summary' | 'imgUrl' | 'createdAt'>
@@ -128,7 +129,7 @@ export const getPublishedPostsByTitlePaginated = async (
 // Cached version for ISR (use this in Server Components)
 export const getCachedPostsPaginated = unstable_cache(
   async (title: string, page: number = 1, postsPerPage: number = 6) => {
-    try {
+    return withDbRetry(async () => {
       const skip = (page - 1) * postsPerPage
 
       const [posts, totalCount] = await Promise.all([
@@ -181,10 +182,7 @@ export const getCachedPostsPaginated = unstable_cache(
         currentPage: page,
         postsPerPage,
       }
-    } catch (error) {
-      console.log(error)
-      return null
-    }
+    }, { label: 'getCachedPostsPaginated' })
   },
   ['posts-paginated'], // Cache key
   {
@@ -197,17 +195,15 @@ export const getCachedPostsPaginated = unstable_cache(
 export const getAllPosts = unstable_cache(
   async () => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const posts = await prisma.post.findMany({
-        orderBy: {
-          updatedAt: 'desc',
-        },
-      })
-      return posts
-    } catch (error) {
-      console.error('Error getting all posts:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.post.findMany({
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        }),
+      { label: 'getAllPosts' }
+    )
   },
   ['posts-all'], // Cache key prefix
   {
@@ -220,16 +216,15 @@ export const getAllPosts = unstable_cache(
 export const getPostForEditing = unstable_cache(
   async (postId: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      return await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-      })
-    } catch (error) {
-      console.error('Error getting post for editing:', error)
-      return null
-    }
+    return withDbRetry(
+      () =>
+        prisma.post.findUnique({
+          where: {
+            id: postId,
+          },
+        }),
+      { label: 'getPostForEditing' }
+    )
   },
   ['post-for-editing'], // Cache key prefix
   {
@@ -241,39 +236,38 @@ export const getPostForEditing = unstable_cache(
 // Get post by id for public post detail page
 export const getPostById = unstable_cache(
   async (postId: string) => {
-    try {
-      return await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-        include: {
-          user: {
-            select: {
-              name: true,
+    return withDbRetry(
+      () =>
+        prisma.post.findUnique({
+          where: {
+            id: postId,
+          },
+          include: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
+            postLikes: {
+              select: {
+                userId: true,
+              },
+            },
+            postVisits: {
+              select: {
+                userId: true,
+              },
+            },
+            _count: {
+              select: {
+                postLikes: true,
+                postVisits: true,
+              },
             },
           },
-          postLikes: {
-            select: {
-              userId: true,
-            },
-          },
-          postVisits: {
-            select: {
-              userId: true,
-            },
-          },
-          _count: {
-            select: {
-              postLikes: true,
-              postVisits: true,
-            },
-          },
-        },
-      })
-    } catch (error) {
-      console.error('Error getting post by id:', error)
-      return null
-    }
+        }),
+      { label: 'getPostById' }
+    )
   },
   ['post-by-id-v2'],
   {

@@ -2,6 +2,7 @@
 
 import { unstable_cache } from 'next/cache'
 import type { Prisma } from '@prisma/client'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 function parseImgUrls(value: Prisma.JsonValue | null | undefined): string[] {
   if (value == null) return []
@@ -35,7 +36,7 @@ function mergeUniquePreservingOrder(base: string[], extra: string[]): string[] {
 const getCachedSiblingSeriesGalleryUrls = unstable_cache(
   async (seriesId: string, excludeEventId: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
+    return withDbRetry(async () => {
       const siblings = await prisma.event.findMany({
         where: {
           seriesId,
@@ -50,10 +51,7 @@ const getCachedSiblingSeriesGalleryUrls = unstable_cache(
         urls.push(...parseImgUrls(row.imgUrls))
       }
       return urls
-    } catch (error) {
-      console.error('getCachedSiblingSeriesGalleryUrls:', error)
-      return []
-    }
+    }, { label: 'getCachedSiblingSeriesGalleryUrls' })
   },
   ['series-sibling-galleries'],
   {

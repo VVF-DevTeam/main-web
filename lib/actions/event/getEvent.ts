@@ -2,6 +2,7 @@
 
 import { Prisma } from '@prisma/client'
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 /** All events row for admin list (`getAllEvents`) */
 export type EventWithHostsForAdmin = Prisma.EventGetPayload<{
@@ -13,25 +14,22 @@ export type EventWithHostsForAdmin = Prisma.EventGetPayload<{
 export const getAllPublishedEvents = unstable_cache(
   async (selectFields?: Prisma.EventSelect) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      // If selectFields provided, use select; otherwise default to id and title
-      const events = await prisma.event.findMany({
-        where: {
-          isPublished: true,
-        },
-        select: selectFields || {
-          id: true,
-          title: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      })
-      return events
-    } catch (error) {
-      console.error('Error getting published events:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.event.findMany({
+          where: {
+            isPublished: true,
+          },
+          select: selectFields || {
+            id: true,
+            title: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        }),
+      { label: 'getAllPublishedEvents' }
+    )
   },
   ['events-published-all'], // Cache key prefix
   {
@@ -44,24 +42,22 @@ export const getAllPublishedEvents = unstable_cache(
 export const getAllPublishedEventsWithRelations = unstable_cache(
   async () => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const events = await prisma.event.findMany({
-        where: {
-          isPublished: true,
-        },
-        orderBy: {
-          endDate: 'desc',
-        },
-        include: {
-          categories: true,
-          tickets: true,
-        },
-      })
-      return events
-    } catch (error) {
-      console.error('Error getting published events:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.event.findMany({
+          where: {
+            isPublished: true,
+          },
+          orderBy: {
+            endDate: 'desc',
+          },
+          include: {
+            categories: true,
+            tickets: true,
+          },
+        }),
+      { label: 'getAllPublishedEventsWithRelations' }
+    )
   },
   ['events-published-with-relations'], // Cache key prefix
   {
@@ -90,7 +86,7 @@ export const getPublishedEventsWithFilters = unstable_cache(
     selectFields?: Prisma.EventSelect
   }) => {
     const { prisma } = await import('@/lib/db')
-    try {
+    return withDbRetry(async () => {
       const baseQuery = {
         where: {
           isPublished: true,
@@ -111,27 +107,22 @@ export const getPublishedEventsWithFilters = unstable_cache(
         take: numberOfEvents ? numberOfEvents : undefined,
       }
 
-      const events = selectFields
-        ? await prisma.event.findMany({
+      return selectFields
+        ? prisma.event.findMany({
             ...baseQuery,
             select: {
               ...selectFields,
               categories: includeCategories ? true : false,
             },
           })
-        : await prisma.event.findMany({
+        : prisma.event.findMany({
             ...baseQuery,
             include: {
               categories: includeCategories ? true : false,
               tickets: true,
             },
           })
-
-      return events
-    } catch (error) {
-      console.error('Error getting published events:', error)
-      return []
-    }
+    }, { label: 'getPublishedEventsWithFilters' })
   },
   ['events-published-filtered'], // Cache key prefix
   {
@@ -144,10 +135,10 @@ export const getPublishedEventsWithFilters = unstable_cache(
 export const getClosestFutureEvent = unstable_cache(
   async () => {
     const { prisma } = await import('@/lib/db')
-    try {
+    return withDbRetry(async () => {
       const now = new Date()
-      
-      const closestEvent = await prisma.event.findFirst({
+
+      return prisma.event.findFirst({
         where: {
           isPublished: true,
           startDate: {
@@ -168,12 +159,7 @@ export const getClosestFutureEvent = unstable_cache(
           startDate: 'asc', // Get the closest one first
         },
       })
-
-      return closestEvent
-    } catch (error) {
-      console.error('Error getting closest future event:', error)
-      return null
-    }
+    }, { label: 'getClosestFutureEvent' })
   },
   ['events-closest-future'], // Cache key prefix
   {
@@ -188,20 +174,18 @@ export const getClosestFutureEvent = unstable_cache(
 export const getAllEvents = unstable_cache(
   async (): Promise<EventWithHostsForAdmin[]> => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const events = await prisma.event.findMany({
-        orderBy: {
-          updatedAt: 'desc',
-        },
-        include: {
-          hosts: true,
-        },
-      })
-      return events
-    } catch (error) {
-      console.error('Error getting all events:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.event.findMany({
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          include: {
+            hosts: true,
+          },
+        }),
+      { label: 'getAllEvents' }
+    )
   },
   ['events-all'], // Cache key prefix
   {
@@ -214,16 +198,14 @@ export const getAllEvents = unstable_cache(
 export const getEventTitleByKeyName = unstable_cache(
   async (eventKeyName: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const event = await prisma.event.findUnique({
-        where: { keyName: eventKeyName },
-        select: { title: true },
-      })
-      return event
-    } catch (error) {
-      console.error('Error getting event title by keyName:', error)
-      return null
-    }
+    return withDbRetry(
+      () =>
+        prisma.event.findUnique({
+          where: { keyName: eventKeyName },
+          select: { title: true },
+        }),
+      { label: 'getEventTitleByKeyName' }
+    )
   },
   ['event-title-by-keyname'], // Cache key prefix
   {

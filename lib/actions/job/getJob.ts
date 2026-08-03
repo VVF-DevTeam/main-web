@@ -1,22 +1,21 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Get all jobs (both published and unpublished) for admin management
 export const getAllJobs = unstable_cache(
   async () => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const jobs = await prisma.job.findMany({
-        orderBy: {
-          updatedAt: 'desc',
-        },
-      })
-      return jobs
-    } catch (error) {
-      console.error('Error getting all jobs:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.job.findMany({
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        }),
+      { label: 'getAllJobs' }
+    )
   },
   ['jobs-all'], // Cache key prefix
   {
@@ -29,13 +28,15 @@ export const getAllJobs = unstable_cache(
 export const getPublishedJobs = unstable_cache(
   async (filters?: { title?: string; eventKeyName?: string }) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      // Build where clause
-      const whereClause: any = {
+    return withDbRetry(async () => {
+      const whereClause: {
+        isPublished: boolean
+        title?: { contains: string; mode: 'insensitive' }
+        event?: { keyName: string }
+      } = {
         isPublished: true,
       }
 
-      // Add title filter if provided
       if (filters?.title) {
         whereClause.title = {
           contains: filters.title,
@@ -43,14 +44,13 @@ export const getPublishedJobs = unstable_cache(
         }
       }
 
-      // Add event filter if provided and not 'all'
       if (filters?.eventKeyName && filters.eventKeyName !== 'all') {
         whereClause.event = {
           keyName: filters.eventKeyName,
         }
       }
 
-      const jobs = await prisma.job.findMany({
+      return prisma.job.findMany({
         where: whereClause,
         include: {
           event: {
@@ -65,11 +65,7 @@ export const getPublishedJobs = unstable_cache(
           updatedAt: 'desc',
         },
       })
-      return jobs
-    } catch (error) {
-      console.error('Error getting published jobs:', error)
-      return []
-    }
+    }, { label: 'getPublishedJobs' })
   },
   ['jobs-published'], // Cache key prefix
   {
@@ -83,24 +79,23 @@ export const getPublishedJobs = unstable_cache(
 export const getJobForEditing = unstable_cache(
   async (jobKeyName: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      return await prisma.job.findUnique({
-        where: {
-          keyName: jobKeyName,
-        },
-        include: {
-          event: {
-            select: {
-              id: true,
-              title: true,
+    return withDbRetry(
+      () =>
+        prisma.job.findUnique({
+          where: {
+            keyName: jobKeyName,
+          },
+          include: {
+            event: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
           },
-        },
-      })
-    } catch (error) {
-      console.error('Error getting job for editing:', error)
-      return null
-    }
+        }),
+      { label: 'getJobForEditing' }
+    )
   },
   ['job-for-editing'], // Cache key prefix
   {

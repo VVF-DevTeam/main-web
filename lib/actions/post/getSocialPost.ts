@@ -262,7 +262,6 @@ export const getCachedSocialMediaPostsPaginated = unstable_cache(
     isEstimated: boolean
     hasMorePages: boolean
   }> => {
-    try {
       // Fetch enough posts for current page + buffer
       const fetchLimit = 100
 
@@ -275,6 +274,12 @@ export const getCachedSocialMediaPostsPaginated = unstable_cache(
           `https://graph.facebook.com/v22.0/${INSTAGRAM_ID}/media?fields=id,caption,media_url,media_type,permalink,timestamp,thumbnail_url,like_count,comments_count&limit=${fetchLimit}&access_token=${FACEBOOK_ACCESS_TOKEN}`
         ),
       ])
+
+      if (!fbRes.ok || !igRes.ok) {
+        throw new Error(
+          `Social media API error: Facebook ${fbRes.status}, Instagram ${igRes.status}`
+        )
+      }
 
       const [fbJson, igJson] = await Promise.all([fbRes.json(), igRes.json()])
 
@@ -363,21 +368,6 @@ export const getCachedSocialMediaPostsPaginated = unstable_cache(
         isEstimated: !reachedEnd,
         hasMorePages: !reachedEnd || currentPage < totalPages,
       }
-    } catch (error) {
-      console.error(
-        'Error fetching cached paginated social media posts:',
-        error.message
-      )
-      return {
-        posts: [],
-        totalCount: 0,
-        totalPages: 0,
-        currentPage: 1,
-        fetchedCount: 0,
-        isEstimated: false,
-        hasMorePages: false,
-      }
-    }
   },
   ['social-media-posts'],
   {

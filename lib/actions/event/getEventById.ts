@@ -1,55 +1,55 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Cached version to get event by ID (without time filter)
 const getCachedEventById = unstable_cache(
   async (eventId: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      return prisma.event.findUnique({
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          location: true,
-          startDate: true,
-          startTime: true,
-          imgUrl: true,
-          endTime: true,
-          formLink: true,
-          endDate: true,
-          keyName: true,
-          eventType: true,
-          tickets: {
-            select: {
-              id: true,
-              type: true,
-              price: true,
+    return withDbRetry(
+      () =>
+        prisma.event.findUnique({
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            location: true,
+            startDate: true,
+            startTime: true,
+            imgUrl: true,
+            endTime: true,
+            formLink: true,
+            endDate: true,
+            keyName: true,
+            eventType: true,
+            tickets: {
+              select: {
+                id: true,
+                type: true,
+                price: true,
+              },
+            },
+            hosts: {
+              select: {
+                name: true,
+              },
+            },
+            schedules: {
+              select: {
+                id: true,
+                startTime: true,
+                endTime: true,
+                description: true,
+              },
             },
           },
-          hosts: {
-            select: {
-              name: true,
-            },
+          where: {
+            id: eventId,
           },
-          schedules: {
-            select: {
-              id: true,
-              startTime: true,
-              endTime: true,
-              description: true,
-            },
-          },
-        },
-        where: {
-          id: eventId,
-        },
-      })
-    } catch (error) {
-      console.error('Error getting event by ID:', error)
-      return null
-    }
+        }),
+      { label: 'getCachedEventById' }
+    )
   },
   ['event-by-id'], // Cache key prefix
   {
@@ -66,19 +66,14 @@ export const getEventById = async ({
   eventId: string
   requestTime: Date
 }) => {
-  try {
-    const event = await getCachedEventById(eventId)
+  const event = await getCachedEventById(eventId)
 
-    // Apply time filter after cache retrieval
-    if (!event || new Date(event.endDate) < requestTime) {
-      return null
-    }
-
-    return event
-  } catch (error) {
-    console.error('Error in getEventById wrapper:', error)
+  // Apply time filter after cache retrieval
+  if (!event || new Date(event.endDate) < requestTime) {
     return null
   }
+
+  return event
 }
 
 // Cached version to get event by keyName with full relations
@@ -87,44 +82,43 @@ export const getEventById = async ({
 export const getEventByKeyName = unstable_cache(
   async (eventKeyName: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      return await prisma.event.findUnique({
-        where: {
-          keyName: eventKeyName,
-        },
-        include: {
-          schedules: true,
-          categories: true,
-          hosts: {
-            select: {
-              name: true,
-              image: true,
-            },
+    return withDbRetry(
+      () =>
+        prisma.event.findUnique({
+          where: {
+            keyName: eventKeyName,
           },
-          _count: {
-            select: {
-              Review: true,
+          include: {
+            schedules: true,
+            categories: true,
+            hosts: {
+              select: {
+                name: true,
+                image: true,
+              },
             },
-          },
-          series: {
-            select: {
-              id: true,
+            _count: {
+              select: {
+                Review: true,
+              },
             },
-          },
-          tickets: true,
-          sponsors: {
-            include: {
-              sponsor: true,
+            series: {
+              select: {
+                id: true,
+              },
             },
-            orderBy: [{ tier: 'asc' }, { order: 'asc' }],
+            tickets: true,
+            sponsors: {
+              include: {
+                sponsor: true,
+              },
+              orderBy: [{ tier: 'asc' }, { order: 'asc' }],
+            },
+            jobs: true,
           },
-          jobs: true,
-        },
-      })
-    } catch (error) {
-      console.error('Error getting event by keyName:', error)
-      return null
-    }
+        }),
+      { label: 'getEventByKeyName' }
+    )
   },
   ['event-by-keyname'], // Cache key prefix
   {
@@ -138,47 +132,46 @@ export const getEventByKeyName = unstable_cache(
 export const getEventForEditing = unstable_cache(
   async (eventKeyName: string) => {
     const { prisma } = await import('@/lib/db')
-    try {
-      return await prisma.event.findUnique({
-        where: {
-          keyName: eventKeyName,
-        },
-        include: {
-          schedules: {
-            orderBy: {
-              position: 'asc',
-            },
+    return withDbRetry(
+      () =>
+        prisma.event.findUnique({
+          where: {
+            keyName: eventKeyName,
           },
-          categories: true,
-          hosts: {
-            select: {
-              name: true,
-              role: true,
-              id: true,
-            },
-          },
-          series: true,
-          tickets: {
-            include: {
-              payments: {
-                where: {
-                  refunded: false,
-                },
-                select: {
-                  quantity: true,
-                },
+          include: {
+            schedules: {
+              orderBy: {
+                position: 'asc',
               },
             },
-            orderBy: {
-              createdAt: 'asc',
+            categories: true,
+            hosts: {
+              select: {
+                name: true,
+                role: true,
+                id: true,
+              },
+            },
+            series: true,
+            tickets: {
+              include: {
+                payments: {
+                  where: {
+                    refunded: false,
+                  },
+                  select: {
+                    quantity: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: 'asc',
+              },
             },
           },
-        },
-      })
-    } catch (error) {
-      console.error('Error getting event for editing:', error)
-      return null
-    }
+        }),
+      { label: 'getEventForEditing' }
+    )
   },
   ['event-for-editing'], // Cache key prefix
   {

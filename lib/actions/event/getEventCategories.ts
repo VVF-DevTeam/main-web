@@ -2,22 +2,21 @@
 
 import { unstable_cache } from 'next/cache'
 import { EventCategory } from '@prisma/client'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Cached version of getAllEventCategories
 export const getAllEventCategories = unstable_cache(
   async (): Promise<EventCategory[]> => {
     const { prisma } = await import('@/lib/db')
-    try {
-      const categories = await prisma.eventCategory.findMany({
-        orderBy: {
-          title: 'asc',
-        },
-      })
-      return categories
-    } catch (error) {
-      console.error('Error getting event categories:', error)
-      return []
-    }
+    return withDbRetry(
+      () =>
+        prisma.eventCategory.findMany({
+          orderBy: {
+            title: 'asc',
+          },
+        }),
+      { label: 'getAllEventCategories' }
+    )
   },
   ['event-categories-all'], // Cache key prefix
   {
@@ -25,4 +24,3 @@ export const getAllEventCategories = unstable_cache(
     tags: ['event-categories'], // Tag for revalidation
   }
 )
-
