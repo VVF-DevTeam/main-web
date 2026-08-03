@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { PaymentWithRelations } from '@/lib/types/payment'
 import { UserInfoProps } from '@/lib/types/userInfo'
 import { Prisma } from '@prisma/client'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 // Base function to fetch payments (without caching)
 async function fetchPaymentsData(
@@ -13,6 +14,7 @@ async function fetchPaymentsData(
   pageSize: number,
   searchTerm: string = ''
 ) {
+  return withDbRetry(async () => {
   const skip = Math.max(0, (currentPage - 1) * pageSize)
   const requiredCount = currentPage * pageSize + pageSize // Extra page as buffer
   const smartFetchLimit = Math.max(requiredCount * 2, 100) // *2 for filtering buffer
@@ -189,6 +191,7 @@ async function fetchPaymentsData(
     currentPage,
     fetchedCount: payments.length,
   }
+  }, { label: 'fetchPaymentsData' })
 }
 
 export const getPaginatedPayments = async (
@@ -205,38 +208,26 @@ export const getPaginatedPayments = async (
   isFromCache: boolean
   cacheReason?: string
 }> => {
-  try {
-    // Create stable cache key from user properties
-    const userRole = user.role[0] || 'USER'
-    const userId = user.role.includes('HOST') ? user.id : 'all'
-    const cacheKey = `payments-${userRole}-${userId}-${currentPage}-${pageSize}-${searchTerm.trim().toLowerCase()}`
-    
-    // Use unstable_cache with stable key
-    const getCachedPaymentsData = unstable_cache(
-      async () => fetchPaymentsData(user, currentPage, pageSize, searchTerm),
-      [cacheKey], // stable cache key
-      {
-        tags: ['payments'], // tag for revalidation
-        revalidate: 300, // 5 minutes default revalidation
-      }
-    )
-    
-    const result = await getCachedPaymentsData()
-    
-    return {
-      ...result,
-      isFromCache: true, // unstable_cache handles caching internally
-      cacheReason: 'next-cache',
+  // Create stable cache key from user properties
+  const userRole = user.role[0] || 'USER'
+  const userId = user.role.includes('HOST') ? user.id : 'all'
+  const cacheKey = `payments-${userRole}-${userId}-${currentPage}-${pageSize}-${searchTerm.trim().toLowerCase()}`
+
+  // Use unstable_cache with stable key
+  const getCachedPaymentsData = unstable_cache(
+    async () => fetchPaymentsData(user, currentPage, pageSize, searchTerm),
+    [cacheKey], // stable cache key
+    {
+      tags: ['payments'], // tag for revalidation
+      revalidate: 300, // 5 minutes default revalidation
     }
-  } catch (error) {
-    console.error('Error fetching paginated payments:', error)
-    return {
-      payments: [],
-      totalCount: 0,
-      totalPages: 0,
-      currentPage: 1,
-      fetchedCount: 0,
-      isFromCache: false,
-    }
+  )
+
+  const result = await getCachedPaymentsData()
+
+  return {
+    ...result,
+    isFromCache: true, // unstable_cache handles caching internally
+    cacheReason: 'next-cache',
   }
 }

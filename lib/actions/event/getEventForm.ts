@@ -1,6 +1,7 @@
 'use server'
 
 import { unstable_cache } from 'next/cache'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 export type FormQuestionCondition = {
   numberOperator?: 'eq' | 'lt' | 'gt'
@@ -33,16 +34,13 @@ export type EventFormData = Array<{ questions: FormQuestion[] }> | null
 export const getEventForm = unstable_cache(
   async (eventId: string): Promise<EventFormData> => {
     const { prisma } = await import('@/lib/db')
-    try {
+    return withDbRetry(async () => {
       const eventForm = await prisma.eventForm.findFirst({
         where: { eventId },
       })
 
       return eventForm?.FormData as EventFormData
-    } catch (error) {
-      console.error('Error getting event form:', error)
-      return null
-    }
+    }, { label: 'getEventForm' })
   },
   ['event-form'], // Cache key prefix
   {

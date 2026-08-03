@@ -2,6 +2,7 @@
 
 import { unstable_cache } from 'next/cache'
 import { UserInfoSimpleProps } from '@/lib/types/userInfo'
+import { withDbRetry } from '@/lib/db/withDbRetry'
 
 interface GetUsersSimpleParams {
   count?: number
@@ -12,49 +13,51 @@ interface GetUsersSimpleParams {
 const getCachedUsersSimple = unstable_cache(
   async ({ count = 0, nameSortString = '' }: GetUsersSimpleParams) => {
     const { prisma } = await import('@/lib/db')
-    let users = []
-    if (count > 0) {
-      users = await prisma.user.findMany({
-        take: count,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        where: {
-          name: {
-            contains: nameSortString,
-            mode: 'insensitive',
+    return withDbRetry(async () => {
+      let users = []
+      if (count > 0) {
+        users = await prisma.user.findMany({
+          take: count,
+          select: {
+            id: true,
+            name: true,
+            email: true,
           },
-        },
-      })
-    } else {
-      users = await prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        where: {
-          name: {
-            contains: nameSortString,
-            mode: 'insensitive',
+          orderBy: {
+            createdAt: 'desc',
           },
-        },
-      })
-    }
+          where: {
+            name: {
+              contains: nameSortString,
+              mode: 'insensitive',
+            },
+          },
+        })
+      } else {
+        users = await prisma.user.findMany({
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          where: {
+            name: {
+              contains: nameSortString,
+              mode: 'insensitive',
+            },
+          },
+        })
+      }
 
-    return users.map((user) => ({
-      id: user.id,
-      name: user.name ?? '',
-      email: user.email,
-    }))
+      return users.map((user) => ({
+        id: user.id,
+        name: user.name ?? '',
+        email: user.email,
+      }))
+    }, { label: 'getCachedUsersSimple' })
   },
   ['users-simple'], // Cache key prefix
   {
