@@ -15,7 +15,9 @@ const StudentBenefits = async ({ locale }: StudentBenefitsProps) => {
     <div className="flex flex-col gap-y-5 bg-bgColor-secondary100 p-4 pb-10 pt-10 text-base md:pb-[80px] md:pt-[40px] md:text-lg lg:pb-[80px]">
       <h1 className="web_h1 text-center">{t('studentBenefitsSection-title')}</h1>
       <h2 className="web-body-regular text-center">
-        {t('studentBenefitsSection-description')}
+        {t('studentBenefitsSection-description-prefix')}
+        <em className="italic">{t('studentBenefitsSection-description-emphasis')}</em>
+        {t('studentBenefitsSection-description-suffix')}
       </h2>
 
       <div className="flex flex-col items-center justify-center gap-y-6 md:grid md:grid-cols-2">
