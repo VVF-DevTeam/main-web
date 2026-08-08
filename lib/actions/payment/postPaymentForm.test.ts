@@ -132,8 +132,15 @@ describe('postPaymentForm actions', () => {
   })
 
   test('accepts a payment row id as the post-payment reference when Stripe payment id is unavailable', async () => {
+    const formToken = createPostPaymentFormAccessToken({
+      paymentReference: 'payment_1',
+      eventKeyName: 'camp',
+      guestEmail: 'guest@example.com',
+    })
+
     const result = await verifyPostPaymentFormAccess({
       paymentReference: 'payment_1',
+      formToken,
       eventKeyName: 'camp',
       guestEmail: 'guest@example.com',
     })

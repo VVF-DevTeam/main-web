@@ -8,6 +8,13 @@ import { sendSubscriptionConfirmationEmail } from '@/lib/actions/email/sendSubsc
 import { sendShopOrderConfirmationEmail, ShopOrderItem } from '@/lib/actions/email/sendShopOrderConfirmationEmail'
 import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
 import { buildPostPaymentFormLink } from '@/lib/utils/buildPostPaymentFormLink'
+import {
+  claimCheckoutSessionForPayment,
+  hasExistingStripeCheckoutPayments,
+  rollbackCheckoutSessionClaim,
+  shouldSkipDuplicateStripeSuccessEvent,
+  shouldSkipInitialSubscriptionInvoice,
+} from '@/lib/actions/payment/stripeWebhookPaymentGate'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -515,6 +522,41 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.error('Error parsing otherGuestsInfo:', e)
         otherGuestsInfo = null
+      }
+    }
+
+    if (shouldSkipDuplicateStripeSuccessEvent(event.type, metadata)) {
+      return NextResponse.json({ received: true }, { status: 200 })
+    }
+
+    if (
+      shouldSkipInitialSubscriptionInvoice(
+        event.type,
+        event.type === 'invoice.paid'
+          ? (paymentData as Stripe.Invoice).billing_reason
+          : null
+      )
+    ) {
+      return NextResponse.json({ received: true }, { status: 200 })
+    }
+
+    let claimedCheckoutSession = false
+
+    if (metadata?.checkoutDataId) {
+      const claimResult = await claimCheckoutSessionForPayment(
+        prisma,
+        metadata.checkoutDataId,
+        paymentId
+      )
+
+      if (claimResult.action === 'skip') {
+        return NextResponse.json({ received: true }, { status: 200 })
+      }
+
+      claimedCheckoutSession = claimResult.claimed
+    } else if (paymentId) {
+      if (await hasExistingStripeCheckoutPayments(prisma, paymentId)) {
+        return NextResponse.json({ received: true }, { status: 200 })
       }
     }
 
@@ -1274,6 +1316,17 @@ export async function POST(req: NextRequest) {
         }
       }
     } catch (error) {
+      if (claimedCheckoutSession && metadata?.checkoutDataId) {
+        try {
+          await rollbackCheckoutSessionClaim(prisma, metadata.checkoutDataId)
+        } catch (rollbackError) {
+          console.error(
+            '[WEBHOOK_ERROR] Failed to rollback checkout session claim:',
+            rollbackError
+          )
+        }
+      }
+
       console.error('[PRISMA_CREATE_PAYMENT_ERROR]', error)
       const message =
         error instanceof Error
