@@ -22,8 +22,20 @@ const jobTypeColors: Record<string, string> = {
   HR: 'bg-yellow-600 hover:bg-yellow-500/80',
   Tech: 'bg-pink-800 hover:bg-pink-800/80',
   Performance: 'bg-blue-300 hover:bg-blue-200/80',
-  Volunteer: 'bg-gradient-to-r from-bgColor-secondary900 to-bgColor-brand900 hover:from-bgColor-secondary900/80 hover:to-bgColor-brand900/80',
+  Volunteer: 'bg-green-700 hover:bg-green-600/80',
 }
+
+const formatDescriptionPreview = (html: string, maxLength = 200) =>
+  html
+    .replace(/<br\s*\/?>/gi, ' / ')
+    .replace(/<\/(p|h[1-6]|li|div|tr|blockquote)>/gi, ' / ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\r?\n/g, ' / ')
+    .replace(/\s+/g, ' ')
+    .replace(/\/+/g, ' / ')
+    .replace(/^\/+|\/+$/g, '')
+    .trim()
+    .slice(0, maxLength)
 
 // Main Component
 const JobCard = async ({ job }: JobCardProps) => {
@@ -65,7 +77,7 @@ const JobCard = async ({ job }: JobCardProps) => {
         {/* Short Description */}
         <div className="flex-between gap-x-2">
           <span className="flex items-center gap-x-2">
-            {job.description.replace(/<[^>]+>/g, '').slice(0, 200)}...
+            {formatDescriptionPreview(job.description)}...
           </span>
           <JobButton jobKeyName={job.keyName} />
         </div>

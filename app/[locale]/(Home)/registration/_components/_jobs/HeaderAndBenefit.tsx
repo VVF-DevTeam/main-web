@@ -15,17 +15,17 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
   const { t } = await initTranslations(locale, ['job', 'common'])
 
   return (
-    <div className="flex-col-center gap-y-10 px-5 py-20 lg:gap-y-20">
+    <div className="flex-col-center gap-y-5 px-5 pt-7 pb-5 lg:gap-y-10">
     {/* Header */}
     <div className="flex-col-center">
-      <h1 className="header-sub mb-2 text-center text-textColor-brandDark900 lg:text-5xl">
+      <h1 className="header-sub text-center text-textColor-brandDark900 lg:text-5xl">
         {t('header-benefits')}
       </h1>
       <Separator className="w-[120%] bg-bgColor-brandDark900" />
     </div>
 
     {/* Benefits */}
-    <div className="flex-col-default">
+    <div className="flex flex-col gap-x-8 gap-y-2">
       <p>
         {t('benefits-description1')}
       </p>
@@ -44,9 +44,6 @@ const HeaderAndBenefit = async ({locale}: HeaderAndBenefitProps) => {
                 {t('benefits-subitem1')}
               </li>
               <li>{t('benefits-subitem2')}</li>
-              <li>
-                {t('benefits-subitem3')}
-              </li>
               <li>
                 {t('benefits-subitemMore')}
               </li>

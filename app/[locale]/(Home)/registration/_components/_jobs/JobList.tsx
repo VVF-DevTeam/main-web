@@ -51,8 +51,8 @@ const JobList = async ({ title, eventKeyName, locale }: JobListProps) => {
       {/* Job Posts */}
       <div className="flex w-full flex-col items-center">
         {/* Header */}
-        <div className="flex-col-center mb-8">
-          <h1 className="header-sub header-font-default mb-7 text-center text-textColor-brandDark900 lg:text-5xl">
+        <div className="flex flex-col items-center justify-center mb-2">
+          <h1 className="header-sub header-font-default mb-2 text-center text-textColor-brandDark900 lg:text-5xl">
             {t('headerJob')}
           </h1>
         </div>
