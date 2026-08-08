@@ -154,10 +154,14 @@ export async function POST(req: Request) {
       alreadyRefundedForRowInCents + refund.amount
     const isPaymentFullyRefunded =
       totalRefundedForRowAfterThisRefund >= rowPaidInCents
+    const isIntentFullyRefunded =
+      alreadyRefundedInCents + refund.amount >= totalPaidInCents
+    const shouldMarkRowRefunded =
+      isPaymentFullyRefunded || isIntentFullyRefunded
 
     // If it's a full Membership refund, cancel subscription immediately
     if (
-      isPaymentFullyRefunded &&
+      shouldMarkRowRefunded &&
       payment.type === 'Membership' &&
       payment.user?.stripeSubscriptionId
     ) {
@@ -185,13 +189,31 @@ export async function POST(req: Request) {
       where: { id: paymentId },
       data: {
         updatedAt: new Date(),
-        refunded: isPaymentFullyRefunded,
+        refunded: shouldMarkRowRefunded,
         totalRefundAmount: totalRefundedForRowAfterThisRefund / 100,
         monitorUserId,
         ...(payment.type === 'Membership' &&
-          isPaymentFullyRefunded && { expiresAt: null }),
+          shouldMarkRowRefunded && { expiresAt: null }),
       },
     })
+
+    // Split checkouts share one Stripe PaymentIntent. Rounding can leave a row
+    // with remaining balance even after the intent is fully refunded, so sync any
+    // sibling purchase rows once Stripe has no refundable balance left.
+    if (isIntentFullyRefunded) {
+      await prisma.payment.updateMany({
+        where: {
+          stripePaymentId: payment.stripePaymentId,
+          type: { not: 'Refund' },
+          refunded: false,
+        },
+        data: {
+          updatedAt: new Date(),
+          refunded: true,
+          monitorUserId,
+        },
+      })
+    }
 
     // Add a new payment record for the refund
     await prisma.payment.create({
@@ -249,7 +271,7 @@ export async function POST(req: Request) {
     // If it's an event payment, remove the user from the event
     // If user has deleted their account, no need to disconnect them from the event
     if (
-      isPaymentFullyRefunded &&
+      shouldMarkRowRefunded &&
       payment.type !== 'Membership' &&
       payment.eventId &&
       payment.userId
