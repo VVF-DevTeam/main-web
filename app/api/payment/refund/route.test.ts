@@ -82,6 +82,7 @@ describe('payment refund route', () => {
     } as any)
 
     prisma.payment.update.mockResolvedValue({} as any)
+    prisma.payment.updateMany.mockResolvedValue({ count: 1 } as any)
     prisma.payment.create.mockResolvedValue({} as any)
     prisma.event.update.mockResolvedValue({} as any)
   })
@@ -180,5 +181,78 @@ describe('payment refund route', () => {
     expect(mockStripeClient.refunds.create).not.toHaveBeenCalled()
     expect(prisma.payment.update).not.toHaveBeenCalled()
     expect(mockRevalidateTag).not.toHaveBeenCalled()
+  })
+
+  test('marks sibling purchase rows refunded when the shared payment intent is fully drained', async () => {
+    prisma.payment.findUnique.mockResolvedValue({
+      stripePaymentId: 'pi_shared',
+      pricePaid: 10,
+      totalRefundAmount: null,
+      type: 'Event',
+      eventId: 'event_1',
+      userId: 'user_1',
+      eventTicketId: 'ticket_1',
+      quantity: 1,
+      refunded: false,
+      guestName: 'Guest Buyer',
+      guestEmail: 'guest@example.com',
+      guestPhone: null,
+      user: {
+        stripeSubscriptionId: null,
+        name: 'Guest Buyer',
+        email: 'guest@example.com',
+      },
+      event: {
+        title: 'Festival',
+        startDate: new Date('2026-06-01T00:00:00.000Z'),
+        endDate: new Date('2026-06-02T00:00:00.000Z'),
+        location: 'Venue',
+      },
+    } as any)
+
+    mockStripeClient.paymentIntents.retrieve.mockResolvedValue({
+      amount_received: 9999,
+      amount: 9999,
+    } as any)
+    mockStripeClient.refunds.list.mockResolvedValue({
+      data: [
+        {
+          status: 'succeeded',
+          amount: 9000,
+        },
+      ],
+    } as any)
+    mockStripeClient.refunds.create.mockResolvedValue({
+      amount: 999,
+    } as any)
+
+    const response = await POST(
+      buildRequest({
+        paymentId: 'payment_row_last',
+        amount: 9.99,
+        monitorUserId: 'admin_1',
+      })
+    )
+
+    expect(response.status).toBe(200)
+    expect(prisma.payment.update).toHaveBeenCalledWith({
+      where: { id: 'payment_row_last' },
+      data: expect.objectContaining({
+        refunded: true,
+        totalRefundAmount: 9.99,
+      }),
+    })
+    expect(prisma.payment.updateMany).toHaveBeenCalledWith({
+      where: {
+        stripePaymentId: 'pi_shared',
+        type: { not: 'Refund' },
+        refunded: false,
+      },
+      data: {
+        updatedAt: expect.any(Date),
+        refunded: true,
+        monitorUserId: 'admin_1',
+      },
+    })
   })
 })
