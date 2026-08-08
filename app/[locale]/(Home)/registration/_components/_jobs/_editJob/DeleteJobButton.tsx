@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
@@ -32,6 +32,8 @@ const DeleteJobButton = ({ jobId, isSuperAdmin }: DeleteJobButtonProps) => {
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
+  const { locale } = useParams<{ locale: string }>()
   const currentDateTime = getCurrentDateTime()
   const deniedMessage =
     'Only Super Admin have delete permission, please contact Director of IT department (Khai) or any other Director'
@@ -54,7 +56,11 @@ const DeleteJobButton = ({ jobId, isSuperAdmin }: DeleteJobButtonProps) => {
         },
       })
       setOpen(false)
-      router.push('/registration/jobs/allJobs')
+      if (pathname?.includes('/profile')) {
+        router.push(`/${locale}/profile?section=admin-all-jobs`)
+      } else {
+        router.push(`/${locale}/registration/jobs/allJobs`)
+      }
     } catch (error: any) {
       console.log(error)
       toast.error(error.response?.data || 'Error deleting job', {

@@ -24,7 +24,7 @@ const JobsAndVolunteers = async ({
     <div className="flex flex-col gap-y-6 p-4 text-base md:text-lg">
       <HeaderAndBenefit locale={locale} />
       <JobList title={title} eventKeyName={eventKeyName} locale={locale} />
-      <JobAdminButtons />
+      {/* <JobAdminButtons /> */}
     </div>
   )
 }

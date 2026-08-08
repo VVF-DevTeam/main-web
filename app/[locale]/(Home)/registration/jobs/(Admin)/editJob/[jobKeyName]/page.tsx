@@ -13,13 +13,18 @@ const EditJobPage = async ({
 }: {
   params: Promise<{ jobKeyName: string; locale: string }>
 }) => {
-  // check if the current user is an admin to allow access to the post control page
-  if (!(await roleCheck({ role: 'ADMIN' }))) {
-    return redirect('/jobs')
+  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
+
+  // check if the current user is an admin to allow access to the job control page
+  if (
+    !(await roleCheck({ role: 'ADMIN' })) &&
+    !(await roleCheck({ role: 'HOST' })) &&
+    !isSuperAdmin
+  ) {
+    return redirect('/registration/jobs')
   }
 
-  const { jobKeyName, locale } = await params
-  const isSuperAdmin = await roleCheck({ role: 'SUPERADMIN' })
+  const { jobKeyName } = await params
 
   // Get current user info
   const user = await getCurrentUserInfo()
