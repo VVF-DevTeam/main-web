@@ -5,6 +5,10 @@ import { getEventDiscountsAndTickets } from '@/lib/actions/event/getEventDiscoun
 import { prisma } from '@/lib/db'
 import { CheckoutItems } from '@/lib/types/payment'
 import { getFinalTicketPrice } from '@/lib/actions/price/getPrices'
+import {
+  priceLineAfterQuantityRange,
+  roundMoney,
+} from '@/lib/actions/price/quantityRangeDiscount'
 import { buildAppliedDiscountsMulti } from '@/lib/actions/payment/checkoutDiscountApplied'
 
 // ##################### FLOW OF PRICES ######################
@@ -68,6 +72,9 @@ interface EventDiscountJson {
   discountAmount?: number
   discountUnit?: 'percentage' | 'amount'
   minQuantity?: number | null
+  maxQuantity?: number | null
+  minDiscountPercent?: number | null
+  maxDiscountPercent?: number | null
   minTotal?: number | null
   code?: string | null
   cannotBeStacked?: boolean | null
@@ -305,6 +312,55 @@ export async function POST(req: Request) {
     const discountList: EventDiscountJson[] = event.eventDiscounts && Array.isArray(event.eventDiscounts)
       ? (event.eventDiscounts as EventDiscountJson[])
       : []
+
+    const lineQuantity = (item: (typeof checkoutItems)[number]) =>
+      item.seatNumbers.length > 0
+        ? item.seatNumbers.length
+        : (item.quantity || 1)
+
+    const rangedUnitPrice = (ticketId: string, rawUnitPrice: number) => {
+      if (type === 'Membership') {
+        return {
+          percent: 0,
+          unitPrice: rawUnitPrice,
+          lineTotal: rawUnitPrice,
+        }
+      }
+      return priceLineAfterQuantityRange(
+        discountList,
+        unitsPerTicket.get(ticketId) ?? 0,
+        rawUnitPrice
+      )
+    }
+
+    let totalAfterQuantityRange = 0
+    const quantityRangeApplied: Array<{
+      ticketId: string
+      percentOff: number
+      quantity: number
+    }> = []
+    const seenRangeTickets = new Set<string>()
+
+    for (const item of checkoutItems) {
+      const priceId = resolveStripePriceId(item)
+      const stripePrice = stripePriceCache.get(priceId)
+      if (!stripePrice) continue
+      const rawUnit = (stripePrice.unit_amount || 0) / 100
+      const ranged = rangedUnitPrice(item.ticketId, rawUnit)
+      totalAfterQuantityRange += ranged.unitPrice * lineQuantity(item)
+      if (ranged.percent > 0 && !seenRangeTickets.has(item.ticketId)) {
+        seenRangeTickets.add(item.ticketId)
+        quantityRangeApplied.push({
+          ticketId: item.ticketId,
+          percentOff: ranged.percent,
+          quantity: unitsPerTicket.get(item.ticketId) ?? lineQuantity(item),
+        })
+      }
+    }
+    const hasQuantityRange = quantityRangeApplied.length > 0
+    totalAfterQuantityRange = hasQuantityRange
+      ? roundMoney(totalAfterQuantityRange)
+      : totalAfterMembership
 
     // Re-verify discount code server-side to prevent tampering
     let verifiedCodeDiscount: { code: string; discountAmount: number; discountUnit: 'percentage' | 'amount'; cannotBeStacked: boolean } | null = null
@@ -619,11 +675,11 @@ export async function POST(req: Request) {
     // 1. Apply percentage: totalAfterPercent = totalAfterMembership * (1 - effectivePercent / 100)
     // 2. Apply amount: totalAfterAll = max(0, totalAfterPercent - effectiveAmount)
     // We need to match this by rounding per unit, then distributing across items
-    let totalAfterPercentDiscounts = totalAfterMembership
+    let totalAfterPercentDiscounts = totalAfterQuantityRange
     let totalDiscountAmount = 0
 
     if (shouldApplyDiscount) {
-      // First apply percentage-based discounts (if any)
+      // First apply percentage-based discounts (if any) on the quantity-range price
       if (effectivePercent > 0) {
         // Apply percentage discount per unit and round (matching frontend)
         let sumOfRoundedPrices = 0
@@ -641,7 +697,10 @@ export async function POST(req: Request) {
           }
 
           const stripePrice = stripePriceCache.get(priceId)!
-          const unitPrice = (stripePrice.unit_amount || 0) / 100
+          const unitPrice = rangedUnitPrice(
+            item.ticketId,
+            (stripePrice.unit_amount || 0) / 100
+          ).unitPrice
 
           const unitCount = item.seatNumbers.length > 0
             ? item.seatNumbers.length
@@ -661,7 +720,7 @@ export async function POST(req: Request) {
       // Then apply amount-based discounts on top of percentage discounts
       const totalAfterAllEventDiscounts = Math.max(0, totalAfterPercentDiscounts - effectiveAmount)
 
-      totalDiscountAmount = totalAfterMembership - totalAfterAllEventDiscounts
+      totalDiscountAmount = totalAfterQuantityRange - totalAfterAllEventDiscounts
       // Round to 2 decimal places (matching frontend)
       totalDiscountAmount = Math.round(totalDiscountAmount * 100) / 100
     }
@@ -692,30 +751,43 @@ export async function POST(req: Request) {
       }
 
       const stripePrice = stripePriceCache.get(key)!
-      const unitPrice = (stripePrice.unit_amount || 0) / 100
+      const unitPrice = rangedUnitPrice(
+        item.ticketId,
+        (stripePrice.unit_amount || 0) / 100
+      ).unitPrice
 
       priceGroups.get(key)!.push({ item, unitCount, unitPrice })
     }
 
     // Calculate discounted prices for each price group
     for (const [priceId, group] of priceGroups.entries()) {
-      if (!shouldApplyDiscount || totalDiscountAmount === 0) {
+      const groupHasRange = group.some((entry) =>
+        quantityRangeApplied.some((range) => range.ticketId === entry.item.ticketId)
+      )
+      const applyEventDiscount =
+        shouldApplyDiscount &&
+        totalDiscountAmount > 0 &&
+        totalAfterQuantityRange > 0
+      if (!applyEventDiscount && !groupHasRange) {
         continue
       }
 
       // Calculate total for this price group
       const groupTotal = group.reduce((sum, g) => sum + (g.unitPrice * g.unitCount), 0)
 
-      // Calculate discount for this group proportionally based on final discount amount
-      const groupDiscount = (groupTotal / totalAfterMembership) * totalDiscountAmount
-      const groupFinalTotal = groupTotal - groupDiscount
+      let discountedAmountInCents: number
+      if (applyEventDiscount) {
+        // Calculate discount for this group proportionally based on final discount amount
+        const groupDiscount = (groupTotal / totalAfterQuantityRange) * totalDiscountAmount
+        const groupFinalTotal = groupTotal - groupDiscount
 
-      // Calculate discounted price per unit
-      const totalUnits = group.reduce((sum, g) => sum + g.unitCount, 0)
-      const discountedPricePerUnit = groupFinalTotal / totalUnits
-
-      // Round to cents (Stripe requires integer cents)
-      const discountedAmountInCents = Math.round(discountedPricePerUnit * 100)
+        // Calculate discounted price per unit
+        const totalUnits = group.reduce((sum, g) => sum + g.unitCount, 0)
+        const discountedPricePerUnit = groupFinalTotal / totalUnits
+        discountedAmountInCents = Math.round(discountedPricePerUnit * 100)
+      } else {
+        discountedAmountInCents = Math.round(group[0].unitPrice * 100)
+      }
 
       // Get first item's details for creating the price
       const firstItem = group[0].item
@@ -729,9 +801,14 @@ export async function POST(req: Request) {
             product: firstItem.stripeProductId,
             metadata: {
               originalPriceId: priceId,
-              discountType: 'event_discount',
+              discountType: hasQuantityRange ? 'quantity_range' : 'event_discount',
               discountPercent: effectivePercent.toString(),
               discountAmount: effectiveAmount.toString(),
+              quantityRangePercent: (
+                quantityRangeApplied.find(
+                  (range) => range.ticketId === firstItem.ticketId
+                )?.percentOff ?? 0
+              ).toString(),
               ...(verifiedCodeDiscount && {
                 codeDiscount: verifiedCodeDiscount.code,
                 codeDiscountAmount: verifiedCodeDiscount.discountAmount.toString(),
@@ -751,8 +828,8 @@ export async function POST(req: Request) {
       const resolvedPriceId = resolveStripePriceId(item)
       let priceIdToUse = resolvedPriceId
 
-      // If discount applies, use the discounted price
-      if (shouldApplyDiscount && discountedPriceCache.has(resolvedPriceId)) {
+      // If a quantity-range or event discount price was created, charge that price
+      if (discountedPriceCache.has(resolvedPriceId)) {
         priceIdToUse = discountedPriceCache.get(resolvedPriceId)!
       }
 
@@ -801,7 +878,14 @@ export async function POST(req: Request) {
       })
     }
 
-    const discountApplied = buildAppliedDiscountsMulti({
+    const discountApplied = [
+      ...quantityRangeApplied.map((range) => ({
+        kind: 'quantity_range' as const,
+        ticketId: range.ticketId,
+        percentOff: range.percentOff,
+        quantity: range.quantity,
+      })),
+      ...buildAppliedDiscountsMulti({
       checkoutItems,
       ticketById,
       pricingSubscribed: pricingSubscribed,
@@ -814,7 +898,8 @@ export async function POST(req: Request) {
       totalAfterMembership,
       verifiedCodeDiscount,
       codeDiscountApplied,
-    })
+    }),
+    ]
 
     // Save all checkout data to CheckoutSessionData before creating Stripe session
     const checkoutSessionData = await prisma.checkoutSessionData.create({

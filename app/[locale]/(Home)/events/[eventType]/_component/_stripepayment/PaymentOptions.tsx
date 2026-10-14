@@ -572,6 +572,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   selectedTickets={selectedTickets}
                   setSelectedTickets={setSelectedTickets}
                   userInfo={userInfo}
+                  discounts={discounts}
                 />
               </div>
             ) : seatingMap && seatingMap.length > 0 ? (

@@ -184,6 +184,7 @@ type DiscountAppliedRecord = {
   kind?:
     | 'membership'
     | 'student'
+    | 'quantity_range'
     | 'event_percent'
     | 'event_amount'
     | 'discount_code'
@@ -199,6 +200,7 @@ type DiscountAppliedRecord = {
   cannotBeStacked?: boolean
   originalPrice?: number
   finalPrice?: number
+  quantity?: number
 }
 
 function formatMoney(value: unknown): string {
@@ -227,6 +229,8 @@ function formatDiscountApplied(discountApplied?: JsonValue): string {
           return `Member ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (list ${formatMoney(d.originalPrice)})` : ''}${tid ? ` · ${tid}` : ''}`
         case 'student':
           return `Student ${d.percentOff ?? 0}%${d.originalPrice != null ? ` (list ${formatMoney(d.originalPrice)})` : ''}${tid ? ` · ${tid}` : ''}`
+        case 'quantity_range':
+          return `Quantity ${d.percentOff ?? 0}% off${d.quantity != null ? ` for ${d.quantity} tickets` : ''}${tid ? ` · ${tid}` : ''}`
         case 'event_percent':
           return `Event ${d.eventPercentOff ?? 0}% off subtotal${d.preEventDiscountSubtotal != null ? ` (subtotal ${formatMoney(d.preEventDiscountSubtotal)})` : ''}`
         case 'event_amount':
@@ -288,6 +292,19 @@ function buildDiscountRows(entries: DiscountAppliedRecord[]): DiscountRowVisual[
                 ? `Ticket ${tid}`
                 : undefined,
           boxClass: 'border-violet-200 bg-violet-50/90',
+        }
+      case 'quantity_range':
+        return {
+          key: baseKey,
+          badge: 'Quantity',
+          title: `${d.percentOff ?? 0}% off each ticket`,
+          subtitle:
+            d.quantity != null
+              ? `${d.quantity} tickets of this type${tid ? ` · ${tid}` : ''}`
+              : tid
+                ? `Ticket ${tid}`
+                : undefined,
+          boxClass: 'border-emerald-200 bg-emerald-50/90',
         }
       case 'event_percent':
         return {
