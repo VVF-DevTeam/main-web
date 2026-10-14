@@ -389,7 +389,7 @@ export default function EditEvent({
               onToggle={() => toggleSection('location')}
               description={
                 <p className="text-sm text-muted-foreground">
-                  NOTE: Do not use special characters such as &quot; or &apos;
+                  IMPORTANT: Do not use special characters such as &quot; or &apos;
                   or &amp;. Comma can be used.
                 </p>
               }

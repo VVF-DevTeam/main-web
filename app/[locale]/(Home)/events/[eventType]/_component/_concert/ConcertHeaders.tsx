@@ -12,6 +12,12 @@ interface ConcertHeadersProps {
 }
 
 const ConcertHeaders = ({ event }: ConcertHeadersProps) => {
+  const subImgUrls: string[] = event.subImgUrls
+    ? JSON.parse(JSON.stringify(event.subImgUrls))
+    : []
+  const primarySubImg = subImgUrls[0]?.trim() ?? ''
+  const secondarySubImg = subImgUrls[1]?.trim() ?? ''
+
   return (
     <div className="flex h-[70vh] flex-col justify-between gap-y-4 py-10 md:py-12 lg:flex-row">
       {/* Event title and subtitle */}
@@ -68,29 +74,24 @@ const ConcertHeaders = ({ event }: ConcertHeadersProps) => {
         {/* large image */}
         <div className="z-1 h-full w-[50%] max-w-4xl lg:aspect-square">
           <Image
-            src={
-              event.subImgUrls
-                ? JSON.parse(JSON.stringify(event.subImgUrls))[0]
-                : ''
-            }
+            src={primarySubImg}
             fill
             alt="Event Image"
             className="lg:rounded-md object-cover"
           />
         </div>
-        {/* small image */}
-        <div className="z-2 absolute bottom-0 left-[-15%] right-0 top-[25%] hidden h-[45%] w-[35%] lg:block">
-          <Image
-            src={
-              event.subImgUrls
-                ? JSON.parse(JSON.stringify(event.subImgUrls))[1]
-                : ''
-            }
-            fill
-            alt="Event Image"
-            className="rounded-md object-cover"
-          />
-        </div>
+        
+        {/* small image — only when second sub image URL is set */}
+        {secondarySubImg ? (
+          <div className="z-2 absolute bottom-0 left-[-15%] right-0 top-[25%] hidden h-[45%] w-[35%] lg:block">
+            <Image
+              src={secondarySubImg}
+              fill
+              alt="Event Image"
+              className="rounded-md object-cover"
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   )

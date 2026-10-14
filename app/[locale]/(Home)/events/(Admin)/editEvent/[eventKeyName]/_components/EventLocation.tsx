@@ -20,13 +20,17 @@ import {
 } from '@/components/ui/form'
 import { axiosInstance } from '@/lib/axios'
 import Loader from '@/components/loader/Loader'
+import { formatEventLocationInput } from '@/lib/utilFunctions/eventLocationUtils'
 
 interface EventLocationProps {
   event: Event
 }
 
 const EventLocationSchema = z.object({
-  location: z.string().min(10, { message: 'Location is required' }),
+  location: z
+    .string()
+    .transform(formatEventLocationInput)
+    .pipe(z.string().min(10, { message: 'Location is required' })),
 })
 
 const EventLocation = ({ event }: EventLocationProps) => {
@@ -36,12 +40,11 @@ const EventLocation = ({ event }: EventLocationProps) => {
   const form = useForm<z.infer<typeof EventLocationSchema>>({
     resolver: zodResolver(EventLocationSchema),
     defaultValues: {
-      location: event?.location || '',
+      location: formatEventLocationInput(event?.location || ''),
     },
   })
   const { isSubmitting, isValid } = form.formState
   const onSubmit = async (values: z.infer<typeof EventLocationSchema>) => {
-    console.log(values)
     try {
       setIsLoading(true)
       await axiosInstance.put(`/api/events/edit/${event.id}`, values)
@@ -101,7 +104,17 @@ const EventLocation = ({ event }: EventLocationProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Input placeholder="eg: Metro Vancouver" {...field} />
+                    <Input
+                      placeholder="eg: Metro Vancouver"
+                      {...field}
+                      onBlur={(e) => {
+                        const formatted = formatEventLocationInput(e.target.value)
+                        if (formatted !== field.value) {
+                          field.onChange(formatted)
+                        }
+                        field.onBlur()
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

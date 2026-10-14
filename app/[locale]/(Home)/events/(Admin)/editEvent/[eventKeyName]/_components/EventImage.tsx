@@ -267,7 +267,7 @@ const EventImage = ({ event }: EventImageProps) => {
                             <div className="space-y-3">
                               <div className="space-y-2">
                                 <Input
-                                  placeholder="Enter Second Sub Image URL. This will be the small image on the middle of top of the page"
+                                  placeholder="(OPTIONAL) Enter Second Sub Image URL. This will be the small image on the middle of top of the page"
                                   {...field}
                                   onBlur={(e) => {
                                     const raw = e.target.value || ''
@@ -338,7 +338,10 @@ const EventImage = ({ event }: EventImageProps) => {
             </div>
             {event.eventType === 'CONCERT' && (event?.subImgUrls as string[])?.length > 0 && (
               <div className="flex flex-wrap justify-center gap-4">
-                {(event?.subImgUrls as string[]).map((subImage, index) => (
+                {(event?.subImgUrls as string[])
+                  .map((subImage, index) => ({ subImage, index }))
+                  .filter(({ subImage }) => subImage?.trim())
+                  .map(({ subImage, index }) => (
                   <div key={index} className="relative aspect-video h-[200px] w-[400px]">
                     {(() => {
                       const subSrc =
