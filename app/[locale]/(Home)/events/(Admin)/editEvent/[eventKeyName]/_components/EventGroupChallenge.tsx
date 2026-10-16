@@ -14,6 +14,7 @@ import {
   saveGroupChallenge,
   type GroupChallengeReward,
 } from '@/lib/actions/challenge/groupChallenge'
+import ReferralStatsPanel from '@/app/[locale]/(Home)/profile/_components/ReferralStatsPanel'
 
 interface EventGroupChallengeProps {
   eventId: string
@@ -184,6 +185,7 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
       <Button type="button" onClick={() => void onSave()} disabled={saving}>
         {saving ? 'Saving...' : 'Save group challenge'}
       </Button>
+      <ReferralStatsPanel eventId={eventId} />
     </div>
   )
 }
