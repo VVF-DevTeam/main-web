@@ -249,5 +249,17 @@
   "post-payment-form-error-already_submitted": "Formulaire déjà soumis",
   "post-payment-form-error-empty_form": "Veuillez remplir le formulaire avant de soumettre",
   "post-payment-form-error-invalid_payment": "Référence de paiement invalide",
-  "post-payment-form-error-server_error": "Une erreur s'est produite. Veuillez réessayer plus tard."
+  "post-payment-form-error-server_error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+  "prizes-section-title": "Amazing Prizes or perks Await!",
+  "prizes-cta": "Get Your Ticket",
+  "leaderboard-rewards": "Récompenses",
+  "leaderboard-members": "Groupe",
+  "leaderboard-tickets": "{{count}} billets",
+  "leaderboard-empty": "Soyez le premier groupe au classement. Achetez un billet et invitez vos amis.",
+  "referral-checkout-banner": "Vous utilisez un code d'invitation :",
+  "invite-friends": "Invite Your Friends",
+  "invite-copy": "Copier le lien",
+  "invite-copied": "Lien copié",
+  "invite-code-label": "Votre code de parrainage",
+  "invite-hint": "Partagez votre lien. Les amis qui achètent avec rejoignent votre groupe au classement."
 }

@@ -28,6 +28,8 @@ import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
 import VolunteerSection from '../_class/VolunteerSection'
 import EventVotingPanel from '../EventVotingPanel'
+import { SponsorPrizeTeaser, SponsorPrizesSection } from '../../../_components/SponsorPrizes'
+import { GroupChallengeBoard } from '../../../_components/GroupChallengeBoard'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
@@ -72,6 +74,7 @@ interface ConcertDescriptionsProps {
   reviewsCount: number
   seriesId?: string
   seatingMap: SeatingMap
+  referralCode?: string | null
 }
 
 const typeMap = {
@@ -87,6 +90,7 @@ const ConcertDescriptions = async ({
   reviewsCount,
   seriesId,
   seatingMap,
+  referralCode,
 }: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
 
@@ -291,7 +295,10 @@ const ConcertDescriptions = async ({
               </div>
 
               {/* Go to check out section button */}
-              <ScrollToCheckoutButton text={t('goToCheckout')} />
+              <div className="flex flex-col gap-3">
+                <ScrollToCheckoutButton text={t('goToCheckout')} />
+                <SponsorPrizeTeaser eventId={event.id} />
+              </div>
 
               {/* Already paid */}
               {existingPayment && existingPayment.length > 0 && (
@@ -302,6 +309,9 @@ const ConcertDescriptions = async ({
             </div>
           </div>
         </div>
+
+        <SponsorPrizesSection eventId={event.id} locale={locale} />
+        <GroupChallengeBoard eventId={event.id} locale={locale} />
 
         {/* Payment Options */}
         <div id="checkout-section" className="w-full">
@@ -317,6 +327,7 @@ const ConcertDescriptions = async ({
             tickets={event.tickets}
             isCapacityExceeded={isCapacityExceeded}
             discounts={event.eventDiscounts}
+            referralCode={referralCode}
           />
         </div>
 

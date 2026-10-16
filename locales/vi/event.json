@@ -249,5 +249,17 @@
   "post-payment-form-error-already_submitted": "Đã gửi mẫu rồi",
   "post-payment-form-error-empty_form": "Vui lòng điền mẫu trước khi gửi",
   "post-payment-form-error-invalid_payment": "Tham chiếu thanh toán không hợp lệ",
-  "post-payment-form-error-server_error": "Đã xảy ra lỗi. Vui lòng thử lại sau."
+  "post-payment-form-error-server_error": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+  "prizes-section-title": "Amazing Prizes or perks Await!",
+  "prizes-cta": "Get Your Ticket",
+  "leaderboard-rewards": "Phần thưởng",
+  "leaderboard-members": "Nhóm",
+  "leaderboard-tickets": "{{count}} vé",
+  "leaderboard-empty": "Hãy là nhóm đầu tiên. Mua vé và mời bạn bè để lên bảng xếp hạng.",
+  "referral-checkout-banner": "Bạn đang dùng mã mời:",
+  "invite-friends": "Invite Your Friends",
+  "invite-copy": "Sao chép liên kết",
+  "invite-copied": "Đã sao chép",
+  "invite-code-label": "Mã giới thiệu của bạn",
+  "invite-hint": "Chia sẻ liên kết này. Bạn bè mua vé bằng liên kết sẽ vào nhóm của bạn trên bảng xếp hạng."
 }

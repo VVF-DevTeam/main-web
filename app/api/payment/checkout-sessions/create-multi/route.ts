@@ -10,6 +10,7 @@ import {
   roundMoney,
 } from '@/lib/actions/price/quantityRangeDiscount'
 import { buildAppliedDiscountsMulti } from '@/lib/actions/payment/checkoutDiscountApplied'
+import { normalizeReferralCode } from '@/lib/actions/referral/referralCode'
 
 // ##################### FLOW OF PRICES ######################
 // Discount price creation (event_discount)
@@ -99,6 +100,7 @@ export async function POST(req: Request) {
       formResponses, // Event form responses
       pricingIsSubscribed,
       pricingHasStudentDiscount,
+      referralCode,
     }: {
       eventKeyName: string
       userId?: string
@@ -114,7 +116,10 @@ export async function POST(req: Request) {
       /** Matches client member pricing (additive with student in getFinalTicketPrice). */
       pricingIsSubscribed?: boolean
       pricingHasStudentDiscount?: boolean
+      referralCode?: string
     } = await req.json()
+
+    const normalizedReferralCode = normalizeReferralCode(referralCode)
 
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
       return NextResponse.json(
@@ -917,6 +922,7 @@ export async function POST(req: Request) {
         // Event form responses
         formResponses: formResponses || undefined,
         discountApplied: discountApplied.length > 0 ? discountApplied : undefined,
+        referralCode: normalizedReferralCode || undefined,
       },
     })
 
@@ -930,8 +936,8 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership/payment/success`
           : type === 'Concert'
-            ? `${origin}/events/concert/${eventKeyName}/payment/success`
-            : `${origin}/events/class/${eventKeyName}/payment/success`,
+            ? `${origin}/events/concert/${eventKeyName}/payment/success?session_id={CHECKOUT_SESSION_ID}`
+            : `${origin}/events/class/${eventKeyName}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:
         type === 'Membership'
           ? `${origin}/registration/membership`

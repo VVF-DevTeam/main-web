@@ -42,6 +42,7 @@ interface PaymentOptionsProps {
   tickets?: EventTicket[]
   isCapacityExceeded?: boolean
   discounts: JsonValue
+  referralCode?: string | null
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -58,6 +59,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   tickets = [],
   isCapacityExceeded = false,
   discounts,
+  referralCode,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -595,6 +597,12 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
             {/* Cart summary */}
             {selected === 'checkout' && !formLink && (
+              <>
+              {referralCode && (
+                <p className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-900">
+                  {t('referral-checkout-banner')} <strong>{referralCode}</strong>
+                </p>
+              )}
               <EventCartCheckout
                 eventKeyName={eventKeyName}
                 userId={userId}
@@ -610,7 +618,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                 selectedTickets={selectedTickets}
                 discounts={discounts}
                 userInfo={userInfo}
+                referralCode={referralCode}
               />
+              </>
             )}
 
             {/* {selected === 'etransfer' && (

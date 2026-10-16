@@ -246,5 +246,17 @@
   "post-payment-form-error-already_submitted": "Form already submitted",
   "post-payment-form-error-empty_form": "Please fill out the form before submitting",
   "post-payment-form-error-invalid_payment": "Invalid payment reference",
-  "post-payment-form-error-server_error": "Something went wrong. Please try again later."
+  "post-payment-form-error-server_error": "Something went wrong. Please try again later.",
+  "prizes-section-title": "Amazing Prizes or perks Await!",
+  "prizes-cta": "Get Your Ticket",
+  "leaderboard-rewards": "Rewards",
+  "leaderboard-members": "Group",
+  "leaderboard-tickets": "{{count}} tickets",
+  "leaderboard-empty": "Be the first group on the board. Buy a ticket and invite your friends.",
+  "referral-checkout-banner": "You are using an invite code:",
+  "invite-friends": "Invite Your Friends",
+  "invite-copy": "Copy invite link",
+  "invite-copied": "Link copied",
+  "invite-code-label": "Your referral code",
+  "invite-hint": "Share your link. Friends who buy with it join your group on the leaderboard."
 }

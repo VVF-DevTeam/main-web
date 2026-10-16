@@ -6,6 +6,7 @@ import {
   buildAppliedDiscountsSingle,
   type TicketDiscountFields,
 } from '@/lib/actions/payment/checkoutDiscountApplied'
+import { normalizeReferralCode } from '@/lib/actions/referral/referralCode'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -33,7 +34,10 @@ export async function POST(req: Request) {
       formResponses,
       pricingIsSubscribed,
       pricingHasStudentDiscount,
+      referralCode,
     } = await req.json()
+
+    const normalizedReferralCode = normalizeReferralCode(referralCode)
 
     let priceIdToUse = stripePriceId
     const useStudentPricing =
@@ -152,7 +156,8 @@ export async function POST(req: Request) {
       guestPhone ||
       (Array.isArray(otherGuestsInfo) && otherGuestsInfo.length > 0) ||
       formResponses ||
-      discountApplied.length > 0
+      discountApplied.length > 0 ||
+      normalizedReferralCode
     ) {
       const checkoutData = await prisma.checkoutSessionData.create({
         data: {
@@ -172,6 +177,7 @@ export async function POST(req: Request) {
           }],
           formResponses: formResponses || undefined,
           discountApplied: discountApplied.length > 0 ? discountApplied : undefined,
+          referralCode: normalizedReferralCode || undefined,
           status: 'PENDING',
         },
       })
@@ -187,8 +193,8 @@ export async function POST(req: Request) {
         type === 'Membership'
           ? `${origin}/registration/membership/payment/success`
           : type === 'Concert'
-            ? `${origin}/events/concert/${eventKeyName}/payment/success`
-            : `${origin}/events/class/${eventKeyName}/payment/success`,
+            ? `${origin}/events/concert/${eventKeyName}/payment/success?session_id={CHECKOUT_SESSION_ID}`
+            : `${origin}/events/class/${eventKeyName}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:
         type === 'Membership'
           ? `${origin}/registration/membership`
