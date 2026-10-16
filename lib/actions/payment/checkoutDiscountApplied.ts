@@ -8,6 +8,7 @@ export type CheckoutAppliedDiscountRecord = {
   kind:
     | 'membership'
     | 'student'
+    | 'quantity_range'
     | 'event_percent'
     | 'event_amount'
     | 'discount_code'
@@ -26,6 +27,8 @@ export type CheckoutAppliedDiscountRecord = {
   discountUnit?: 'percentage' | 'amount'
   /** Configured value for code rules (percent or currency amount depending on discountUnit) */
   configuredValue?: number
+  /** Tickets of this type used to choose a quantity-range percent. */
+  quantity?: number
   cannotBeStacked?: boolean
   /**
    * List unit price in dollars before membership/student % off

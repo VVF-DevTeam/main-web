@@ -31,9 +31,17 @@ import {
 import { axiosInstance } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import Loader from '@/components/loader/Loader'
+import {
+  formatDiscountPercent,
+  quantityRangeSchedule,
+} from '@/lib/actions/price/quantityRangeDiscount'
 
 // Discount type definition
-type DiscountType = 'Bulk Discount' | 'Minimum Total Discount' | 'Code Discount'
+type DiscountType =
+  | 'Bulk Discount'
+  | 'Minimum Total Discount'
+  | 'Code Discount'
+  | 'Quantity Range Discount'
 
 // Discount data structure
 interface EventDiscount {
@@ -41,7 +49,10 @@ interface EventDiscount {
   type: DiscountType
   discountAmount: number
   discountUnit: 'percentage' | 'amount'
-  minQuantity?: number // Only for Bulk Discount
+  minQuantity?: number // Bulk Discount, or the low end of a Quantity Range Discount
+  maxQuantity?: number // High end of a Quantity Range Discount
+  minDiscountPercent?: number
+  maxDiscountPercent?: number
   minTotal?: number // Only for Minimum Total Discount
   code?: string // Only for Code Discount
   maxUses?: number // Only for Code Discount. Omit for unlimited uses.
@@ -55,10 +66,28 @@ interface EventDiscountsProps {
 // Schema for discount form
 const eventDiscountSchema = z
   .object({
-    type: z.enum(['Bulk Discount', 'Minimum Total Discount', 'Code Discount']),
+    type: z.enum([
+      'Bulk Discount',
+      'Minimum Total Discount',
+      'Code Discount',
+      'Quantity Range Discount',
+    ]),
     discountAmount: z.coerce.number().min(0, 'Discount amount must be at least 0'),
     discountUnit: z.enum(['percentage', 'amount']),
     minQuantity: z.coerce.number().min(1, 'Minimum quantity must be at least 1').optional().nullable(),
+    maxQuantity: z.coerce.number().min(2, 'Maximum tickets must be at least 2').optional().nullable(),
+    minDiscountPercent: z.coerce
+      .number()
+      .min(0, 'Discount must be at least 0')
+      .max(100, 'Discount cannot exceed 100')
+      .optional()
+      .nullable(),
+    maxDiscountPercent: z.coerce
+      .number()
+      .min(0, 'Discount must be at least 0')
+      .max(100, 'Discount cannot exceed 100')
+      .optional()
+      .nullable(),
     minTotal: z.coerce.number().min(0, 'Minimum total must be at least 0').optional().nullable(),
     code: z.string().min(1, 'Code is required').optional().nullable(),
     maxUses: z
@@ -114,7 +143,10 @@ const eventDiscountSchema = z
   .refine(
     (data) => {
       // If unit is "percentage", amount must be at most 100
-      if (data.discountUnit === 'percentage') {
+      if (
+        data.type !== 'Quantity Range Discount' &&
+        data.discountUnit === 'percentage'
+      ) {
         return data.discountAmount <= 100
       }
       return true
@@ -122,6 +154,25 @@ const eventDiscountSchema = z
     {
       message: 'Percentage must be at most 100',
       path: ['discountAmount'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.type !== 'Quantity Range Discount') return true
+      return (
+        data.minQuantity != null &&
+        data.minQuantity >= 2 &&
+        data.maxQuantity != null &&
+        data.maxQuantity > data.minQuantity &&
+        data.minDiscountPercent != null &&
+        data.maxDiscountPercent != null &&
+        data.maxDiscountPercent > data.minDiscountPercent
+      )
+    },
+    {
+      message:
+        'Set a higher ticket count and a higher percent than the starting tier',
+      path: ['maxQuantity'],
     }
   )
 
@@ -147,6 +198,9 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
       discountAmount: 0,
       discountUnit: 'percentage',
       minQuantity: null,
+      maxQuantity: null,
+      minDiscountPercent: null,
+      maxDiscountPercent: null,
       minTotal: null,
       code: null,
       maxUses: null,
@@ -156,6 +210,20 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
 
   const discountType = discountForm.watch('type')
   const discountUnit = discountForm.watch('discountUnit')
+  const minQuantity = discountForm.watch('minQuantity')
+  const maxQuantity = discountForm.watch('maxQuantity')
+  const minDiscountPercent = discountForm.watch('minDiscountPercent')
+  const maxDiscountPercent = discountForm.watch('maxDiscountPercent')
+  const rangePreview =
+    discountType === 'Quantity Range Discount'
+      ? quantityRangeSchedule({
+          type: discountType,
+          minQuantity,
+          maxQuantity,
+          minDiscountPercent,
+          maxDiscountPercent,
+        })
+      : []
 
   const resetDiscountForm = () => {
     discountForm.reset({
@@ -163,6 +231,9 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
       discountAmount: 0,
       discountUnit: 'percentage',
       minQuantity: null,
+      maxQuantity: null,
+      minDiscountPercent: null,
+      maxDiscountPercent: null,
       minTotal: null,
       code: null,
       maxUses: null,
@@ -187,6 +258,11 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
       discountAmount: discountAmount,
       discountUnit: discountUnit,
       minQuantity: discount.minQuantity ?? null,
+      maxQuantity: discount.maxQuantity ?? null,
+      minDiscountPercent:
+        discount.minDiscountPercent ??
+        (discount.type === 'Quantity Range Discount' ? discountAmount : null),
+      maxDiscountPercent: discount.maxDiscountPercent ?? null,
       minTotal: discount.minTotal ?? null,
       code: discount.code ?? null,
       maxUses: discount.maxUses ?? null,
@@ -202,12 +278,25 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
       setIsLoading(true)
 
       // Create discount object
+      const isQuantityRange = values.type === 'Quantity Range Discount'
       const discountData: EventDiscount = {
         id: editingDiscountId || `${event.keyName}--${values.type.toLowerCase().replace(' ', '-')}--${values.discountAmount}--${Date.now()}`,
         type: values.type,
-        discountAmount: values.discountAmount,
-        discountUnit: values.discountUnit,
-        minQuantity: values.type === 'Bulk Discount' ? values.minQuantity ?? undefined : undefined,
+        discountAmount: isQuantityRange
+          ? (values.minDiscountPercent ?? 0)
+          : values.discountAmount,
+        discountUnit: isQuantityRange ? 'percentage' : values.discountUnit,
+        minQuantity:
+          values.type === 'Bulk Discount' || isQuantityRange
+            ? values.minQuantity ?? undefined
+            : undefined,
+        maxQuantity: isQuantityRange ? values.maxQuantity ?? undefined : undefined,
+        minDiscountPercent: isQuantityRange
+          ? values.minDiscountPercent ?? undefined
+          : undefined,
+        maxDiscountPercent: isQuantityRange
+          ? values.maxDiscountPercent ?? undefined
+          : undefined,
         minTotal: values.type === 'Minimum Total Discount' ? values.minTotal ?? undefined : undefined,
         code: values.type === 'Code Discount' ? values.code ?? undefined : undefined,
         maxUses:
@@ -216,7 +305,7 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
           values.maxUses !== undefined
             ? values.maxUses
             : undefined,
-        cannotBeStacked: values.cannotBeStacked ?? false,
+        cannotBeStacked: isQuantityRange ? false : (values.cannotBeStacked ?? false),
       }
 
       // Update discounts array
@@ -440,6 +529,19 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                           (Minimum {discount.minQuantity} items)
                         </span>
                       )}
+                      {discount.type === 'Quantity Range Discount' &&
+                        discount.minQuantity &&
+                        discount.maxQuantity && (
+                          <span className="text-sm font-normal text-muted-foreground">
+                            {' '}
+                            ({discount.minQuantity} tickets{' '}
+                            {formatDiscountPercent(
+                              discount.minDiscountPercent ?? discount.discountAmount
+                            )}
+                            % → {discount.maxQuantity} tickets{' '}
+                            {formatDiscountPercent(discount.maxDiscountPercent ?? 0)}%)
+                          </span>
+                        )}
                       {discount.type === 'Minimum Total Discount' && discount.minTotal !== undefined && (
                         <span className="text-sm font-normal text-muted-foreground">
                           {' '}
@@ -531,6 +633,9 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="Bulk Discount">Bulk Discount</SelectItem>
+                              <SelectItem value="Quantity Range Discount">
+                                Quantity Range Discount
+                              </SelectItem>
                               <SelectItem value="Minimum Total Discount">Minimum Total Discount</SelectItem>
                               <SelectItem value="Code Discount">Code Discount</SelectItem>
                             </SelectContent>
@@ -541,6 +646,7 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                     />
 
                     {/* Discount Unit */}
+                    {discountType !== 'Quantity Range Discount' && (
                     <FormField
                       control={discountForm.control}
                       name="discountUnit"
@@ -565,8 +671,10 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                         </FormItem>
                       )}
                     />
+                    )}
 
                     {/* Discount Amount */}
+                    {discountType !== 'Quantity Range Discount' && (
                     <FormField
                       control={discountForm.control}
                       name="discountAmount"
@@ -587,6 +695,7 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                         </FormItem>
                       )}
                     />
+                    )}
 
                     {/* Min Quantity - Only shown for Bulk Discount */}
                     {discountType === 'Bulk Discount' && (
@@ -614,6 +723,109 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                           </FormItem>
                         )}
                       />
+                    )}
+
+                    {discountType === 'Quantity Range Discount' && (
+                      <>
+                        <FormField
+                          control={discountForm.control}
+                          name="minQuantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Fewest tickets for a discount</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="1"
+                                  min="2"
+                                  placeholder="eg: 2"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    field.onChange(value === '' ? null : Number(value))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={discountForm.control}
+                          name="minDiscountPercent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Discount at that quantity (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  max="100"
+                                  placeholder="eg: 5"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    field.onChange(value === '' ? null : Number(value))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={discountForm.control}
+                          name="maxQuantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Most tickets in the range</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="1"
+                                  min="3"
+                                  placeholder="eg: 10"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    field.onChange(value === '' ? null : Number(value))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={discountForm.control}
+                          name="maxDiscountPercent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Discount at that quantity (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  max="100"
+                                  placeholder="eg: 20"
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    field.onChange(value === '' ? null : Number(value))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
                     )}
 
                     {/* Min Total - Only shown for Minimum Total Discount */}
@@ -701,7 +913,48 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                     )}
                   </div>
 
+                  {discountType === 'Quantity Range Discount' && (
+                    <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+                      <p>
+                        The discount rises evenly from the smaller group to the
+                        larger one. One ticket stays full price. Past the
+                        largest group, the highest discount stays. It applies
+                        separately to each ticket type.
+                      </p>
+                      {rangePreview.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {(rangePreview.length > 16
+                            ? [
+                                ...rangePreview.slice(0, 8),
+                                null,
+                                ...rangePreview.slice(-4),
+                              ]
+                            : rangePreview
+                          ).map((step, index) =>
+                            step ? (
+                              <span
+                                key={step.quantity}
+                                className="rounded bg-white px-2 py-1 text-xs text-slate-700"
+                              >
+                                {step.quantity} tickets:{' '}
+                                {formatDiscountPercent(step.percent)}%
+                              </span>
+                            ) : (
+                              <span
+                                key={`gap-${index}`}
+                                className="px-1 py-1 text-xs text-slate-400"
+                              >
+                                …
+                              </span>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Cannot Be Stacked Checkbox */}
+                  {discountType !== 'Quantity Range Discount' && (
                   <FormField
                     control={discountForm.control}
                     name="cannotBeStacked"
@@ -719,6 +972,7 @@ const EventDiscounts = ({ event }: EventDiscountsProps) => {
                       </FormItem>
                     )}
                   />
+                  )}
 
                   <div className="flex gap-x-2">
                     <Button

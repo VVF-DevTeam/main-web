@@ -17,6 +17,13 @@ import {
   getTicketUnitPrice,
   STUDENT_DISCOUNT_PERCENT,
 } from '@/lib/actions/price/getPrices'
+import {
+  formatDiscountPercent,
+  isQuantityRangeDiscount,
+  priceLineAfterQuantityRange,
+  QuantityRangeRule,
+} from '@/lib/actions/price/quantityRangeDiscount'
+import { JsonValue } from '@prisma/client/runtime/library'
 
 export interface SelectedTicketWithQuantity {
   ticket: EventTicket
@@ -38,6 +45,7 @@ interface EventSingleCheckOutProps {
   selectedTickets?: SelectedTicketWithQuantity[]
   setSelectedTickets?: (selectedTickets: SelectedTicketWithQuantity[]) => void // Callback to pass selected tickets to parent
   userInfo?: UserInfoProps | null
+  discounts?: JsonValue
 }
 
 const resolvePaymentType = (
@@ -75,6 +83,7 @@ export default function EventSingleCheckOut({
   selectedTickets,
   setSelectedTickets,
   userInfo,
+  discounts = [],
 }: EventSingleCheckOutProps) {
   // @ts-ignore: useTranslation will always throw an error for typescript
   const { t } = useTranslation('event')
@@ -243,6 +252,13 @@ export default function EventSingleCheckOut({
     [selectedTickets]
   )
 
+  const quantityRangeRules = useMemo(() => {
+    if (!Array.isArray(discounts)) return []
+    return (discounts as QuantityRangeRule[])
+      .filter(isQuantityRangeDiscount)
+      .sort((a, b) => (a.minQuantity ?? 0) - (b.minQuantity ?? 0))
+  }, [discounts])
+
   const hasTickets = checkoutTickets.length > 0
   const eduEmailExpiredDate = session?.user?.eduEmailExpiredDate
     ? new Date(session.user.eduEmailExpiredDate)
@@ -362,8 +378,22 @@ export default function EventSingleCheckOut({
                 isSubscribed,
                 hasActiveStudentDiscount,
               })
+              const selectedQuantity = getQuantity(ticket.id)
+              const rangedPrice = priceLineAfterQuantityRange(
+                quantityRangeRules,
+                selectedQuantity,
+                discountedPrice
+              )
+              const showRangePrice =
+                selectedQuantity > 0 && rangedPrice.percent > 0
+              const displayUnitPrice = showRangePrice
+                ? rangedPrice.unitPrice
+                : discountedPrice
               const hasAnyDiscount =
-                (isSubscribed && hasMemberDiscount) || hasActiveStudentDiscount
+                (isSubscribed && hasMemberDiscount) ||
+                hasActiveStudentDiscount ||
+                showRangePrice
+              const nextRange = quantityRangeRules[0]
 
               // Check if ticket has expired (date only, ignoring time)
               const currentDate = new Date()
@@ -412,8 +442,17 @@ export default function EventSingleCheckOut({
                           </span>
                         )}
                         <span className={`text-lg font-bold drop-shadow-sm ${hasAnyDiscount ? 'text-green-600' : 'text-gray-900'}`}>
-                          ${discountedPrice.toFixed(2)}
+                          ${displayUnitPrice.toFixed(2)}
                         </span>
+                        {showRangePrice && (
+                          <span className="text-xs font-medium text-green-700 drop-shadow-sm">
+                            {t('quantity-range-current', {
+                              count: selectedQuantity,
+                              percent: formatDiscountPercent(rangedPrice.percent),
+                              price: rangedPrice.unitPrice.toFixed(2),
+                            })}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -463,6 +502,43 @@ export default function EventSingleCheckOut({
                         </span>
                       )}
                     </div>
+
+                    {nextRange && !seatNumber && (
+                      <span className="text-xs text-green-700 drop-shadow-sm">
+                        {selectedQuantity > 0 && rangedPrice.percent <= 0
+                          ? t('quantity-range-add-more', {
+                              count: Math.max(
+                                1,
+                                (nextRange.minQuantity ?? 2) - selectedQuantity
+                              ),
+                              percent: formatDiscountPercent(
+                                nextRange.minDiscountPercent ??
+                                  nextRange.discountAmount ??
+                                  0
+                              ),
+                            })
+                          : t('quantity-range-scale', {
+                              minQty: nextRange.minQuantity,
+                              minPercent: formatDiscountPercent(
+                                nextRange.minDiscountPercent ??
+                                  nextRange.discountAmount ??
+                                  0
+                              ),
+                              maxQty: nextRange.maxQuantity,
+                              maxPercent: formatDiscountPercent(
+                                nextRange.maxDiscountPercent ?? 0
+                              ),
+                            })}
+                        {selectedQuantity > 1 && showRangePrice && (
+                          <>
+                            {' '}
+                            · {t('quantity-range-line', {
+                              total: rangedPrice.lineTotal.toFixed(2),
+                            })}
+                          </>
+                        )}
+                      </span>
+                    )}
 
                     {ticket.limit && (
                       <span className="text-xs text-gray-500 drop-shadow-sm">

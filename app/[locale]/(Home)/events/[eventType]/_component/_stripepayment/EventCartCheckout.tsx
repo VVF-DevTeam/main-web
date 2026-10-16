@@ -28,6 +28,12 @@ import {
   getTicketUnitPrice,
   STUDENT_DISCOUNT_PERCENT,
 } from '@/lib/actions/price/getPrices'
+import {
+  formatDiscountPercent,
+  isQuantityRangeDiscount,
+  priceLineAfterQuantityRange,
+  roundMoney,
+} from '@/lib/actions/price/quantityRangeDiscount'
 
 interface SelectedSeatWithTicket {
   seat: {
@@ -64,6 +70,9 @@ interface EventDiscountJson {
   discountAmount?: number
   discountUnit?: 'percentage' | 'amount'
   minQuantity?: number | null
+  maxQuantity?: number | null
+  minDiscountPercent?: number | null
+  maxDiscountPercent?: number | null
   minTotal?: number | null
   code?: string | null
   cannotBeStacked?: boolean | null
@@ -330,8 +339,56 @@ export default function EventCartCheckout({
       })
     }
 
+    const seatCountByTicketId = new Map<string, number>()
+    selectedSeatsWithTickets.forEach((item) => {
+      seatCountByTicketId.set(
+        item.ticket.id,
+        (seatCountByTicketId.get(item.ticket.id) ?? 0) + 1
+      )
+    })
+
+    const seatUnitAfterRange = (item: SelectedSeatWithTicket) => {
+      const identityUnit = getFinalTicketPrice(item.ticket, {
+        isSubscribed,
+        hasActiveStudentDiscount,
+      })
+      return priceLineAfterQuantityRange(
+        discountList,
+        seatCountByTicketId.get(item.ticket.id) ?? 1,
+        identityUnit
+      )
+    }
+
+    const ticketUnitAfterRange = (item: SelectedTicketWithQuantity) => {
+      const identityUnit = getFinalTicketPrice(item.ticket, {
+        isSubscribed,
+        hasActiveStudentDiscount,
+        quantity: 1,
+      })
+      return priceLineAfterQuantityRange(discountList, item.quantity, identityUnit)
+    }
+
+    const rangeApplies =
+      selectedSeatsWithTickets.some((item) => seatUnitAfterRange(item).percent > 0) ||
+      selectedTickets.some((item) => ticketUnitAfterRange(item).percent > 0)
+
+    let totalAfterRange = totalAfterStudent
+    if (rangeApplies) {
+      totalAfterRange = 0
+      selectedSeatsWithTickets.forEach((item) => {
+        totalAfterRange += seatUnitAfterRange(item).unitPrice
+      })
+      selectedTickets.forEach((item) => {
+        totalAfterRange += ticketUnitAfterRange(item).lineTotal
+      })
+      totalAfterRange = roundMoney(totalAfterRange)
+    }
+    const quantityRangeDiscountAmount = rangeApplies
+      ? roundMoney(Math.max(0, totalAfterStudent - totalAfterRange))
+      : 0
+
     // Apply event discounts with stacking rules
-    let totalAfterBulk = totalAfterStudent
+    let totalAfterBulk = totalAfterRange
     let bulkDiscountAmount = 0
     let effectivePercent = 0
     let effectiveAmount = 0
@@ -703,8 +760,8 @@ export default function EventCartCheckout({
         currency: string
       }> = []
 
-      // First apply percentage-based discounts (if any)
-      let totalAfterPercentDiscounts = totalAfterStudent
+      // First apply percentage-based discounts (if any) on the quantity-range price
+      let totalAfterPercentDiscounts = totalAfterRange
 
       if (effectivePercent > 0) {
         let sumOfRoundedPrices = 0
@@ -717,8 +774,8 @@ export default function EventCartCheckout({
         >()
 
         selectedSeatsWithTickets.forEach((item) => {
-          const originalPrice = item.price
-          const discountedPrice = item.price * (1 - effectivePercent / 100)
+          const originalPrice = seatUnitAfterRange(item).unitPrice
+          const discountedPrice = originalPrice * (1 - effectivePercent / 100)
           const roundedPrice = Math.round(discountedPrice * 100) / 100
           const discountAmount = originalPrice - roundedPrice
           sumOfRoundedPrices += roundedPrice
@@ -753,10 +810,7 @@ export default function EventCartCheckout({
 
         // Apply discount to each ticket unit individually and round
         selectedTickets.forEach((item) => {
-          const memberDiscountedPrice = getFinalTicketPrice(item.ticket, {
-            isSubscribed,
-            hasActiveStudentDiscount,
-          })
+          const memberDiscountedPrice = ticketUnitAfterRange(item).unitPrice
 
           // Calculate discount for this ticket type
           const originalTotalPrice = memberDiscountedPrice * item.quantity
@@ -794,7 +848,7 @@ export default function EventCartCheckout({
       )
 
       totalAfterBulk = totalAfterAllEventDiscounts
-      bulkDiscountAmount = totalAfterStudent - totalAfterBulk
+      bulkDiscountAmount = totalAfterRange - totalAfterBulk
 
       return {
         baseTotal,
@@ -803,6 +857,7 @@ export default function EventCartCheckout({
         totalAfterBulk,
         membershipDiscountAmount,
         studentDiscountAmount,
+        quantityRangeDiscountAmount,
         bulkDiscountAmount,
         finalTotal: totalAfterBulk,
         effectivePercent,
@@ -823,6 +878,7 @@ export default function EventCartCheckout({
       totalAfterBulk,
       membershipDiscountAmount,
       studentDiscountAmount,
+      quantityRangeDiscountAmount,
       bulkDiscountAmount,
       finalTotal: totalAfterBulk,
       effectivePercent,
@@ -1114,7 +1170,17 @@ export default function EventCartCheckout({
                 hasActiveStudentDiscount,
               })
               const hasAnyDiscount = hasMemberDiscount || hasActiveStudentDiscount
-              const displayPrice = hasAnyDiscount ? memberPrice : basePrice
+              const identityUnit = hasAnyDiscount ? memberPrice : basePrice
+              const seatsOfType = selectedSeatsWithTickets.filter(
+                (item) => item.ticket.id === seat.ticket.id
+              ).length
+              const rangedSeat = priceLineAfterQuantityRange(
+                discountList,
+                seatsOfType,
+                identityUnit
+              )
+              const showRangePrice = rangedSeat.percent > 0
+              const displayPrice = showRangePrice ? rangedSeat.unitPrice : identityUnit
               const currency = seat.ticket.currency || 'CAD'
               const totalPercentOff = hasAnyDiscount
                 ? Number(
@@ -1141,15 +1207,25 @@ export default function EventCartCheckout({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end gap-0.5">
-                      {hasAnyDiscount && (
+                      {(hasAnyDiscount || showRangePrice) && (
                         <>
                           <span className="text-xs text-gray-400 line-through">
                             {currency} ${basePrice.toFixed(2)}
                           </span>
-                          <span className="text-xs font-medium text-green-600">
-                            {totalPercentOff}% off
-                          </span>
+                          {hasAnyDiscount && (
+                            <span className="text-xs font-medium text-green-600">
+                              {totalPercentOff}% off
+                            </span>
+                          )}
                         </>
+                      )}
+                      {showRangePrice && (
+                        <span className="text-xs font-medium text-green-600">
+                          {t('quantity-range-each', {
+                            percent: formatDiscountPercent(rangedSeat.percent),
+                            price: rangedSeat.unitPrice.toFixed(2),
+                          })}
+                        </span>
                       )}
                       <span className="text-sm font-semibold text-gray-900">
                         {currency} ${displayPrice.toFixed(2)}
@@ -1187,7 +1263,18 @@ export default function EventCartCheckout({
                 quantity: item.quantity,
               })
               const hasAnyDiscount = hasMemberDiscount || hasActiveStudentDiscount
-              const displayPrice = hasAnyDiscount ? memberPrice : basePrice
+              const identityLine = hasAnyDiscount ? memberPrice : basePrice
+              const identityUnit =
+                item.quantity > 0 ? identityLine / item.quantity : identityLine
+              const rangedTicket = priceLineAfterQuantityRange(
+                discountList,
+                item.quantity,
+                identityUnit
+              )
+              const showRangePrice = rangedTicket.percent > 0
+              const displayPrice = showRangePrice
+                ? rangedTicket.lineTotal
+                : identityLine
               const currency = item.ticket.currency || 'CAD'
               const totalPercentOff = hasAnyDiscount
                 ? Number(
@@ -1211,15 +1298,25 @@ export default function EventCartCheckout({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end gap-0.5">
-                      {hasAnyDiscount && (
+                      {(hasAnyDiscount || showRangePrice) && (
                         <>
                           <span className="text-xs text-gray-400 line-through">
                             {currency} ${basePrice.toFixed(2)}
                           </span>
-                          <span className="text-xs font-medium text-green-600">
-                            {totalPercentOff}% off
-                          </span>
+                          {hasAnyDiscount && (
+                            <span className="text-xs font-medium text-green-600">
+                              {totalPercentOff}% off
+                            </span>
+                          )}
                         </>
+                      )}
+                      {showRangePrice && (
+                        <span className="text-xs font-medium text-green-600">
+                          {t('quantity-range-each', {
+                            percent: formatDiscountPercent(rangedTicket.percent),
+                            price: rangedTicket.unitPrice.toFixed(2),
+                          })}
+                        </span>
                       )}
                       <span className="text-sm font-semibold text-gray-900">
                         {currency} ${displayPrice.toFixed(2)}
@@ -1262,7 +1359,9 @@ export default function EventCartCheckout({
                   )}
                   {priceBreakdown.effectivePercent === 0 && priceBreakdown.effectiveAmount === 0 && (
                     <>
-                      {t('no-discounts-applied')}
+                      {priceBreakdown.quantityRangeDiscountAmount > 0
+                        ? t('quantity-range-applied-note')
+                        : t('no-discounts-applied')}
                     </>
                   )}
                   {appliedCodeDiscount?.cannotBeStacked
@@ -1297,6 +1396,30 @@ export default function EventCartCheckout({
                     <p className="text-xs text-gray-600">
                       No discounts available for this event.
                     </p>
+                  )}
+
+                  {discountList.some((d) => isQuantityRangeDiscount(d)) && (
+                    <div className="space-y-1 text-xs">
+                      <p className="font-semibold text-green-900">
+                        {t('quantity-range-title')}
+                      </p>
+                      {discountList
+                        .filter((d) => isQuantityRangeDiscount(d))
+                        .map((discount, index) => (
+                          <p key={discount.id || `range-${index}`} className="text-green-800">
+                            {t('quantity-range-scale', {
+                              minQty: discount.minQuantity,
+                              minPercent: formatDiscountPercent(
+                                discount.minDiscountPercent ?? discount.discountAmount ?? 0
+                              ),
+                              maxQty: discount.maxQuantity,
+                              maxPercent: formatDiscountPercent(
+                                discount.maxDiscountPercent ?? 0
+                              ),
+                            })}
+                          </p>
+                        ))}
+                    </div>
                   )}
 
                   {/* Bulk Discounts Group */}
@@ -1601,6 +1724,18 @@ export default function EventCartCheckout({
                 </span>
               </div>
 
+              {priceBreakdown.quantityRangeDiscountAmount > 0 && (
+                <div className="flex items-center justify-between text-green-600">
+                  <span>{t('checkout-quantity-discount')}</span>
+                  <span>
+                    -{selectedSeatsWithTickets[0]?.ticket.currency ||
+                      selectedTickets[0]?.ticket.currency ||
+                      'CAD'}{' '}
+                    ${priceBreakdown.quantityRangeDiscountAmount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
               {/* Event Discounts (Bulk / Min Total / Code combined) */}
               {priceBreakdown.bulkDiscountAmount > 0 && (
                 <div className="flex items-center justify-between text-green-600">
@@ -1640,14 +1775,14 @@ export default function EventCartCheckout({
                       if (priceBreakdown.effectivePercent > 0 && flatAmount > 0) {
                         return (
                           <span className="whitespace-nowrap">
-                            - (${priceBreakdown.totalAfterStudent.toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
+                            - (${(priceBreakdown.totalAfterStudent - priceBreakdown.quantityRangeDiscountAmount).toFixed(2)} × {priceBreakdown.effectivePercent}% + ${flatAmount.toFixed(2)})
                           </span>
                         )
                       }
                       if (priceBreakdown.effectivePercent > 0) {
                         return (
                           <span className="whitespace-nowrap">
-                            - ${priceBreakdown.totalAfterStudent.toFixed(2)} × {priceBreakdown.effectivePercent}%
+                            - ${(priceBreakdown.totalAfterStudent - priceBreakdown.quantityRangeDiscountAmount).toFixed(2)} × {priceBreakdown.effectivePercent}%
                           </span>
                         )
                       }
