@@ -49,11 +49,13 @@ export async function GroupChallengeBoard({
         <ol className="list-decimal space-y-1 pl-5 text-sm text-neutral-700">
           <li>{t('referral-step-eligible')}</li>
           <li>{t('referral-step-code')}</li>
-          <li>
-            {t('referral-step-share', {
-              percent: challenge.referralDiscountPercent || 0,
-            })}
-          </li>
+          {challenge.referralDiscountPercent > 0 && (
+            <li>
+              {t('referral-step-share', {
+                percent: challenge.referralDiscountPercent,
+              })}
+            </li>
+          )}
           <li>
             {challenge.countOwnTickets
               ? t('referral-step-count-with-own')
