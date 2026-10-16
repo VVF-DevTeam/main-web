@@ -490,6 +490,14 @@ model EventGroupChallenge {
   description String?
   /// [{ place, title, description, imageUrl }]
   rewards     Json?
+  /// Referrals after this instant do not count. Interpreted in Pacific time in the editor.
+  endsAt      DateTime?
+  /// Percent off for a friend who checks out with a personal code. 0 means no discount.
+  referralDiscountPercent Int @default(0)
+  /// When true, the referrer's own tickets are added to the public score.
+  countOwnTickets Boolean @default(false)
+  /// Confirmed performers who can claim a code without buying a ticket.
+  performerEmails String[] @default([])
 
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }

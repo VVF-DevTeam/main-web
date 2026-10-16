@@ -7,6 +7,10 @@ import {
   type TicketDiscountFields,
 } from '@/lib/actions/payment/checkoutDiscountApplied'
 import { normalizeReferralCode } from '@/lib/actions/referral/referralCode'
+import {
+  getActiveReferralDiscount,
+  priceWithReferralDiscount,
+} from '@/lib/actions/referral/referralOffer'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -139,6 +143,28 @@ export async function POST(req: Request) {
       useStudentPricing,
       type,
     })
+
+    const referralDiscount =
+      type === 'Membership' || !eventId
+        ? null
+        : await getActiveReferralDiscount({
+            eventId,
+            code: normalizedReferralCode,
+            buyerEmail: email,
+          })
+    if (referralDiscount) {
+      priceIdToUse = await priceWithReferralDiscount(
+        stripe,
+        priceIdToUse,
+        referralDiscount.percent,
+        new Map()
+      )
+      discountApplied.push({
+        kind: 'referral',
+        code: referralDiscount.code,
+        percentOff: referralDiscount.percent,
+      })
+    }
 
     // Create single line item for one ticket
     const lineItems = [

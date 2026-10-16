@@ -5,6 +5,7 @@ import {
   normalizeBuyerEmail,
   normalizeReferralCode,
 } from '@/lib/actions/referral/referralCode'
+import { isBeforeDeadline } from '@/lib/actions/referral/pacificTime'
 
 export type ReferralShare = {
   code: string
@@ -103,7 +104,12 @@ export async function settleCheckoutReferrals(input: {
   if (!buyerEmail) return shares
 
   const incomingCode = normalizeReferralCode(input.referralCode)
-  if (incomingCode) {
+  const challenge = await prisma.eventGroupChallenge.findUnique({
+    where: { eventId: input.eventId },
+    select: { endsAt: true },
+  })
+  const challengeOpen = isBeforeDeadline(challenge?.endsAt)
+  if (incomingCode && challengeOpen) {
     const referrer = await prisma.ticketReferral.findFirst({
       where: { code: incomingCode, eventId: input.eventId },
     })

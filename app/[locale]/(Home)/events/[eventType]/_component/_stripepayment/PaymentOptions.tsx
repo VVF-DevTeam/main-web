@@ -43,6 +43,7 @@ interface PaymentOptionsProps {
   isCapacityExceeded?: boolean
   discounts: JsonValue
   referralCode?: string | null
+  referralDiscountPercent?: number
 }
 
 type OptionType = 'checkout' | 'quick' | 'etransfer'
@@ -60,6 +61,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   isCapacityExceeded = false,
   discounts,
   referralCode,
+  referralDiscountPercent = 0,
 }) => {
   // @ts-ignore: useTranslation will always throw an error for TypeScript
   const { t } = useTranslation('event')
@@ -601,6 +603,14 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
               {referralCode && (
                 <p className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-900">
                   {t('referral-checkout-banner')} <strong>{referralCode}</strong>
+                  {referralDiscountPercent > 0 && (
+                    <>
+                      {' '}
+                      {t('referral-discount-banner', {
+                        percent: referralDiscountPercent,
+                      })}
+                    </>
+                  )}
                 </p>
               )}
               <EventCartCheckout

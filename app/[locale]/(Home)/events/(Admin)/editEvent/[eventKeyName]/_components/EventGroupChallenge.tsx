@@ -38,6 +38,10 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
     emptyReward(2),
     emptyReward(3),
   ])
+  const [endsAt, setEndsAt] = useState('')
+  const [referralDiscountPercent, setReferralDiscountPercent] = useState(0)
+  const [countOwnTickets, setCountOwnTickets] = useState(false)
+  const [performerEmails, setPerformerEmails] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -49,6 +53,10 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
           setTitle(challenge.title)
           setDescription(challenge.description)
           if (challenge.rewards.length > 0) setRewards(challenge.rewards)
+          setEndsAt(challenge.endsAt)
+          setReferralDiscountPercent(challenge.referralDiscountPercent)
+          setCountOwnTickets(challenge.countOwnTickets)
+          setPerformerEmails(challenge.performerEmails)
         }
       } catch (error) {
         console.error(error)
@@ -87,6 +95,10 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
         title,
         description,
         rewards,
+        endsAt,
+        referralDiscountPercent,
+        countOwnTickets,
+        performerEmails,
       })
       if (!result.ok) {
         toast.error(result.error)
@@ -106,9 +118,10 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted-foreground">
-        Buyers get a personal invite code. Friends who buy with that code join
-        the buyer&apos;s group. The public board shows masked names and the
-        rewards you set here.
+        Ticket holders, VVF members, volunteers, and the performer emails below
+        can claim a code on the event page. Friends who buy with that code
+        before the end time get the discount, and those tickets decide the winner.
+        Names on the public board stay partly hidden.
       </p>
       <div className="flex items-center gap-2">
         <Switch checked={isEnabled} onCheckedChange={setIsEnabled} />
@@ -123,7 +136,43 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
         <Textarea
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Invite friends. The group with the most tickets wins."
+          placeholder="Bowling night for 4, sponsored by Grandview Lanes."
+          rows={6}
+        />
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="space-y-1">
+          <Label>End time (Pacific)</Label>
+          <Input
+            type="datetime-local"
+            value={endsAt}
+            onChange={(event) => setEndsAt(event.target.value)}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label>Friend discount (%)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            value={referralDiscountPercent}
+            onChange={(event) =>
+              setReferralDiscountPercent(Number(event.target.value))
+            }
+          />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch checked={countOwnTickets} onCheckedChange={setCountOwnTickets} />
+        <Label>Also count the referrer&apos;s own tickets</Label>
+      </div>
+      <div className="space-y-1">
+        <Label>Confirmed performer emails</Label>
+        <Textarea
+          value={performerEmails}
+          onChange={(event) => setPerformerEmails(event.target.value)}
+          placeholder="one email per line"
+          rows={4}
         />
       </div>
       <div className="space-y-3">

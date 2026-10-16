@@ -30,6 +30,7 @@ import VolunteerSection from '../_class/VolunteerSection'
 import EventVotingPanel from '../EventVotingPanel'
 import { SponsorPrizeTeaser, SponsorPrizesSection } from '../../../_components/SponsorPrizes'
 import { GroupChallengeBoard } from '../../../_components/GroupChallengeBoard'
+import { getEventReferralDiscountPercent } from '@/lib/actions/referral/referralOffer'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
@@ -93,6 +94,7 @@ const ConcertDescriptions = async ({
   referralCode,
 }: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+  const referralDiscountPercent = await getEventReferralDiscountPercent(event.id)
 
   // Get the current user's id
   const session = await auth()
@@ -328,6 +330,7 @@ const ConcertDescriptions = async ({
             isCapacityExceeded={isCapacityExceeded}
             discounts={event.eventDiscounts}
             referralCode={referralCode}
+            referralDiscountPercent={referralDiscountPercent}
           />
         </div>
 

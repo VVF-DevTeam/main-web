@@ -261,5 +261,19 @@
   "invite-copy": "Sao chép liên kết",
   "invite-copied": "Đã sao chép",
   "invite-code-label": "Mã giới thiệu của bạn",
-  "invite-hint": "Chia sẻ liên kết này. Bạn bè mua vé bằng liên kết sẽ vào nhóm của bạn trên bảng xếp hạng."
+  "invite-hint": "Chia sẻ liên kết này. Bạn bè mua vé bằng liên kết sẽ vào nhóm của bạn trên bảng xếp hạng.",
+  "referral-how-title": "Cách tham gia",
+  "referral-step-eligible": "Mua vé, hoặc là thành viên VVF, tình nguyện viên của sự kiện, hoặc nghệ sĩ đã được xác nhận.",
+  "referral-step-code": "Lấy mã cá nhân tại đây. Người mua vé cũng nhận mã trong email.",
+  "referral-step-share": "Chia sẻ mã. Bạn bè được giảm {{percent}}% giá vé.",
+  "referral-step-count": "Mỗi vé xác nhận mua bằng mã của bạn được tính. Người có nhiều lượt referral nhất thắng.",
+  "referral-step-count-with-own": "Vé của bạn và vé mua bằng mã của bạn đều được tính. Tổng cao nhất thắng.",
+  "referral-ends": "Cuộc thi kết thúc {{when}}.",
+  "referral-ended": "Cuộc thi đã kết thúc. Lượt referral mới không còn được tính.",
+  "referral-friends-discount": "Bạn bè dùng mã của bạn được giảm {{percent}}%.",
+  "referral-get-code": "Lấy mã referral của tôi",
+  "referral-login": "Đăng nhập để lấy mã",
+  "referral-ineligible": "Mã dành cho người đã mua vé, thành viên VVF, tình nguyện viên sự kiện này và nghệ sĩ đã xác nhận.",
+  "referral-unavailable": "Sự kiện này hiện chưa mở mã referral.",
+  "referral-discount-banner": "Mã mời này giảm {{percent}}%."
 }

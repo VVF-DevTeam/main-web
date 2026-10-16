@@ -9,6 +9,12 @@ import {
   rankChallengeGroups,
   type RankedChallengeGroup,
 } from '@/lib/actions/referral/rankChallengeGroups'
+import {
+  formatPacificDateTimeLocal,
+  formatPacificDisplay,
+  isBeforeDeadline,
+  parsePacificDateTimeLocal,
+} from '@/lib/actions/referral/pacificTime'
 
 export type GroupChallengeReward = {
   place: number
@@ -22,6 +28,11 @@ export type PublicGroupChallenge = {
   description: string | null
   rewards: GroupChallengeReward[]
   groups: RankedChallengeGroup[]
+  endsAt: Date | null
+  endsAtLabel: string | null
+  ended: boolean
+  referralDiscountPercent: number
+  countOwnTickets: boolean
 }
 
 const EXCLUDED_PAYMENT_TYPES: PaymentType[] = [
@@ -129,11 +140,20 @@ export async function getPublicGroupChallenge(
     }
   })
 
+  const ended = !isBeforeDeadline(challenge.endsAt)
+
   return {
     title: challenge.title,
     description: challenge.description,
     rewards: parseChallengeRewards(challenge.rewards),
-    groups: rankChallengeGroups(groups),
+    groups: rankChallengeGroups(groups, 20, {
+      countOwnTickets: challenge.countOwnTickets,
+    }),
+    endsAt: challenge.endsAt,
+    endsAtLabel: challenge.endsAt ? formatPacificDisplay(challenge.endsAt) : null,
+    ended,
+    referralDiscountPercent: challenge.referralDiscountPercent,
+    countOwnTickets: challenge.countOwnTickets,
   }
 }
 
@@ -148,7 +168,19 @@ export async function getGroupChallengeForAdmin(eventId: string) {
     title: challenge.title,
     description: challenge.description || '',
     rewards: parseChallengeRewards(challenge.rewards),
+    endsAt: formatPacificDateTimeLocal(challenge.endsAt),
+    referralDiscountPercent: challenge.referralDiscountPercent,
+    countOwnTickets: challenge.countOwnTickets,
+    performerEmails: challenge.performerEmails.join('\n'),
   }
+}
+
+function parsePerformerEmails(raw: string): string[] {
+  const emails = raw
+    .split(/[\s,;]+/)
+    .map((email) => normalizeBuyerEmail(email))
+    .filter((email): email is string => Boolean(email))
+  return [...new Set(emails)].slice(0, 200)
 }
 
 export async function saveGroupChallenge(input: {
@@ -157,6 +189,10 @@ export async function saveGroupChallenge(input: {
   title: string
   description?: string
   rewards: GroupChallengeReward[]
+  endsAt?: string
+  referralDiscountPercent?: number
+  countOwnTickets?: boolean
+  performerEmails?: string
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await canAccessEventPaymentData(input.eventId))) {
     return { ok: false, error: 'You do not have access to this event' }
@@ -167,7 +203,7 @@ export async function saveGroupChallenge(input: {
     return { ok: false, error: 'Title is too long' }
   }
   const description = input.description?.trim() || null
-  if (description && description.length > 1000) {
+  if (description && description.length > 4000) {
     return { ok: false, error: 'Description is too long' }
   }
 
@@ -182,6 +218,23 @@ export async function saveGroupChallenge(input: {
   }
 
   const rewards = parseChallengeRewards(input.rewards)
+  const endsAt = input.endsAt?.trim()
+    ? parsePacificDateTimeLocal(input.endsAt)
+    : null
+  if (input.endsAt?.trim() && !endsAt) {
+    return { ok: false, error: 'End time must be a valid date' }
+  }
+  const referralDiscountPercent = Math.min(
+    100,
+    Math.max(0, Math.round(input.referralDiscountPercent || 0))
+  )
+  const performerEmails = parsePerformerEmails(input.performerEmails || '')
+  const rules = {
+    endsAt,
+    referralDiscountPercent,
+    countOwnTickets: input.countOwnTickets === true,
+    performerEmails,
+  }
 
   await prisma.eventGroupChallenge.upsert({
     where: { eventId: input.eventId },
@@ -191,12 +244,14 @@ export async function saveGroupChallenge(input: {
       title,
       description,
       rewards,
+      ...rules,
     },
     update: {
       isEnabled: input.isEnabled,
       title,
       description,
       rewards,
+      ...rules,
     },
   })
 

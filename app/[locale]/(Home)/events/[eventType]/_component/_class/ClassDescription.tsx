@@ -15,6 +15,7 @@ import VolunteerSection from './VolunteerSection'
 import EventVotingPanel from '../EventVotingPanel'
 import { SponsorPrizeTeaser, SponsorPrizesSection } from '../../../_components/SponsorPrizes'
 import { GroupChallengeBoard } from '../../../_components/GroupChallengeBoard'
+import { getEventReferralDiscountPercent } from '@/lib/actions/referral/referralOffer'
 
 // Interfaces & Types
 import {
@@ -98,6 +99,7 @@ const ClassDescription = async ({
   referralCode,
 }: ClassDescriptionProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+  const referralDiscountPercent = await getEventReferralDiscountPercent(classId)
 
   // Get the current user's id
   const session = await auth()
@@ -277,6 +279,7 @@ const ClassDescription = async ({
                   isCapacityExceeded={isCapacityExceeded}
                   discounts={discounts}
                   referralCode={referralCode}
+                  referralDiscountPercent={referralDiscountPercent}
                 />
               </div>
 

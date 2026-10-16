@@ -16,8 +16,10 @@ export type RankedChallengeGroup = {
 
 export function rankChallengeGroups(
   groups: ChallengeGroupInput[],
-  limit = 20
+  limit = 20,
+  options?: { countOwnTickets?: boolean }
 ): RankedChallengeGroup[] {
+  const countOwnTickets = options?.countOwnTickets === true
   const ranked = groups
     .map((group) => {
       const ownerEmail = group.ownerEmail.trim().toLowerCase()
@@ -45,9 +47,11 @@ export function rankChallengeGroups(
 
       return {
         ownerName: group.ownerName,
-        score: ownQuantity + referredQuantity,
+        score: (countOwnTickets ? ownQuantity : 0) + referredQuantity,
         members: [
-          { displayName: maskBuyerName(group.ownerName) },
+          ...(countOwnTickets
+            ? [{ displayName: maskBuyerName(group.ownerName) }]
+            : []),
           ...referred.map((member) => ({
             displayName: maskBuyerName(member.name),
           })),

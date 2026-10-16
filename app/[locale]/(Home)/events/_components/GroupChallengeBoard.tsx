@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import initTranslation from '@/app/i18n'
 import { getPublicGroupChallenge } from '@/lib/actions/challenge/groupChallenge'
+import ReferralCodeClaim from '@/app/[locale]/(Home)/events/_components/ReferralCodeClaim'
 
 export async function GroupChallengeBoard({
   eventId,
@@ -21,10 +22,51 @@ export async function GroupChallengeBoard({
           {challenge.title}
         </h2>
         {challenge.description && (
-          <p className="mt-2 max-w-3xl text-sm text-neutral-600 md:text-base">
+          <p className="mt-2 max-w-3xl whitespace-pre-line text-sm text-neutral-600 md:text-base">
             {challenge.description}
           </p>
         )}
+        {challenge.endsAtLabel && (
+          <p className="mt-3 text-sm font-medium text-rose-800">
+            {challenge.ended
+              ? t('referral-ended')
+              : t('referral-ends', { when: challenge.endsAtLabel })}
+          </p>
+        )}
+        {challenge.referralDiscountPercent > 0 && !challenge.ended && (
+          <p className="mt-2 text-sm font-medium text-neutral-800">
+            {t('referral-friends-discount', {
+              percent: challenge.referralDiscountPercent,
+            })}
+          </p>
+        )}
+      </div>
+
+      <div className="mb-6 rounded-xl bg-neutral-50 p-4">
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-rose-700">
+          {t('referral-how-title')}
+        </h3>
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-neutral-700">
+          <li>{t('referral-step-eligible')}</li>
+          <li>{t('referral-step-code')}</li>
+          <li>
+            {t('referral-step-share', {
+              percent: challenge.referralDiscountPercent || 0,
+            })}
+          </li>
+          <li>
+            {challenge.countOwnTickets
+              ? t('referral-step-count-with-own')
+              : t('referral-step-count')}
+          </li>
+        </ol>
+        <div className="mt-4">
+          <ReferralCodeClaim
+            eventId={eventId}
+            locale={locale}
+            ended={challenge.ended}
+          />
+        </div>
       </div>
 
       {challenge.rewards.length > 0 && (

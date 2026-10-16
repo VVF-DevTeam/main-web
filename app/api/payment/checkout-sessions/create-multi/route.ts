@@ -11,6 +11,10 @@ import {
 } from '@/lib/actions/price/quantityRangeDiscount'
 import { buildAppliedDiscountsMulti } from '@/lib/actions/payment/checkoutDiscountApplied'
 import { normalizeReferralCode } from '@/lib/actions/referral/referralCode'
+import {
+  getActiveReferralDiscount,
+  priceWithReferralDiscount,
+} from '@/lib/actions/referral/referralOffer'
 
 // ##################### FLOW OF PRICES ######################
 // Discount price creation (event_discount)
@@ -829,6 +833,15 @@ export async function POST(req: Request) {
       }
     }
 
+    const referralDiscount = type === 'Membership'
+      ? null
+      : await getActiveReferralDiscount({
+          eventId,
+          code: normalizedReferralCode,
+          buyerEmail: mainEmail,
+        })
+    const referralPriceCache = new Map<string, string>()
+
     for (const item of checkoutItems) {
       const resolvedPriceId = resolveStripePriceId(item)
       let priceIdToUse = resolvedPriceId
@@ -836,6 +849,15 @@ export async function POST(req: Request) {
       // If a quantity-range or event discount price was created, charge that price
       if (discountedPriceCache.has(resolvedPriceId)) {
         priceIdToUse = discountedPriceCache.get(resolvedPriceId)!
+      }
+
+      if (referralDiscount) {
+        priceIdToUse = await priceWithReferralDiscount(
+          stripe,
+          priceIdToUse,
+          referralDiscount.percent,
+          referralPriceCache
+        )
       }
 
       // Create line items: one per seat for seated tickets, or use quantity for non-seated tickets
@@ -904,6 +926,13 @@ export async function POST(req: Request) {
       verifiedCodeDiscount,
       codeDiscountApplied,
     }),
+      ...(referralDiscount
+        ? [{
+            kind: 'referral' as const,
+            code: referralDiscount.code,
+            percentOff: referralDiscount.percent,
+          }]
+        : []),
     ]
 
     // Save all checkout data to CheckoutSessionData before creating Stripe session

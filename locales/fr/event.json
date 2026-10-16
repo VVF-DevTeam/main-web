@@ -261,5 +261,19 @@
   "invite-copy": "Copier le lien",
   "invite-copied": "Lien copié",
   "invite-code-label": "Votre code de parrainage",
-  "invite-hint": "Partagez votre lien. Les amis qui achètent avec rejoignent votre groupe au classement."
+  "invite-hint": "Partagez votre lien. Les amis qui achètent avec rejoignent votre groupe au classement.",
+  "referral-how-title": "Comment participer",
+  "referral-step-eligible": "Achetez un billet, ou soyez membre VVF, bénévole de cet événement, ou artiste confirmé.",
+  "referral-step-code": "Obtenez votre code ici. Les acheteurs le reçoivent aussi par e-mail.",
+  "referral-step-share": "Partagez votre code. Vos amis obtiennent {{percent}} % de réduction.",
+  "referral-step-count": "Chaque billet confirmé acheté avec votre code compte. La personne avec le plus de parrainages gagne.",
+  "referral-step-count-with-own": "Vos billets et ceux achetés avec votre code comptent. Le total le plus élevé gagne.",
+  "referral-ends": "Le défi se termine le {{when}}.",
+  "referral-ended": "Ce défi est terminé. Les nouveaux parrainages ne comptent plus.",
+  "referral-friends-discount": "Les amis qui utilisent votre code obtiennent {{percent}} % de réduction.",
+  "referral-get-code": "Obtenir mon code",
+  "referral-login": "Connectez-vous pour obtenir votre code",
+  "referral-ineligible": "Le code est réservé aux détenteurs de billets, membres VVF, bénévoles de cet événement et artistes confirmés.",
+  "referral-unavailable": "Les codes de parrainage ne sont pas disponibles pour cet événement.",
+  "referral-discount-banner": "Ce code d'invitation réduit le prix de {{percent}} %."
 }
