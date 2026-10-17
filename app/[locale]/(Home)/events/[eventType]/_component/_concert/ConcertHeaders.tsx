@@ -19,7 +19,7 @@ const ConcertHeaders = ({ event }: ConcertHeadersProps) => {
   const secondarySubImg = subImgUrls[1]?.trim() ?? ''
 
   return (
-    <div className="flex h-[70vh] flex-col justify-between gap-y-4 py-10 md:py-12 lg:flex-row">
+    <div className="flex flex-col gap-y-4 py-10 md:py-12 lg:flex-row lg:items-center">
       {/* Event title and subtitle */}
       <div className="flex flex-col gap-y-4 px-6 md:px-12 lg:mt-4 lg:basis-1/2 xl:mt-6 xl:gap-y-7">
         {/* Event title */}
@@ -69,21 +69,23 @@ const ConcertHeaders = ({ event }: ConcertHeadersProps) => {
         </div>
       </div>
 
-      {/* Event image */}
-      <div className="relative flex h-full w-full lg:basis-1/2 xl:h-[90%]">
+      {/* Event image — fixed 70vh column on lg matches production framing */}
+      <div className="relative flex h-[50vh] w-full shrink-0 lg:h-[calc(70vh-6rem)] lg:basis-1/2 lg:self-center xl:h-[calc((70vh-6rem)*0.9)]">
         {/* large image */}
-        <div className="z-1 h-full w-[50%] max-w-4xl lg:aspect-square">
+        <div
+          className="relative z-1 h-full w-full max-[1020px]:max-w-none min-[1021px]:aspect-square min-[1021px]:w-full min-[1021px]:max-w-4xl"
+        >
           <Image
             src={primarySubImg}
             fill
             alt="Event Image"
-            className="lg:rounded-md object-cover"
+            className="object-cover max-[1020px]:rounded-none min-[1021px]:rounded-md"
           />
         </div>
-        
+
         {/* small image — only when second sub image URL is set */}
         {secondarySubImg ? (
-          <div className="z-2 absolute bottom-0 left-[-15%] right-0 top-[25%] hidden h-[45%] w-[35%] lg:block">
+          <div className="z-2 absolute bottom-0 left-[-18%] right-0 top-[25%] hidden h-[45%] w-[35%] lg:block">
             <Image
               src={secondarySubImg}
               fill
