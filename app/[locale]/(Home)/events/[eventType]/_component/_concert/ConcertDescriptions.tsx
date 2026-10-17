@@ -27,7 +27,8 @@ import EventGalleryCarousel from '../EventGalleryCarousel'
 import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
 import VolunteerSection from '../_class/VolunteerSection'
-import EventVotingPanel from '../EventVotingPanel'
+import EventEngageLink from '../../../_components/EventEngageLink'
+import { getEventReferralDiscountPercent } from '@/lib/actions/referral/referralOffer'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
 import { SeatingMap } from '../../../(Admin)/editEvent/[eventKeyName]/_components/EventSeating'
@@ -72,6 +73,7 @@ interface ConcertDescriptionsProps {
   reviewsCount: number
   seriesId?: string
   seatingMap: SeatingMap
+  referralCode?: string | null
 }
 
 const typeMap = {
@@ -87,8 +89,10 @@ const ConcertDescriptions = async ({
   reviewsCount,
   seriesId,
   seatingMap,
+  referralCode,
 }: ConcertDescriptionsProps) => {
   const { t } = await initTranslation(locale, ['event', 'common'])
+  const referralDiscountPercent = await getEventReferralDiscountPercent(event.id)
 
   // Get the current user's id
   const session = await auth()
@@ -274,6 +278,13 @@ const ConcertDescriptions = async ({
                   </div>
                 </div>
 
+                <EventEngageLink
+                  locale={locale}
+                  eventType={event.eventType}
+                  eventKeyName={event.keyName}
+                  variant="concert"
+                />
+
                 {/* Map */}
                 <div className="flex min-h-0 flex-1 rounded-2xl">
                   <iframe
@@ -291,7 +302,9 @@ const ConcertDescriptions = async ({
               </div>
 
               {/* Go to check out section button */}
-              <ScrollToCheckoutButton text={t('goToCheckout')} />
+              <div className="flex flex-col gap-3">
+                <ScrollToCheckoutButton text={t('goToCheckout')} />
+              </div>
 
               {/* Already paid */}
               {existingPayment && existingPayment.length > 0 && (
@@ -317,15 +330,10 @@ const ConcertDescriptions = async ({
             tickets={event.tickets}
             isCapacityExceeded={isCapacityExceeded}
             discounts={event.eventDiscounts}
+            referralCode={referralCode}
+            referralDiscountPercent={referralDiscountPercent}
           />
         </div>
-
-        <EventVotingPanel
-          eventId={event.id}
-          locale={locale}
-          isLoggedIn={Boolean(author)}
-          userEmail={session?.user?.email}
-        />
 
         {/* Sponsors */}
         {event.sponsors && event.sponsors.length > 0 && (
