@@ -12,9 +12,8 @@ import PaymentOptions from '../_stripepayment/PaymentOptions'
 import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
 import VolunteerSection from './VolunteerSection'
-import EventVotingPanel from '../EventVotingPanel'
-import { SponsorPrizeTeaser, SponsorPrizesSection } from '../../../_components/SponsorPrizes'
-import { GroupChallengeBoard } from '../../../_components/GroupChallengeBoard'
+import { SponsorPrizeTeaser } from '../../../_components/SponsorPrizes'
+import EventEngageLink from '../../../_components/EventEngageLink'
 import { getEventReferralDiscountPercent } from '@/lib/actions/referral/referralOffer'
 
 // Interfaces & Types
@@ -267,6 +266,12 @@ const ClassDescription = async ({
               {/* Payment Options */}
               <div id="checkout-section" className="flex flex-col gap-3">
                 <SponsorPrizeTeaser eventId={classId} />
+                <EventEngageLink
+                  locale={locale}
+                  eventType={eventType}
+                  eventKeyName={keyName}
+                  variant="class"
+                />
                 <PaymentOptions
                   formLink={formLink}
                   eventKeyName={keyName}
@@ -290,17 +295,6 @@ const ClassDescription = async ({
               )}
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex w-full flex-col gap-8">
-          <SponsorPrizesSection eventId={classId} locale={locale} />
-          <GroupChallengeBoard eventId={classId} locale={locale} />
-          <EventVotingPanel
-            eventId={classId}
-            locale={locale}
-            isLoggedIn={Boolean(author)}
-            userEmail={session?.user?.email}
-          />
         </div>
 
         {/* Sponsors */}

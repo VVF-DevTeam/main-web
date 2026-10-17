@@ -48,7 +48,7 @@ function cleanHttpUrl(value?: string | null): string {
   return trimmed
 }
 
-export function parseChallengeRewards(value: unknown): GroupChallengeReward[] {
+function parseChallengeRewards(value: unknown): GroupChallengeReward[] {
   if (!Array.isArray(value)) return []
   return value
     .map((item) => {

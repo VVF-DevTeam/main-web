@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import initTranslation from '@/app/i18n'
 import { getPublicGroupChallenge } from '@/lib/actions/challenge/groupChallenge'
 import ReferralCodeClaim from '@/app/[locale]/(Home)/events/_components/ReferralCodeClaim'
+import { SponsorPrizesSection } from '@/app/[locale]/(Home)/events/_components/SponsorPrizes'
 
 export async function GroupChallengeBoard({
   eventId,
@@ -71,40 +71,9 @@ export async function GroupChallengeBoard({
         </div>
       </div>
 
-      {challenge.rewards.length > 0 && (
-        <div className="mb-6">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-rose-700">
-            {t('leaderboard-rewards')}
-          </h3>
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {challenge.rewards.map((reward) => (
-              <div
-                key={`${reward.place}-${reward.title}`}
-                className="flex w-56 shrink-0 flex-col gap-2 rounded-xl border border-rose-100 bg-rose-50/60 p-3"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D20C36] text-xs font-bold text-white">
-                    {reward.place}
-                  </span>
-                  <span className="font-semibold text-neutral-900">{reward.title}</span>
-                </div>
-                {reward.imageUrl && (
-                  <Image
-                    src={reward.imageUrl}
-                    alt={reward.title}
-                    width={200}
-                    height={120}
-                    className="h-24 w-full rounded-lg object-cover"
-                  />
-                )}
-                {reward.description && (
-                  <p className="text-xs text-neutral-600">{reward.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="mb-6">
+        <SponsorPrizesSection eventId={eventId} locale={locale} />
+      </div>
 
       {challenge.groups.length === 0 ? (
         <p className="rounded-xl bg-neutral-50 px-4 py-6 text-sm text-neutral-600">

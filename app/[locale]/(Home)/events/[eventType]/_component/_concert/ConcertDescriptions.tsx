@@ -27,9 +27,7 @@ import EventGalleryCarousel from '../EventGalleryCarousel'
 import SponsorsList from '../../../_components/SponsorsList'
 import ServerError from '@/components/error/ServerError'
 import VolunteerSection from '../_class/VolunteerSection'
-import EventVotingPanel from '../EventVotingPanel'
-import { SponsorPrizeTeaser, SponsorPrizesSection } from '../../../_components/SponsorPrizes'
-import { GroupChallengeBoard } from '../../../_components/GroupChallengeBoard'
+import EventEngageLink from '../../../_components/EventEngageLink'
 import { getEventReferralDiscountPercent } from '@/lib/actions/referral/referralOffer'
 // Types
 import { EventSchedule, EventTicket, EventSponsor, SponsorTier, Job, Payment } from '@prisma/client'
@@ -280,6 +278,13 @@ const ConcertDescriptions = async ({
                   </div>
                 </div>
 
+                <EventEngageLink
+                  locale={locale}
+                  eventType={event.eventType}
+                  eventKeyName={event.keyName}
+                  variant="concert"
+                />
+
                 {/* Map */}
                 <div className="flex min-h-0 flex-1 rounded-2xl">
                   <iframe
@@ -299,7 +304,6 @@ const ConcertDescriptions = async ({
               {/* Go to check out section button */}
               <div className="flex flex-col gap-3">
                 <ScrollToCheckoutButton text={t('goToCheckout')} />
-                <SponsorPrizeTeaser eventId={event.id} />
               </div>
 
               {/* Already paid */}
@@ -311,9 +315,6 @@ const ConcertDescriptions = async ({
             </div>
           </div>
         </div>
-
-        <SponsorPrizesSection eventId={event.id} locale={locale} />
-        <GroupChallengeBoard eventId={event.id} locale={locale} />
 
         {/* Payment Options */}
         <div id="checkout-section" className="w-full">
@@ -333,13 +334,6 @@ const ConcertDescriptions = async ({
             referralDiscountPercent={referralDiscountPercent}
           />
         </div>
-
-        <EventVotingPanel
-          eventId={event.id}
-          locale={locale}
-          isLoggedIn={Boolean(author)}
-          userEmail={session?.user?.email}
-        />
 
         {/* Sponsors */}
         {event.sponsors && event.sponsors.length > 0 && (
