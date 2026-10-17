@@ -1,4 +1,4 @@
-import { randomBytes } from 'crypto'
+import { randomInt } from 'crypto'
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
@@ -16,10 +16,9 @@ export function normalizeBuyerEmail(raw?: string | null): string | null {
 }
 
 export function generateReferralCode(): string {
-  const bytes = randomBytes(8)
   let code = ''
   for (let i = 0; i < 8; i++) {
-    code += ALPHABET[bytes[i]! % ALPHABET.length]
+    code += ALPHABET[randomInt(ALPHABET.length)]!
   }
   return code
 }
