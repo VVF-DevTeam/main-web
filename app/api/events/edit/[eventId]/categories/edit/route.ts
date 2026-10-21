@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
+import { hasAdminOrHostAccess } from '@/lib/user/roleAccess'
 
 export const POST = async (
   request: Request,
@@ -47,7 +48,7 @@ export const DELETE = async (
 ) => {
   try {
     const session = await auth()
-    if (!session?.user?.role?.includes('ADMIN') && !session?.user?.role?.includes('HOST')) {
+    if (!hasAdminOrHostAccess(session?.user?.role)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

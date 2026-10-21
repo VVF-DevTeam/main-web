@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 // Components
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { hasAdminAccess } from '@/lib/user/roleAccess'
 
 // Main Component
 const JobAdminButtons = () => {
@@ -14,10 +15,9 @@ const JobAdminButtons = () => {
   // Don't render anything while loading or if not authenticated
   if (status === 'loading') return null
 
-  const userRole = session?.user?.role
-  const isAdmin = userRole?.includes('ADMIN')
+  const isAdmin = hasAdminAccess(session?.user?.role)
 
-  // Only show buttons for admin users
+  // Only show buttons for admin users (includes SUPERADMIN)
   if (!isAdmin) return null
 
   return (

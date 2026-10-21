@@ -3,6 +3,7 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 import { UserInfoProps } from '@/lib/types/userInfo'
+import { normalizeUserRoles } from '@/lib/user/normalizeUserRoles'
 
 export async function getCurrentUserInfo(): Promise<UserInfoProps | null> {
   try {
@@ -30,7 +31,7 @@ export async function getCurrentUserInfo(): Promise<UserInfoProps | null> {
       subscribedAt: user.subscribedAt ?? null,
       subscribeExpires: user.subscribeExpires ?? null,
       stripeSubscriptionId: user.stripeSubscriptionId ?? null,
-      role: user.role ?? [],
+      role: normalizeUserRoles(user.role),
       phoneVerified: user.phoneVerified ?? null,
       emailVerifiedDate: user.emailVerifiedDate ?? null,
     }
