@@ -2,6 +2,8 @@
 import { getToken } from 'next-auth/jwt'
 import { Role } from '@prisma/client'
 import { NextRequest } from 'next/server'
+import { normalizeUserRoles } from '@/lib/user/normalizeUserRoles'
+import { hasRole } from '@/lib/user/roleAccess'
 
 interface StatusCheckProps {
   role?: Role
@@ -19,9 +21,10 @@ export async function roleCheckToken({ role, req }: StatusCheckProps) {
 
   // console.log('Cookies:', req.cookies.getAll())  
   if (!token) return false
+  const roles = normalizeUserRoles(token.role)
   if (role) {
-    return token.role?.includes(role)
+    return hasRole(roles, role)
   }
 
-  return token.role && token.role?.length > 0
+  return roles.length > 0
 }

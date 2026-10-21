@@ -17,6 +17,11 @@ import { validateSecretToken } from './lib/actions/token/secretToken'
 import { Role } from '@prisma/client'
 import * as jose from 'jose'
 import { linkGuestPaymentsToUser } from './lib/actions/payment/linkGuestPayments'
+import { normalizeUserRoles } from './lib/user/normalizeUserRoles'
+import {
+  hasAdminAccess,
+  hasAdminOrHostAccess,
+} from './lib/user/roleAccess'
 
 export default {
   providers: [
@@ -90,8 +95,7 @@ export default {
         token.email = user.email as string
         token.name = user.name as string
         token.image = user.image as string
-        token.role =
-          user.role && user.role.length > 0 ? (user.role as Role[]) : ['USER']
+        token.role = normalizeUserRoles(user.role)
         token.eduEmailExpiredDate = user.eduEmailExpiredDate as Date
       }
 
@@ -107,6 +111,9 @@ export default {
           token.eduEmailExpiredDate = eduEmailExpiredDate
         }
       }
+      if (token.role !== undefined) {
+        token.role = normalizeUserRoles(token.role)
+      }
       return token
     },
     async session({ session, token }) {
@@ -114,7 +121,7 @@ export default {
       session.user.email = token.email as string
       session.user.name = token.name as string
       session.user.image = token.image as string
-      session.user.role = token.role as Role[]
+      session.user.role = normalizeUserRoles(token.role)
       session.user.eduEmailExpiredDate = token.eduEmailExpiredDate as Date
       return session
     },
@@ -249,19 +256,17 @@ export default {
                 role: string[]
               }
 
-              const { role, id } = jwtDecoded
+              const { role: jwtRoles, id } = jwtDecoded
+              const mobileRoles = normalizeUserRoles(jwtRoles)
               response.headers.set('userId', id)
 
-              if (path.includes('categories') && !role.includes('ADMIN')) {
-                //For categories, only allow ADMIN
+              if (path.includes('categories') && !hasAdminAccess(mobileRoles)) {
                 return new NextResponse('Forbidden', { status: 403 })
               }
               if (
                 path.includes('events') &&
-                !role.includes('ADMIN') &&
-                !role.includes('HOST')
+                !hasAdminOrHostAccess(mobileRoles)
               ) {
-                // For events API, only allow Admin and Host
                 return new NextResponse('Forbidden', { status: 403 })
               }
 
@@ -272,7 +277,7 @@ export default {
                     status: 403,
                   })
                 }
-                if (!path.includes('apply') && !role.includes('ADMIN')) {
+                if (!path.includes('apply') && !hasAdminAccess(mobileRoles)) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }
@@ -281,7 +286,7 @@ export default {
                   if (!token) {
                     return new NextResponse('Forbidden', { status: 403 })
                   }
-                } else if (!role.includes('ADMIN')) {
+                } else if (!hasAdminAccess(mobileRoles)) {
                   return new NextResponse('Forbidden', { status: 403 })
                 }
               }

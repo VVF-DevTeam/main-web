@@ -1,5 +1,7 @@
 import { auth } from '@/auth'
 import { Role } from '@prisma/client'
+import { normalizeUserRoles } from '@/lib/user/normalizeUserRoles'
+import { hasRole } from '@/lib/user/roleAccess'
 type role = Role
 
 interface StatusCheckProps {
@@ -8,16 +10,11 @@ interface StatusCheckProps {
 
 export async function roleCheck({ role }: StatusCheckProps) {
   const session = await auth()
+  const roles = normalizeUserRoles(session?.user?.role)
 
   if (role) {
-    let matchRole = false
-    if (session?.user?.role?.includes(role) ) {
-      matchRole = true
-    }
-
-    return matchRole
+    return hasRole(roles, role)
   }
 
-  // return role if param is not provided
-  return session?.user?.role
+  return roles
 }
