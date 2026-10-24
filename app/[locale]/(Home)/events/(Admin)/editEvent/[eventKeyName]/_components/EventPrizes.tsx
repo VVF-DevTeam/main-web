@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import Loader from '@/components/loader/Loader'
+import { brandSwitchClassName } from '@/lib/ui/brandSwitchClassName'
 import {
   deleteEventPrize,
   getEventPrizeAdminState,
@@ -212,6 +213,7 @@ export default function EventPrizes({ eventId }: EventPrizesProps) {
               onCheckedChange={(checked) =>
                 updatePrize(index, { isPublished: checked })
               }
+              className={brandSwitchClassName}
             />
             <Label>Show on the event page</Label>
           </div>

@@ -10,6 +10,7 @@ import { getPublicGroupChallenge } from '@/lib/actions/challenge/groupChallenge'
 import { getPublicEventVote } from '@/lib/actions/vote/eventVote'
 import { SponsorPrizesSection } from '@/app/[locale]/(Home)/events/_components/SponsorPrizes'
 import { GroupChallengeBoard } from '@/app/[locale]/(Home)/events/_components/GroupChallengeBoard'
+import { EngageCollapsibleSection } from '@/app/[locale]/(Home)/events/_components/EngageCollapsibleSection'
 import EventVotingPanel from '../../_component/EventVotingPanel'
 
 interface EventEngagePageProps {
@@ -78,17 +79,37 @@ const EventEngagePage = async ({ params }: EventEngagePageProps) => {
             {t('engage-empty')}
           </p>
         ) : (
-          <div className="flex flex-col gap-8">
-            {!challenge && prizes.length > 0 && (
-              <SponsorPrizesSection eventId={event.id} locale={locale} />
+          <div className="flex flex-col gap-4">
+            {prizes.length > 0 && (
+              <EngageCollapsibleSection title={t('engage-section-prizes')}>
+                <SponsorPrizesSection
+                  eventId={event.id}
+                  locale={locale}
+                  showHeading={false}
+                />
+              </EngageCollapsibleSection>
             )}
-            <GroupChallengeBoard eventId={event.id} locale={locale} />
-            <EventVotingPanel
-              eventId={event.id}
-              locale={locale}
-              isLoggedIn={Boolean(session?.user)}
-              userEmail={session?.user?.email}
-            />
+            {challenge !== null && (
+              <EngageCollapsibleSection title={challenge.title}>
+                <GroupChallengeBoard
+                  eventId={event.id}
+                  locale={locale}
+                  showPrizes={false}
+                  showHeading={false}
+                />
+              </EngageCollapsibleSection>
+            )}
+            {vote !== null && (
+              <EngageCollapsibleSection title={t('engage-section-voting')}>
+                <EventVotingPanel
+                  eventId={event.id}
+                  locale={locale}
+                  isLoggedIn={Boolean(session?.user)}
+                  userEmail={session?.user?.email}
+                  embedInCollapsible
+                />
+              </EngageCollapsibleSection>
+            )}
           </div>
         )}
       </div>

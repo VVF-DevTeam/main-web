@@ -21,6 +21,7 @@ import {
 } from '@/lib/actions/vote/votingWindow'
 import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Loader from '@/components/loader/Loader'
+import { brandSwitchClassName } from '@/lib/ui/brandSwitchClassName'
 
 const toastSuccessStyle = { color: '#22c55e' }
 const toastErrorStyle = { color: '#ef4444' }
@@ -228,6 +229,7 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
             id="vote-enabled"
             checked={isEnabled}
             onCheckedChange={setIsEnabled}
+            className={brandSwitchClassName}
           />
           <Label htmlFor="vote-enabled">Show vote on event page</Label>
         </div>
@@ -236,6 +238,7 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
             id="vote-allow-change"
             checked={allowChangeVote}
             onCheckedChange={setAllowChangeVote}
+            className={brandSwitchClassName}
           />
           <Label htmlFor="vote-allow-change">Allow voters to change vote</Label>
         </div>

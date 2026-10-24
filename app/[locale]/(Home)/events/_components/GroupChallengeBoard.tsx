@@ -6,9 +6,13 @@ import { SponsorPrizesSection } from '@/app/[locale]/(Home)/events/_components/S
 export async function GroupChallengeBoard({
   eventId,
   locale,
+  showPrizes = true,
+  showHeading = true,
 }: {
   eventId: string
   locale: string
+  showPrizes?: boolean
+  showHeading?: boolean
 }) {
   const challenge = await getPublicGroupChallenge(eventId)
   if (!challenge) return null
@@ -16,13 +20,17 @@ export async function GroupChallengeBoard({
   const { t } = await initTranslation(locale, ['event'])
 
   return (
-    <section className="w-full rounded-2xl bg-white p-5 shadow-[0_0_15px_rgba(0,0,0,0.08)] md:p-8">
+    <section className="w-full">
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-neutral-900 md:text-3xl">
-          {challenge.title}
-        </h2>
+        {showHeading && (
+          <h2 className="text-2xl font-bold text-neutral-900 md:text-3xl">
+            {challenge.title}
+          </h2>
+        )}
         {challenge.description && (
-          <p className="mt-2 max-w-3xl whitespace-pre-line text-sm text-neutral-600 md:text-base">
+          <p
+            className={`max-w-3xl whitespace-pre-line text-sm text-neutral-600 md:text-base ${showHeading ? 'mt-2' : ''}`}
+          >
             {challenge.description}
           </p>
         )}
@@ -71,9 +79,15 @@ export async function GroupChallengeBoard({
         </div>
       </div>
 
-      <div className="mb-6">
-        <SponsorPrizesSection eventId={eventId} locale={locale} />
-      </div>
+      {showPrizes && (
+        <div className="mb-6">
+          <SponsorPrizesSection
+            eventId={eventId}
+            locale={locale}
+            showHeading={false}
+          />
+        </div>
+      )}
 
       {challenge.groups.length === 0 ? (
         <p className="rounded-xl bg-neutral-50 px-4 py-6 text-sm text-neutral-600">

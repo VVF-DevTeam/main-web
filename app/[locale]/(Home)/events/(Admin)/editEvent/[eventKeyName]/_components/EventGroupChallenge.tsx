@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import Loader from '@/components/loader/Loader'
+import { brandSwitchClassName } from '@/lib/ui/brandSwitchClassName'
 import {
   getGroupChallengeForAdmin,
   saveGroupChallenge,
@@ -124,7 +125,11 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
         Names on the public board stay partly hidden.
       </p>
       <div className="flex items-center gap-2">
-        <Switch checked={isEnabled} onCheckedChange={setIsEnabled} />
+        <Switch
+          checked={isEnabled}
+          onCheckedChange={setIsEnabled}
+          className={brandSwitchClassName}
+        />
         <Label>Show the leaderboard on the event and ticket page</Label>
       </div>
       <div className="space-y-1">
@@ -163,7 +168,11 @@ export default function EventGroupChallenge({ eventId }: EventGroupChallengeProp
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Switch checked={countOwnTickets} onCheckedChange={setCountOwnTickets} />
+        <Switch
+          checked={countOwnTickets}
+          onCheckedChange={setCountOwnTickets}
+          className={brandSwitchClassName}
+        />
         <Label>Also count the referrer&apos;s own tickets</Label>
       </div>
       <div className="space-y-1">

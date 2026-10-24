@@ -39,9 +39,11 @@ export async function SponsorPrizeTeaser({ eventId }: { eventId: string }) {
 export async function SponsorPrizesSection({
   eventId,
   locale,
+  showHeading = true,
 }: {
   eventId: string
   locale: string
+  showHeading?: boolean
 }) {
   const prizes = await getPublicEventPrizes(eventId)
   if (prizes.length === 0) return null
@@ -50,11 +52,13 @@ export async function SponsorPrizesSection({
 
   return (
     <section className="w-full">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <h2 className="text-2xl font-bold text-neutral-900 md:text-3xl lg:text-4xl">
-          {t('prizes-section-title')}
-        </h2>
-      </div>
+      {showHeading && (
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <h2 className="text-2xl font-bold text-neutral-900 md:text-3xl lg:text-4xl">
+            {t('prizes-section-title')}
+          </h2>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {prizes.map((prize) => (
           <article

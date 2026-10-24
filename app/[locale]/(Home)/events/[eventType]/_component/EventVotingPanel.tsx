@@ -45,6 +45,8 @@ interface EventVotingPanelProps {
   locale: string
   isLoggedIn: boolean
   userEmail?: string | null
+  /** Hide outer card chrome when nested in EngageCollapsibleSection */
+  embedInCollapsible?: boolean
 }
 
 const RESULTS_POLL_MS = 10000
@@ -54,6 +56,7 @@ export default function EventVotingPanel({
   locale,
   isLoggedIn,
   userEmail,
+  embedInCollapsible = false,
 }: EventVotingPanelProps) {
   const [vote, setVote] = useState<PublicEventVote | null>(null)
   const [loading, setLoading] = useState(true)
@@ -178,15 +181,22 @@ export default function EventVotingPanel({
     }
   }
 
+  const Wrapper = embedInCollapsible ? 'div' : 'section'
+  const wrapperClassName = embedInCollapsible
+    ? 'w-full'
+    : 'w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8'
+
   return (
-    <section className="w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+    <Wrapper className={wrapperClassName}>
       <div className="mb-4 flex items-start gap-3">
         <div className="rounded-full bg-red-50 p-2 text-red-600">
           <Vote className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-bold md:text-2xl">Community vote</h2>
+            {!embedInCollapsible && (
+              <h2 className="text-xl font-bold md:text-2xl">Community vote</h2>
+            )}
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                 votingOpen
@@ -364,6 +374,6 @@ export default function EventVotingPanel({
           </p>
         </div>
       </div>
-    </section>
+    </Wrapper>
   )
 }
