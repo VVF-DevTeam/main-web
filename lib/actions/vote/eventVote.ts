@@ -92,10 +92,13 @@ export async function getPublicEventVote(
 
   if (!vote || !vote.isEnabled) return null
 
+  const ballots = vote.ballots ?? []
+  const options = vote.options ?? []
+
   const session = await auth()
   const userId = session?.user?.id ?? null
   const deviceToken = await readVoterDeviceToken()
-  const mine = vote.ballots.filter(
+  const mine = ballots.filter(
     (ballot) =>
       (userId !== null && ballot.userId === userId) ||
       (deviceToken !== null && ballot.deviceToken === deviceToken)
@@ -110,10 +113,13 @@ export async function getPublicEventVote(
   const votingOpen = isVotingOpen(vote.votingStartsAt, vote.votingEndsAt, now)
 
   const counts = new Map<string, number>()
-  for (const option of vote.options) counts.set(option.id, 0)
-  for (const ballot of vote.ballots) {
+  for (const option of options) counts.set(option.id, 0)
+  for (const ballot of ballots) {
     counts.set(ballot.optionId, (counts.get(ballot.optionId) || 0) + 1)
   }
+
+  const minSelections = vote.minSelections ?? 1
+  const maxSelections = vote.maxSelections ?? 1
 
   return {
     id: vote.id,
@@ -121,20 +127,20 @@ export async function getPublicEventVote(
     question: vote.question,
     description: vote.description,
     allowChangeVote: vote.allowChangeVote,
-    minSelections: vote.minSelections,
-    maxSelections: vote.maxSelections,
+    minSelections,
+    maxSelections,
     votingStartsAt: vote.votingStartsAt,
     votingEndsAt: vote.votingEndsAt,
     votingStatus,
     isVotingOpen: votingOpen,
-    totalVotes: vote.ballots.length,
-    options: vote.options.map((option) => ({
+    totalVotes: ballots.length,
+    options: options.map((option) => ({
       id: option.id,
       label: option.label,
       position: option.position,
       voteCount: counts.get(option.id) || 0,
     })),
-    ballots: vote.ballots.map((ballot) => ({
+    ballots: ballots.map((ballot) => ({
       id: ballot.id,
       optionId: ballot.optionId,
       optionLabel: ballot.option.label,
@@ -144,7 +150,7 @@ export async function getPublicEventVote(
     })),
     mySelections: mine.length
       ? {
-          optionIds: vote.options
+          optionIds: options
             .map((option) => option.id)
             .filter((id) => mine.some((ballot) => ballot.optionId === id)),
           nickname: mine.find((ballot) => ballot.nickname)?.nickname ?? null,
@@ -318,9 +324,36 @@ export type CastVoteInput = {
   nickname?: string
 }
 
-export async function castEventVote(input: CastVoteInput) {
+/** Pre–multi-select clients sent a single optionId */
+type LegacyCastVoteInput = {
+  eventId: string
+  optionId?: string
+  nickname?: string
+}
+
+function resolveCastOptionIds(
+  input: CastVoteInput | LegacyCastVoteInput
+): string[] {
+  if ('optionIds' in input && Array.isArray(input.optionIds)) {
+    return input.optionIds
+  }
+  if ('optionId' in input) {
+    const legacy = input.optionId?.trim()
+    if (legacy) return [legacy]
+  }
+  return []
+}
+
+export async function castEventVote(
+  input: CastVoteInput | LegacyCastVoteInput
+) {
+  const eventId = input.eventId?.trim()
+  if (!eventId) {
+    return { success: false as const, error: 'Invalid event' }
+  }
+
   const vote = await prisma.eventVote.findUnique({
-    where: { eventId: input.eventId },
+    where: { eventId },
     include: { options: true },
   })
 
@@ -339,11 +372,13 @@ export async function castEventVote(input: CastVoteInput) {
     }
   }
 
+  const minSelections = vote.minSelections ?? 1
+  const maxSelections = vote.maxSelections ?? 1
   const selection = validateCastSelection(
-    input.optionIds,
+    resolveCastOptionIds(input),
     vote.options.map((option) => option.id),
-    vote.minSelections,
-    vote.maxSelections
+    minSelections,
+    maxSelections
   )
   if (!selection.ok) {
     return { success: false as const, error: selection.error }

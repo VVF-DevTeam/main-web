@@ -50,6 +50,11 @@ describe('validateCastSelection', () => {
   test('rejects an option that is not on the poll', () => {
     expect(validateCastSelection(['a', 'nope'], options, 1, 2).ok).toBe(false)
   })
+
+  test('treats missing optionIds as empty (no throw)', () => {
+    expect(validateCastSelection(undefined, options, 1, 2).ok).toBe(false)
+    expect(validateCastSelection(null, options, 1, 1).ok).toBe(false)
+  })
 })
 
 describe('selectionRequirementLabel', () => {

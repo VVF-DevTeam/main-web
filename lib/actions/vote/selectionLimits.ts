@@ -50,13 +50,14 @@ export function selectionRequirementLabel(
 }
 
 export function validateCastSelection(
-  optionIds: string[],
-  validOptionIds: string[],
+  optionIds: string[] | undefined | null,
+  validOptionIds: string[] | undefined | null,
   minSelections: number,
   maxSelections: number
 ): { ok: true; optionIds: string[] } | { ok: false; error: string } {
-  const unique = [...new Set(optionIds.filter((id) => id.trim().length > 0))]
-  const valid = new Set(validOptionIds)
+  const ids = Array.isArray(optionIds) ? optionIds : []
+  const unique = [...new Set(ids.filter((id) => id.trim().length > 0))]
+  const valid = new Set(Array.isArray(validOptionIds) ? validOptionIds : [])
   if (unique.some((id) => !valid.has(id))) {
     return { ok: false, error: 'Invalid option' }
   }
