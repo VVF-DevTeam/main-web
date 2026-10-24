@@ -13,6 +13,32 @@ import {
 } from '@/lib/actions/vote/eventVote'
 import { formatVotingWindowLabel } from '@/lib/actions/vote/votingWindow'
 import { selectionRequirementLabel } from '@/lib/actions/vote/selectionLimits'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
+
+const toastSuccessStyle = { color: '#22c55e' }
+const toastErrorStyle = { color: '#ef4444' }
+
+function showVoteSuccessToast(message: string) {
+  toast.success(message, {
+    description: (
+      <span style={{ color: 'var(--muted-foreground)' }}>
+        {getCurrentDateTime()}
+      </span>
+    ),
+    style: toastSuccessStyle,
+  })
+}
+
+function showVoteErrorToast(message: string) {
+  toast.error(message, {
+    description: (
+      <span style={{ color: 'var(--muted-foreground)' }}>
+        {getCurrentDateTime()}
+      </span>
+    ),
+    style: toastErrorStyle,
+  })
+}
 
 interface EventVotingPanelProps {
   eventId: string
@@ -108,7 +134,9 @@ export default function EventVotingPanel({
       return
     }
     if (selectedOptionIds.length >= vote.maxSelections) {
-      toast.error(`You can select at most ${vote.maxSelections} options`)
+      showVoteErrorToast(
+        `You can select at most ${vote.maxSelections} options`
+      )
       return
     }
     setSelectedOptionIds([...selectedOptionIds, optionId])
@@ -135,14 +163,16 @@ export default function EventVotingPanel({
         nickname: mode === 'nickname' ? nickname.trim() : undefined,
       })
       if (!result.success) {
-        toast.error(result.error || 'Vote failed')
+        showVoteErrorToast(result.error || 'Vote failed')
         return
       }
-      toast.success(result.changed ? 'Vote updated' : 'Vote submitted')
+      showVoteSuccessToast(
+        result.changed ? 'Vote updated' : 'Vote submitted'
+      )
       await reload(true)
     } catch (error) {
       console.error(error)
-      toast.error('Vote failed')
+      showVoteErrorToast('Vote failed')
     } finally {
       setSubmitting(false)
     }

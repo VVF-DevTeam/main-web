@@ -473,12 +473,39 @@ export async function castEventVote(
   return { success: true as const, changed: existing.length > 0 }
 }
 
-export async function deleteEventVote(eventId: string) {
+async function canManageEventVote(eventId: string): Promise<boolean> {
   const session = await auth()
   const roles = (session?.user?.role ?? []) as Role[]
   const canAdmin =
     roles.includes(Role.ADMIN) || roles.includes(Role.SUPERADMIN)
-  if (!canAdmin && !(await canAccessEventPaymentData(eventId))) {
+  if (canAdmin) return true
+  return canAccessEventPaymentData(eventId)
+}
+
+/** Removes all cast ballots; keeps poll question, options, and settings. */
+export async function resetEventVoteBallots(eventId: string) {
+  if (!(await canManageEventVote(eventId))) {
+    return { success: false as const, error: 'Unauthorized' }
+  }
+
+  const vote = await prisma.eventVote.findUnique({
+    where: { eventId },
+    select: { id: true },
+  })
+  if (!vote) {
+    return { success: false as const, error: 'No vote tool configured' }
+  }
+
+  const { count } = await prisma.eventVoteBallot.deleteMany({
+    where: { voteId: vote.id },
+  })
+
+  revalidateTag('events')
+  return { success: true as const, deletedCount: count }
+}
+
+export async function deleteEventVote(eventId: string) {
+  if (!(await canManageEventVote(eventId))) {
     return { success: false as const, error: 'Unauthorized' }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Event } from '@prisma/client'
 import { toast } from 'sonner'
 import { Plus, Trash2 } from 'lucide-react'
@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import {
   getEventVoteForAdmin,
+  resetEventVoteBallots,
   saveEventVote,
   deleteEventVote,
 } from '@/lib/actions/vote/eventVote'
@@ -18,7 +19,36 @@ import {
   parseDatetimeLocal,
   toDatetimeLocalValue,
 } from '@/lib/actions/vote/votingWindow'
+import { getCurrentDateTime } from '@/lib/actions/date/getCurrentDateTime'
 import Loader from '@/components/loader/Loader'
+
+const toastSuccessStyle = { color: '#22c55e' }
+const toastErrorStyle = { color: '#ef4444' }
+
+function showVoteToolSuccessToast(message: string) {
+  toast.success(message, {
+    description: (
+      <span style={{ color: 'var(--muted-foreground)' }}>
+        {getCurrentDateTime()}
+      </span>
+    ),
+    style: toastSuccessStyle,
+  })
+}
+
+function showVoteToolErrorToast(message: string, detail?: ReactNode) {
+  toast.error(message, {
+    description: (
+      <div className="flex flex-col gap-1">
+        {detail ? <span>{detail}</span> : null}
+        <span style={{ color: 'var(--muted-foreground)' }}>
+          {getCurrentDateTime()}
+        </span>
+      </div>
+    ),
+    style: toastErrorStyle,
+  })
+}
 
 interface EventVoteToolProps {
   event: Event
@@ -68,7 +98,7 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
         }
       } catch (error) {
         console.error(error)
-        toast.error('Failed to load vote settings')
+        showVoteToolErrorToast('Failed to load vote settings')
       } finally {
         setLoading(false)
       }
@@ -92,10 +122,10 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
         options,
       })
       if (!result.success) {
-        toast.error(result.error || 'Failed to save')
+        showVoteToolErrorToast(result.error || 'Failed to save')
         return
       }
-      toast.success('Vote tool saved')
+      showVoteToolSuccessToast('Vote tool saved')
       setHasVote(true)
       const refreshed = await getEventVoteForAdmin(event.id)
       if (refreshed) {
@@ -105,8 +135,35 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
         setBallotCount(refreshed._count.ballots)
       }
     } catch (error) {
-      toast.error(
+      showVoteToolErrorToast(
+        'Something went wrong',
         error instanceof Error ? error.message : 'Failed to save vote tool'
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const onResetBallots = async () => {
+    if (
+      !confirm(
+        `Clear all ${ballotCount} ballot${ballotCount === 1 ? '' : 's'}? The poll question, options, and settings will stay. Voters can submit again.`
+      )
+    ) {
+      return
+    }
+    setSaving(true)
+    try {
+      const result = await resetEventVoteBallots(event.id)
+      if (!result.success) {
+        showVoteToolErrorToast(result.error || 'Failed to reset votes')
+        return
+      }
+      setBallotCount(0)
+      showVoteToolSuccessToast(
+        result.deletedCount === 0
+          ? 'No ballots to clear'
+          : `Cleared ${result.deletedCount} ballot${result.deletedCount === 1 ? '' : 's'}`
       )
     } finally {
       setSaving(false)
@@ -127,7 +184,7 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
     try {
       const result = await deleteEventVote(event.id)
       if (!result.success) {
-        toast.error(result.error || 'Failed to delete')
+        showVoteToolErrorToast(result.error || 'Failed to delete')
         return
       }
       setHasVote(false)
@@ -141,7 +198,7 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
       setVotingEndsAt('')
       setOptions([{ label: '' }, { label: '' }])
       setBallotCount(0)
-      toast.success('Vote tool removed')
+      showVoteToolSuccessToast('Vote tool removed')
     } finally {
       setSaving(false)
     }
@@ -312,6 +369,16 @@ export default function EventVoteTool({ event }: EventVoteToolProps) {
         <Button type="button" disabled={saving} onClick={() => void onSave()}>
           {saving ? 'Saving…' : 'Save vote tool'}
         </Button>
+        {hasVote && ballotCount > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={saving}
+            onClick={() => void onResetBallots()}
+          >
+            Reset all votes
+          </Button>
+        )}
         {hasVote && (
           <Button
             type="button"
